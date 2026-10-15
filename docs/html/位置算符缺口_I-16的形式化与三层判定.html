@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>位置算符缺口：I-16 的形式化与「三层判定」</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>位置算符缺口：I-16 的形式化与「三层判定」</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 68 轮</strong>（2026-10-01）。核验脚本 <code>_posop_68.py</code>，<strong>PO-1…PO-9，9 项 0 失败</strong>。
+本轮的<strong>性质</strong>：<strong>形式化</strong>，不是新物理 —— I-16 登记时自己就写了「这是形式化问题、不是新物理」。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<blockquote>
+<p><strong>框架里「位置」有两个身份，但它从来不是「量子自由度」。</strong>
+因此「势阱型构型差」——<strong>化学键 / 相变潜热 / 电离能要的那种差</strong>——在框架里<strong>结构上不存在</strong>。</p>
+<p>⭐ <strong>缺口不在「位置」，也不在「能量」，而在「位置的量子化」。</strong></p>
+</blockquote>
+<p>这一点比第 56／60 轮的说法都更精确：框架<strong>确实有</strong>位置依赖的能量（§6.1 钉扎项），
+所以「框架没有位置」是<strong>错的</strong>；正确的陈述是「<strong>框架有位置依赖的能量，但位置是 c-数背景</strong>」。</p>
+<hr />
+<h2>二、命题（两级，先分清哪一版被证了）</h2>
+<p><strong>弱版（可逐条核验，✅ 已证）</strong></p>
+<blockquote>
+<p>框架的算符代数 𝒜 由 9 类生成元构成，<strong>没有一类的定义含坐标函数</strong>。</p>
+</blockquote>
+<p><strong>强版（结构定理，候选 ⚠️）</strong></p>
+<blockquote>
+<p>框架的态空间（衬底构型 ＋ 弦网通量）是<strong>有限维</strong>的，位置只是<strong>标号</strong>；
+框架<strong>唯一</strong>的连续位置出现在 <strong>c-数背景</strong>里（<code>Φ(x)</code> 及其导出的 <code>Φ(r) = −GM/r</code>）
+⟹ <strong>不存在「位置的量子态」</strong> ⟹ 不存在由量子态之差定义的<strong>势阱型构型差</strong>。</p>
+</blockquote>
+<p>⚠️ 强版依赖一个<strong>设定</strong>而非推导：「𝒜 就是全部」。见 §六 边界①。</p>
+<hr />
+<h2>三、判据与数值</h2>
+<h3>PO-1 引文清点（三列底本对照，铁律 20）</h3>
+<p>底本：第 60 轮前 / 第 67 轮前 / 当前稿。</p>
+<table>
+<thead>
+<tr>
+<th>类</th>
+<th>词条</th>
+<th>60 轮前</th>
+<th>67 轮前</th>
+<th>当前</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>缺口词</strong>（15 个）</td>
+<td>位置算符 / 坐标算符 / 相对位置 / 相对坐标 / 内坐标 / 势垒 / 有效势 / 双体 / 质心 / 约化质量 / 键角 / 方向依赖 / 平移不变 / 正则对易 / 势能面</td>
+<td><strong>0</strong></td>
+<td>0–1</td>
+<td>0–1</td>
+</tr>
+<tr>
+<td><strong>已有词</strong></td>
+<td>势阱</td>
+<td>0</td>
+<td>6</td>
+<td>6</td>
+</tr>
+<tr>
+<td></td>
+<td>构型空间</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+</tr>
+<tr>
+<td></td>
+<td>各向同性</td>
+<td>38</td>
+<td>38</td>
+<td>38</td>
+</tr>
+<tr>
+<td></td>
+<td>钉扎</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td></td>
+<td>m_eff</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>15 个几何构型词条在第 60 轮前全部 0 处</strong>；而「钉扎 / m_eff / 各向同性」是框架<strong>原有</strong>语言。
+（「势阱」从 0→6 是第 60／62 轮<strong>我自己写进去的</strong>，正是铁律 18 的元文本污染。）</p>
+<h3>PO-2 算符代数 𝒜 的生成元：9 类、0 个含坐标</h3>
+<table>
+<thead>
+<tr>
+<th>算符</th>
+<th>定义</th>
+<th>作用对象</th>
+<th>本征值</th>
+<th>含坐标函数？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>A_v</code></td>
+<td><code>Π_{e∋v} X_e</code></td>
+<td>固定顶点 v 的关联边</td>
+<td>±1</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><code>B_p</code></td>
+<td><code>Π_{e∈∂p} Z_e</code></td>
+<td>固定面 p 的边界边</td>
+<td>±1</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><code>X_f</code> / <code>Z_f</code></td>
+<td>边上的 Pauli</td>
+<td>固定边 f</td>
+<td>±1</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><code>A_c</code></td>
+<td><code>Π_{f⊂∂c} Z_f</code></td>
+<td>固定立方体 c</td>
+<td>±1</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><code>σ_j</code> / <code>M_a</code></td>
+<td>tick 置换</td>
+<td>全体格点的<strong>重排</strong></td>
+<td>置换</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><code>Π_μ</code>（Clifford）</td>
+<td>相遇—湮灭非交换投影</td>
+<td>事件（内部）</td>
+<td>投影</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><code>C</code>（Hadamard）</td>
+<td>量子游走硬币</td>
+<td>内部（coin）</td>
+<td>±1</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><code>S</code>（条件位移）</td>
+<td><code>U = S(C⊗I)</code> 的位移</td>
+<td>格点→相邻格点</td>
+<td><strong>准动量</strong></td>
+<td><strong>无</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 𝒜 的元素是<strong>格点指标的组合函数</strong>，不是坐标的函数。</p>
+<h3>PO-3 ⭐ 「位置」在衬底层只有个位数等价类（数值）</h3>
+<p>用<strong>完整 tick 群</strong>算<strong>无序点对</strong>的轨道（BFS 中规范化为 min/max）：</p>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th>无序对</th>
+<th><strong>δ 类数</strong></th>
+<th><strong>完整轨道数</strong></th>
+<th><code>(N/4)²</code></th>
+<th>N / 轨道数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td>28</td>
+<td><strong>7</strong></td>
+<td><strong>7</strong></td>
+<td>4</td>
+<td>1.14</td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>16</td>
+<td>120</td>
+<td><strong>8</strong></td>
+<td><strong>9</strong></td>
+<td>16</td>
+<td>1.78</td>
+</tr>
+<tr>
+<td>(2,2,6)</td>
+<td>24</td>
+<td>276</td>
+<td><strong>8</strong></td>
+<td><strong>10</strong></td>
+<td>36</td>
+<td>2.40</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>δ 类数的上限恒为 8</strong>（= <code>|(Z₂)³|</code>），<strong>与 N 无关</strong>（只要每个奇偶类 ≥2 个点）—— 这是<strong>严格的组合事实</strong>。</li>
+<li><strong>N 涨 3 倍，轨道数只涨 1.43 倍</strong> ⟹ 位置的分辨率被压到个位数。</li>
+<li>⭐ <strong>交叉验证（铁律 37）</strong>：<strong>全部</strong> tick 置换（去重 3 / 18 个）与<strong>化简</strong>生成元（3 / 7 个）
+  给出<strong>完全相同的</strong>轨道数（7 / 9）⟹ 排除「生成元化简出错」。</li>
+</ul>
+<blockquote>
+<p>⚠️ <strong>由此查出一处更正（C-10）</strong>：论文第 425 行（第 40 轮块）写
+「<strong>点对恰有 8 条轨道</strong>」—— <strong>实测是 7（N=8）/ 9（N=16）/ 10（N=24），不是 8</strong>。
+正确表述要分两半：
+· 「<strong>不变量 δ 的取值数</strong> ≤ 8」✓ <strong>对</strong>；
+· 「<strong>轨道数</strong> = 8」✗ <strong>错</strong>（N=16 时 δ <strong>不完备</strong> —— 8 个 δ 值被细分成 9 条轨道）；
+· 而同句的 <strong><code>|O₂| = (N/4)²</code></strong> ✓ <strong>全对</strong>（N=8→4；N=16→16，与实测逐位吻合）。</p>
+</blockquote>
+<h3>PO-4 ⚠️ 反例一：<strong>框架有</strong>位置依赖的能量（必须承认）</h3>
+<p>§6.1 作用量（第 949 行）含<strong>钉扎项</strong> <code>gΦψ̄ψ</code>，第 951 行明写：</p>
+<blockquote>
+<p>「环境依赖有效质量 <strong><code>m_eff(x) = m + gΦ(x)</code></strong> ——『粒子被风暴钉住』」</p>
+</blockquote>
+<p>⟹ 粒子能量 <code>E ≈ m_eff(x)·c²</code> <strong>依赖位置 x</strong>。这是<strong>真的</strong>「位置 × 能量」耦合。
+⟹ <strong>判据不能是「有没有位置依赖的能量」</strong>，必须是「<strong>位置是不是量子自由度</strong>」。</p>
+<h3>PO-5 ⚠️ 反例二：引力 <code>Φ(r)</code></h3>
+<p>§4.1（第 145–147 行）：</p>
+<blockquote>
+<p>「质量 M 的物体『吞』通量，产生稳态亏损。无源区通量亏损满足 <strong><code>∇²(δρ) = 0</code></strong>，
+球对称解 <strong><code>δρ ∝ 1/r</code></strong>；由时间分量匹配牛顿势」</p>
+</blockquote>
+<p>⟹ 位置依赖来自<strong>连续场方程</strong>（PDE）：<code>δρ</code> 是<strong>连续密度</strong>（粗粒化量，不是算符）、
+<code>r</code> 是<strong>经典自变量</strong>、结果 <code>Φ(r)</code> 是 <strong>c-数背景场</strong>，<strong>不经由 𝒜</strong>。</p>
+<h3>PO-6 ⭐ 判据核心：非交换化把「什么」非交换化了？</h3>
+<p>§7.2（第 991 行）原文：</p>
+<blockquote>
+<p>「把<strong>事件流状态</strong>从经典概率分布（交换代数 <code>L^∞</code>）升级为<strong>算子代数</strong>（C* 代数），
+『<strong>相遇—湮灭</strong>』事件对应非交换投影算子（Clifford 型 <code>{Π_μ, Π_ν} ≠ 0</code>）」</p>
+</blockquote>
+<p>⟹ <strong>非交换化的对象是「事件算符」，不是「位置」。</strong></p>
+<p>三类位置算符的签名 — <strong>全部 0 处</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>签名</th>
+<th>处数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>位置算符 / 坐标算符</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>正则对易关系 <code>[x̂, p̂] = iℏ</code></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>变形量子化 / Moyal 星积</td>
+<td><strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⭐ 而第 1002 行量子游走的<strong>条件位移 <code>S</code></strong> 是<strong>晶格位移</strong>，其本征值是<strong>准动量</strong> ——
+<strong>正是 Noether 守恒量</strong>，不是位置算符。（这正是第 688 行自己写的：「空间平移 → 动量」给的是
+<strong>守恒量，不是势能面 <code>V(R)</code></strong>；且是<strong>格点背景的对称性</strong>。）</p>
+<h3>PO-7 ⭐ 定量：能量依赖「图距离」，不认识「欧氏距离」</h3>
+<p>弦势 <code>E_pair(d) = 2E_m + σ_m·d</code> 中的 d 是<strong>格点步数</strong>；立方格点上弦只能沿轴走 ⟹ <code>d = L1</code>。</p>
+<table>
+<thead>
+<tr>
+<th>位移 a</th>
+<th>L1（框架）</th>
+<th>L2（欧氏）</th>
+<th>框架给的 E</th>
+<th>真实 <code>V(r)</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(1,1,0)</td>
+<td><strong>2</strong></td>
+<td>1.4142</td>
+<td>∝ 2</td>
+<td>∝ 1/1.414</td>
+</tr>
+<tr>
+<td>(2,0,0)</td>
+<td><strong>2</strong></td>
+<td>2.0000</td>
+<td>∝ 2</td>
+<td>∝ 1/2.000</td>
+</tr>
+<tr>
+<td>(1,0,1)</td>
+<td><strong>2</strong></td>
+<td>1.4142</td>
+<td>∝ 2</td>
+<td>∝ 1/1.414</td>
+</tr>
+<tr>
+<td>(3,0,0)</td>
+<td>3</td>
+<td>3.0000</td>
+<td>∝ 3</td>
+<td>∝ 1/3.000</td>
+</tr>
+<tr>
+<td>(2,1,0)</td>
+<td>3</td>
+<td>2.2361</td>
+<td>∝ 3</td>
+<td>∝ 1/2.236</td>
+</tr>
+</tbody>
+</table>
+<p><strong>决定性的一组</strong>：<code>(1,1,0)</code> 与 <code>(2,0,0)</code> 的 <strong>L1 都是 2 ⟹ 框架给同一能量</strong>，
+而<strong>欧氏距离之比 = 2/√2 = 1.4142</strong>（差 <strong>41.4%</strong>）。</p>
+<p>⟹ <strong>框架的能量不认识欧氏距离</strong> ⟹ 同 L1 的<strong>所有方向退化</strong> ⟹ <strong>无键角</strong> ⟹ 无分子几何。</p>
+<h3>PO-8 势阱判据：<code>E_pair(d)</code> 恒单调</h3>
+<table>
+<thead>
+<tr>
+<th>耦合</th>
+<th>σ_m</th>
+<th><code>ΔE(d → d+1)</code></th>
+<th>单调性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>λ = 0.5</td>
+<td>0.21</td>
+<td>0.21</td>
+<td>单调不减 ✓</td>
+</tr>
+<tr>
+<td>λ = 1.0</td>
+<td>1.09</td>
+<td>1.09</td>
+<td>单调不减 ✓</td>
+</tr>
+<tr>
+<td>λ = 2.0</td>
+<td>3.04</td>
+<td>3.04</td>
+<td>单调不减 ✓</td>
+</tr>
+<tr>
+<td>λ = 0（严格 deconfined）</td>
+<td>0.00</td>
+<td><strong>0.00</strong></td>
+<td><strong>平坦</strong>（仍无极小）✓</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>判据方向（铁律 4）</strong>：要问的不是「<code>E = f(d)</code> 是不是等式」，而是
+<strong>「<code>E(d)</code> 是否存在极小」</strong> —— 束缚态 ⟺ 势阱；<strong>单调（或平坦）⟹ 无极小 ⟹ 结构上不可能</strong>。</p>
+<hr />
+<h2>四、三层判定表（本轮主结论）</h2>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>位置</th>
+<th>能量</th>
+<th>哪类数</th>
+<th>能否做「两态之差」</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>衬底层</strong>（tick 置换）</td>
+<td>✅ 但只 <strong>8 个 (Z₂)³ 类</strong></td>
+<td>❌</td>
+<td><strong>q-数</strong>（置换）</td>
+<td>❌ 无能量</td>
+</tr>
+<tr>
+<td><strong>弦网层</strong>（<code>A_v</code> / <code>B_p</code>）</td>
+<td>❌（态是通量 <code>Z_f</code>）</td>
+<td>✅</td>
+<td><strong>q-数</strong>（矩阵）</td>
+<td>❌ 无位置</td>
+</tr>
+<tr>
+<td><strong>场论层</strong>（§6.1 作用量）</td>
+<td>✅ 连续 x</td>
+<td>✅ <code>gΦ(x)ψ̄ψ</code></td>
+<td><strong>c-数</strong></td>
+<td>❌ 位置不可叠加</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⭐ <strong>三层里没有一层同时满足「有位置 ＋ 有能量 ＋ 位置是 q-数」。</strong></p>
+</blockquote>
+<hr />
+<h2>五、⭐ 闭环：这同时解释了第 61 轮的「精确化」</h2>
+<p>第 61 轮留下的一句：</p>
+<blockquote>
+<p>框架能做「<strong>测试粒子在外源场中</strong>」（引力侧有 <code>Φ(r) = −GM/r</code>），
+不能做「<strong>两个可比质量物体的排布</strong>」。</p>
+</blockquote>
+<p><strong>本轮给出它的结构原因</strong>：</p>
+<ul>
+<li>「测试粒子在外源场中」= <strong>钉扎项 <code>gΦ(x)ψ̄ψ</code> 的单粒子版</strong> —— x 是<strong>给定的背景</strong>（c-数）✓ 能做；</li>
+<li>「两个可比质量物体的排布」需要<strong>位置本身是 q-数</strong>（可叠加、可比较两个构型的能量）✗ 缺。</li>
+</ul>
+<p>⟹ <strong>两者是同一条结构性质的正面与反面。</strong> 第 61 轮是从<strong>观测侧</strong>归纳的，本轮是从<strong>算符侧</strong>推出的。</p>
+<hr />
+<h2>六、诚实边界（五条）</h2>
+<ol>
+<li><strong>强版依赖一个设定，不是推导</strong>：「𝒜 就是框架的全部算符」是<strong>当前的清单</strong>，
+   不是从公理 1–4 推出的。⟹ 命题的地位是「<strong>相对 v2.9 成立的结构定理（候选）</strong>」，
+   <strong>不是公理级命题</strong>。I-16 原问句是「能否形式化为<strong>公理级</strong>命题」——
+   本轮的回答是：<strong>能形式化，但只能到「结构定理」这一级</strong>。</li>
+<li><strong>若把 Φ 量子化，命题会被打破</strong>：只要有人把引力侧也提升为算符（<code>Φ̂(x)</code>），
+   位置就获得了 q-数身份。本轮的诚实结论应是
+   「<strong>框架的引力量子化之日，就是这条边界消失之时</strong>」。</li>
+<li><strong>充分性 ≠ 必要性</strong>：证的是「<strong>在当前算符清单下不可能</strong>」（充分），
+   不是「在任何扩展下都不可能」（必要）。</li>
+<li><strong>框架「确实能」涌现出位置依赖</strong>（引力就是），所以本命题<strong>不是</strong>「框架没有位置」——
+   它的精确形式只是「<strong>位置与能量不在同一个「数」的层面上</strong>」。</li>
+<li><strong>不构成新成果的重复计数</strong>：第 1103 行已把「方向场的 Σ 指数 = χ」与「弦网的 <code>Π_v A_v = 1</code>」
+   登记为<strong>同一个拓扑守恒</strong>；本轮<strong>不涉及</strong>那条守恒，是<strong>另一条</strong>结构性质。
+   但也要写明：<strong>框架第 688 行（第 60 轮块）已有本命题的雏形</strong>，本轮是<strong>形式化 + 定量化 + 补两个反例</strong>，
+   <strong>不是首次提出</strong>。</li>
+</ol>
+<hr />
+<h2>七、判决</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>I-16</strong></td>
+<td><strong>✅ 已做（第 68 轮）</strong>：命题成立，弱版<strong>已证</strong>、强版为<strong>候选结构定理</strong>（受边界 1 限制）</td>
+</tr>
+<tr>
+<td>四类判定</td>
+<td><strong>不是</strong>真预言 / postdiction / 半拟合 —— 它是<strong>形式化</strong>（I-16 原登记就如此定性）</td>
+</tr>
+<tr>
+<td><strong>它同时解释</strong></td>
+<td>I-14（三类差）、N-16（化学储能）、N-18（储能容量）、N-19（电化学转换）、S-13（不覆盖储能）、<strong>以及「工程出口 = 0」</strong></td>
+</tr>
+<tr>
+<td>⚠️ 它<strong>不</strong>解释</td>
+<td>「孤子化」的机制（I-18）—— 那是另一个方向的缺口</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>八、顺带产出</h2>
+<ul>
+<li><strong>C-10（更正）</strong>：论文第 425 行「点对恰有 8 条轨道」不准确（实测 7 / 9 / 10）；
+  同句的 <code>|O₂| = (N/4)²</code> 正确。</li>
+<li><strong>N-26（负面）</strong>：把「钉扎项 <code>gΦ(x)ψ̄ψ</code>」当作「框架有位置算符」的证据 ——
+  它给出的是 <strong>c-数背景</strong>里的势能，<strong>不能与另一个构型做量子态之差</strong>。</li>
+</ul>
+<hr />
+<h2>九、下一步（候选）</h2>
+<ol>
+<li><strong>I-18（孤子化的机制）</strong> —— 第 67 轮暴露的最大缺口，且<strong>方向相反</strong>：
+   本轮证明「位置不是 q-数」，而孤子化问的是「平滑层从哪来」。两者合起来才是完整的底层图像。</li>
+<li><strong>两项便宜的数值核查（积压）</strong>：论文 §5.7 的「能隙 Δ = 1」（候选池 41）；
+   <code>ε ~ 10⁻⁵⁰</code> 的来源（第 0 批遗留）。</li>
+<li><strong>候选池 36</strong>：S-12 与 ΛCDM 的判别点（找不出 ⟹ 登记「框架不覆盖宇宙学判别」）。</li>
+</ol>
+
+<div class="footer">位置算符缺口：I-16 的形式化与「三层判定」 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 位置算符缺口_I-16的形式化与三层判定.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

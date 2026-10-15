@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>甲-4 结项：麦克斯韦谱「严格化」—— 恒等式验证（C-67）与二阶各向同性定理</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>甲-4 结项：麦克斯韦谱「严格化」—— 恒等式验证（C-67）与二阶各向同性定理</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 103 轮</strong> ｜ 2026-10-04 ｜ 核验脚本 <code>_maxwell_103.py</code>（<strong>MW-1 … MW-10，25 项 0 失败</strong>）
+<strong>任务来源</strong>：第 99 轮四源清点「甲-4」= §10.2#13 的最后一个开放项「<strong>麦克斯韦谱严格验证</strong>」。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p><strong>论文里的「数值验证 C」是两处独立的空转</strong>（<code>ω/k = 1.0000</code> 是变量直接赋值；<code>ω/|k| = 0.9999</code> 是长波泰勒展开），
+<strong>它不验证框架的任何命题</strong>（推导链里框架特有元素 <strong>0 个</strong>）；
+但同一轮可以把真正有内容的部分<strong>严格化</strong>：<strong>长波极限的误差有方向无关的显式上界</strong>，
+且 <strong>「光速各向同性」是立方对称的定理（不需要连续旋转）</strong> —— 而<strong>四阶修正必然各向异性</strong>（格点伪影）。</p>
+<p>⟹ <strong>判决：§10.2#13 的「麦克斯韦谱严格验证」结项为</strong> —— <strong>可严格化的部分已严格化（二阶 + 误差界），
+不可严格化的部分（全谱 / 连续极限）明确划界</strong>。</p>
+<hr />
+<h2>二、取证：论文的「数值验证 C」是什么</h2>
+<p>底本 = <code>论文初稿_..._备份_2026-10-04第103轮前.md</code>。</p>
+<p>论文同一小节（§5.8）里有两处：</p>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>原文</th>
+<th>出处脚本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1100（v1.29 段）</td>
+<td>光子色散 <strong>ω=|k|</strong>（<strong>ω/k=1.0000 验证</strong>）</td>
+<td><code>_u1_spin2.py</code> L70–72</td>
+</tr>
+<tr>
+<td>L1121（v1.30 段）</td>
+<td>格点色散 ω(k)=2√(Σsin²(k/2))，长波 <strong>ω/|k|=0.9999</strong></td>
+<td><code>_z2u1_spin2_4d.py</code> L43–50</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两处相距 21 行（同属 §5.8），却给了不同的数</strong> —— 而它们<strong>都不构成验证</strong>：</p>
+<h3>⚠️ C-67（本轮核心负面产出）：两处独立的空转</h3>
+<p><strong>(A1) <code>ω/k = 1.0000</code> 是恒等式。</strong> <code>_u1_spin2.py</code> 第 70 行原文：</p>
+<pre><code class="language-python">omega = k  # ω=|k| 无质量光子
+...
+print(f&quot;    验证: ω/k = {omega[5]/k[5]:.4f} ≈ 1 (所有 k) ⟹ 线性色散 ✓&quot;)
+</code></pre>
+<p>变量 <code>omega</code> 被<strong>直接赋值为 <code>k</code></strong>，然后验证 <code>omega/k == 1</code> —— 这是 <code>x/x = 1</code>。<strong>零内容。</strong></p>
+<p><strong>(A2) <code>0.9999</code> 是长波泰勒展开的舍入值。</strong> <code>_z2u1_spin2_4d.py</code> 只打印 4 位小数：</p>
+<pre><code>k = 0.05 → ω = 2√(3sin²(k/2)) = 0.086593519562
+           |k| = √3·k          = 0.086602540378
+           ω/|k|               = 0.999895836588  →  打印 0.9999
+</code></pre>
+<p>而 <code>ω/|k| = 2sin(k/2)/k = 1 − k²/24 + O(k⁶)</code> —— <strong>论文的 0.9999 就是 <code>1 − 0.05²/24</code> 的四舍五入</strong>。</p>
+<p>⚠️ <strong>附带发现：该脚本两个约定混用</strong> —— <code>w_k</code> 里的 <code>k</code> 当<strong>分量</strong>、<code>k_abs = √3·k</code> 当<strong>沿方向</strong>的模，
+两者口径不一致（严格应为 <code>sinc(k/(2√3)) = 1 − k²/72</code>，而不是 <code>1 − k²/24</code>）。</p>
+<p><strong>(A3) 框架内容 = 0。</strong> 逐项清点色散公式的推导链：</p>
+<table>
+<thead>
+<tr>
+<th>实际用到的输入</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>离散 Laplace 算子 ∇²_lat 的定义</td>
+<td>格点场论标准</td>
+</tr>
+<tr>
+<td>高斯积分（线性化 cos θ ≈ 1 − θ²/2）</td>
+<td>初等微积分</td>
+</tr>
+<tr>
+<td>sin x ≈ x（长波）</td>
+<td>泰勒展开</td>
+</tr>
+</tbody>
+</table>
+<p>看似相关、<strong>实际不进入推导</strong>的框架元素：Z₂ ⊂ U(1) 群嵌入（群论事实）、Villain 紧致化（标准结果）、
+弦网配对阶数 n = 1（只定「涌现 U(1)」而非色散）、衬底立方几何（<strong>只影响四阶伪影</strong>）。</p>
+<p>⟹ <strong>「长波 ω=|k|」不是框架的预言</strong>，而是<strong>任何</strong>格点规范理论的共同性质。
+框架对它的全部贡献 = <strong>把格点选成简单立方</strong>（第 30 轮 T-6），且该选择<strong>只影响四阶</strong>。</p>
+<hr />
+<h2>三、严格化（本轮的正面增量）</h2>
+<h3>3.1 定理（MW-3）：方向无关的显式误差界</h3>
+<p>设三维立方格点（a = 1），<code>ω(k) = 2√(Σ_i sin²(k_i/2))</code>，<code>0 &lt; |k| ≤ √12 = 3.4641</code>。则</p>
+<div class="formula">0  le  1 - <span class="frac"><span class="num">ω(k)</span><span class="den">|k|</span></span>  le  1 - <span class="sqrt">√<span class="radicand">1 - <span class="frac"><span class="num">k<sup>2</sup></span><span class="den">12</span></span></span></span>  le  <span class="frac"><span class="num">k<sup>2</sup></span><span class="den">12</span></span>,</div>
+
+<p>且上界的<strong>最坏方向是 [100] 型</strong>（只有一个分量非零），该处界<strong>紧</strong>。</p>
+<p><strong>证明</strong>：
+1. <code>|sin y| ≤ |y|</code> ⟹ <code>4sin²(x/2) ≤ x²</code> ⟹ 逐分量求和给 <code>ω² ≤ k²</code>（左边不等式）；
+2. 对 <code>0 ≤ y ≤ π/2</code>：<code>sin y ≥ y − y³/6</code>（因 <code>d/dy[sin y − y + y³/6] = cos y − 1 + y²/2 ≥ 0</code>）
+   与 <code>|sin y| ≤ y</code> 得 <code>sin²y ≥ y²(1 − y²/6)² = y²(1 − y²/3 + y⁴/36) ≥ y² − y⁴/3</code>
+   ⟹ <code>4sin²(x/2) ≥ x² − x⁴/12</code>；
+3. <code>Σ_i k_i⁴ ≤ (Σ_i k_i²)² = k⁴</code>（交叉项 <code>2Σ_{i&lt;j}k_i²k_j² ≥ 0</code>）
+   ⟹ <code>ω² ≥ k² − k⁴/12 = k²(1 − k²/12)</code> ⟹ <code>ω ≥ |k|√(1 − k²/12)</code>；
+4. <code>1 − √(1−ε) = ε/(1+√(1−ε)) ≤ ε</code> ⟹ 结论。∎</p>
+<p><strong>数值验证</strong>（MW-3）：7 个 <code>|k|</code> × 400 个随机方向 = <strong>2800 个点</strong>，
+<code>max(实测偏差/界) =</code> <strong>99.59%</strong> ⟹ 界成立且<strong>接近紧</strong>；最坏方向确为 <code>[±0.006, 1.000, 0]</code>（= [100] 型）✓</p>
+<p>⟹ <strong>这是对「长波 ω→|k|」的真正严格化</strong>：不再依赖「数值看上去是 0.9999」，
+而是对<strong>任意方向、任意 <code>0&lt;|k|≤√12</code></strong> 给出<strong>定量</strong>上界。</p>
+<h3>3.2 各向同性的<strong>分层</strong>结论（MW-5 / MW-6）</h3>
+<p>用立方群 <code>O_h</code>（48 元 = 6 坐标置换 × 8 符号翻转）的<strong>表示论</strong>判定：</p>
+<table>
+<thead>
+<tr>
+<th>阶</th>
+<th>空间</th>
+<th><code>O_h</code> 不变子空间维数</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>二阶</strong></td>
+<td><code>Sym²(T₁)</code>（6 维：xx,yy,zz,xy,xz,yz）</td>
+<td><strong>1</strong></td>
+<td>⟹ 任何 <code>O_h</code> 不变的二次作用量必为 <code>M_ij = c·δ_ij</code> ⟹ <strong>光速 c 自动各向同性</strong> —— <strong>定理</strong></td>
+</tr>
+<tr>
+<td>四阶</td>
+<td><code>Sym⁴(T₁)</code>（15 维）</td>
+<td><strong>2</strong></td>
+<td>⟹ 四阶修正有<strong>两个</strong>独立不变量（<code>(k²)²</code> 与 <code>Σk_i⁴</code>），其比值依赖方向 ⟹ <strong>四阶必然各向异性</strong></td>
+</tr>
+<tr>
+<td>全阶</td>
+<td>—</td>
+<td>—</td>
+<td>各向同性<strong>只能靠连续极限</strong>（世界级；论文已诚实标注）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>二阶各向同性为什么是定理</strong>：<code>Sym²(T₁)</code> 对 <code>O_h</code> 分解为 <code>A_1g ⊕ E_g ⊕ T_2g</code>，
+其中<strong>一维的只有 <code>A_1g</code></strong> ⟹ 不变子空间一维 ⟹ <code>M_ij ∝ δ_ij</code>。
+<strong>关键</strong>：只需要<strong>立方</strong>对称（不需要连续旋转）—— 这正好是格点能提供的全部对称性。</p>
+<p><strong>四阶各向异性为什么不可避免</strong>：<code>(k²)²</code> 与 <code>Σk_i⁴</code> 都在 <code>A_1g</code> 里（都 <code>O_h</code> 不变），
+但 <code>Σk_i⁴/(k²)²</code> 沿 [100] 为 <strong>1</strong>、沿 [111] 为 <strong>1/3</strong> ⟹ 比值依赖方向 ⟹ 任何一个不变量的组合都不各向同性。</p>
+<p><strong>数值印证</strong>（MW-4）—— <code>ω²/k² = 1 − (1/12)·(Σk_i⁴/k⁴) + O(k⁴)</code>，四阶系数：</p>
+<table>
+<thead>
+<tr>
+<th>方向</th>
+<th><code>Σk_i⁴/k⁴</code></th>
+<th>数值系数</th>
+<th>解析</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>[100]</strong></td>
+<td>1</td>
+<td>0.0833322</td>
+<td><strong>1/12</strong>（偏差最大）</td>
+</tr>
+<tr>
+<td>[110]</td>
+<td>0.5</td>
+<td>0.0416664</td>
+<td>1/24</td>
+</tr>
+<tr>
+<td><strong>[111]</strong></td>
+<td>1/3</td>
+<td>0.0277777</td>
+<td><strong>1/36</strong>（偏差最小）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>[100] 与 [111] 差 3 倍</strong> ⟹ 格点色散在四阶明确各向异性。</p>
+<hr />
+<h2>四、反例与计数</h2>
+<table>
+<thead>
+<tr>
+<th>检查</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MW-7</strong> <code>ω(π,π,π) = 2√3 = 3.4641</code> vs <code>\|k\| = π√3 = 5.4414</code></td>
+<td>比值 = <strong>2/π = 0.6366</strong>，与 1 差 <strong>36%</strong> ⟹ <strong>「ω=|k|」全谱在格点上不成立</strong>；且 <code>ω</code> 是 BZ <strong>周期函数</strong> ⟹ 与连续 <code>\|k\|</code> 比较<strong>只在长波有意义</strong></td>
+</tr>
+<tr>
+<td><strong>MW-8</strong> 横向自由度</td>
+<td><code>k·ε = 0</code> 的零空间维数 = <strong>3 − 1 = 2</strong>（纯代数）；⚠️ 格点上实际有 <strong>3 支</strong>（2 横 + 1 纵），纵向模在库仑相不传播 —— 其消失同样依赖连续极限</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>五、判决</h2>
+<table>
+<thead>
+<tr>
+<th>命题</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「长波 ω→|k|」</td>
+<td>✅ <strong>已严格化</strong></td>
+<td>MW-3 的显式界（2800 点验证，紧度 99.6%）</td>
+</tr>
+<tr>
+<td>「光速 c 各向同性」</td>
+<td>✅ <strong>定理</strong>（只需立方对称）</td>
+<td>MW-5：<code>Sym²</code> 的 <code>A_1g</code> 一维</td>
+</tr>
+<tr>
+<td>「四阶无各向异性」</td>
+<td>❌ <strong>假</strong>（格点伪影）</td>
+<td>MW-6：[100] vs [111] 差 3 倍</td>
+</tr>
+<tr>
+<td>「ω=|k| 全谱」</td>
+<td>❌ <strong>格点上假</strong></td>
+<td>MW-7：BZ 边界差 36%</td>
+</tr>
+<tr>
+<td>「数值验证 C」</td>
+<td>❌ <strong>降级为恒等式</strong>（<strong>C-67</strong>）</td>
+<td>MW-1／MW-2：赋值 + 泰勒</td>
+</tr>
+<tr>
+<td>框架对麦克斯韦谱的<strong>独有</strong>贡献</td>
+<td><strong>0</strong></td>
+<td>MW-10：推导链里框架元素 0 个</td>
+</tr>
+<tr>
+<td>连续极限严格化</td>
+<td>⏹️ <strong>世界级，不声称</strong></td>
+<td>论文已标注</td>
+</tr>
+</tbody>
+</table>
+<p><strong>§10.2#13 的「麦克斯韦谱严格验证」由此收口</strong>：
+第 ③ 环（光子色散）从「✅ 数值（定理 C）」<strong>降级为「⚠️ 恒等式（C-67）＋ ✅ 长波严格化（二阶各向同性定理）」</strong>。</p>
+<hr />
+<h2>六、诚实边界（必须一起读）</h2>
+<ol>
+<li><strong>本轮的正面产出是「把一条恒等式换成一条定理」，不是新物理。</strong> 二阶各向同性在任何晶格场论教科书里都有（Bloch 定理 + 立方点群的二次不变量），本轮的价值在于<strong>把它写成框架能用的形式并给出显式的、方向无关的误差界</strong>，且<strong>逐项验证了它不依赖框架</strong>。</li>
+<li><strong>框架的麦克斯韦谱内容 = 0</strong>（MW-10）。若论文要声称「涌现麦克斯韦」，<strong>唯一非平凡的一环是「连续极限」</strong>（世界级），其余（长波线性色散、2 个横向极化）<strong>是所有格点规范理论的共同性质</strong>。</li>
+<li><strong>界只在 <code>|k| ≤ √12</code> 内声明</strong> —— BZ 内 <code>|k|</code> 最大 <code>π√3 = 5.441</code>，超出部分本就不是长波。</li>
+<li><strong>MW-8 的「3 支 → 2 支」依赖连续极限</strong>，与 MW-6 是同一个缺口的两面，<strong>不得</strong>写成「框架推出 2 个横向极化」。</li>
+<li>本轮<strong>未</strong>验证：<code>ω</code> 的高阶（六阶及以上）系数、非立方格点的情形、以及「自旋 2」那条线（属另一议题，第 54 轮已判该特征不判别）。</li>
+</ol>
+<hr />
+<h2>七、下一步</h2>
+<p>§10.2#13 剩下三项，全部为<strong>世界级</strong>（论文已诚实标注，不声称）：
+① Z₂→U(1) 连续极限的<strong>重整化群严格化</strong>（第 80 轮已把 R1–R3 严格化、R4/R5 明确划界）；
+② 4D 无质量自旋 2 场论涌现；
+③ 4D YM 质量隙。</p>
+<p>⟹ <strong>甲-4 结项后，甲类（环境已就绪、纯本地、判据硬）只剩 甲-5（N2 的 4π 相位锁定相容性方程，§10.2#7）</strong>。</p>
+
+<div class="footer">甲-4 结项：麦克斯韦谱「严格化」—— 恒等式验证（C-67）与二阶各向同性定理 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 甲4结项_麦克斯韦谱_恒等式验证与二阶各向同性定理.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

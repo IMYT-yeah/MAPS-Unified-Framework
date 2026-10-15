@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>甲-2 结项：`λ_c(∞)` 仍未定位 —— 判据分辨率不足的量化，与 A1 结论的更正</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、结论（先说）</div>
+  <h1>甲-2 结项：`λ_c(∞)` 仍未定位 —— 判据分辨率不足的量化，与 A1 结论的更正</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 101 轮</strong>（2026-10-03）｜任务来源：第 99 轮四源清点点选的「甲-2」
+｜判据（原定）：χ 峰随尺寸收敛（已有 λ_χ≈0.21–0.23，<strong>L=3 盒子待做</strong>）
+｜脚本：<code>_lc3d_box_fast.py</code>（求解器）／<code>_lc3d_run_101.py</code>（扫描）／<code>_lc3d_analyze.py</code>（判据）／<code>_lc3d_chitest.py</code>（χ 收敛）</p>
+</blockquote>
+<hr />
+<h2>一、结论（先说）</h2>
+<p><strong>本轮没能定位 <code>λ_c(∞)</code>，并且给出了它为什么难定位的量化证据。更重要的：本轮推翻了 A1 报告的 <code>λ_c(∞) ∈ [0.21, 0.23]</code>。</strong></p>
+<table>
+<thead>
+<tr>
+<th>判据</th>
+<th>2×2×2 (L̄=2.00)</th>
+<th>3×2×2 (2.289)</th>
+<th>3×3×2 (2.621)</th>
+<th><strong>3×3×3 (3.00)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>J1 χ 峰（粗 0.05）</strong></td>
+<td>0.2425</td>
+<td>0.2459</td>
+<td>0.2826</td>
+<td><strong>0.3075</strong></td>
+</tr>
+<tr>
+<td><strong>J1 χ 峰（细）</strong></td>
+<td><strong>0.2348</strong>（0.0125）</td>
+<td><strong>0.2281</strong>（0.0125）</td>
+<td><strong>0.2572</strong>（0.02）</td>
+<td>未做</td>
+</tr>
+<tr>
+<td>↳ <strong>网格差</strong></td>
+<td>0.008</td>
+<td>0.018</td>
+<td><strong>0.025</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>J1s χ 峰（平滑，粗）</td>
+<td>0.2192</td>
+<td>0.2414</td>
+<td>0.2859</td>
+<td>0.4000（越界）</td>
+</tr>
+<tr>
+<td>J2 保真度磁化率峰（粗）</td>
+<td>0.2802</td>
+<td>0.2801</td>
+<td>0.3035</td>
+<td>0.3008</td>
+</tr>
+</tbody>
+</table>
+<p><strong>三条硬事实：</strong></p>
+<ol>
+<li><strong><code>λ_χ</code> 在粗网格上单调上升（0.2425 → 0.3075），但在细网格上不单调（0.2348 → 0.2281 → 0.2572），且两组数据在不同尺寸处给出相反的趋势</strong> ⟹ A1 报告说「两尺寸峰位无漂移 ⟹ λ_c(∞) ∈ [0.21, 0.23]」—— <strong>那是 2 点样本的假象</strong>；而且<strong>连"漂移方向"本身都依赖于扫描网格</strong>。</li>
+<li><strong>网格差本身随尺寸增大</strong>（0.008 → 0.018 → <strong>0.025</strong>）⟹ <strong>网格不确定度与尺寸漂移（~0.03）无法分离</strong> ⟹ 任何"尺寸漂移"的解读都被网格效应污染。</li>
+<li><strong>1/L̄ 外推给出荒谬值</strong>：6 个数据点线性外推 ⟹ <code>λ_c(∞) = 0.4361</code>（斜率 −0.4154）。这个值<strong>比全部数据点都大</strong>，而 λ=0.40 时 ⟨A_c⟩ 已降到 0.24（系统明显在无序侧）⟹ <strong>外推完全不成立</strong>。</li>
+</ol>
+<p><strong>⟹ 判据的可用性排序（本轮实测）：</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>判据</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅</td>
+<td><strong>⟨A_c⟩ 跨尺寸交叉点</strong></td>
+<td>集中在 <strong>0.32–0.34</strong>（8 组配对全部落在 0.279–0.344），且<strong>不需要数值微分</strong></td>
+</tr>
+<tr>
+<td>⚠️</td>
+<td>χ 峰</td>
+<td><strong>最不可靠</strong>：网格差随尺寸增大（0.008→0.025），粗/细给出相反趋势</td>
+</tr>
+<tr>
+<td>⚠️</td>
+<td>保真度磁化率</td>
+<td>对简并点/正交点敏感（λ≤0.05 处 F≈0 ⟹ 必须剔除）；网格差也大</td>
+</tr>
+<tr>
+<td>❌</td>
+<td>E0 二阶导</td>
+<td>峰始终落在区间边界（越界）—— 不可用</td>
+</tr>
+<tr>
+<td>❌</td>
+<td><strong>Binder 累积量</strong></td>
+<td><strong>恒等失效</strong>：<code>A_c² = I</code> ⟹ ⟨A²⟩≡1、⟨A⁴⟩≡1 ⟹ Binder ≡ 2/3（0 信息）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两个独立判据（χ 峰 @ L=3 的 0.3075、交叉点 0.32–0.34）都指向 <code>λ_c ≈ 0.31–0.34</code></strong>，<strong>远离</strong> 3D Ising 的 <code>β_c = 0.221654</code> —— 但 ⚠️ 见 <strong>C-62</strong>：两者<strong>不在同一个轴上，不能直接比较</strong>。</p>
+<hr />
+<h2>二、工程：让 3×3×3 从「不可行」变「可行」</h2>
+<h3>2.1 原求解器的瓶颈（诊断）</h3>
+<p><code>_lc3d_box.py::dmrg1</code> 在<strong>每个 site</strong> 都调用 <code>env_left_at</code> / <code>env_right_at</code>，二者各自<strong>从 0 重新缩并到底</strong> ⟹ 单 sweep 成本 <strong>O(n²)</strong> 次张量缩并。规模对比：</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>面数 n</th>
+<th>MPO bond D</th>
+<th>旧版可行？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×2×2</td>
+<td>36</td>
+<td>11</td>
+<td>✅（~1.8 s/sweep）</td>
+</tr>
+<tr>
+<td>3×2×2</td>
+<td>52</td>
+<td>15</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>3×3×2</td>
+<td>75</td>
+<td>21</td>
+<td>勉强</td>
+</tr>
+<tr>
+<td><strong>3×3×3</strong></td>
+<td><strong>108</strong></td>
+<td><strong>30</strong></td>
+<td>❌ 约 3 小时 / λ 点</td>
+</tr>
+</tbody>
+</table>
+<h3>2.2 两级优化</h3>
+<p>① <strong>环境增量推进</strong>：左环境在正向扫中逐步右推、右环境预建后缓存 ⟹ <strong>O(n²) → O(n)</strong>。
+② <strong>BLAS 化</strong>（第二轮才发现真正的瓶颈）：单 sweep 2×2×2 实测 <strong>2.10 s</strong>，而 142 次环境推移只需 0.04 s ⟹ <strong>瓶颈在 <code>build_heff1_dense</code></strong>。把它的两级收缩改成「先缩 n、再 BLAS matmul」，中间张量从 <code>(χ,2,χ,χ,2,χ)=16384</code> 降下来。</p>
+<p><strong>实测</strong>：2×2×2 单点 <strong>36.5 s → 12.9 s</strong>（2.8×）；3×3×3 单 sweep <strong>23.6 s → 约 8–10 s</strong>（<strong>从不可行变为 9 分钟/λ 点</strong>）。</p>
+<h3>2.3 验证（三道关，全过）</h3>
+<table>
+<thead>
+<tr>
+<th>检查</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BLAS vs 原版（含边界 <code>aL=1</code>）</td>
+<td>4 组全过，Δ ~ <strong>1e-13</strong></td>
+</tr>
+<tr>
+<td>2×1×1 对<strong>精确对角化</strong></td>
+<td>ΔE₀ = <strong>8.9e-16</strong>、Δ⟨A_c⟩ = 5.6e-16</td>
+</tr>
+<tr>
+<td>2×2×2 复现原报告 λ_χ</td>
+<td><strong>0.230</strong>（原 0.230）、χ_max <strong>3.076</strong>（原 3.08）、⟨A_c⟩ 逐点最大偏差 <strong>5e-5</strong></td>
+</tr>
+<tr>
+<td>跨系统自洽 <strong>E(λ=0) = −N_c</strong></td>
+<td><strong>四个尺寸全部精确成立</strong>：−8 / −12 / −18 / −27</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <strong>自己踩的一个真 bug</strong>（已修）：第一版 <code>push_left</code>/<code>push_right</code> 把 L（或 R）的两个 bond 都当成 χ，而<strong>边界位点 aL=1</strong>（<code>init_left</code> 是 <code>(1,1,D,D)</code>）⟹ 正向扫 <code>c=0</code> 时 reshape 直接崩。<strong>两个 bond 必须分开写</strong>（<code>aL = T.shape[0]</code>、<code>ar = T.shape[2]</code>）。</p>
+</blockquote>
+<hr />
+<h2>三、数据</h2>
+<h3>3.1 四个尺寸的 ⟨A_c⟩(λ)（统一网格 step 0.05，χ=8）</h3>
+<table>
+<thead>
+<tr>
+<th>λ</th>
+<th>2×2×2</th>
+<th>3×2×2</th>
+<th>3×3×2</th>
+<th><strong>3×3×3</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.00</td>
+<td>1.00000</td>
+<td>1.00000</td>
+<td>1.00000</td>
+<td>1.00000</td>
+</tr>
+<tr>
+<td>0.05</td>
+<td>0.98549</td>
+<td>0.98750</td>
+<td>0.99015</td>
+<td>0.99193</td>
+</tr>
+<tr>
+<td>0.10</td>
+<td>0.93444</td>
+<td>0.94122</td>
+<td>0.95550</td>
+<td>0.96376</td>
+</tr>
+<tr>
+<td>0.15</td>
+<td>0.84571</td>
+<td>0.85706</td>
+<td>0.89210</td>
+<td>0.91143</td>
+</tr>
+<tr>
+<td>0.20</td>
+<td>0.72859</td>
+<td>0.74846</td>
+<td>0.80246</td>
+<td>0.83477</td>
+</tr>
+<tr>
+<td>0.25</td>
+<td>0.58480</td>
+<td>0.62711</td>
+<td>0.68214</td>
+<td>0.73351</td>
+</tr>
+<tr>
+<td>0.30</td>
+<td>0.43516</td>
+<td>0.50390</td>
+<td><strong>0.46299</strong></td>
+<td>0.57637</td>
+</tr>
+<tr>
+<td>0.35</td>
+<td>0.35168</td>
+<td><strong>0.40292</strong></td>
+<td>0.31530</td>
+<td>0.31313</td>
+</tr>
+<tr>
+<td>0.40</td>
+<td>0.32387</td>
+<td>0.33048</td>
+<td>0.24918</td>
+<td>0.24324</td>
+</tr>
+</tbody>
+</table>
+<p><strong>读法</strong>：
+- <strong>λ ≤ 0.25</strong>：⟨A_c⟩ 随 L <strong>单调增大</strong>（大系统更有序）⟹ <strong>符合 λ &lt; λ_c</strong> 的预期 ✓
+- <strong>λ ≥ 0.35</strong>：随 L <strong>单调减小</strong> ⟹ <strong>符合 λ &gt; λ_c</strong> ✓
+- ⚠️ <strong>λ = 0.30 与 0.35 处出现非单调</strong>（3×3×2 的 0.46299 &lt; 3×2×2 的 0.50390；3×2×2 的 0.40292 反常偏高）—— <strong>而那正是 χ 峰所在区</strong> ⟹ 该区的数值已不可靠。</p>
+<h3>3.2 判定「λ_χ 不可外推」的三条证据</h3>
+<p><strong>(a) 峰位随尺寸单调上升（不收敛）</strong>
+<code>0.2425 → 0.2459 → 0.2826 → 0.3075</code>（L̄ = 2 → 3）。若按 L^{−1/ν}（ν=0.63）外推，<code>λ_c(∞)</code> 会给出 <strong>0.435</strong> —— 更荒谬。</p>
+<p><strong>(b) 峰位随网格漂移，且漂移量随尺寸增大</strong>（同一尺寸，两种网格）</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>step 0.05</th>
+<th>step 0.0125 / 0.02</th>
+<th>差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×2×2 χ 峰</td>
+<td>0.2425</td>
+<td><strong>0.2348</strong></td>
+<td>0.008</td>
+</tr>
+<tr>
+<td>3×2×2 χ 峰</td>
+<td>0.2459</td>
+<td><strong>0.2281</strong></td>
+<td>0.018</td>
+</tr>
+<tr>
+<td>3×3×2 χ 峰</td>
+<td>0.2826</td>
+<td><strong>0.2572</strong></td>
+<td><strong>0.025</strong></td>
+</tr>
+<tr>
+<td>2×2×2 χ_max</td>
+<td>2.945</td>
+<td><strong>3.100</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>3×2×2 χ_max</td>
+<td>2.447</td>
+<td><strong>3.431</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>3×3×2 χ_max</td>
+<td>3.778</td>
+<td><strong>4.727</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>网格差单调增大（0.008 → 0.018 → 0.025）</strong> —— 恰好与"尺寸漂移"同量级 ⟹ <strong>二者在现有精度下不可分离</strong>。这是本轮判 <code>λ_c(∞)</code>「未定位」的<strong>决定性一步</strong>。</p>
+<p><strong>(c) 四判据在同一尺寸上的分歧 ~0.04</strong>（2×2×2 细）：J1=0.2348、J1s=0.2253、J2=0.2647 ⟹ 跨度 <strong>0.039</strong>；而跨尺寸漂移也只有 0.073（0.2348→0.3075）。</p>
+<h3>3.3 ⭐ χ 截断测试（<code>_lc3d_chitest.py</code>）—— 判据可靠性的一票否决</h3>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>λ</th>
+<th>χ=8 ⟨A_c⟩</th>
+<th>χ=16 ⟨A_c⟩</th>
+<th>跨度</th>
+<th>χ=8 的 E 误差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×2×2</td>
+<td>0.22</td>
+<td>0.66777</td>
+<td>0.64728</td>
+<td><strong>+0.0205（3.17%）</strong></td>
+<td>ΔE = −0.182（1.7%）</td>
+</tr>
+<tr>
+<td>2×2×2</td>
+<td>0.24</td>
+<td>0.60411</td>
+<td>0.59649</td>
+<td>+0.0076（1.28%）</td>
+<td>ΔE = −0.210（1.9%）</td>
+</tr>
+<tr>
+<td>2×2×2</td>
+<td><strong>0.26</strong></td>
+<td>0.51355</td>
+<td>0.47417</td>
+<td><strong>+0.0394（6.93%）</strong></td>
+<td>ΔE = −0.214（1.9%）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>即使在最小的 2×2×2 上，χ=8 的 ⟨A_c⟩ 也偏 1–3%</strong>，而<strong>在 λ=0.26（最接近相变点处）偏到 6.93%</strong> —— <strong>恰恰是最需要精度的地方误差最大</strong>。
+而 3×3×3 的纠缠只会更强 ⟹ <strong>χ=8 在 L=3 上的误差 ≥ 3%（未量化，且无法量化 —— 见下）</strong>。</p>
+<blockquote>
+<p>⚠️⚠️ <strong>为什么不能像原计划那样「用 discarded weight 判断 χ 够不够」</strong>：
+<strong>1-site DMRG 的 1-site 更新不增长 bond</strong> —— SVD 的 <code>min(aL·2, aR)</code> 恰好 ≤ χ ⟹ <strong>丢弃权重恒为 0</strong>。
+所以 <code>dw = 0</code> 是<strong>恒等式，不是质量指标</strong>。本轮实测四个尺寸的 dw 全部为 <strong>0.00e+00</strong>。
+<strong>唯一可用的 χ 质量指标就是「χ=8 vs 16 的能量/⟨A_c⟩ 差」</strong> —— 而 3×3×3 的 χ=16 单点约需 <strong>1 小时</strong>，本轮未做。</p>
+</blockquote>
+<p><strong>⟹ 结论：3×3×3 的 0.3075 是「χ=8 层面上的数」，误差未量化。</strong></p>
+<hr />
+<h2>四、五条方法学陷阱（可复用）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>陷阱</th>
+<th>判据问句</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>1-site DMRG 的 <code>dw ≡ 0</code> 是恒等式</strong>（不增长 bond）</td>
+<td>「这个质量指标，在这个算法下会不会恒为常数？」</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Binder 累积量在本模型恒等失效</strong>（<code>A_c² = I</code> ⟹ ≡ 2/3）</td>
+<td>「序参量的幂等性会不会让累积量退化？」</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>χ 峰对网格敏感</strong>（0.2348 vs 0.2425）</td>
+<td>「我的峰位有多少是网格造成的？」</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>2 点外推无意义</strong>（补到 4 点后外推值从 0.269 跳到 0.436）</td>
+<td>「几个点？我拟合了几个参数？」</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>外推结果必须与数据范围比对</strong>：<code>λ_c(∞)=0.436 &gt; max(数据)=0.40</code> 且系统已明显在无序侧 ⟹ 自证荒谬</td>
+<td>「外推值落在数据的哪一侧？」</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>五、⚠️ 三条更正（相对 A1 报告与论文）</h2>
+<h3>C-61 ⭐⭐ A1 的「<code>λ_c(∞) ∈ [0.21, 0.23]</code>」是<strong>过度解读</strong></h3>
+<p>A1 报告原文：「两尺寸<strong>最小线性尺寸均为 L=2</strong>，λ_χ 基本不随体积漂移（0.230 → 0.21）——支持 λ_c(∞) 落在 0.21–0.23 区间」。</p>
+<p><strong>更正</strong>：两个尺寸的<strong>最短边都是 2</strong> ⟹ 它们<strong>不是独立的标度点</strong>（标度变量在这些尺寸上几乎不变）。补上 L̄=2.62 与 <strong>L̄=3</strong> 后，峰位升到 0.2826 / 0.3075 ⟹ <strong>原「无漂移」是样本选择的产物</strong>。
+<strong>正确表述</strong>：<code>λ_χ(L̄) = 0.24 (L̄=2) → 0.31 (L̄=3)</code>，<strong>单调上升，外推不成立</strong>；<code>λ_c(∞)</code> <strong>仍未定位</strong>。</p>
+<h3>C-62 ⭐ 把 h 轴的 <code>λ_c</code> 与 3D Ising 的 <code>β_c = 0.221654</code> 直接比较，<strong>轴混淆</strong></h3>
+<p>A1 报告与论文中文稿 L2033 写：「真 3D 临界耦合 0.230 与 2D toric code（0.25–0.32）同量级、与 3D Ising <code>β_c=0.2217</code> <strong>高度接近（差 3.7%）</strong> —— 支持『3+1D 弦网 ↔ 3D Z₂ 格点规范 ↔ 3D Ising』对偶自洽」。</p>
+<p><strong>问题</strong>：
+- 3D Ising 的 <code>β_c</code> 是<strong>耦合常数倒数</strong>（温度）；本模型的 <code>λ</code> 是 <strong>X 场强度</strong>。对偶映射（Fradkin–Shenker 型）连接的是 Ising 的 <code>β</code> 与规范的 <strong>plaquette 耦合 K</strong>，<strong>不是</strong> X 场 <code>h</code>。
+- 本模型 <code>K = 1</code> <strong>固定</strong>、<code>λ = h</code> 变化 ⟹ 走的是 <strong>h 轴</strong>。由 <code>β_c = 0.221654</code> 反推规范侧 <code>K_c = −½ln(tanh β_c) ≈ 0.7615</code>，而 <code>K = 1 &gt; K_c</code> ⟹ λ=0 侧确在解禁闭相 ✓（与 ⟨A_c⟩(λ=0)=1 一致），但<strong>沿 h 轴的相变点不是 0.2217</strong>。
+- ⟹ 「差 3.7% ⟹ 对偶自洽」<strong>缺乏依据</strong>，是<strong>两个不同轴的数</strong>碰巧接近。</p>
+<p><strong>处置</strong>：论文该处改为「与 3D Ising <code>β_c</code> 的接近<strong>不构成对偶检验</strong>（轴不同）；精确对偶映射（h ↔ β）未建立」。⚠️ 本轮<strong>不</strong>声称 <code>λ_c ≈ 0.31–0.34</code> 与任何文献值一致。</p>
+<h3>C-63 ⭐ 中英不同步（A1 的 3D 盒子结果<strong>只进了中文稿</strong>）</h3>
+<ul>
+<li><strong>中文稿</strong> L2031–2037：有完整的「真 3D 盒子 DMRG（A1）」段（λ_χ=0.230、估计 [0.21,0.23]）。</li>
+<li><strong>英文稿</strong> L2000：仍是旧版 —— 「conservative interval <code>λ_c(∞) ∈ [0.140, 0.140]</code>」；L2004 仍写「<code>λ_c(∞)</code> is an <strong>open numerical problem</strong>」。</li>
+<li>⟹ 英文稿<strong>完全没有</strong> A1 的内容。本轮<strong>一并修正</strong>（改为本轮结论）。</li>
+</ul>
+<hr />
+<h2>六、判决与下一步</h2>
+<p><strong>判决</strong>：<code>λ_c(∞)</code>（§10.2 #13 的剩余开放项）<strong>本轮未解决</strong>，且<strong>被证明在本方法下不可解</strong> —— 判据分辨率（~0.04）与尺寸漂移（~0.04）同量级。<strong>登记为「方法学不足，未定位」</strong>，而不是给一个数。</p>
+<p><strong>要真正定位，需要（按必要性排序）：</strong>
+1. <strong>换判据</strong>（而不是换尺寸）：<code>⟨A_c⟩</code> 的 χ 峰<strong>不是</strong>可靠序参量 —— 与论文已记录的 2D 诊断「m(h_c) 外推 → 0.93 ≠ 0 ⟹ ⟨X⟩ 非相变序参量」<strong>同族</strong>。3D 侧应改用 <strong>'t Hooft 环 / Wilson 环的周长–面积律交叉</strong>（非局域序参量）。
+2. <strong>换算法</strong>：3D 盒子的 MPS 截断太狠（χ=8 在 L=2 上就偏 3%）⟹ 应换 <strong>PEPS / 3D DMRG / 量子蒙特卡洛</strong>（QMC 对本模型无符号问题，应是最优选择）。
+3. <strong>建立精确对偶映射</strong>（h ↔ β），否则无法与任何文献值对照。</p>
+<p><strong>⚠️ 本轮明确不做的</strong>：不声称 <code>λ_c ≈ 0.31–0.34</code> 是热力学极限值（它来自 L≤3 且 χ=8，且交叉判据本身没有误差棒）。</p>
+<hr />
+<h2>七、脚本与数据</h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_lc3d_box_fast.py</code></td>
+<td><strong>增量环境 + BLAS</strong> 求解器（含 <code>push_left_einsum</code> 原版对照、<code>verify</code> 三关自检）</td>
+</tr>
+<tr>
+<td><code>_lc3d_run_101.py</code></td>
+<td>扫描驱动（记录 E / ⟨A_c⟩ / <strong>保真度 F</strong>）</td>
+</tr>
+<tr>
+<td><code>_lc3d_analyze.py</code></td>
+<td>四判据定位 + 1/L̄ 外推 + 跨尺寸交叉</td>
+</tr>
+<tr>
+<td><code>_lc3d_chitest.py</code></td>
+<td><strong>χ 收敛测试</strong>（唯一可用的截断质量指标）</td>
+</tr>
+<tr>
+<td><code>_lc3d_pushbench.py</code></td>
+<td>BLAS 化的正确性 + 速度基准</td>
+</tr>
+<tr>
+<td><code>_lc3d_101_t222/t322/t332/t333chi8.npz</code></td>
+<td>四尺寸粗扫（step 0.05）</td>
+</tr>
+<tr>
+<td><code>_lc3d_101_f222/f322chi8.npz</code></td>
+<td>2×2×2、3×2×2 细扫（step 0.0125）</td>
+</tr>
+<tr>
+<td><code>_lc3d_101_datadump.txt</code></td>
+<td>全部扫描数据的文本转储</td>
+</tr>
+<tr>
+<td><code>_log_chi222.txt</code></td>
+<td>χ=8 vs 16 的截断测试日志</td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">甲-2 结项：`λ_c(∞)` 仍未定位 —— 判据分辨率不足的量化，与 A1 结论的更正 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 甲2结项_λc∞未定位_判据分辨率不足的量化.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

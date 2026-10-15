@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>配对阶数-表示论严格化：引理链与严格性分级</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 问题与目标</div>
+  <h1>配对阶数-表示论严格化：引理链与严格性分级</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>批次</strong>：YM 质量隙研究纲领子课题②
+<strong>任务</strong>：把框架"n=1/2/3 ⟹ 实/伪实/复表示"（原文 245–249）写成严格引理链——表示论部分用标准定理支撑，诚实标注框架启发式部分
+<strong>性质标注</strong>：【定理】= 表示论标准定理（严格）；【事实】= 标准事实（严格）；【启发式】= 框架主张（非定理）；【预言】= 可检验预言</p>
+</blockquote>
+<hr />
+<h2>1 问题与目标</h2>
+<p>框架主张【原文 249】：U(1) n=1 线性/实、SU(2)_L n=2 平方/伪实、SU(3)_c n=3 立方/复——"2 vs 3 对立在规范理论里的完备实现"。</p>
+<p><strong>目标</strong>：把可严格化的部分（表示论分类、张量积分解）写成引理链；诚实标注不可严格化的部分（费马对应、三代类比）。</p>
+<h2>2 引理链【定理 + 事实】</h2>
+<h3>引理 A（Frobenius-Schur 三分法）【定理】</h3>
+<p>紧群/有限群的每个不可约复表示 ρ 恰属三类之一（Frobenius-Schur 指标）：</p>
+<div class="formula"><span class="rm">FS</span>(ρ) = <span class="frac"><span class="num">1</span><span class="den">|G|</span></span>∑<sub>g</sub> χ<sub>ρ</sub>(g<sup>2</sup>) ∈ {+1, -1, 0}</div>
+
+<table>
+<thead>
+<tr>
+<th>FS 值</th>
+<th>类型</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+1</td>
+<td>实（real）</td>
+<td>可定义不变实结构，ρ ≅ ρ̄ 且对称配对</td>
+</tr>
+<tr>
+<td>−1</td>
+<td>伪实（pseudoreal/quaternionic）</td>
+<td>ρ ≅ ρ̄ 但反对称配对</td>
+</tr>
+<tr>
+<td>0</td>
+<td>复（complex）</td>
+<td>ρ ≇ ρ̄</td>
+</tr>
+</tbody>
+</table>
+<h3>引理 B（规范群基本表示分类）【事实】</h3>
+<table>
+<thead>
+<tr>
+<th>群</th>
+<th>基本表示</th>
+<th>FS</th>
+<th>类型</th>
+<th>配对阶数 n</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U(1)</td>
+<td>1 维（电荷）</td>
+<td>+1</td>
+<td><strong>实</strong></td>
+<td>n=1 线性</td>
+</tr>
+<tr>
+<td>SU(2)</td>
+<td>2 维（自旋-1/2）</td>
+<td>−1</td>
+<td><strong>伪实</strong></td>
+<td>n=2 平方</td>
+</tr>
+<tr>
+<td>SU(3)</td>
+<td>3 维（夸克色）</td>
+<td>0</td>
+<td><strong>复</strong></td>
+<td>n=3 立方</td>
+</tr>
+</tbody>
+</table>
+<h3>引理 C（张量积分解）【事实】</h3>
+<table>
+<thead>
+<tr>
+<th>群</th>
+<th>张量积</th>
+<th>分解</th>
+<th>单态？</th>
+<th>配对含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SU(2)</td>
+<td>2⊗2</td>
+<td>3 ⊕ 1</td>
+<td><strong>含 1</strong></td>
+<td>二体可完全配对（平方有解）</td>
+</tr>
+<tr>
+<td>SU(3)</td>
+<td>3⊗3</td>
+<td>6 ⊕ 3̄</td>
+<td><strong>不含 1</strong></td>
+<td>二体不可配对（qq 不成单态）</td>
+</tr>
+<tr>
+<td>SU(3)</td>
+<td>3⊗3⊗3</td>
+<td>1 ⊕ 8 ⊕ 8 ⊕ 10</td>
+<td><strong>含 1</strong></td>
+<td>三体才可配对（重子 qqq）</td>
+</tr>
+</tbody>
+</table>
+<h3>定理 D（禁闭的表示论根源）【事实→框架推论】</h3>
+<ul>
+<li>SU(2)：2⊗2 含单态 ⟹ 二体可配对（"平方有解"）⟹ 可完美交换；</li>
+<li>SU(3)：3⊗3 不含单态、3⊗3⊗3 含单态 ⟹ <strong>qq 不成单态、qqq 才成单态</strong>——色单态需三体（重子）或 qq̄（介子）——<strong>禁闭的群论层面</strong>（"立方不可分解"）。</li>
+</ul>
+<h2>3 框架启发式（诚实标注）【启发式】</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>框架主张</th>
+<th>数学地位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H1</td>
+<td>配对阶数 n ↔ 费马可解性 ↔ 规范群类型</td>
+<td><strong>启发式</strong>：费马定理（n≥3 无解）与表示论的对应是类比，需证明"配对可解性 ⟺ 禁闭"映射本身</td>
+</tr>
+<tr>
+<td>H2</td>
+<td>三代费米子 = SU(3) 的"三"（涡卷绕模 n=1,2,3）</td>
+<td><strong>类比非定理</strong>：SU(3) 的"3"是定义表示维数，"三代"是唯象事实，无表示论必然联系</td>
+</tr>
+<tr>
+<td>H3</td>
+<td>n=4 涡不稳定 ⟹ 无第四代</td>
+<td><strong>预言</strong>（与 LHC 未发现新物理一致，但有张力）</td>
+</tr>
+</tbody>
+</table>
+<h2>4 可检验预言【预言】</h2>
+<p><strong>P1：SU(3) β 函数阶梯跳跃</strong>【原文 249】——当能量超过第四代费米子阈值，SU(3) 耦合跑动出现额外跳跃（非标准模型对数跑动）。窗口：FCC-hh（100 TeV）、LHAASO/CTA 宇宙线。这是框架"2 vs 3"对接最可检验的支点。</p>
+<h2>5 结论：框架"2 vs 3"的数学地位</h2>
+<p><strong>可严格化的内核（引理 A–D）</strong>：表示论三分法（实/伪实/复）与张量积分解是<strong>标准定理</strong>——框架的"n=1/2/3 ⟹ 实/伪实/复"与"平方配对/立方禁闭"在这些层面<strong>有严格支撑</strong>。</p>
+<p><strong>不可严格化的外壳（H1–H3）</strong>：费马对应、三代类比是<strong>启发式</strong>——它们是框架的解释性叙事，不是已证定理。</p>
+<p><strong>对质量隙问题的意义</strong>【评估】：引理 D 说明"SU(3) 色单态需三体/qq̄"是<strong>群论事实</strong>（为什么重子是 qqq），但"这个群论事实 ⟹ 动力学禁闭（面积律、质量隙）"仍需 K2/K3（构造性 QFT + 面积律证明）——<strong>引理链为禁闭提供群论层面，未提供动力学层面</strong>。</p>
+<h2>6 与框架其他成果的衔接</h2>
+<table>
+<thead>
+<tr>
+<th>成果</th>
+<th>衔接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>批 6"2 vs 3"数轴分类（2→电磁、3→弱、6→强）</td>
+<td>与表示论编号（U(1) n=1、SU(2) n=2、SU(3) n=3）的错位遗留（见 §7）</td>
+</tr>
+<tr>
+<td>P3-E 非阿贝尔涌现（通量管→f^abc）</td>
+<td>引理 B/C 给群结构层，P3-E 给动力学层</td>
+</tr>
+<tr>
+<td>胶球 X(2370)（通量管打结）</td>
+<td>引理 C 的 8（伴随表示）是胶球色结构</td>
+</tr>
+</tbody>
+</table>
+<h2>7 遗留</h2>
+<ol>
+<li><strong>数轴分类 vs 表示论编号错位</strong>（批 2：2→电磁、3→弱、6→强 vs 表示论：U(1) n=1、SU(2) n=2、SU(3) n=3）——两套编号的统一待解决；</li>
+<li><strong>费马对应 ⟹ 禁闭的严格化</strong>：H1 的映射若可证，将是重大突破（当前无路径）；</li>
+<li><strong>三代类比的动力学来源</strong>：三代费米子质量谱（F28）与卷绕模 n=1,2,3 的定量对应待推导。</li>
+</ol>
+<hr />
+<h2>附录：数值脚本</h2>
+<p><code>_pair_rep.py</code>（FS 三分法 + 张量积分解 + 分级，可复现）。</p>
+
+<div class="footer">配对阶数-表示论严格化：引理链与严格性分级 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 配对阶数表示论严格化.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

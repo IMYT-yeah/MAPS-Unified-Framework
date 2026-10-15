@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第五力实验线 ×3：判据精确化（×3.2 / ×6.4）与候选装置核对</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>第五力实验线 ×3：判据精确化（×3.2 / ×6.4）与候选装置核对</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 121 轮</strong>（2026-10-04）｜核验脚本 <code>_exp121.py</code>（<strong>E121-1 … E121-16，34 项断言 0 失败</strong>）
+题源：第 120 轮 §八 的第 2 项「实验线：40–60 μm ×3」（升级为对外材料包）</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<blockquote>
+<p>① <strong>把「×3」精确化</strong>（登记 <strong>C-85</strong>）：λ = 47.1 μm 处<strong>判死 (c) 所需改进 = ×1.97（Lee 链）– ×3.17（Tan 链）</strong>；
+<strong>「×3」= 到达判定边缘</strong>（新界 0.218–0.352 恰好跨过 <code>α_Y = 1/3</code>）、<strong>×3.2 = 四链干净排除</strong>
+（把 <code>α = 1/3</code> 边界从 65–87 μm 推到 <strong>≤ 47 μm</strong>）、<strong>×6.4 = 2× 裕度</strong>。
+② <strong>现状核对</strong>（2026-10-04 公开检索）：40–60 μm 带<strong>自 2020 年后无新实验</strong>（仍由 Lee/Tan 2020 把守）。
+③ ⭐ <strong>已发表一条瞄准该带的「下一代设计」</strong>：<strong>Du et al. 2022（CQG 39, 105008）「32 重对称吸引子」</strong> ——
+明言最强界覆盖 <strong>40–800 μm</strong>、投影总误差 <strong>2.0×10⁻¹⁷ N·m</strong>、<strong>λ ≈ 300 μm 处改进约一个量级</strong>；
+⚠️ 但<strong>其在 40–60 μm 段的投影未公布</strong> —— 这正是缺的那个数（登记 <strong>I-27</strong>）。
+④ 另有一条<strong>在建</strong>实验：<strong>Cal Poly Humboldt（Hoyle/Decca/Sako）「50 μm 以下」</strong>成分偶极扭秤（2025–26 会议材料）。
+⑤ 产出：《第五力实验线材料包》（对外，<strong>未送出</strong>）——单一请求：「报 40–60 μm 段的 α_max，目标 ≤ 0.3（稳健 ≤ 1/6）」。</p>
+</blockquote>
+<hr />
+<h2>一、为什么做、做了什么</h2>
+<p>第 120 轮把 Φ 的第五力窗口收成「λ ≲ 65–90 μm，只剩 (c) 47.1 μm 一个半拟合档」，并留下唯一可操作的终审判据：
+「40–60 μm 段再改进 ×3 ⟹ (c) 可判定」。本轮（用户指令「实验线 ×3」）做三件事：</p>
+<ol>
+<li><strong>判据精确化</strong>：把「×3」变成实验组可直接引用的目标数字（分锚线报区间，并给出到判定/到裕度的三个档）；</li>
+<li><strong>装置侧核对</strong>：谁在守这条带、谁在动、动了多少（2026-10-04 快照；四类分级：结果／设计／在建／计划）；</li>
+<li><strong>对外化</strong>：把判据写成《实验线材料包》（与 EMRI 材料包同规格），供后续送交。</li>
+</ol>
+<p>⚠️ 本轮<strong>无新物理、无新数值模拟、无新自由参数</strong>：产出 = 算术（判据精确化）＋ 外部核对 ＋ 一份对外材料。</p>
+<hr />
+<h2>二、判据精确化（C-85）</h2>
+<p>沿用第 120 轮的<strong>两锚点幂律族</strong> <code>α_max(λ) = (λ/λ₀)^(−p)</code>，4 组端点组合的重算结果（<code>_exp121.py</code> E121-1…E121-8）：</p>
+<table>
+<thead>
+<tr>
+<th>链</th>
+<th>锚点</th>
+<th>p</th>
+<th><code>α_max(47.1 μm)</code></th>
+<th>判死 (c) 需改进</th>
+<th>2× 裕度需改进</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Tan 48 μm/1 → 70 μm/(1/3)</td>
+<td>2.912</td>
+<td>1.057</td>
+<td><strong>×3.17</strong></td>
+<td>×6.34</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Tan 48 μm/1 → 1 mm/10⁻³</td>
+<td>2.275</td>
+<td>1.044</td>
+<td>×3.13</td>
+<td>×6.26</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Tan 48 μm/1 → 2 mm/10⁻³</td>
+<td>1.852</td>
+<td>1.036</td>
+<td>×3.11</td>
+<td>×6.21</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Lee 38.6 μm/1 → 1 mm/10⁻³</td>
+<td>2.123</td>
+<td><strong>0.655</strong></td>
+<td><strong>×1.97</strong></td>
+<td>×3.93</td>
+</tr>
+</tbody>
+</table>
+<h3>2.1 三个档（本轮的核心产出）</h3>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>改进</th>
+<th>新界 @47.1 μm</th>
+<th>结果（若无信号）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>边缘档</strong></td>
+<td><strong>×3</strong>（第 120 轮的原话）</td>
+<td><strong>0.218–0.352</strong> ⟹ <strong>恰好跨过 1/3</strong></td>
+<td>最松链上「刚好不排除」⟹ <strong>不是干净判定</strong></td>
+</tr>
+<tr>
+<td><strong>判定档</strong></td>
+<td><strong>×3.2</strong></td>
+<td>0.205–0.330（四链全 &lt; 1/3）</td>
+<td><strong>四链干净排除</strong> ⟹ (c) 判死</td>
+</tr>
+<tr>
+<td><strong>稳健档</strong></td>
+<td><strong>×6.4</strong></td>
+<td>0.102–0.165（四链全 &lt; 1/6）</td>
+<td><strong>2× 裕度排除</strong></td>
+</tr>
+</tbody>
+</table>
+<p>（×6.4 的来源：四链最严值 = ×6.34 ⟹ 上取整；<strong>×6.3 不足</strong>，E121-4b 已断言。）</p>
+<h3>2.2 等价说法（给实验组）</h3>
+<blockquote>
+<p><strong>现在 <code>α = 1/3</code> 的排除边界在 65–87 μm；把它推到 ≤ 47 μm</strong>（≈ 把 40–60 μm 段的界压 ~3.2 倍），
+即可判定 (c)。或：<strong>在 40–60 μm 段把 α_max 压到 ≤ 0.3（目标 ≤ 1/6 = 稳健档）</strong>。</p>
+</blockquote>
+<p>⭐ 一个漂亮的结构（E121-7b）：<strong>×3 恰好把 <code>α = 1/3</code> 边界推到旧的 <code>α = 1</code> 锚点（48 / 38.6 μm）</strong> ——
+这就是「×3 是边缘」的量级来源（判定边缘 = 旧锚点位置）。</p>
+<hr />
+<h2>三、装置侧核对（2026-10-04 快照）</h2>
+<p><strong>分级口径</strong>（本表每行必带类型）：<strong>结果</strong>（已发表实验）/ <strong>设计</strong>（已发表设计计算）/ <strong>在建</strong>（公开材料自述）/ <strong>计划</strong>（目标数字）。</p>
+<h3>3.1 谁在守这条带（结果级，现状不变）</h3>
+<table>
+<thead>
+<tr>
+<th>实验</th>
+<th>装置</th>
+<th>关键数字（摘要原文要点）</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lee et al. 2020</strong>（Eöt-Wash/UW）</td>
+<td>旋转吸引子（18/120 重对称）+ 静止扭秤</td>
+<td>分离 <strong>52 μm–3 mm</strong>；<strong>引力强度（α=1）Yukawa 力程被限在 &lt; 38.6 μm</strong></td>
+<td>PRL <strong>124</strong>, 101101；arXiv:2002.11761</td>
+</tr>
+<tr>
+<td><strong>Tan et al. 2020</strong>（HUST）</td>
+<td>双调制双补偿扭秤</td>
+<td><strong>|α| ≤ 1 直到 λ = 48 μm</strong>；<strong>40–350 μm 最强界</strong>；<strong>λ ≈ 70 μm 处改进 ×3</strong>（相较前值）</td>
+<td>PRL <strong>124</strong>, 051301</td>
+</tr>
+</tbody>
+</table>
+<p><strong>复核</strong>：INSPIRE 题名扫描（「inverse-square law」2020+ 共 10 篇；含 torsion 题名 2023+ 50 篇）
+＋ 第 120 轮的 2025–26 约束带扫描 ⟹ <strong>40–60 μm 带自 2020 年后无新实验数据</strong>（三条扫描一致）。</p>
+<h3>3.2 谁在动</h3>
+<p><strong>候选 ①（设计级，最直接）：HUST「32 重对称吸引子」</strong></p>
+<blockquote>
+<p>Du, Tan, Dong, Huang, Zhu, Tan, Shao, Yang, Luo，<strong>Class. Quantum Grav. 39(10), 105008 (2022-05-12)</strong>。
+摘要原文（IOP）：<strong>「…can establish the strongest bound on the magnitude α of the Yukawa violation at the range of
+<strong>40–800 μm</strong> with the total error of about <strong>2.0×10⁻¹⁷ N m</strong>, and improve the previous bounds
+about <strong>one order of magnitude at the length scale λ ≈ 300 μm</strong>.」</strong>
+⚠️ <strong>三处必须带上</strong>：① 这是<strong>设计计算</strong>，不是实验结果（发表后未见「在建/进展」的公开陈述）；
+② 「×10」是 <strong>λ ≈ 300 μm 处</strong>的数 —— <strong>不能搬去 47 μm</strong>；③ <strong>40–60 μm 段的投影曲线未公布</strong>（= <strong>I-27</strong>）。</p>
+</blockquote>
+<p><strong>候选 ②（在建）：Cal Poly Humboldt（Hoyle / Decca / Sako）</strong></p>
+<blockquote>
+<p>成分偶极（composition-dipole）扭秤 + 振荡吸引子；目标 = <strong>测量 50 μm 以下的引力相互作用</strong>（ISL ＋ WEP）。
+材料：APS 2025 春季会议摘要（Keltz 等）＋ IdeaFest 2025（环境监测）／2026（装置）海报；
+状态 = <strong>在建</strong>（环境监测/装置发展阶段）；<strong>无公开灵敏度数字</strong>。NSF 资助（摘要致谢列 PHY-1606988／PHY-1908502 等）。
+📌 该组与 Eöt-Wash 系谱直接相连（Hoyle 是 Kapner 2007 合作者）⟹ 「40 μm 以下」最活跃的新入口。</p>
+</blockquote>
+<p><strong>候选 ③（同组另一条线，勿混引）</strong>：HUST 条纹型钨片设计（d=6 洛伦兹破坏；Shao 2015／2016 系谱），
+其实验自述<strong>「正在进行中（proceeding smoothly）」</strong>（Symmetry <strong>16</strong>, 1432 (2024)），系统灵敏度 ~5×10⁻¹⁶ N·m。
+⚠️ <strong>与候选 ① 不是同一台</strong>、目标也不是 ISL/Yukawa —— 「进行中」<strong>不能</strong>用来支持候选 ①。</p>
+<p><strong>系统学前沿（HUST 系列，2020–2022）</strong>：残余气体阻尼（Ke 2020）、非等温挤压膜阻尼（Ke 2022）、
+振动–残余静电耦合（Zhu 等）—— 这些定义了该带「为什么停在 ~40 μm」。</p>
+<p><strong>长线（不计入）</strong>：悬浮/量子力传感器（<em>Sci. Rep.</em> 16, 5180 (2026) 微球，距 α ~ 1 差 6 个量级；
+HFUT Meissner 悬浮提案 arXiv:2602.13829 目标 0.1–10 μm、投影 10⁻¹⁹ N/√Hz）—— 与 40–60 μm 段<strong>不重叠</strong>。</p>
+<h3>3.3 小结</h3>
+<blockquote>
+<p><strong>判据有对象，但还没有「在跑」的实验</strong>：最直接的候选 ① 是<strong>设计已发表、实验状态未知</strong>；
+候选 ② 是<strong>在建</strong>但没有灵敏度数字；候选 ③ <strong>不是 ISL</strong>。
+⟹ 对外请求的正确形式是<strong>问候选 ①/② 的 40–60 μm 段投影</strong>，而不是「等某个已宣布的结果」。</p>
+</blockquote>
+<hr />
+<h2>四、对外材料包</h2>
+<p>见 <code>第五力实验线材料包_给短程引力实验组.md</code>（同 EMRI 材料包规格：<strong>边界先行、单一可判定请求、退出机制、
+含可直接粘贴的邮件短版<strong>）。</strong>状态：已备好，未送出；未联系任何实验组。</strong></p>
+<hr />
+<h2>五、诚实边界（七条）</h2>
+<ol>
+<li>判据精确化 = <strong>算术</strong>（4 组端点组合的同一台幂律族机器，与第 120 轮逐项一致）；一手 α_max 曲线仍未取到（Murata 2026 图中）。</li>
+<li>全部改进因子与投影数字是<strong>引文</strong>（Du 2022 摘要／Tan 2020 摘要／Lee 2020 摘要／Symmetry 2024 正文）；<strong>本轮未独立复算实验数据</strong>。</li>
+<li><strong>「×N 改进」必带自变量 λ</strong>：Du 的 ×10 在 300 μm；Tan 2020 的 ×3 在 70 μm。</li>
+<li>Humboldt 的信息源是<strong>会议摘要与海报</strong>（尚无论文）；「在建」由 2025–26 两份材料支持，<strong>灵敏度未知</strong>。</li>
+<li><code>α_Y = 1/3</code> 是标准 KK 知识、且 (c) 档的<strong>条件性边界不变</strong>（第 120 轮 §六）。</li>
+<li>检索窗口 = 2026-10-04；聚合器新闻一条（2026-05「Newton's law passes biggest test… 0.1 mm」）<strong>源头未追到，未采用</strong>。</li>
+<li>「×3.2／×6.4」是<strong>请求目标</strong>（给实验组的数），不是「已有实验能做到」的断言。</li>
+</ol>
+<hr />
+<h2>六、判决（四类判定）</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>判据精确化（×3 边缘／×3.2 干净／×6.4 裕度）</td>
+<td><strong>推导（算术）</strong>；登记 <strong>C-85</strong></td>
+</tr>
+<tr>
+<td>40–60 μm 带 2020 后无新实验</td>
+<td><strong>复核确认</strong>（三条扫描一致；结论未变）</td>
+</tr>
+<tr>
+<td>Du 2022 设计覆盖 40–800 μm、2.0×10⁻¹⁷ N·m、×10@300 μm</td>
+<td><strong>引文</strong>（设计计算；非实验）</td>
+</tr>
+<tr>
+<td>Humboldt「50 μm 以下」在建</td>
+<td><strong>引文</strong>（会议材料）</td>
+</tr>
+<tr>
+<td>40–60 μm 段投影未公布</td>
+<td><strong>难题登记 I-27</strong>（可判定问句：该段投影是否 ≤ 1/3？）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>与既有结论的关系</strong>：第 61（工程出口 = 0）／62（四力位无空位）／72（耦合给不出）／120（窗口 λ ≲ 65–90 μm、
+剩一个半拟合档）不变；本轮把「终审判据」从一句话变成<strong>带数字的三档请求</strong>（×3.2／×6.4）。</p>
+<hr />
+<h2>七、下一步</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>动作</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>送材料包</strong>（或先发「单问邮件」，材料包 §7 已备短版）</td>
+<td>收件人候选：HUST（Du／Tan W.-H.／Zhu）、Cal Poly Humboldt（Hoyle）</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>I-27 的取值</strong></td>
+<td>等候选 ① 的实验论文，或向作者索取 40–60 μm 段投影曲线</td>
+</tr>
+<tr>
+<td>3</td>
+<td>不变：<strong>送私审</strong>（两包已备）／<strong>等 LISA</strong></td>
+<td>——</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>不建议</strong>：继续挑 <code>m_Φ</code> 的档位（无判别力增量，第 70/72 轮告诫）；用「计划」数字当「结果」引用（第 116 陷阱）。</p>
+<hr />
+<h2>八、本轮改动一览</h2>
+<ul>
+<li><strong>论文（中英同步）</strong>：第 120 轮块后加<strong>第 121 轮块</strong>（8 行/语）。</li>
+<li><strong>清单</strong>：零表第 121 轮行；<strong>C-85</strong>（紧跟 C-84）＋ <strong>I-27</strong>（紧跟 I-26）；撤回计数 <strong>83 → 84</strong>；I 计数行提及 I-27；§1.x「剩余待办」补第 121 轮落地说明。</li>
+<li><strong>交接说明</strong>：§七 新条目（121 当前建议；120 降为历史）。</li>
+<li><strong>备忘</strong>：第 120 轮备忘录 §四 加<strong>补注</strong>（×3 的精确化 ＋ 候选装置）。</li>
+<li><strong>记忆 / 技能</strong>：MEMORY 进度 121 ＋ 条目；技能陷阱 <strong>117</strong> ＋ §5.0 第五力条补第 121 轮两行。</li>
+<li><strong>核验</strong>：<code>_exp121.py</code>（<strong>E121-1…E121-16，34 项断言 0 失败</strong>）。</li>
+</ul>
+
+<div class="footer">第五力实验线 ×3：判据精确化（×3.2 / ×6.4）与候选装置核对 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 第五力实验线_x3判据精确化与候选装置核对.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

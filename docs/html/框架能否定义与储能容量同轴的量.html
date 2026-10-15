@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>框架能否定义一个与「储能容量」同轴的量？</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>框架能否定义一个与「储能容量」同轴的量？</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 56 轮 ｜ 2026-09-24 ｜ 脚本 <code>_storage_axis_56.py</code>（SA-1…SA-12，<strong>11 项 0 失败</strong>）
+起因：第 55 轮战略审查的收口（候选池第 38 项）。第 55 轮证明框架现有量<strong>全都不同轴</strong>，
+留下的唯一<strong>可判定</strong>问题是：<strong>框架能不能定义一个与「储能容量」同轴的量？</strong></p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>能，而且不止一个 —— 但它们全部落在 f = O(1) 这一档（质能当量），
+而储能容量的全部物理内容恰在 f ~ 10⁻¹⁰。</strong></p>
+<p>⟹ 障碍<strong>不是</strong>"尺度差 10 个数量级"，而是一个<strong>结构性缺口</strong>：
+<strong>框架有 4 个哈密顿量，却没有一个势函数</strong>（势能 0 处 / 结合能 0 处 / V(r) 0 处）
+⟹ 它没有"两个态"可言 ⟹ 造不出"束缚能之差" ⟹ 储能容量在框架里无从定义。</p>
+<hr />
+<h2>一、先立判据：「同轴」是什么意思，怎么检验</h2>
+<p>把日常词「储能容量」翻译成可检验的条件 —— Q ≡ ΔE/M 要同轴，须满足五条：</p>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>S1 双因子</strong></td>
+<td>能分解为「可释放能量 ΔE」÷「承载质量 M」，两者<strong>各自可算</strong></td>
+</tr>
+<tr>
+<td><strong>S2 束缚–解离差</strong> ★</td>
+<td>ΔE 必须是<strong>两个态之差</strong>（束缚态 vs 解离态），不是某个绝对能标</td>
+</tr>
+<tr>
+<td><strong>S3 记账单元对偶</strong></td>
+<td>ΔE 与 M 按<strong>同一单元</strong>计数（否则比值随系统大小漂移）</td>
+</tr>
+<tr>
+<td><strong>S4 可释放性</strong></td>
+<td>存在从高能态到低能态的单调路径，且不违反框架的熵账</td>
+</tr>
+<tr>
+<td><strong>S5 可逆性</strong></td>
+<td>Q 与充放路径无关（状态函数）</td>
+</tr>
+</tbody>
+</table>
+<p>并把 Q 锚定在一个<strong>无量纲数</strong>上：</p>
+<blockquote>
+<p><strong>f ≡ Q/c² = ΔE_bind / (m_unit·c²)</strong> —— "<strong>可释放质量份额</strong>"</p>
+</blockquote>
+<p>这个 f 才是「储能容量」这个词的<strong>真正物理内容</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>介质</th>
+<th>Wh/kg</th>
+<th><strong>f = Q/c²</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Li–O₂（化学天花板）</strong></td>
+<td>3 458</td>
+<td><strong>1.385×10⁻¹⁰</strong></td>
+</tr>
+<tr>
+<td>汽油（燃烧）</td>
+<td>12 000</td>
+<td>4.807×10⁻¹⁰</td>
+</tr>
+<tr>
+<td>U-235（纯 U-235，完全裂变）</td>
+<td>2.2806×10¹⁰</td>
+<td><strong>9.135×10⁻⁴</strong></td>
+</tr>
+<tr>
+<td>质能 E=mc²（100%）</td>
+<td>2.4965×10¹³</td>
+<td><strong>1.000</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>口径核对</strong>（SA-4）：Li–O₂ 按 <code>2Li + O₂ → Li₂O₂</code>（M = 45.878 g/mol、每式 4 原子）
+⟹ 3458 Wh/kg = 1.2449×10⁷ J/kg ÷ 5.2506×10²⁵ 原子/kg = <strong>1.4798 eV/原子</strong>
+⟹ 与化学计量 <code>5.92 eV / 4 = 1.4800 eV/原子</code> <strong>逐位一致 ✓</strong></p>
+<p>⚠️ <strong>「储能」与「质能等价」的区别，全在 f ≪ 1 这一档。</strong></p>
+<hr />
+<h2>二、「能不能定义」—— 能，有三个</h2>
+<h3>2.1 ★ Q_BH = TS/M = c²/2（黑洞热力学）</h3>
+<p>框架有完整黑洞热力学（<code>S = k_B A/(4l_P²)</code>、<code>T = ℏc³/(8πGMk_B)</code>）。于是：</p>
+<pre><code>sympy 符号消元：  T·S = M·c²/2       （代入 l_P² = ℏG/c³ 后 M_Pl 全部消掉）
+
+数值（太阳质量黑洞）：
+  S/k_B = 1.049430×10⁷⁷   （论文记 1.0494×10⁷⁷ ✓）
+  T     = 6.168678×10⁻⁸ K （标准 Hawking 值 ✓）
+  T·S   = 8.937761×10⁴⁶ J ；  TS/(Mc²) = 0.500000000
+
+⟹ Q_BH = c²/2 = 4.4938×10¹⁶ J/kg = 1.2483×10¹³ Wh/kg
+</code></pre>
+<p><strong>这是一个真·同轴量</strong>：量纲 [能量/质量]、有表达式、<strong>换算因子 0</strong>、非恒等式。
+⚠️ 但两条限制：① 它是<strong>标准结果</strong>（黑洞热力学的可逆过程效率），<strong>非框架独有</strong>；
+② 它给 <strong>f = 0.5</strong> —— 与 Li–O₂ 之比 <strong>3.61×10⁹（9.6 个数量级）</strong>。</p>
+<h3>2.2 Q_tube = c²（通量管线性势）—— 恒等式</h3>
+<p>框架 §5.7："<strong>禁闭 = 通量管线性势</strong>"：把电荷对拉开 d，管中储能 E = σ·d。
+管自身的质量 = E/c² ⟹</p>
+<pre><code>Q_tube = σd / (σd/c²) = c²        ← σ、d、g、n_G 全部消掉
+（数值验算：σ_P = E_P/l_P = 1.2103×10⁴⁴ N；取 d = 1 m 得 E/M = 8.987552×10¹⁶ m²/s² ≡ c²）
+</code></pre>
+<p>⟹ <strong>恒等式</strong>（第 53 轮 C-4 判据）：与任何参数无关 ⟹ <strong>零内容</strong>。
+它只是"质量就是能量"的重述。</p>
+<h3>2.3 Q_res = E(R)/m_unit（降标机制）—— 需要外部质量</h3>
+<p>框架 §4.6 F2 的模态能标 <code>E ~ E_P·√(l_P/R)</code>（δ = √(R·l_P)，粗粒化截断）写成：</p>
+<pre><code>E(R) = √(ℏc·E_P / R)      自洽检查：R = l_P ⟹ E = E_P ✓（1.220890×10²⁸ eV 逐位）
+</code></pre>
+<p>四个落点（SA-7）：</p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>E</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>l_P = 1.61628×10⁻³⁵ m</td>
+<td>1.2209×10²⁸ eV</td>
+<td>公理 1 上限（自洽 ✓）</td>
+</tr>
+<tr>
+<td><strong>0.15 nm（真实键长）</strong></td>
+<td><strong>4.008×10¹⁵ eV = 4.0 PeV</strong></td>
+<td><strong>原子尺度上框架只认识 PeV</strong></td>
+</tr>
+<tr>
+<td>R_H = 1.3725×10²⁶ m</td>
+<td>4.190×10⁻³ eV</td>
+<td>≈ 4.19 meV</td>
+</tr>
+<tr>
+<td><strong>78.06 kpc</strong>（要 1 eV）</td>
+<td>1.000 eV</td>
+<td><strong>要 1 eV 得去星系尺度</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 这个机制<strong>不是"束缚能"</strong>，而是<strong>粗粒化截断能标</strong>：
+在真实键长处它给 <strong>PeV</strong>，比真实键能高 <strong>15.4 个数量级</strong>。
+⟹ 换句话说：<strong>「在 0.1 nm 尺度上放出 1 eV」这件事，框架的能标–长度对偶描述不了</strong>。</p>
+<h3>2.4 判决表</h3>
+<table>
+<thead>
+<tr>
+<th>路径</th>
+<th>表达式</th>
+<th>换算因子</th>
+<th>f</th>
+<th>判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1 化学储能（材料/结构）</td>
+<td>（无）</td>
+<td>—</td>
+<td>—</td>
+<td>❌ 零内容（第 55 轮）</td>
+</tr>
+<tr>
+<td>P2 跨支 ER 通道</td>
+<td>（无）</td>
+<td>—</td>
+<td>—</td>
+<td>❌ 自己的能量条件 + 量子不等式（第 55 轮）</td>
+</tr>
+<tr>
+<td><strong>P3 黑洞热力学 TS/M</strong></td>
+<td><strong>c²/2（严格）</strong></td>
+<td><strong>0</strong></td>
+<td><strong>0.5</strong></td>
+<td>⚠️ 同轴，但是<strong>标准结果</strong></td>
+</tr>
+<tr>
+<td><strong>P4 通量管线性势</strong></td>
+<td><strong>c²（恒等）</strong></td>
+<td><strong>0</strong></td>
+<td><strong>1.0</strong></td>
+<td>❌ 恒等式 ⟹ 零内容</td>
+</tr>
+<tr>
+<td>P5 B5 熵 × Landauer</td>
+<td>σ·k_BT·ln2</td>
+<td><strong>2</strong></td>
+<td>—</td>
+<td>❌ 需外部 T 与比特数</td>
+</tr>
+<tr>
+<td>P6 降标机制 E(R) → 键能</td>
+<td>√(ℏcE_P/R)</td>
+<td><strong>2</strong></td>
+<td>—</td>
+<td>❌ 键长处给 PeV</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>换算因子 = 0 且给出具体数的只有 P3 / P4，二者都只给 f = O(1)。</strong></p>
+<hr />
+<h2>三、★ 为什么做不到：本轮的结构性发现</h2>
+<h3>3.1 框架有 4 个哈密顿量，却没有一个势函数</h3>
+<p>全文检索（SA-1）：</p>
+<table>
+<thead>
+<tr>
+<th>检索词</th>
+<th>处数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>势能 / 结合能 / 相互作用势 / 解离 / 化学键 / 键能 / 内能 / 自由能</td>
+<td><strong>各 0 处</strong></td>
+</tr>
+<tr>
+<td><strong>带径向形式的 V(r) / U(r)</strong></td>
+<td><strong>0 处</strong></td>
+</tr>
+<tr>
+<td>哈密顿 / 拉氏量 / 作用量</td>
+<td>17 / 1 / 4 处</td>
+</tr>
+</tbody>
+</table>
+<p>而 4 个哈密顿量<strong>全是"整体能量标尺"</strong>（SA-2）：</p>
+<table>
+<thead>
+<tr>
+<th>哈密顿量</th>
+<th>形式</th>
+<th>能尺</th>
+<th>有势吗？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H_event（经典层）</td>
+<td>Σp²/2m + ΣV_contact</td>
+<td><strong>未给</strong></td>
+<td>V_contact = 相遇-湮灭-再生（<strong>无函数形式、无耦合常数</strong>）</td>
+</tr>
+<tr>
+<td>H_F（2+1D）</td>
+<td>−JΣA_v − KΣB_p</td>
+<td>J = n_G·E_P·g（<strong>普朗克</strong>）</td>
+<td>✗（J/K = 3 已推导，绝对尺度是 E_P）</td>
+</tr>
+<tr>
+<td>H(λ)（3+1D 弦网）</td>
+<td>−ΣA_cube − λΣX_face</td>
+<td>同 J</td>
+<td>✗（Δ=2、Δ±2≈0.49 都是<strong>以 J 为单位</strong>）</td>
+</tr>
+<tr>
+<td>H_quantum</td>
+<td>−i[H₀,ρ] + Σ(LρL†−½{…},ρ)</td>
+<td><strong>未给</strong></td>
+<td>✗（框架自标"微观结构开放"）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>S2（束缚–解离差）致命失败</strong>：框架的动力学里<strong>没有第二个态</strong>。
+它算的是能谱 / 能隙 / 简并 / 序参量 / χ / 熵 —— <strong>全是单个谱的量</strong>，没有"两态之差"。
+⟹ <code>ΔE_bind</code> 无从定义 ⟹ f 无从定义 ⟹ <strong>储能容量无从定义</strong>。</p>
+<h3>3.2 缺口是<strong>不对称</strong>的：质量侧勉强有、束缚侧完全空白</h3>
+<p>f = ΔE_bind/(m_unit c²) 需要<strong>两档能标</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>区间</th>
+<th>框架有几条</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① <strong>束缚能档</strong> ΔE_bind</td>
+<td>1 – 10³ eV</td>
+<td><strong>0 / 6</strong> —— 最近的是 E_c = 1.02×10⁻³ eV（差 <strong>3.0 个数量级</strong>）、降标 4.19×10⁻³ eV（差 2.4 个）</td>
+</tr>
+<tr>
+<td>② 单元质量档 m·c²</td>
+<td>1 GeV – 1 TeV</td>
+<td><strong>1 / 6</strong> —— η 能标 0.969 TeV，<strong>但是配出来的</strong>；＋ 1 条几何依赖 E_P√(l_P/R)（随 R 漂移）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>不是"框架离化学储能很远"，而是"框架的那一半（束缚侧）是空的"。</strong></p>
+<h3>3.3 精确化表述：<strong>轴差 = 一个能标</strong></h3>
+<p>储能容量总可写成<strong>乘积形式</strong>（能量 = 熵 × 温度，量纲上恒可这样分）：</p>
+<pre><code>Q_storage = Σ(info) × T_eff
+</code></pre>
+<ul>
+<li><strong>Σ 侧</strong>：框架<strong>很擅长</strong>（B5 的 0.25 纳特/l_P²、熵面积律、轨道数、压缩因子 11.0904 —— 纯计数）</li>
+<li><strong>T_eff 侧</strong>：框架<strong>只有两端</strong>（E_P = 1.22×10²⁸ eV 与 meV 档），<strong>中间空</strong></li>
+</ul>
+<p>⟹ 第 55 轮说的"不同轴"，现在<strong>精确化为：轴差恰好是一个能标（温度）</strong>。</p>
+<p><strong>B5 × Landauer 的数值化</strong>（SA-9）：B5 给 0.25 纳特/面元 = <strong>0.3607 比特/面元</strong>。
+每比特代价 k_BT·ln2 ⟹ 室温下 <strong>0.0179 eV/比特</strong>；而 Li–O₂ 是 <strong>1.480 eV/原子</strong>。
+反向标定：要让"1 比特的代价"等于每原子能量，需 <strong>T = 24 775 K（室温的 82.6 倍）</strong>。
+⟹ 该路径需<strong>两个外部输入</strong>（温度 T ＋ 每单元比特数）⟹ <strong>零预言力</strong>。</p>
+<h3>3.4 ⚠️ 一处去重复计数（负面，但应记）</h3>
+<p>F2 降标机制在 <strong>R = R_H</strong> 处给 <strong>4.19 meV</strong>；
+而标准物理对暗能量能标的量级估算正是 <code>√(M_Pl·H₀)</code>（自然单位）= <strong>4.17 meV</strong>
+—— <strong>两者是同一个组合</strong>。</p>
+<p>⟹ "框架给出 meV 量级的暗能量能标"与"框架的降标机制在哈勃尺度自洽"是<strong>同一件事</strong>，
+不应计为两条成果。
+⚠️ 标注：这是<strong>量级比较</strong>（4 倍内）；且第 53 轮已证 <code>E_c</code> 本身是恒等式（C-4）
+⟹ <strong>不构成新证据</strong>。</p>
+<h3>3.5 顺带的观察：框架的能量机制只覆盖"湮灭档"</h3>
+<p>框架的能量释放机制（正反物质对湮灭-再生、通量管、黑洞热力学）<strong>全部是 f = O(1)</strong>。
+⟹ <strong>框架描述的宇宙是"湮灭主导"的</strong>；日常世界的能量释放（化学，f ~ 10⁻¹⁰）不在它的语言里。
+⚠️ 这<strong>不是框架的预言</strong> —— 标准物理同样说"反物质是理论上限"；框架只是<strong>没有别的可说</strong>。</p>
+<hr />
+<h2>四、判决</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>问题</strong></td>
+<td>框架能不能定义一个与「储能容量」同轴的量？</td>
+</tr>
+<tr>
+<td><strong>答案</strong></td>
+<td><strong>能，但是有条件的"能"</strong> —— 能定义 [能量/质量] 量（P3/P4），<strong>但只有 f = O(1) 一档</strong></td>
+</tr>
+<tr>
+<td><strong>四类判定</strong></td>
+<td>P3 = <strong>postdiction</strong>（标准结果）；P4 = <strong>恒等式</strong>（零内容）；P5/P6 = <strong>失败</strong></td>
+</tr>
+<tr>
+<td><strong>对用户目标的意义</strong></td>
+<td>「从底层原理增加储能密度」= 造一个 <strong>f ~ 10⁻¹⁰ 的机制</strong>。框架<strong>没有 f ≪ 1 的机制</strong>（因为势能 0 处 ⟹ 无束缚态差）</td>
+</tr>
+<tr>
+<td><strong>建议写入清单</strong></td>
+<td><strong>S-13 = 「框架不覆盖储能」</strong>（负面判定，省投入）—— 第 55 轮的结论经本轮<strong>从结构层加固</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>诚实边界</h2>
+<p><strong>是引文核对 / 算术（可逐步复核）</strong>：
+- 全文词条计数（势能 / 结合能 / 相互作用势 / V(r) <strong>全 0 处</strong>，哈密顿 17 处）；4 个哈密顿量的形式与能尺；
+- Li–O₂ 的 3458 Wh/kg ↔ 1.480 eV/原子 的口径核对（与 <code>5.92 eV / 4</code> 逐位一致）；
+- <code>T·S = Mc²/2</code> 的 sympy 符号消元 + 太阳质量黑洞数值（S/k_B = 1.049430×10⁷⁷ 与论文 1.0494×10⁷⁷ 相符、T 与标准 Hawking 值相符）；
+- <code>Q_tube ≡ c²</code> 的代数消元；<code>E(R) = √(ℏcE_P/R)</code> 在四个 R 上的数值；
+- Landauer 数值与反向标定 T = 24 775 K。</p>
+<p><strong>是判定（需要后续验证）</strong>：
+- <strong>S1–S5 五条判据是本轮自拟的</strong>（把日常词「储能容量」形式化）⟹ 它们<strong>不是定理</strong>，
+  而是"要同轴必须具备的结构"。若有人能给出不满足 S2 却仍算储能的量，本判决需修。
+- <strong>f ≡ Q/c² 的地位</strong>：本轮把 f 当作储能容量的物理内容，依据是"储能 = 部分质能的释放"。
+  这是一条<strong>语义约定</strong>，不是推导出来的。
+- <strong>"质量不可部分释放"的推论</strong>：框架只说"质量遮蔽通量产生负压差"（§4.1），
+  并没说"质量不可部分释放"；本轮是从"无势函数"推的，属<strong>推论而非引文</strong>。</p>
+<p><strong>没做</strong>：
+- <strong>没有</strong>研究任何真实电池材料（DFT / 实验领域，非本框架）；
+- <strong>没有</strong>给出「能量方程式」—— 本轮恰恰证明<strong>框架里没有这样的方程可给</strong>；
+- <strong>没有</strong>裁决"框架是否应新增内容以对接储能"（那是<strong>扩展框架</strong>的决定，属用户）。</p>
+<hr />
+<h2>下一步</h2>
+<ol>
+<li><strong>收口（推荐，便宜）</strong>：把 <strong>S-13 = 「框架不覆盖储能」</strong> 写进清单与论文
+   （含本轮三条结构性论据）。此后不在"储能"方向投入 ——
+   第 55 / 56 两轮已把它判死两次，<strong>第二次是从结构层（无势函数）</strong>。</li>
+<li>若仍想沿"能量"主题走，<strong>唯一有结构的落点是反物质</strong>（正是框架的名字）——
+   但它的瓶颈是<strong>制造与约束</strong>（工程），框架对此零内容。</li>
+<li><strong>主线（清单侧）</strong>：现清单<strong>已无任何 ★★★ 工程项</strong>。
+   建议做候选池 <strong>37（工程可达性系统性重估）</strong> 或 <strong>36（S-12 平坦性具体化，唯一 ★★★，宇宙学侧）</strong>。</li>
+</ol>
+
+<div class="footer">框架能否定义一个与「储能容量」同轴的量？ · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 框架能否定义与储能容量同轴的量.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

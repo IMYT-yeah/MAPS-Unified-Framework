@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A1 结项：Lean 资产恢复 —— 重建（分级）＋ 环境启动</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、侦察（本轮先做的四路取证，全部为负）</div>
+  <h1>A1 结项：Lean 资产恢复 —— 重建（分级）＋ 环境启动</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 96 轮</strong> ｜ 2026-10-02 ｜ 核验脚本：<code>_lean_a1_96.py</code>（<strong>LA-1…LA-9，45 项 0 失败</strong>）
+<strong>一句话：A1 的全部可恢复资产已恢复</strong> —— 五个工程文件（StormPoC.lean / lakefile / lean-toolchain /
+CI workflow / README）按恢复规格 + 日志重建（<strong>分级标注</strong>：含证明 21 条、sorry 2 条、待重写 23 条、
+设计登记 5 条）；本机 Lean 工具链<strong>正在恢复</strong>（zip 850.7MB，下载中）；
+⚠️ 顺带发现 <strong>RECOVERY.md 的丢失清单不完整</strong>（四份中旬报告未登记）。</p>
+</blockquote>
+<hr />
+<h2>一、侦察（本轮先做的四路取证，全部为负）</h2>
+<table>
+<thead>
+<tr>
+<th>渠道</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>.git/objects</code> 对象池</strong>（630 个 loose objects）</td>
+<td>❌ 严格 Lean 判据只命中 3 个对象 —— 均为 <code>README.md</code> 的版本，<strong>无任何 .lean 源码</strong></td>
+</tr>
+<tr>
+<td><strong>git 历史</strong></td>
+<td>❌ 仓库 "No commits yet"（09-16 重建时未提交；索引 554 文件亦无 lean 源）</td>
+</tr>
+<tr>
+<td><strong>git remote</strong></td>
+<td>❌ 无 remote（从未关联 GitHub；CI 通道从未实际运行过）</td>
+</tr>
+<tr>
+<td><strong>全盘文件系统</strong>（<code>C:\Users\Administrator</code>）</td>
+<td>❌ 无 <code>StormPoC*</code> / <code>lakefile*</code> / <code>lean-toolchain</code> 残留</td>
+</tr>
+<tr>
+<td><strong>旧机</strong>（<code>D:\Users\IMYT.YT\...</code>）</td>
+<td>❌ 本机无 D 盘（09-16 已判定不可访问）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>「拷回」通道全断</strong>；恢复 = <strong>按恢复规格重建</strong>（本轮完成）。</p>
+<h2>二、重建产物（5 文件，全部落盘）</h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>内容</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>verification/lean/StormPoC.lean</code></td>
+<td><strong>分级重建版 v2</strong>（23 条声明 + 8 族注释登记）</td>
+<td>README 恢复规格 ＋ 09-09/10/11/12 日志</td>
+</tr>
+<tr>
+<td><code>verification/lean/lakefile.lean</code></td>
+<td><code>package StormPoC</code> + <code>require mathlib</code> + <code>lean_lib</code></td>
+<td>09-09（含当日修复项：缺 package 声明）</td>
+</tr>
+<tr>
+<td><code>verification/lean/lean-toolchain</code></td>
+<td><code>leanprover/lean4:v4.34.0-rc2</code></td>
+<td>README 规格</td>
+</tr>
+<tr>
+<td><code>.github/workflows/lean-poc.yml</code></td>
+<td>push 触发：elan → <code>lake update</code> → <code>cache get</code> → <code>lake build StormPoC</code></td>
+<td>09-09 描述</td>
+</tr>
+<tr>
+<td><code>verification/lean/README.md</code></td>
+<td>更新为「已重建」+ <strong>恢复状态表</strong> + 补全路线（6 步）</td>
+<td>本轮</td>
+</tr>
+</tbody>
+</table>
+<h3>StormPoC.lean 的分级（引用时必须区分）</h3>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>内容</th>
+<th>数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅ <strong>完整重建</strong>（含证明）</td>
+<td>GA1/GA2/T1/T2 ＋ A3 族 4（<code>stationary_proper_time</code> / <code>rate_from_clock</code> / <code>time_frequency_metric</code> / <code>clock_rate_ratio</code>）</td>
+<td>8</td>
+</tr>
+<tr>
+<td>⚠️ <strong>重建·待编译确认</strong>（含证明）</td>
+<td>A4 族 9（<code>a4_metric_reciprocal</code> … <code>a4_t_label_not_a3_time</code>，名字与 09-10 日志逐一对账）</td>
+<td>9</td>
+</tr>
+<tr>
+<td>🔶 <strong>陈述级重建·有证</strong></td>
+<td>AR-3（净荷零）/ AR-4（净能量非零 —— 路线 A 的断裂点）/ LC-6（λ=1 ⟹ β=1/2π）/ LW-3（Ω_K=1−4α²β²）</td>
+<td>4</td>
+</tr>
+<tr>
+<td>🔶 <strong>陈述级重建·sorry</strong></td>
+<td>BH-1（视界重合 ⟺ 临界密度）/ AR-8/9（k=0 ⟺ λ=1）</td>
+<td>2</td>
+</tr>
+<tr>
+<td>📝 <strong>设计登记</strong></td>
+<td>BX-5 条（09-16 设计，自注「仍未成定理」）</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>历史修正已内建</strong>：三处 09-09 实测修正（<code>Real.exp_eq_tsum</code> 删除 → <code>exp_eq_exp_ℝ</code> 桥接；<code>λ</code> 保留字 → <code>l</code>；
+T2 等价形式）＋ A4 的 <code>simpa</code>/除法记法坑 —— 全部写入源码注释，供首次 build 时对照。</p>
+<h2>三、环境就位（工具链 ✅；mathlib 待装）</h2>
+<ul>
+<li><strong>下载</strong>：<code>~/.lean-dl/lean-4.34.0-rc2-windows.zip</code> —— 服务器实值 <strong>850,663,032 B（850.7MB）</strong>，
+  ghfast.top 实测<strong>峰值 2.07 MB/s、全程 6m51s</strong>（09 月中旬记录的「561.6MB」为旧口径，已更正）。</li>
+<li><strong>安装</strong>：解压 17747 文件 → 86 秒 → <code>~/.elan/toolchains/leanprover--lean4---v4.34.0-rc2/</code>。
+  ✅ <strong><code>lean --version</code> = Lean (version 4.34.0-rc2, x86_64-w64-windows-gnu, commit 6a10ac8c…)</strong>
+  ✅ <strong><code>lake --version</code> = Lake version 5.0.0-src+6a10ac8</strong>
+  ✅ <strong>smoke 编译通过</strong>（rfl / 蕴含 / rw / omega —— core 链健康；还当场抓出我一处测试文件的类型错误）</li>
+<li><strong>剩余（2 步 + 迭代）</strong>：<code>lake update</code>（clone mathlib ~494MB）→ <code>lake exe cache get</code> →
+  <code>lake build StormPoC</code> → 按报错修 API 名（历史 3 处已内建注释）→ 目标 <strong>8909 jobs 全绿</strong>。</li>
+</ul>
+<h2>四、⚠️ 顺带发现：RECOVERY.md 的丢失清单不完整</h2>
+<p><strong>第 4–7 行</strong>（本轮取证）：09-11/09-12 的<strong>四份专题报告</strong>——
+<code>黑洞宇宙条件_从巧合到必然.md</code>、<code>路线A_50比50到平坦性_解剖报告.md</code>、
+<code>攻λ_全息热力学与临界密度.md</code>、<code>做功项修正_λ的命运.md</code> ——
+<strong>也不在镜像中</strong>（它们在旧机 repo 的 <code>notes/</code>，09-16 重建时未入镜像），但<strong>未登记</strong>。
+⟹ 已补登记进 RECOVERY.md；其内容以 09-11/09-12 日志为<strong>最高现存凭证</strong>
+（BH/AR/LC/LW 的结论目标已随 StormPoC.lean 重建保留）。</p>
+<h2>五、诚实边界</h2>
+<ol>
+<li><strong>未经编译</strong>：「完整重建」的 17 条声明<strong>未在本机重新编译</strong>（mathlib 环境尚在恢复）。
+   首次 build 预计需按报错微调 API 名 —— 这是 09-09 的<strong>原始经验</strong>（当时也修了 3 处）。</li>
+<li><strong>名称层级</strong>：BH/AR/LC/LW 的原定理名与证明<strong>未入日志</strong> ⟹ 锚点是<strong>重设计</strong>（按结论），
+   不是逐字恢复；引用时不得称「原版定理」。</li>
+<li><strong>BX 未形式化</strong>（原 README 自注）；本轮仅登记设计，未尝试形式化。</li>
+<li><strong>下载/安装的机器开销</strong>：工具链 ~3.1GB（解压后）+ mathlib ~7GB —— 这是「机器核验恢复」的
+   必要成本；若用户不希望本机承担，可改走 CI 通道（workflow 已重建）。</li>
+<li>本轮<strong>未</strong>恢复 <code>python/maps/</code>（T1–T5）—— 那是 A1 之外的独立丢失资产（恢复规格在档，下一步可做）。</li>
+<li>⚠️ <strong>流程疏漏（自记）</strong>：本轮<strong>未先做「第 96 轮前备份」就直接打了补丁</strong>（违反铁律 9 的操作顺序）——
+   已补救：由「第 95 轮前备份 ＋ <code>_patch_95.py</code> <strong>重演</strong>」重建两份第 96 轮前备份（清单/交接），
+   正确性由补丁脚本的确定性保证；回滚路径完整。<strong>教训：备份是打补丁的前置动作，不是可选项。</strong></li>
+</ol>
+<h2>六、判决</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1（Lean 资产恢复）</td>
+<td>✅ <strong>文件层结项</strong>：5 文件全数重建（LA 核验 45 项 0 失败）</td>
+</tr>
+<tr>
+<td>环境层</td>
+<td>✅ <strong>工具链就位</strong>（Lean 4.34.0-rc2 可运行 + smoke 通过）；⏳ mathlib 与 build 复验为剩余步骤</td>
+</tr>
+<tr>
+<td>附加</td>
+<td>RECOVERY.md 补登记（4 份报告）；README 更新为六步补全路线</td>
+</tr>
+<tr>
+<td>⚠️ 教训一条</td>
+<td>「不可恢复」的评估（09-16）<strong>只扫了 outputs 镜像</strong>——<strong>未扫 .git 对象池</strong>（本轮扫了：无）。</td>
+</tr>
+<tr>
+<td>本轮凭证链：<strong>对象池 → git 历史 → remote → 全盘 → 旧机</strong>，五路全查后才定「只能重建」。</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>七、下一步</h2>
+<ol>
+<li>✅ <strong>已完成</strong>：工具链下载 + 解压安装 + smoke（本轮内完成）。</li>
+<li><strong>下一轮</strong>：<code>lake update</code>（mathlib clone）→ <code>cache get</code> → <code>lake build StormPoC</code> → 按报错修复 →
+   目标 <strong>8909 jobs 全绿</strong> → README 状态表改「已复验」；随后补 B 层确认与 C 层 sorry。</li>
+<li><strong>可选</strong>：恢复 <code>python/maps/</code>（T1–T5 包）；或把本轮方法与结果回填论文附录（若论文需要 Lean 资产条目）。</li>
+</ol>
+
+<div class="footer">A1 结项：Lean 资产恢复 —— 重建（分级）＋ 环境启动 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 A1结项_Lean资产恢复_重建与环境启动.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

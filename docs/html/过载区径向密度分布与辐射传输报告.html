@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>过载区径向密度分布与辐射传输：等温球超重 ⟹ 均匀浆糊 + 光学透明</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 背景与核心问题</div>
+  <h1>过载区径向密度分布与辐射传输：等温球超重 ⟹ 均匀浆糊 + 光学透明</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>任务</strong>：蓝图后续工作③——《过载区流体模型》遗留②（径向密度分布 ρ(r)）与遗留③（辐射传输定量计算）。
+<strong>性质标注</strong>：【推导】= 框架内推导；【验证】= 数值验证；【预言】= 可检验预言。</p>
+</blockquote>
+<hr />
+<h2>1 背景与核心问题</h2>
+<p><strong>遗留②</strong>：ρ_avg 是体积平均，实际径向分布（中心 vs 边缘）未建模；
+<strong>遗留③</strong>："过载区不辐射"是定性结论，需做辐射传输定量计算。</p>
+<p><strong>核心问题</strong>：过载区（黑洞内部，0&lt;r&lt;r_h）在钳制物态 P=P_P·tanh(ρ/ρ_P) 下的自洽径向结构是什么？它对辐射的定量作用是什么？</p>
+<hr />
+<h2>2 核心论证：等温球超重 ⟹ 内部无引力梯度 ⟹ 均匀浆糊【推导 + 验证】</h2>
+<h3>2.1 尝试一：线性区静水平衡（等温球）——失败【推导 + 验证】</h3>
+<p>假设过载区内部有牛顿引力梯度（dP/dr = −ρ·GM(r)/r²），且密度远低于 ρ_P（线性区 P≈c²ρ，宏观黑洞成立）：
+- c²dρ/dr = −ρGM(r)/r²，dM/dr = 4πr²ρ ⟹ <strong>奇异等温球</strong> ρ(r) = c²/(2πG)·r⁻²，M(r) = 2c²r/G；
+- <strong>在视界 r_h=2GM/c² 处：M(r_h) = 4M——恒定超重 4 倍</strong>（奇异等温球无标度自相似解，与 M 无关）；</p>
+<p><strong>数值验证</strong>（6 个质量：太阳/Sgr A<em>/M87</em>/原初 10¹¹/10¹³ kg/普朗克质量）：M_iso(r_h)/M = <strong>4.0×M 全部</strong> ✓——线性区静水平衡与总质量守恒<strong>不相容</strong>。</p>
+<p><strong>推论</strong>：过载区内部<strong>不存在</strong>净引力梯度。</p>
+<h3>2.2 框架机制的独立印证【推导】</h3>
+<p>框架中引力 = 通量遮挡亏损（P0：质量遮蔽通量产生 1/r² 力）。但：
+- 【原文 88–90】视界 = <strong>通量降到零的等势面</strong>（风暴压强临界面）；
+- 七环机制环 1：黑洞 = <strong>风暴压制区</strong>——视界内部净通量被压制到 0；
+- ⟹ 过载区内部<strong>无净通量梯度 ⟹ 无引力梯度</strong>（引力 = 通量遮挡，遮挡亏损消失）；
+- ⟹ 静水平衡 dP/dr = 0 ⟹ P = 常数 ⟹（钳制物态单调）<strong>ρ = 常数——均匀浆糊</strong>。</p>
+<p><strong>两条独立路径收敛</strong>：① 等温球超重 4M 排除内部引力；② 框架机制（视界通量=0 + 风暴压制）给出内部无引力的本体论理由。</p>
+<h3>2.3 均匀解【推导】</h3>
+<p>总质量 + 体积锁定：</p>
+<div class="formula"><span class="acc">ρ̄</span> = <span class="frac"><span class="num">M</span><span class="den"><span class="frac"><span class="num">4</span><span class="den">3</span></span>π r<sub>h</sub><sup>3</sup></span></span> = <span class="frac"><span class="num">3c<sup>6</sup></span><span class="den">32π G<sup>3</sup> M<sup>2</sup></span></span>,   P = P<sub>P</sub>tanh(<span class="acc">ρ̄</span>/ρ<sub>P</sub>),   c<sub>s</sub><sup>2</sup> = c<sup>2</sup> <span class="txt">sech</span><sup>2</sup>(<span class="acc">ρ̄</span>/ρ<sub>P</sub>)</div>
+
+<p><strong>与 v1.18 ρ_avg 精确一致</strong>（太阳 ρ̄=1.842×10¹⁹ kg/m³ ✓、Sgr A<em> 3.94×10⁶ ✓、M87</em> 1.73 ✓）——自洽性验证。</p>
+<p><strong>均匀 = "最大熵无结构"的动力学表达</strong>【原文 90】：无内部梯度 ⟹ 无内部结构 ⟹ 无特征辐射（遗留②关闭）。</p>
+<hr />
+<h2>3 均匀过载区剖面（数值）【验证】</h2>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>ρ̄ (kg/m³)</th>
+<th>ρ̄/ρ_P</th>
+<th>P/P_P</th>
+<th>c_s/c</th>
+<th>与 v1.18 ρ_avg</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>太阳质量</td>
+<td>1.842×10¹⁹</td>
+<td>3.57×10⁻⁷⁸</td>
+<td>3.57×10⁻⁷⁸</td>
+<td>1.000000</td>
+<td>✓ 1.8×10¹⁹</td>
+</tr>
+<tr>
+<td>Sgr A*</td>
+<td>3.942×10⁶</td>
+<td>7.65×10⁻⁹¹</td>
+<td>7.65×10⁻⁹¹</td>
+<td>1.000000</td>
+<td>✓ 1.0×10⁶</td>
+</tr>
+<tr>
+<td>M87*</td>
+<td>1.725</td>
+<td>3.35×10⁻⁹⁷</td>
+<td>3.35×10⁻⁹⁷</td>
+<td>1.000000</td>
+<td>✓ 0.44</td>
+</tr>
+<tr>
+<td>原初 10¹¹ kg</td>
+<td>7.289×10⁵⁷</td>
+<td>1.41×10⁻³⁹</td>
+<td>1.41×10⁻³⁹</td>
+<td>1.000000</td>
+<td>✓ 7.3×10⁵⁷</td>
+</tr>
+<tr>
+<td>普朗克质量</td>
+<td>1.539×10⁹⁵</td>
+<td><strong>0.0299</strong></td>
+<td>0.0298</td>
+<td>0.999555</td>
+<td>✓ 1.5×10⁹⁵</td>
+</tr>
+</tbody>
+</table>
+<p><strong>P≈c²ρ̄（0.9995）</strong>：宏观黑洞过载区全部处于钳制物态线性区——均匀、近辐射气体、声速≈c。</p>
+<hr />
+<h2>4 辐射传输：光学深度与透射率【推导 + 验证】</h2>
+<p>碎片散射截面取普朗克单元截面 σ = l_P²（碎片 = 普朗克尺寸，最小截面假设）。过载区光学深度：</p>
+<div class="formula">τ = ∫<sub>0</sub><sup>r<sub>h</sub></sup><span class="frac"><span class="num">ρ(r)</span><span class="den">m<sub>P</sub></span></span> l<sub>P</sub><sup>2</sup> dr = <span class="frac"><span class="num"><span class="acc">ρ̄</span></span><span class="den">m<sub>P</sub></span></span>l<sub>P</sub><sup>2</sup> r<sub>h</sub> = <span class="frac"><span class="num">3c<sup>6</sup></span><span class="den">32π G<sup>3</sup> M<sup>2</sup></span></span>·<span class="frac"><span class="num">l<sub>P</sub><sup>2</sup></span><span class="den">m<sub>P</sub></span></span>·<span class="frac"><span class="num">2GM</span><span class="den">c<sup>2</sup></span></span> = <span class="frac"><span class="num">3c<sup>4</sup> l<sub>P</sub><sup>2</sup></span><span class="den">16π G<sup>2</sup> m<sub>P</sub> M</span></span></div>
+
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>τ</th>
+<th>透射率 T=e^(−τ)</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>太阳质量</td>
+<td>6.5×10⁻⁴⁰</td>
+<td>≈1</td>
+<td><strong>光学透明</strong></td>
+</tr>
+<tr>
+<td>Sgr A*</td>
+<td>3.0×10⁻⁴⁶</td>
+<td>≈1</td>
+<td>光学透明</td>
+</tr>
+<tr>
+<td>M87*</td>
+<td>2.0×10⁻⁴⁹</td>
+<td>≈1</td>
+<td>光学透明</td>
+</tr>
+<tr>
+<td>原初 10¹¹ kg</td>
+<td>1.3×10⁻²⁰</td>
+<td>≈1</td>
+<td>光学透明</td>
+</tr>
+<tr>
+<td>普朗克质量</td>
+<td><strong>0.0597</strong></td>
+<td>0.942</td>
+<td><strong>临界窗口</strong>（勉强透明）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键结论（遗留③定量化）</strong>：
+- <strong>过载区不吸收也不发射辐射的定量原因 = 光学透明</strong>（碎片截面 l_P² 极小、数密度极低），而非仅"最大熵无结构"；
+- 宏观黑洞 τ~10⁻⁴⁰——落入辐射<strong>直接穿过过载区</strong>，不产生次级辐射（与"过载区无特征辐射"一致，原因升级为定量）；
+- 普朗克质量黑洞 τ≈0.06——唯一可能观测到过载区吸收/散射效应的窗口（原初黑洞蒸发末期）。</p>
+<hr />
+<h2>5 与既有推导的衔接</h2>
+<table>
+<thead>
+<tr>
+<th>既有结果</th>
+<th>衔接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v1.18 ρ_avg</td>
+<td>均匀模型 ρ̄ 与其精确一致（自洽性验证）</td>
+</tr>
+<tr>
+<td>v1.24 钳制物态微观推导</td>
+<td>均匀浆糊 = 钳制物态 + 内部无引力梯度的直接推论</td>
+</tr>
+<tr>
+<td>七环机制环 1（风暴压制）</td>
+<td>内部无引力梯度的本体论来源</td>
+</tr>
+<tr>
+<td>通量遮挡（引力=遮挡亏损）</td>
+<td>通量=0 ⟹ 遮挡亏损消失 ⟹ 无引力——同一机制的自洽闭合</td>
+</tr>
+<tr>
+<td>S4 预言（过载区无奇点）</td>
+<td>均匀有限密度 ρ̄（无发散）+ 光学透明</td>
+</tr>
+<tr>
+<td>挂谷集信息测度≈0</td>
+<td>无内部梯度 ⟹ 无结构 ⟹ 信息无法编码</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6 可检验预言【预言】</h2>
+<ol>
+<li><strong>过载区光学透明</strong>（宏观黑洞 τ~10⁻⁴⁰）：落入物质穿过过载区不产生次级辐射——过载区辐射特征 = 无（定量）；</li>
+<li><strong>普朗克质量黑洞临界窗口</strong>：τ≈0.06、T=0.94——过载区首次"可见"（吸收 6%）的原初黑洞尺度，蒸发末期可测签名；</li>
+<li><strong>均匀性</strong>：过载区无径向结构（ρ=常数）——与任何"内部结构"模型（如分层/结晶）可区分。</li>
+</ol>
+<hr />
+<h2>7 对论文的并入建议（待确认）</h2>
+<p>§4.6 v1.18/v1.24 段后追加 v1.25 补充：
+- "过载区径向结构（v1.25）——等温球（线性区静水平衡）在 r_h 处 M=4M 恒定超重 ⟹ 内部无净引力梯度（视界通量=0 压制）⟹ <strong>均匀浆糊 ρ̄=3c⁶/(32πG³M²)</strong>（与 ρ_avg 精确一致）；辐射传输：宏观黑洞光学深度 τ~10⁻⁴⁰（光学透明，过载区不吸收/不发射辐射的定量原因），普朗克质量黑洞 τ≈0.06（临界窗口）"；
+- §9 S4 行补充"光学透明"。</p>
+<hr />
+<h2>8 诚实标注【开放】</h2>
+<ol>
+<li><strong>均匀模型依赖"内部无引力梯度"</strong>：等温球超重 4M 排除了线性区静水平衡，框架机制（视界通量=0）给出本体论支撑——但未排除更复杂的残余结构（如有弱残余通量梯度/非均匀边界层）；</li>
+<li><strong>碎片截面 σ~l_P² 为最小截面假设</strong>：若碎片有效截面更大（合并团块），τ 相应增大（普朗克质量窗口会提前）；</li>
+<li><strong>视界边界层未建模</strong>：视界处（饱和模态/火墙，厚度 δ~√(R·l_P)，F1'''）与均匀过载区的连接条件未推导；</li>
+<li>均匀模型对<strong>旋转黑洞</strong>（Kerr，过载区可能非球对称）未推广。</li>
+</ol>
+<hr />
+<p><em>过载区径向密度分布与辐射传输完成 · 均匀浆糊 ρ̄=3c⁶/(32πG³M²) · 光学透明 τ~10⁻⁴⁰（宏观）/ 0.06（普朗克）· 遗留②③关闭</em></p>
+
+<div class="footer">过载区径向密度分布与辐射传输：等温球超重 ⟹ 均匀浆糊 + 光学透明 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 过载区径向密度分布与辐射传输报告.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

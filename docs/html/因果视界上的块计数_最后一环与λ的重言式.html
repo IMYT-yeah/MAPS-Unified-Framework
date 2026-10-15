@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>因果视界上的块计数：最后一环闭合到 10⁻⁶¹，附带查出 λ 的重言式</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、要证的命题</div>
+  <h1>因果视界上的块计数：最后一环闭合到 10⁻⁶¹，附带查出 λ 的重言式</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-17（第 16 轮）
+<strong>脚本</strong>：<code>outputs/_b5_horizon_count.py</code>（检查项 CG-0 … CG-6，全部通过，失败项：无）
+<strong>一句话结论</strong>：B5「同一批相干块」这一环<strong>可以闭合</strong>，但闭合的理由不是零表面，而是<strong>时间尺分离</strong>（残差 O(H₀t_P) = 1.18×10⁻⁶¹）；同时查出两件更重要的：① 框架的面<strong>不是</strong>零表面，「因果补丁边界」的说法要废弃；② <code>λ = 4α²β² = 1</code> 是<strong>恒等式</strong>，不构成平直性的证据。</p>
+</blockquote>
+<hr />
+<h2>一、要证的命题</h2>
+<p>上一轮（09-16 第 15 轮）把 B5 的最后一环定形为：</p>
+<table>
+<thead>
+<tr>
+<th>端</th>
+<th>计数方式</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>观测者端（B5）</td>
+<td>面元 → 4 bits → 16 倍压缩</td>
+<td>每相干块 <strong>1 nat</strong>（修正后）</td>
+</tr>
+<tr>
+<td>统计端（F3/BH）</td>
+<td>通量管相干块计数</td>
+<td>每 <code>4l_P²</code> <strong>1 nat</strong></td>
+</tr>
+</tbody>
+</table>
+<p>单位已由 Hawking 温度裁决（1 nat，不是 1 bit）。<strong>剩下没证的</strong>是：两端数的<strong>是不是同一批块</strong>。
+此前只能靠「涌现次序」的架构论证，本轮要把它变成可核验的命题。</p>
+<p><strong>做法</strong>：不再纠结「定义是不是同一个」，改问一个可量化的版本——
+<strong>在什么精度上，两种分解可以不同？</strong> 若答案是 O(H₀t_P)，则这一环对一切物理目的都已闭合。</p>
+<hr />
+<h2>二、CG-0/CG-1　基线与候选面清单</h2>
+<p>基线复算与 09-11 完全对齐：<code>R_c = 14.45163 Gly</code>、<code>T = 2.66558×10⁻³⁰ K</code>、<code>N = A/(4l_P²) = 2.24809×10¹²²</code>、<code>M = c³/(2GH₀) = 9.20550×10⁵² kg</code>，且 <code>R_S = R_c</code>、<code>Nk_BT = c⁵/(2GH)</code> 两项精确成立（相对误差 &lt; 10⁻¹²）。</p>
+<p>候选热力学面（积分器先对纯 de Sitter 与三个单流体闭式解 <code>−2/(3w+1)</code> 校验通过，ΛCDM 积分换分割数 5×10⁴/2×10⁵/8×10⁵ 结果一致到 10 位）：</p>
+<table>
+<thead>
+<tr>
+<th>面</th>
+<th>定义</th>
+<th>半径</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>平流停滞面</strong> <code>R_c</code></td>
+<td><code>v_rec = Hr = c</code></td>
+<td><strong>14.4516 Gly</strong></td>
+<td>框架选定的面</td>
+</tr>
+<tr>
+<td><strong>事件视界</strong> <code>R_EH</code></td>
+<td><code>a₀∫dt c/a</code></td>
+<td><strong>16.5802 Gly</strong>（<code>R_EH/R_c = 1.147288</code>）</td>
+<td>唯一按构造为<strong>零表面</strong></td>
+</tr>
+<tr>
+<td>表观视界（λ_micro = 8π/3）</td>
+<td><code>c/(H√λ)</code></td>
+<td>4.9930 Gly</td>
+<td>λ=1 时与 <code>R_c</code> 重合</td>
+</tr>
+</tbody>
+</table>
+<p>框架自身宇宙学（Ω_m = 1/3, Ω_Λ = 2/3）下 <code>R_EH/R_c = 1.161001</code>。</p>
+<hr />
+<h2>三、CG-2　时间尺分离：这一环在 10⁻⁶¹ 上闭合</h2>
+<pre><code>ν  = 1/t_P                  = 1.85486×10⁴³ s⁻¹
+ν/H₀                        = 8.45924×10⁶⁰      （= R_c/l_P，精确）
+H₀ t_P                      = 1.18214×10⁻⁶¹
+</code></pre>
+<p><strong>论证</strong>：块的分解是<strong>瞬时量</strong>——它由风暴当前的微观结构定义，不带历史。风暴以 ν = 1/t_P 刷新（一个哈勃时内每个面元被刷新 <strong>8.46×10⁶⁰ 次</strong>），而视界几何只以 H₀ 变化。因此两端的分解<strong>只能</strong>是同一套，除非微观结构被冻结。</p>
+<p><strong>量化残差</strong>：唯一可能造成失配的机制是「面在移动时扫过新面元、历史分解留下痕迹」，其特征量级为 <code>H₀/ν = H₀t_P = 1.18×10⁻⁶¹</code>。</p>
+<p>对照两个尺度：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>数值</th>
+<th>与本残差之比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本轮残差 <code>H₀t_P</code></td>
+<td>1.18×10⁻⁶¹</td>
+<td>—</td>
+</tr>
+<tr>
+<td>上一轮解决的分歧 <code>ln2</code></td>
+<td>0.6931</td>
+<td><strong>5.86×10⁶⁰ 倍</strong></td>
+</tr>
+<tr>
+<td>冻结结构时的失配 <code>β_s</code></td>
+<td>0.4667</td>
+<td>3.95×10⁵⁹ 倍</td>
+</tr>
+<tr>
+<td><code>β_s²</code></td>
+<td>0.2178</td>
+<td>1.84×10⁵⁹ 倍</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>「同一批块」在 O(10⁻⁶¹) 的意义上成立，比它要确立的效应小 60 个数量级。</strong>
+反过来说：<strong>若风暴不刷新（ν → 0），失配会是 O(β_s) = 0.47 乃至 O(β_s²) = 0.22——即 20%~47% 的块数误差</strong>，那时这一环就是假的。<strong>A1 的 ν ~ 1/t_P 正是让这个链接成立的东西</strong>，这一点此前没有被量化过。</p>
+<hr />
+<h2>四、CG-3　但「零表面」这条理由被否证</h2>
+<p>上一轮的直觉是「框架的面是因果面，所以分解是标准的」。检验一下 <code>R_c</code> 是不是零表面——看它相对共动观测者的外移速度 <code>dR_c/dt = (1+q)c</code>：</p>
+<table>
+<thead>
+<tr>
+<th>w</th>
+<th>q = (1+3w)/2</th>
+<th><code>dR_c/dt / c</code></th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>−1.0000（纯 dS）</td>
+<td>−1.00000</td>
+<td><strong>0.00000</strong></td>
+<td><strong>零表面 ✓</strong></td>
+</tr>
+<tr>
+<td>−0.6889（ΛCDM 有效值）</td>
+<td>−0.53335</td>
+<td>0.46665</td>
+<td>timelike</td>
+</tr>
+<tr>
+<td>−0.5</td>
+<td>−0.25000</td>
+<td>0.75000</td>
+<td>timelike</td>
+</tr>
+<tr>
+<td>0（物质）</td>
+<td>0.50000</td>
+<td>1.50000</td>
+<td>spacelike</td>
+</tr>
+<tr>
+<td>1/3（辐射）</td>
+<td>1.00000</td>
+<td>2.00000</td>
+<td>spacelike</td>
+</tr>
+</tbody>
+</table>
+<p>ΛCDM 的 q₀ = −0.5333 ⟹ <code>dR_c/dt = 0.4667c</code>。</p>
+<p>⟹ <strong>只有纯 de Sitter 时框架的面才是零表面。</strong> 真实宇宙里它以 0.467c 外移，是 <strong>timelike 面</strong>，不是任何意义的「因果视界」。</p>
+<p><strong>这条要写进论文</strong>：B5 不能表述为「观测者因果补丁的边界」（那是事件视界，见 CG-4 会被观测排除），只能表述为<strong>运动学上的平流停滞面</strong>（风暴向外以 c 平流、与退行速度相等之处）。正确的理由链条是 CG-2 的时间尺分离，不是零表面。</p>
+<hr />
+<h2>五、CG-4　判决性检验：改用真事件视界会被观测排除</h2>
+<p>如果改成唯一合法的零表面（事件视界 <code>R_EH</code>），等分账 <code>E = Nk_BT</code> 会给出不同的 λ：</p>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>E 的标度</th>
+<th>λ</th>
+<th>Ω_K = 1−λ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>甲：<code>T</code> 固定 = <code>ℏH₀/(2πk_B)</code></td>
+<td>∝ R²</td>
+<td><code>(R/R_c)²</code></td>
+<td><code>1 − 1.3163</code></td>
+</tr>
+<tr>
+<td>乙：<code>T</code> 由该面表面引力定（∝1/R）</td>
+<td>∝ R</td>
+<td><code>R/R_c</code></td>
+<td><code>1 − 1.1473</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>宇宙学</th>
+<th>读法</th>
+<th>λ</th>
+<th>Ω_K</th>
+<th>偏离（Planck+BAO）</th>
+<th>偏离（Planck 单独）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ΛCDM (0.3111/0.6889)</td>
+<td>甲</td>
+<td>1.3163</td>
+<td><strong>−0.3163</strong></td>
+<td>166.8σ</td>
+<td>15.1σ</td>
+</tr>
+<tr>
+<td>ΛCDM</td>
+<td>乙</td>
+<td>1.1473</td>
+<td><strong>−0.1473</strong></td>
+<td>77.9σ</td>
+<td>5.7σ</td>
+</tr>
+<tr>
+<td>框架 (1/3+2/3)</td>
+<td>甲</td>
+<td>1.3479</td>
+<td><strong>−0.3479</strong></td>
+<td>183.5σ</td>
+<td>16.9σ</td>
+</tr>
+<tr>
+<td>框架 (1/3+2/3)</td>
+<td>乙</td>
+<td>1.1610</td>
+<td><strong>−0.1610</strong></td>
+<td>85.1σ</td>
+<td>6.5σ</td>
+</tr>
+</tbody>
+</table>
+<p>（参照：Planck+BAO 给 Ω_K = 0.0007 ± 0.0019；Planck 单独给 Ω_K = −0.044 ± 0.018。取两者中<strong>最宽松</strong>的约束，偏离仍有 5.7σ。）</p>
+<p>⟹ <strong>事件视界这条路也死了。</strong> 与上一轮那个 217σ 的 Kodama 版合起来看：</p>
+<table>
+<thead>
+<tr>
+<th>候选面 / 温度</th>
+<th>Ω_K</th>
+<th>判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>表观视界 + Kodama 温度</td>
+<td>+0.41</td>
+<td>❌ 217σ（09-12）</td>
+</tr>
+<tr>
+<td>事件视界 + 框架温度</td>
+<td>−0.15 ~ −0.32</td>
+<td>❌ 5.7σ ~ 183σ（本轮）</td>
+</tr>
+<tr>
+<td><strong>平流停滞面 c/H + T_GH</strong></td>
+<td><strong>0</strong></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p><strong>在自然候选里，<code>R_c = c/H</code> 是唯一幸存者。</strong> 这是 B5 目前最强的支持——但它用的是 Ω_K 观测量，所以<strong>仍是数据参与的选择，不是纯先验推导</strong>（与 09-16 的诚实标注一致）。</p>
+<hr />
+<h2>六、CG-5　顺带查出的结构问题：<code>λ = 4α²β² = 1</code> 是重言式</h2>
+<p>框架定义 <code>α = 4π/ξ</code>（熵系数）、<code>β = ξ/(8π)</code>（第一定律反解），于是</p>
+<pre><code>λ = 4α²β² = 4 · (16π²/ξ²) · (ξ²/64π²) = 1
+</code></pre>
+<p><strong>对任意 ξ 恒成立。</strong> 逐值核验（ξ = 1, 2, 3, 4, 4ln2, 8, 16）全部给 <code>1.000000000000</code>。</p>
+<p>上一轮我把这件事记为「<strong>ξ-稳健性</strong>」并当作增益。<strong>换个说法它就是：重言式。</strong> 一个对任意 ξ 都等于 1 的量，不可能携带关于宇宙的信息。</p>
+<p>对照装配分账那条路（CG-4 甲式，<code>λ = (R/R_c)²</code>）——它<strong>真的依赖 R</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>R/R_c</th>
+<th>λ</th>
+<th>Ω_K</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0000</td>
+<td>1.0000</td>
+<td>0.0000</td>
+</tr>
+<tr>
+<td>1.1473</td>
+<td>1.3163</td>
+<td>−0.3163</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两条路只在 R = R_c 处重合。</strong> 所以：</p>
+<ol>
+<li><code>α–β</code> 路<strong>看不见 R</strong>，因此它<strong>不可能用来挑面</strong>；</li>
+<li>它更<strong>不能</strong>作为「λ = 1 已获独立验证」的证据——λ = 1 只是「Bekenstein-Hawking 熵系数 × 标准 GH 温度」的乘积关系，是标准物理的重言式；</li>
+<li><strong>真正有内容的只有一条</strong>：等分账 <code>E = Nk_BT</code> 写在 <code>R_c = c/H</code> 上 ⟹ 解出 <code>ρ = 3H²/(8πG)</code>（09-17 第 4 轮的结果）。这一条才是「平坦性」的来源。</li>
+</ol>
+<p><strong>建议</strong>：论文中把 ξ-稳健性从「支持性结果」降为「一致性检查」；并把 λ 的定义统一为<strong>操作式</strong> <code>λ ≡ ρ/ρ_crit</code>（面敏感），删掉把它与 <code>4α²β²</code> 并列的写法。</p>
+<hr />
+<h2>七、诚实边界</h2>
+<p><strong>是推导的</strong>：
+- <code>ν/H₀ = R_c/l_P = 8.45924×10⁶⁰</code>、<code>H₀t_P = 1.18214×10⁻⁶¹</code>（纯运动学，精确）；
+- <code>R_EH/R_c</code> 的积分（对 4 个闭式解校验通过，收敛到 10 位）；
+- <code>λ = 4α²β² = 1</code> 对任意 ξ 成立（代数恒等）。</p>
+<p><strong>是论证而非证明的</strong>（CG-2 的「同一批块」）：
+- 我把「两端数的是同一批」转化为「两种分解的差异上界」。上界 O(H₀t_P) 依赖两个前提：
+  (i) 两端都是<strong>瞬时</strong>的分解（不带历史累积）；(ii) 风暴刷新率 ν ~ 1/t_P。
+  若任一端实际是历史累积量（例如熵按「曾经扫过的面元」累加），本论证失效。<strong>这一点没有独立证明</strong>，只能靠 A1 的湮灭-再生循环图像支持。
+- 因此结论是「<strong>在 O(10⁻⁶¹) 精度上同一</strong>」，不是「严格同一」。</p>
+<p><strong>是数据参与的</strong>（CG-4 的唯一性）：
+- 排除事件视界用的是 Ω_K 观测值，属数据倒推，不是先验推导。B5 的地位仍然是<strong>准定理 + 数据辅助</strong>，不是定理。</p>
+<p><strong>未动的</strong>：
+- <code>α = π</code> 与 <code>β = 1/(2π)</code> 仍是标准物理的输入（BH 熵、GH 温度）。框架的原创性在「把它们用在 <code>R_c</code> 上」这一步，不在它们的数值。</p>
+<hr />
+<h2>八、判决与下一步</h2>
+<p><strong>判决</strong>：
+- ✅ <strong>最后一环闭合</strong>：「同一批块」在 O(10⁻⁶¹) 上成立，比要确立的 ln2 分歧小 60 个数量级。<strong>机制是 ν ≫ H，不是零表面。</strong>
+- ❌ <strong>「零表面」理由废弃</strong>：框架的面以 0.467c 外移，是 timelike 面。
+- ❌ <strong>事件视界候选被排除</strong>（Ω_K = −0.15 ~ −0.32，最宽约束 5.7σ）。
+- ⚠️ <strong><code>λ = 4α²β² = 1</code> 是重言式</strong>，须在论文中降调；λ 应统一为操作式 <code>ρ/ρ_crit</code>。
+- ⟹ <strong>B5 重述为</strong>：热力学面 = <strong>平流停滞面（v_rec = c）</strong>，建立精度 O(10⁻⁶¹)，在自然候选面中唯一不被观测排除。</p>
+<p><strong>下一步（按价值排序）</strong>：
+1. <strong>论文收口</strong>（工程性但影响正确性）：把 ξ-稳健性降调、λ 定义统一、废弃「因果补丁边界」措辞、把 CG-2 的时间尺分离写成正式论证。
+2. <strong>载流子两类型收口</strong>（唯一还有产出空间的独立支线）：空腔（电子）如何间接获得横向耦合（候选 A/B/C），判别预言 = WF 定律违反幅度 + <code>η/s → 1/(4π)</code>。
+3. <code>O-Λ</code> 的 23.76 倍：已翻过原文 2/3、守恒流、镜像支、微扰尺度四条路，均无解——除非有新结构，否则登记为第四个不可约参数。</p>
+
+<div class="footer">因果视界上的块计数：最后一环闭合到 10⁻⁶¹，附带查出 λ 的重言式 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 因果视界上的块计数_最后一环与λ的重言式.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

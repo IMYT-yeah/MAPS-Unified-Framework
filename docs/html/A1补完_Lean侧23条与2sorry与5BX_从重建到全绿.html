@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A1 补完：Lean 侧 23→24 条待重写 ＋ 2 处 sorry ＋ 5→6 条 BX —— 从重建到全绿</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>A1 补完：Lean 侧 23→24 条待重写 ＋ 2 处 sorry ＋ 5→6 条 BX —— 从重建到全绿</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 100 轮</strong> ｜ 2026-10-03 ｜ 核验脚本 <code>_lean_fill_verify_100.py</code>（<strong>LF-1…LF-16，16 项 0 失败</strong>）
+任务来源：<strong>第 99 轮清点的「甲-1」</strong>（用户点选）—— 「环境已就绪 ＋ 纯本地 ＋ 判据硬」的第一项。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p>第 96 轮重建版里残留的 <strong>2 处 <code>sorry</code></strong> 已补证、<strong>23→24 条「待重写」</strong>已逐条重设计并给出证明、
+<strong>5→6 条 BX「设计登记」</strong>已形式化 ⟹</p>
+<p><strong><code>StormPoC.lean</code> 现在含 55 条声明（54 条内容定理/引理 ＋ 1 条工具），<code>sorry = 0</code>，
+<code>lake build StormPoC</code> = <code>Build completed successfully (8909 jobs)</code>、0 error、0 warning。</strong></p>
+<hr />
+<h2>二、两张表（分级 ＋ 结果）</h2>
+<h3>2.1 分级（沿用 A1 的四级规范，本轮新增 E/F 两档）</h3>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>含义</th>
+<th>条数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>【完整重建·含证明】GA/T ＋ A3 ＋ A4</td>
+<td>17</td>
+</tr>
+<tr>
+<td>B</td>
+<td>【锚点·含证明】AR-3 / AR-4 / LC-6 / LW-3</td>
+<td>4</td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td><strong>【原 sorry ⟹ 本轮补证】</strong> <code>bh_horizon_iff_critical</code> ＋ <code>ar_k_from_lambda</code></td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td><strong>E</strong></td>
+<td><strong>【重设计·含证明（本轮）】</strong> BH 8 / AR 6 / LC 5 / LW 5</td>
+<td><strong>24</strong></td>
+</tr>
+<tr>
+<td><strong>F</strong></td>
+<td><strong>【形式化·含证明（本轮）】</strong> BX</td>
+<td><strong>6</strong></td>
+</tr>
+<tr>
+<td>—</td>
+<td>工具（<code>mul_cancel_iff_of_ne</code>）</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>E/F 两档（30 条）不是「已恢复的原定理」</strong> —— 原 BH/AR/LC/LW 的定理名与陈述<strong>未入任何记录</strong>；
+每条都锚定 09-11 / 09-12 日志的<strong>已记录结论</strong>（出处逐条写在 <code>StormPoC.lean</code> 的 doc 里），
+但<strong>逐条同一性不可核验</strong>。这是 E 档与 A/B 档的<strong>本质区别</strong>。</p>
+<h3>2.2 结果</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sorry</code></td>
+<td><strong>2 → 0</strong></td>
+</tr>
+<tr>
+<td>定理/引理</td>
+<td><strong>23 → 55</strong>（新增 32）</td>
+</tr>
+<tr>
+<td>报错（迭代）</td>
+<td><strong>18 → 2 → 1 → 0</strong>（8 次编译）</td>
+</tr>
+<tr>
+<td>构建</td>
+<td><strong><code>Build completed successfully (8909 jobs)</code></strong>、0 error、<strong>0 warning</strong></td>
+</tr>
+<tr>
+<td>单次构建耗时</td>
+<td>98–313 s（热缓存）；冷缓存 5–11 min</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>三、逐族做了什么</h2>
+<table>
+<thead>
+<tr>
+<th>族</th>
+<th>新增/补证</th>
+<th>内容要点（→ 09-11 / 09-12 日志出处）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BH</strong></td>
+<td>锚点补证 ＋ <strong>8 条重设计</strong></td>
+<td>紧致度 C = (8πG/3)ρR²/c²；取 R = R_H ⟹ C = Ω；C = Ω(R/R_H)²；<strong>C ∝ R²</strong>（「半径必须是哈勃半径」的量化依据：46.5 Gly 会放大 <strong>10.35 倍</strong>）；FRW 展开积的内区未捕获/外区反捕获；<strong>判别器当前不可判</strong>（Planck Ω_K = 0.0007±0.0019 ⟹ 2σ 内含 0）</td>
+</tr>
+<tr>
+<td><strong>AR</strong></td>
+<td>锚点补证 ＋ <strong>6 条重设计</strong></td>
+<td>共动机械能恒等式 E/m = ½(HR)² − (4πG/3)ρR² = −½(kc²/a²)R²；<strong>E=0 ⟺ k=0</strong>（严格）；解出 k 是独立自由度；50:50 <strong>不强制平坦</strong>（可构造 k&lt;0）；⭐ <strong>系数陷阱 AR-7</strong>：球体自能版零能量给 <strong>R_s/R = 10/3 ≠ 1</strong> ⟹ 「零总能量」<strong>必须</strong>指检验粒子版；<strong>k=0 ⟺ λ=1</strong></td>
+</tr>
+<tr>
+<td><strong>LC</strong></td>
+<td><strong>5 条重设计（含 1 条工具拆分）</strong></td>
+<td><code>lc_gauge_identity</code>（c 与 l_P² 相消 ⟹ 4πR·l_P²c² = 4πℏG/H）；<strong>λ = 2αβ</strong>（严格）；α = π；λ = 2πβ；<strong>λ=1 ⟺ β=1/(2π)</strong>；Unruh 系数配平 ℏ(cH)/(2πck_B) = ℏH/(2πk_B)</td>
+</tr>
+<tr>
+<td><strong>LW</strong></td>
+<td><strong>5 条重设计</strong></td>
+<td>一般表观视界解出 κ = c²/R² − H²；⭐ <strong>循环的识别</strong>：在 R·H = c 下 <code>R²(H²+κ)=c² ⟺ κ=0</code>（<strong>预设 R·H=c 等于预设平坦</strong> —— 这正是上一轮的循环所在）；GH 处方（β=1/2π）⟹ <strong>Ω_K = 0</strong>；HK 处方（β=|1−3w|/8π）⟹ Ω_K = 1−(1−3w)²/16；<strong>观测裁决</strong>：Kodama 在 z=0 给 Ω_K ≈ 0.4122，与 Planck 差 <strong>&gt; 200σ</strong></td>
+</tr>
+<tr>
+<td><strong>BX</strong></td>
+<td><strong>6 条形式化</strong></td>
+<td>因果视界 R_c = c/H；κ = cH；<strong>能量匹配 ⟹ λ = 1</strong>；λ=1 ⟹ κ=0 ⟹ R·H = c（取正根）；<strong>BX-F 稳健性</strong>：α=4π/ξ、β=ξ/(8π) ⟹ λ = 4α²β² = <strong>1，ξ 完全约掉</strong>；⭐ <strong>BX-F′ 相容性</strong>：两条 λ 关系不冲突</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>四、⚠️ C-60：计数口径两处「同一件事两个数」</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>原文</th>
+<th>实际分族账</th>
+<th>差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>StormPoC.lean</code> 源码注：「待重写 <strong>23</strong>」</td>
+<td><code>BH 余 8 + AR 余 &lt;strong&gt;6&lt;/strong&gt; + LC 5 + LW 5 = &lt;strong&gt;24&lt;/strong&gt;</code></td>
+<td><strong>1</strong>（在 AR 族）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>源码标题：「BX 族（<strong>5</strong>）」</td>
+<td>设计稿列 <code>BX-1…BX-5 ＋ BX-F = &lt;strong&gt;6&lt;/strong&gt; 条</code></td>
+<td><strong>1</strong>（BX-F）</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ README 的表格其实是<strong>自洽的</strong>（AR 行写「2 有证 ＋ 1 sorry ＋ <strong>6</strong> 待重写」），
+<strong>不自洽的是源码注</strong>（AR 写 5）。⟹ <strong>C-60 = 「同一件事被记成两个数」</strong>（<strong>C-29 同族</strong>）。
+🔧 处置：本轮按<strong>实际条数</strong>清理（BH 9 / AR 9 / LC 7 / LW 6 / BX 6），并在统计块与 README 里显式登记两处歧义。</p>
+<hr />
+<h2>五、⚠️ 诚实边界（必须一起读）</h2>
+<ol>
+<li><strong>E/F 两档 ≠ 原定理</strong>（已述于 §2.1）——<strong>覆盖</strong>目标达成（8 族齐备、原「52 定理」的结论目标全部有对应），
+   但<strong>逐条同一性不可核验</strong>。</li>
+<li><strong>「8909 jobs」≠「54 个定理通过」</strong>（<strong>C-57</strong>，第 97 轮）：8908 个 job 是依赖（mathlib 全量），
+   <code>StormPoC.lean</code> 自身只占 <strong>1 个 job</strong>。本轮 job 数与第 97 轮<strong>完全相同</strong>（8909）——因为它是<strong>依赖计数</strong>，
+   不随本文件内容变化。⚠️ 这本身就是 C-57 的一个现场演示。</li>
+<li><strong>LW-2（<code>R·H = c/(2αβ)</code>）未形式化</strong> —— 09-12 的<strong>头条结果</strong>需要全息关系与 Friedmann 的完整联立；
+   本轮形式化的是它的 <strong>循环识别</strong>（<code>lw_flat_iff_kappa_zero</code>）与<strong>两端处方</strong>（GH / HK / 观测裁决）。
+   ⟹ <strong>这是本轮最大的一处未完成</strong>，明确登记，不做「已覆盖」的暗示。</li>
+<li><strong>LC-1 的输入是本化简后的密度关系</strong>（<code>ρ·(4πG) = 3αβH²</code>）：其中 <code>c</code>、<code>l_P²</code> 的消去由
+   <code>lc_gauge_identity</code> <strong>机器验证</strong>；<code>ℏ</code> 的消去是一步公因子约简（<code>field_simp</code> 会顺带做掉），
+   <strong>该一步未单独形式化</strong>。</li>
+<li><strong>2 处 <code>sorry</code> 的补证是「重设计后的补证」</strong> —— 原锚点的<strong>陈述</strong>是第 96 轮重设计的，
+   所以严格说：本轮补的是「重设计版的锚点」，不是「原件的锚点」。</li>
+</ol>
+<hr />
+<h2>六、本轮踩的 Lean 坑（7 条，已写入 README 与技能）</h2>
+<ol>
+<li>⚠️⭐ <strong><code>λ</code> 与 <code>hλ</code> 都不是合法标识符</strong> —— 该坑<strong>第 3 次</strong>出现（97／98／100 轮）。</li>
+<li>⚠️⭐ <strong><code>field_simp; ring</code> 在 ≥8 个变量上指数爆炸</strong>：一条 10 变量的定理实测 <strong>&gt; 13 分钟未收敛</strong>
+   ⟹ <strong>必须拆成 2–3 步小引理</strong>。</li>
+<li>⚠️ <strong><code>field_simp</code> 顺手约掉两侧公因子</strong>（本轮把 <code>ℏ</code> 约掉了）⟹ 之后按原式推会「找不到符号」。</li>
+<li>⚠️ <strong><code>eq_div_iff</code>（<code>a = b/c</code>）vs <code>div_eq_iff</code>（<code>a/c = b</code>）</strong> —— 本轮<strong>两次用错方向</strong>。</li>
+<li>⚠️ <strong><code>field_simp</code> 常已把目标关掉</strong> ⟹ 后面 <code>ring</code> 报 <code>No goals to be solved</code> ⟹ <strong><code>field_simp; try ring</code></strong>。</li>
+<li>⚠️ <strong><code>linarith</code> 不处理含除法的原子</strong> —— 先 <code>field_simp at h</code> 清分母。</li>
+<li>⚠️ <strong>检查脚本自己也会误报</strong>：LF-16 第一版把 <strong>doc 注释的续行</strong>当代码行 ⟹ 误报 5 处非法标识符。
+   <strong>须用状态机跳过 <code>/-- … -/</code> 块</strong>。</li>
+</ol>
+<hr />
+<h2>七、判决与下一步</h2>
+<ul>
+<li><strong>判决</strong>：<strong>甲-1 结项</strong>。判据（<code>sorry = 0</code> ＋ build 全绿）<strong>由编译器保证，无解释空间</strong>。
+  A1 这条链（96 文件层 → 97 环境层 → <strong>100 补完</strong>）到此<strong>完全闭合</strong>。</li>
+<li>⭐ <strong>净增量</strong>：<strong>30 条新定理（E/F 档）＋ 2 条补证</strong> ＋ <strong>C-60</strong> ＋ 7 条 Lean 坑。</li>
+<li>📌 <strong>剩余清点项</strong>：甲-2（<code>λ_c(∞)</code> 精确定位）／甲-3（相变点精确值）／甲-4（麦克斯韦谱）／甲-5（4π 相位方程）；
+  乙类（并轨 <strong>O1–O5</strong>，<strong>I-23</strong>）；丙类（EMRI 材料包 / 私审准备包）。</li>
+<li>⚠️ <strong>别把本轮当成「框架有新内容」</strong>：这 30 条是<strong>把 09-11/09-12 已记录结论形式化</strong>，
+  不产生新物理；其价值在<strong>机器可验证性</strong>。</li>
+</ul>
+
+<div class="footer">A1 补完：Lean 侧 23→24 条待重写 ＋ 2 处 sorry ＋ 5→6 条 BX —— 从重建到全绿 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 A1补完_Lean侧23条与2sorry与5BX_从重建到全绿.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

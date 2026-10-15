@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>把四类判定从「表」推到「正文」：1 处表‑正文冲突</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>把四类判定从「表」推到「正文」：1 处表‑正文冲突</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 91 轮</strong> ｜ 脚本 <code>_bodyclaim_91.py</code>（<strong>BC-1…BC-5，0 失败</strong>）、核验 <code>_verify_91.py</code>（<strong>V-1…V-10，0 失败</strong>）
+题源：<strong>第 90 轮的诚实边界 §七.1</strong> —— 第 90 轮只做了 §9 表（23 行），<strong>正文里还有 37 行「预言」没标</strong>。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p>把 73 行「预言」按<strong>正文 / 轮次块</strong>二分后，正文里剩下 <strong>21 条实质承诺句</strong>，全部补上四类判定。
+补标过程中翻出<strong>一处真正的横向不一致</strong>：</p>
+<blockquote>
+<p><strong>§5.3 正文写「第四代预言」（n=4 涡衰变），而 §9 表第 5 行对同一命题写的是「与 LHC 未发现存在张力」</strong>
+—— 正文称「预言」、表格称「失败」，<strong>而且中英对称地如此</strong>（EN 同样写 <code>Fourth-generation prediction</code>）。</p>
+</blockquote>
+<p>顺带查出：<strong>摘要是判定覆盖率最低的位置</strong> —— 它列出<strong>约 12 项</strong>预言，<strong>此前只有 1 项（S-E5）带判定</strong>。</p>
+<hr />
+<h2>二、四步做法</h2>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>动作</th>
+<th>实测</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td>全部含「预言」的行 → <strong>正文 / 轮次块</strong> 二分（模式化掩码）</td>
+<td><strong>73 行 → 正文 30 / 块 43</strong></td>
+</tr>
+<tr>
+<td>②</td>
+<td>剔三类噪声：<strong>表行</strong>（第 90 轮已覆盖）／<strong>索引行</strong>（目录、开放问题表）／<strong>变更记录行</strong>（<code>v1.xx 变更</code>）</td>
+<td>30 → <strong>21 条实质承诺句</strong></td>
+</tr>
+<tr>
+<td>③</td>
+<td>逐行判定（依据一律引已登记轮次）</td>
+<td>见 §三</td>
+</tr>
+<tr>
+<td>④</td>
+<td>⭐⭐ <strong>冲突检测</strong>：表里已判「失败」而<strong>正文仍称「预言」且邻域无任何限定</strong></td>
+<td><strong>1 处</strong>（§5.3 第四代）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>三、正文级承诺句台账（21 行）</h2>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>承诺句（简）</th>
+<th><strong>四类判定</strong></th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§4 概览</td>
+<td>指数度规（PPN <code>γ=β=1</code> 其余全 0）</td>
+<td><strong>postdiction</strong></td>
+<td><strong>1PN 与 GR 不可区分</strong> ⟹ 与 GR 同值</td>
+</tr>
+<tr>
+<td>摘要</td>
+<td>「框架给出多项可检验预言」（约 12 项）</td>
+<td><strong>混合（本轮前仅 1 项带判定）</strong></td>
+<td>见本表其余各行</td>
+</tr>
+<tr>
+<td>诚实声明</td>
+<td>v1.0 强场外推预言</td>
+<td><strong>失败（已撤回）</strong></td>
+<td>原文已标</td>
+</tr>
+<tr>
+<td>§4.5b</td>
+<td>β=1 通过 ／ β=1/2 被 <strong>1600σ</strong> 排除</td>
+<td><strong>postdiction ／ 失败（备选路径）</strong></td>
+<td>原文已标</td>
+</tr>
+<tr>
+<td>§4.5b</td>
+<td>测地线 RK4 进动/偏折数值</td>
+<td><strong>推导 / 数值</strong></td>
+<td>——</td>
+</tr>
+<tr>
+<td>§4.6</td>
+<td>v1.1 修订：撤回「光子球 1GM vs 3GM」EHT 冲突预言</td>
+<td><strong>失败（已撤回）</strong></td>
+<td>原文已标</td>
+</tr>
+<tr>
+<td>§4.6</td>
+<td>v1.15 单参数族 <code>α</code>（阴影 <code>b=5.196α·GM/c²</code> 等）</td>
+<td><strong>半拟合</strong></td>
+<td><code>α</code> 是参数；框架称 <code>α=1</code> 由自洽性强制 ⟹ <strong>未独立检验</strong></td>
+</tr>
+<tr>
+<td>§4.6</td>
+<td>新预言：声速剖面 <code>c_s² = c²·sech²(ρ/ρ_P)</code></td>
+<td><strong>推导 / 数值</strong></td>
+<td>由碎片-风暴碰撞动力学涌现</td>
+</tr>
+<tr>
+<td>§4.6</td>
+<td>过载区数值（<code>ρ_avg</code>、<code>P</code>、<code>c_s</code>）</td>
+<td><strong>推导 / 数值</strong></td>
+<td>——</td>
+</tr>
+<tr>
+<td>§4.6</td>
+<td>吸积盘辐射传输【引用 + 数值】</td>
+<td><strong>推导 / 数值</strong></td>
+<td>——</td>
+</tr>
+<tr>
+<td>§4.5b</td>
+<td>「有与观测相容的<strong>几何预言</strong>」</td>
+<td><strong>postdiction</strong></td>
+<td>EHT <strong>已观测</strong> ⟹ 事后相容</td>
+</tr>
+<tr>
+<td>§4.10</td>
+<td>强场预言「见 §9 表」</td>
+<td><strong>索引</strong>（非承诺）</td>
+<td>——</td>
+</tr>
+<tr>
+<td>§4.10</td>
+<td><strong>F4 发射层预言</strong> <code>~√(l_P/R)</code></td>
+<td><strong>真预言</strong></td>
+<td>原初黑洞<strong>未观测</strong></td>
+</tr>
+<tr>
+<td><strong>§5.3</strong></td>
+<td><strong>「第四代预言」</strong></td>
+<td>⚠️ <strong>失败（第 91 轮补标）</strong></td>
+<td><strong>§9 第 5 行同命题 =「与 LHC 未发现存在张力」</strong>；本句原<strong>无一字限定</strong></td>
+</tr>
+<tr>
+<td>§8.2</td>
+<td>诚实标注：<code>⟨f_space⟩</code> 式</td>
+<td><strong>半拟合（已标）</strong></td>
+<td>原文已标「拟合式而非预言」</td>
+</tr>
+<tr>
+<td>§8.4</td>
+<td>void-CPT-κ 可检验预言</td>
+<td><strong>真预言</strong></td>
+<td>未观测（DES/Y3）</td>
+</tr>
+<tr>
+<td>§10.2</td>
+<td>强场度规形式（开放问题 3）</td>
+<td><strong>未定量 / 开放</strong></td>
+<td>原文标「✅ 已推进」</td>
+</tr>
+<tr>
+<td>§10.2</td>
+<td>统计→几何严格化（开放问题 4）</td>
+<td><strong>推导 / 数值</strong></td>
+<td>——</td>
+</tr>
+<tr>
+<td>版本沿革</td>
+<td>各 <code>v1.xx 变更</code> 行</td>
+<td><strong>索引</strong>（非承诺）</td>
+<td>——</td>
+</tr>
+<tr>
+<td>§8.2 末尾</td>
+<td>§8.2 修正（<code>f_space</code>）</td>
+<td><strong>解释性（零预言力，已标）</strong></td>
+<td>原文已标</td>
+</tr>
+</tbody>
+</table>
+<p><strong>汇总（21 行，剔索引 3 行后 18 行）</strong>：
+<strong>真预言 2 ｜ postdiction 3 ｜ 半拟合 2 ｜ 失败 3 ｜ 推导 / 数值 5 ｜ 未定量·开放 1 ｜ 解释性 1 ｜ 混合 1（摘要）</strong>。</p>
+<p>⚠️ <strong>对比 §9 表（第 90 轮）</strong>：表里「真预言」是 <strong>11</strong> 行，正文里只有 <strong>2</strong> 行。
+两者的差不是矛盾 —— <strong>§9 表是「可检验性清单」，正文是「论证过程中的承诺句」</strong>，两者本就不是同一集合。
+⟹ 📌 <strong>但这也说明：把两张表的数加在一起（11 + 2 = 13）是没有意义的</strong> ——
+   <strong>它们的</strong>分母不同<strong>（表 = 可检验项；正文 = 承诺句）。</strong>相加前先问「分母是什么」。**</p>
+<hr />
+<h2>四、⭐ 本轮唯一的实质发现（C-46 主体）</h2>
+<h3>4.1 冲突</h3>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>对「第四代费米子」的表述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>§5.3 正文</strong>（ZH L920 / EN L938）</td>
+<td>「<strong>第四代预言</strong>：n=4 涡在 z&gt;1000 不稳定衰变，&gt;1 TeV 极重极短命。」—— <strong>无一字限定</strong></td>
+</tr>
+<tr>
+<td><strong>§9 表第 5 行</strong></td>
+<td>「与 LHC 未发现存在张力」</td>
+</tr>
+<tr>
+<td><strong>第 90 轮台账</strong></td>
+<td><strong>失败</strong>（依据 = §9 第 5 行）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>同一命题、两种表述</strong>：正文当「预言」卖，表格记「失败」。</p>
+<h3>4.2 为什么这比单个错数更糟</h3>
+<ul>
+<li>读者顺着正文读到 §5.3 时，得到的是<strong>一个活跃的预言</strong>；只有翻到 §9 表才知道它<strong>已被观测排除域</strong>；</li>
+<li>摘要在列「多项可检验预言」时<strong>没有列它</strong>（这一点是对的），但<strong>正文没有同步</strong>；</li>
+<li>⚠️ 而且<strong>中英对称地冲突</strong> —— 若只查中文，会误判为「英文不同步」，实际两边都错。</li>
+</ul>
+<p>⟹ ⭐ <strong>判据（可复用）</strong>：<strong>同一命题在「表」与「正文」两处表述必须一致</strong>；
+   <strong>冲突检测要中英双查</strong>，修的时候<strong>两边各改一处</strong>。</p>
+<h3>4.3 处置</h3>
+<p><strong>在 §5.3 该句后加四类判定注</strong>（引 §9 第 5 行的状态原文），并要求「引用本条时必须同时引 §9 第 5 行的状态」。
+<strong>没有删改原句</strong>（那是框架的设定层陈述），只<strong>补口径</strong>。</p>
+<hr />
+<h2>五、⚠️ 摘要：判定覆盖率最低的位置</h2>
+<p>摘要（§0）列出<strong>约 12 项</strong>预言（B1–B5、EMRI、S-E5、S4、void-CPT-κ、<code>w</code>、SU(3) β、纠缠熵…），
+<strong>此前只有 1 项（S-E5）带判定</strong>。</p>
+<p>⟹ <strong>处置（最小改动）</strong>：在摘要预言段末尾加<strong>指向两张台账的指针</strong>，并<strong>写明</strong>「本段约 12 项里此前只有 S-E5 一项带判定」。
+⟹ 📌 <strong>规范（第 91 轮起）</strong>：<strong>摘要在列完预言后必须给一个指向判定台账的指针</strong> ——
+   摘要是最先被读的部分，<strong>判定覆盖率不该在这里最低</strong>。</p>
+<hr />
+<h2>六、诚实边界</h2>
+<ol>
+<li><strong>21 条承诺句的分类是我的判定</strong>，依据一律引已登记轮次；但「postdiction vs 半拟合」在个别行上仍有裁量空间
+   （如 §4.6 的 <code>α</code> 单参数族：框架声称 <code>α=1</code> 由自洽性强制，我按「有参数 ⟹ 半拟合」处理）。</li>
+<li><strong>「剔三类噪声」的判据是我定的</strong>（表行 / 索引行 / 变更记录行）。换一套剔除标准，21 这个数字会变。
+   ⟹ 与第 89 轮的教训同族：<strong>窗口/剔除法一变，结论就变</strong>，所以必须把剔除法写进结论。</li>
+<li><strong>冲突检测只跑了「§9 表 vs 正文」这一对位置</strong>。<strong>「备忘录 vs 正文」「清单 vs 正文」没有查</strong>
+   （第 89 轮查过「备忘录 → 论文」的方向，但那是找「遗漏」，不是找「表述冲突」）。</li>
+<li><strong>两张表的数不可相加</strong>（§三末）—— 分母不同。<strong>本轮没有做「全论文判定总账」</strong>，
+   因为那需要先把「分母」定义清楚。</li>
+<li><strong>本轮没有新的物理结论</strong> —— 产出是<strong>分类 ＋ 1 处冲突修复 ＋ 一条「表‑正文一致性」规范</strong>。</li>
+</ol>
+<hr />
+<h2>七、判决与产出</h2>
+<ul>
+<li><strong>判决</strong>：<strong>C-46</strong>（正文级承诺句未带四类判定；1 处与 §9 表冲突，中英对称）。</li>
+<li>总账：<strong>更正 44 → 45</strong>；<strong>负面条数不变</strong>。</li>
+<li>论文 <strong>ZH / EN</strong>：§5.3 加四类判定注 ＋ 摘要加台账指针 ＋ §9 后追加<strong>正文级承诺句台账</strong>（中英同步）。</li>
+<li>清单：新增 <strong>C-46</strong> 行 ＋ 总账 <strong>45 条</strong>。</li>
+<li>交接说明：§三 第 91 轮段；技能：<strong>陷阱 85</strong>；记忆：铁律 <strong>41</strong>。</li>
+<li>备忘录：本文件。</li>
+</ul>
+<h2>八、下一步（第 92 轮建议）</h2>
+<ol>
+<li>⭐ <strong>换一对位置做同样的冲突检测</strong>：<strong>「备忘录 vs 正文」</strong>（§六.3 的缺口）——
+   第 89 轮查的是「有没有遗漏」，本轮该查的是「<strong>同一命题在备忘录与正文里的表述是否冲突</strong>」。</li>
+<li><strong>候选池 #5（PPN 优越系 α₁ ≲ 10⁻⁴）</strong> —— ⚠️ 先按<strong>陷阱 50</strong> 自查：若框架给 <code>α₁ = 0</code>（与 GR 同），
+   则<strong>判别力 = 0</strong>（与 <strong>N-22</strong> 的 <code>Ω_K = 0</code> 同病）⟹ <strong>先算「它排除了什么」再开工</strong>。</li>
+<li><strong>第 1–38 轮备忘录缺口</strong>（C-44 登记）是否从 <code>本轮推演总结_2026-09-17/21.md</code> 反向重建。</li>
+</ol>
+
+<div class="footer">把四类判定从「表」推到「正文」：1 处表‑正文冲突 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 四类判定推到正文_表与正文冲突一处.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

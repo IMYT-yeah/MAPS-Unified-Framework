@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>β = 1/(2π) 的框架推导：从"观测倒推"到"框架预言"</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、先说清楚：09-12 的"成功"到底是什么</div>
+  <h1>β = 1/(2π) 的框架推导：从"观测倒推"到"框架预言"</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-09-16 ｜ 接续 LC 族（09-11）与 LW 族（09-12）
+核验脚本：<code>_beta_derive.py</code>（纯标准库，可直接运行）
+<strong>一句话结论：β = 1/(2π) 可以推导，但代价是新增一条框架原生公理（热力学面 = 因果视界）。此前"λ=1 ⟺ β=1/(2π)"只是一个等价关系，不是推导。</strong></p>
+</blockquote>
+<hr />
+<h2>一、先说清楚：09-12 的"成功"到底是什么</h2>
+<p>LC/LW 族的结论写作 <strong>λ = 1 ⟺ β = 1/(2π)</strong>。这是一个<strong>等价关系</strong>，不是推导。
+它只说明"临界密度"和"每比特能量 = ℏH/(2π)"是同一件事的两种说法。
+真正的任务是把 <strong>β 单独算出来</strong>，而不动用 Planck 的 Ω_K 数据。</p>
+<p>把链条摊开后，我发现此前的三条路<strong>两条是废的，一条是空的</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>路线</th>
+<th>做法</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 表观视界</td>
+<td>用 <code>R_A = c/(H√λ)</code> 做能账</td>
+<td><strong>空洞</strong>：E = N k_B T 对任意 λ 恒成立（恒等式）</td>
+</tr>
+<tr>
+<td>② R·H = c</td>
+<td>把 <code>R·H = c</code> 当作表观视界半径</td>
+<td><strong>循环</strong>（09-12 已发现）：预设了 k = 0</td>
+</tr>
+<tr>
+<td>③ Kodama 表面引力</td>
+<td><code>κ = -cH(1-3w)/4</code></td>
+<td><strong>被否证</strong>：λ = (1-3w)²/16，z=0 处偏离 <strong>217σ</strong></td>
+</tr>
+</tbody>
+</table>
+<p>路线①值得展开。取 <code>R_A = c/(H√λ)</code>，则
+<code>ε_bit = E/N = √λ·ℏH/(2π)</code>，而表面引力 <code>κ = c²/R_A = cH√λ</code> 给出的温度正好是
+<code>k_B T = √λ·ℏH/(2π)</code> —— <strong>两者恒等，λ 被约掉了</strong>。所以能账在表观视界上等价于
+Friedmann 方程：它描述动力学，<strong>对 λ 零预言力</strong>。这不是错，是空。</p>
+<hr />
+<h2>二、修复：换"因果视界"，不用"表观视界"</h2>
+<p>框架自己的视界概念来自<strong>风暴本身</strong>，不是 GR 的俘获面。</p>
+<h3>BX-1（因果视界定理）</h3>
+<p>框架的微观速度是 <code>c</code>（对风暴组分的传播速度）。均匀膨胀的运动学恒等式是
+<code>v_rec = H·r</code>（精确，<strong>与 k 无关</strong>）。风暴成分无法回传的界面在</p>
+<div class="formula">R<sub>c</sub> = <span class="frac"><span class="num">c</span><span class="den">H</span></span></div>
+
+<p>这不是"假设 k=0"。表观视界 <code>R_A = c/(H√λ)</code> 是另一个面，两者只在 λ=1 时重合。</p>
+<h3>BX-2（表面引力配平）</h3>
+<p>在 <code>R_c</code> 上取 de Sitter 型表面引力：</p>
+<div class="formula">κ = <span class="frac"><span class="num">c<sup>2</sup></span><span class="den">R<sub>c</sub></span></span> = cH</div>
+
+<p>（等价说法：速度梯度 <code>dv/dr = H</code>，乘以风暴微观速度 <code>c</code> 得加速度 <code>cH</code>。）</p>
+<h3>BX-3（目标结论）</h3>
+<div class="formula">k<sub>B</sub> T = <span class="frac"><span class="num">ℏκ</span><span class="den">2π c</span></span> = <span class="frac"><span class="num">ℏ H</span><span class="den">2π</span></span> ⟹  β ≡ <span class="frac"><span class="num">k<sub>B</sub> T</span><span class="den">ℏ H</span></span> = <span class="frac"><span class="num">1</span><span class="den">2π</span></span></div>
+
+<p><strong>注意 β 与 λ 无关</strong>——这是关键：它不再是一个待拟合参数。</p>
+<h3>BX-4（全息能账 ⟹ λ = 1）</h3>
+<p>在 <code>R_c</code> 内：<code>E = (4π/3)ρ R_c³ c² = λ·c⁵/(2GH)</code>（含 λ）；
+<code>N = π(R_c/l_P)²</code>，<code>k_B T = ℏH/(2π)</code> ⟹ <code>N k_B T = c⁵/(2GH)</code>（<strong>不含 λ</strong>）。
+令 <code>E = N k_B T</code>：</p>
+<div class="formula">boxedλ = 1</div>
+
+<p>代数的：左边正比于 λ，右边不依赖 λ，相等即定 λ。</p>
+<h3>BX-5（自洽性）</h3>
+<p>λ = 1 ⟹ <code>R_A = c/H = R_c</code> ⟹ 因果视界 = 表观视界 = 内质量的史瓦西半径 ⟹
+<strong>"黑洞宇宙"条件自动成立</strong>（不再是 09-11 那个"待解释的巧合"）。</p>
+<hr />
+<h2>三、2π 从哪来：从 F3 熵公式推出来（这是本轮真正的增量）</h2>
+<p>此前 1/(2π) 是从 QFT（Unruh/Hawking）<strong>借</strong>来的。现在它在框架内部闭环：</p>
+<p><strong>F3</strong>：<code>S = k_B·A/(4 l_P²)</code>（通量管相干块微态计数）
+<strong>第一定律</strong>：<code>dE = T dS</code>，<code>E = Mc²</code>，<code>A = 16πG²M²/c⁴</code></p>
+<div class="formula">T = <span class="frac"><span class="num">c<sup>2</sup></span><span class="den"><span class="rm">d</span>S/<span class="rm">d</span>M</span></span> = <span class="frac"><span class="num">ℏ c<sup>3</sup></span><span class="den">8π G M k<sub>B</sub></span></span> = <span class="frac"><span class="num">ℏκ</span><span class="den">2π c k<sub>B</sub></span></span>,   κ = <span class="frac"><span class="num">c<sup>4</sup></span><span class="den">4GM</span></span></div>
+
+<p><strong>数值核验（太阳质量黑洞）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R_s</td>
+<td>2.9540 km</td>
+<td></td>
+</tr>
+<tr>
+<td>S/k_B</td>
+<td>1.0494×10⁷⁷</td>
+<td>README 记 1.05×10⁷⁷ ✓</td>
+</tr>
+<tr>
+<td>T（F3 + 第一定律）</td>
+<td>6.1687×10⁻⁸ K</td>
+<td></td>
+</tr>
+<tr>
+<td>T（ℏc³/8πGMk_B）</td>
+<td>6.1687×10⁻⁸ K</td>
+<td>偏差 &lt; 1e-9 ✓</td>
+</tr>
+</tbody>
+</table>
+<p>所以 <strong>1/(2π) 追溯到了 F3 熵公式里的那个"4"</strong>。框架自己的微态计数给出了正确的
+Hawking 温度，2π 随之而来。这一步不再是外部输入。</p>
+<hr />
+<h2>四、完整链条</h2>
+<pre><code>F3:  S = k_B A/(4 l_P²)  ──dE = T dS──▶  T = ℏκ/(2π c k_B)         [2π 的来源]
+A1:  风暴微观速度 = c ；v_rec = Hr  ──▶  因果视界 R_c = c/H          [任意 k 成立]
+     ──▶  κ = c²/R_c = cH  ──▶  k_B T = ℏH/(2π)  ──▶  β = 1/(2π)    [与 λ 无关]
+     ──▶  E = N k_B T  ⟹  λ = 1  ⟹  Ω_K = 0  ⟹  k = 0  ⟹  黑洞宇宙
+</code></pre>
+<p>数值（Planck 2018, H₀ = 67.66）：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+<th>与 09-11 独立计算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R_c = c/H</td>
+<td>14.4516 Gly</td>
+<td>14.452 ✓</td>
+</tr>
+<tr>
+<td>T = ℏH/(2πk_B)</td>
+<td>2.6656×10⁻³⁰ K</td>
+<td>2.666 ✓</td>
+</tr>
+<tr>
+<td>N = A/(4l_P²)</td>
+<td>2.2481×10¹²²</td>
+<td>2.248 ✓</td>
+</tr>
+<tr>
+<td>M(&lt;R_c)</td>
+<td>9.20545×10⁵² kg</td>
+<td>9.2054 ✓</td>
+</tr>
+<tr>
+<td>E_grav / E_therm</td>
+<td>1.000000000000</td>
+<td>⟹ λ = 1</td>
+</tr>
+<tr>
+<td>R_s(M)/R_c</td>
+<td>1.000000000000</td>
+<td>⟹ 黑洞宇宙</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>五、代价：一条新公理（必须点名）</h2>
+<p><strong>公理 B5（热力学面 = 因果视界）</strong>：携带熵与温度的面是因果视界 <code>R_c = c/H</code>，
+不是 GR 的表观视界 <code>R_A</code>。</p>
+<p>支持它的理由：
+1. <strong>框架原生</strong>：框架的视界由风暴自身的速度 c 定义（因果），不是由俘获定义（引力）。
+2. <strong>唯一有预言力的选择</strong>：用 <code>R_A</code> 能账是恒等式（零信息），用 <code>R_c</code> 才预言 λ=1。
+3. <strong>经受住了那个杀死 Kodama 的检验</strong>：Kodama 处方偏离 217σ，本处方相容。</p>
+<p>反对/存疑：
+- 标准全息学（Jacobson / Cai-Kim / Verlinde）用的都是表观视界。
+- 所以 B5 是<strong>选择与公理</strong>，不是从 A1–A4 推出的定理。<strong>这一点必须在论文里写明。</strong></p>
+<hr />
+<h2>六、开放项：代数能账 vs 微分第一定律（<strong>本节已于同日修正，见下</strong>）</h2>
+<blockquote>
+<p>⚠️ <strong>修正（2026-09-16 夜）</strong>：初稿把这一条写成"两条定律不相容"，框错了。
+真相是<strong>微分第一定律本身成立</strong>，只是它选定的温度是 <strong>Kodama 温度</strong>，不是 GH 温度。
+详细推导与数值见《视界热力学的两个包》。以下为初稿原文，保留以存痕：</p>
+</blockquote>
+<p>本推导用的是<strong>代数等分</strong> <code>E = N k_B T</code>（Verlinde/Padmanabhan 型，写在因果视界上）。
+它与<strong>微分第一定律</strong> <code>dE = T dS + W dV</code>（写在表观视界上，与 Friedmann 等价）
+在 λ=1 时面重合，但若同取 <code>T = ℏH/(2πk_B)</code> 则方程不闭合：</p>
+<table>
+<thead>
+<tr>
+<th>w</th>
+<th>dE/dt</th>
+<th>TdS/dt</th>
+<th>WdV/dt</th>
+<th>(TdS+WdV)/dE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>−0.6889</td>
+<td>3.496e9</td>
+<td>6.992e9</td>
+<td>8.856e9</td>
+<td><strong>4.533</strong></td>
+</tr>
+<tr>
+<td>0</td>
+<td>1.124e10</td>
+<td>2.247e10</td>
+<td>1.686e10</td>
+<td><strong>3.500</strong></td>
+</tr>
+<tr>
+<td>1/3</td>
+<td>1.498e10</td>
+<td>2.997e10</td>
+<td>1.498e10</td>
+<td><strong>3.000</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>修正后的结论</h3>
+<p>比值恒为 <code>(7−3w)/2</code>，与 λ、z 无关。令其为 1 得 w = 5/3（非物理）——
+但<strong>这不该被读成"定律不相容"</strong>，而应反解：把 T 当作未知，要求定律闭合，解出</p>
+<div class="formula">T<sub><span class="txt">要求</span></sub> = <span class="frac"><span class="num">ℏ H(3w-1)</span><span class="den">8π k<sub>B</sub></span></span> = T<sub><span class="txt">Kodama</span></sub></div>
+
+<p>数值：平直情形下 <code>T_Kodama</code> 一列<strong>精确等于 1.000000</strong>（w = 0、−1、1/3 均验证）。
+⟹ <strong>微分第一定律选定的温度是 Kodama 温度</strong>（即 09-12 那个被 217σ 否证的温度）。</p>
+<p><strong>结构因此变清楚了——存在两个互不相容的热力学包</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>温度</th>
+<th>定律</th>
+<th>对 λ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标准包</td>
+<td><code>T_Kodama</code></td>
+<td><code>dE = TdS + WdV</code> ⟺ Friedmann</td>
+<td><strong>不受约束</strong>（初始条件）</td>
+</tr>
+<tr>
+<td>框架包</td>
+<td><code>T_GH = ℏH/(2πk_B)</code></td>
+<td>代数等分 <code>E = T·S</code> 写在 <code>R_c</code> 上</td>
+<td><strong>预言 λ = 1</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 框架取后者 ⟹ 得到 λ=1，但<strong>放弃了"由视界热力学推出 Friedmann"这条路</strong>。
+⟹ 这与"框架未导出 Friedmann"的现状自洽，并且给出一条<strong>方向性结论</strong>：
+<strong>Friedmann 必须从 A1/A2 微观物理推，视界热力学这条路走不通。</strong></p>
+<hr />
+<h2>七、新判别器（升级版）</h2>
+<table>
+<thead>
+<tr>
+<th>检验</th>
+<th>精确 k ≡ 0（本框架）</th>
+<th>暴胀残余 |Ω_K| ~ e^(−2N)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>期望 Ω_K</td>
+<td><strong>恒等于 0</strong></td>
+<td>10⁻⁵ – 10⁻⁴</td>
+</tr>
+<tr>
+<td>当前 Planck+BAO</td>
+<td>0.0007 ± 0.0019</td>
+<td>相容</td>
+</tr>
+<tr>
+<td>判别所需精度</td>
+<td>未来巡天（欧几里得 / LSST / SKA）σ(Ω_K) ≲ 10⁻⁴</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>若未来测到 Ω_K ≠ 0 且排除系统误差 ⟹ 公理 B5 被否证（不是"λ 被微调"，是<strong>面选错了</strong>）。</p>
+<hr />
+<h2>八、遗留</h2>
+<ol>
+<li><strong>公理 B5 的独立论证</strong>：能否从 A1 的"50:50 + 各向同性"推出"热力学面 = 因果视界"？
+   目前只是最佳解释，不是逻辑必然。<strong>这是下一刀该落的地方。</strong></li>
+<li><strong>代数 vs 微分定律</strong>（第六节）需要在框架内重推微分形式：在 <code>R_c</code> 上正确的
+   第一定律长什么样？<code>W dV</code> 项对应框架的什么机制？</li>
+<li><strong>Lean 化</strong>：BX 族应加入 <code>StormPoC.lean</code>。但该 Lean 源文件已于 2026-09-16 确认
+   随 D 盘丢失 —— 恢复规格见 <code>MAPS-Unified-Framework/verification/lean/README.md</code>，
+   本族定理（BX-1…BX-5）已追加进该规格的定理清单。</li>
+<li>框架仍<strong>未导出</strong> Friedmann 方程；本推导用的是 Friedmann 的临界密度定义，不是它的推导。</li>
+</ol>
+
+<div class="footer">β = 1/(2π) 的框架推导：从"观测倒推"到"框架预言" · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 β的框架推导_因果视界与2π的来源.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

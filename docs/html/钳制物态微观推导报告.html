@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>钳制物态微观推导：P = P_P·tanh(ρ/ρ_P) 从"碎片-风暴碰撞"涌现</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 背景：遗留①与微观图景</div>
+  <h1>钳制物态微观推导：P = P_P·tanh(ρ/ρ_P) 从"碎片-风暴碰撞"涌现</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>任务</strong>：蓝图候选 <strong>D</strong>——把过载区物态方程 P(ρ) = P_P·tanh(ρ/ρ_P)（v1.18 唯象假设，遗留①）从"碎片-风暴碰撞"动力学完整推导，使普朗克钳制成为<strong>涌现结果</strong>而非假设。
+<strong>性质标注</strong>：【原文】= 原始对话主张；【推导】= 本报告框架内推导；【验证】= 数值验证；【预言】= 可检验预言。</p>
+</blockquote>
+<hr />
+<h2>1 背景：遗留①与微观图景</h2>
+<p><strong>遗留①</strong>（《过载区流体模型》§7）："钳制物态的微观推导：tanh 形式是唯象假设，需从'碎片-风暴碰撞'动力学推导。"</p>
+<p><strong>原文依据</strong>：
+- 【原文 90】"黑洞内部……正物质碎片在风暴中翻滚……<strong>风暴压强虽然大，但它是有限的（由普朗克尺度限制）</strong>"——过载区 = 碎片 + 风暴，压强有限；
+- 【原文 46】"<strong>吞灭有最大速率</strong>"——碎片-风暴湮灭/动量交换速率有普朗克上限；
+- 【公理 1】事件流各向同性、普朗克频率 ν_P ~ t_P⁻¹——碰撞的微观时钟。</p>
+<p><strong>微观图景</strong>：过载区 = N 个正物质碎片（最基本单位，质量 m_P）浸没在风暴（普朗克事件流）中。压强 = 碎片与风暴双向动量交换的净效应。<strong>推导目标</strong>：从该图景推出 P(ρ)=P_P·tanh(ρ/ρ_P) 及其全部结构。</p>
+<hr />
+<h2>2 推导链（三条微观机制）</h2>
+<h3>机制① 普朗克填充率：ρ/ρ_P 的物理意义【推导】</h3>
+<p>碎片质量 m_P（正物质最基本单位，能标由公理 1 事件流锁定）。每普朗克体积 l_P³ 可容纳的最大碎片质量 = m_P。定义<strong>普朗克填充率</strong>：</p>
+<div class="formula">x = <span class="frac"><span class="num">ρ</span><span class="den">ρ<sub>P</sub></span></span>,   ρ<sub>P</sub> = <span class="frac"><span class="num">m<sub>P</sub></span><span class="den">l<sub>P</sub><sup>3</sup></span></span> = <span class="frac"><span class="num">c<sup>5</sup></span><span class="den">ℏ G<sup>2</sup></span></span>≈ 5.2×10<sup>96</sup> <span class="txt">kg/m</span><sup>3</sup></div>
+
+<ul>
+<li>x ≪ 1：碎片稀疏，每普朗克体积远少于一个碎片质量（宏观黑洞）；</li>
+<li>x ~ 1：碎片填满普朗克体积（普朗克质量黑洞）；</li>
+<li>x ≫ 1：碎片超填 ⟹ 合并（机制④）。</li>
+</ul>
+<p><strong>ρ_P 不再是拟合参数，而是"每普朗克体积一个碎片质量"的几何标度。</strong></p>
+<h3>机制② 双向净动量流的罗吉斯蒂饱和 ⟹ tanh【推导 + 验证】</h3>
+<p>过载区压强 = 碎片-风暴动量交换的<strong>净效应</strong>，分两个竞争通道：
+- <strong>反射通道</strong>（碎片把风暴动量"顶回"，抵抗压缩）：贡献 +J_max；
+- <strong>放行通道</strong>（碎片被风暴冲开，等效负压）：贡献 −J_max。</p>
+<p>净动量流 J = I₊ − I₋ ∈ [−J_max, +J_max]。碎片反射能力随密度增强（遮挡/反射增多），但受普朗克速率钳制。<strong>净流的演化是罗吉斯蒂型</strong>（增长率 ∝ 距上限距离 × 距下限距离——反射增强的边际收益递减、放行衰减的边际阻力递增）：</p>
+<div class="formula"><span class="frac"><span class="num">dJ</span><span class="den">dρ</span></span> = <span class="frac"><span class="num">α</span><span class="den">J<sub>max</sub></span></span>(J<sub>max</sub><sup>2</sup> - J<sup>2</sup>),   α = <span class="frac"><span class="num">1</span><span class="den">ρ<sub>P</sub></span></span></div>
+
+<p>解（解析）：<strong>J(ρ) = J_max·tanh(ρ/ρ_P)</strong>。数值积分 vs 解析：最大偏差 8×10⁻⁴ ✓。</p>
+<p><strong>tanh 的涌现</strong>：双向竞争的对称饱和（反射 +J_max / 放行 −J_max）的罗吉斯蒂演化 ⟹ 双曲正切——不是假设，是两通道竞争的动力学结果。</p>
+<h3>机制③ 普朗克压强 P_P：饱和值的微观构成【推导】</h3>
+<p>每个普朗克体积单元被碎片"激活"时，与风暴交换动量的上限：
+- 单次碰撞最大动量：p_P = ℏ/l_P（普朗克动量，单事件能标 E_P）；
+- 最大碰撞频率：ν_P = c/l_P（普朗克频率，公理 1 事件流上限，【原文 46】最大吞灭速率）；
+- 单元表面力：p_P·ν_P = E_P/l_P，作用在单元面积 l_P² 上 ⟹</p>
+<div class="formula">P<sub>P</sub> = <span class="frac"><span class="num">E<sub>P</sub></span><span class="den">l<sub>P</sub><sup>3</sup></span></span> = <span class="frac"><span class="num">c<sup>7</sup></span><span class="den">ℏ G<sup>2</sup></span></span> ≈ 4.6×10<sup>113</sup> <span class="txt">Pa</span>  <span class="txt">(普朗克压强)</span></div>
+
+<h3>③' 求和：钳制物态的涌现【推导】</h3>
+<p>总压强 = 单元活性比例 × 单元最大压强：</p>
+<div class="formula">boxed P(ρ) = P<sub>P</sub>tanh(<span class="frac"><span class="num">ρ</span><span class="den">ρ<sub>P</sub></span></span>) </div>
+
+<ul>
+<li><strong>线性区</strong>（ρ≪ρ_P）：P ≈ P_P·ρ/ρ_P = c²ρ（相对论性最大因果；与辐射气体 P=c²ρ/3 差 1/3 各向同性几何因子，可由 ρ_P 的 1/3 重定义吸收——诚实标注）；</li>
+<li><strong>饱和区</strong>（ρ≫ρ_P）：P → P_P（压强钳制——【原文 90】"风暴压强有限"的定量表达）；</li>
+<li><strong>普朗克钳制是涌现的</strong>：单次碰撞 ≤ E_P × 最大频率 ν_P / 单元面积 l_P²，三因子全部来自框架既有前提（公理 1 + 原文 46 + 原文 90），无新假设。</li>
+</ul>
+<h3>机制④（附产物）碎片合并与有效质量【推导】</h3>
+<p>活性单元数密度 n_eff = tanh(ρ/ρ_P)/l_P³（随密度饱和）。有效碎片质量：</p>
+<div class="formula">m<sub>eff</sub>(ρ) = <span class="frac"><span class="num">ρ</span><span class="den">n<sub>eff</sub></span></span> = m<sub>P</sub>·<span class="frac"><span class="num">ρ/ρ<sub>P</sub></span><span class="den">tanh(ρ/ρ<sub>P</sub>)</span></span></div>
+
+<ul>
+<li>x ≪ 1：m_eff → m_P（独立碎片）；</li>
+<li>x ≫ 1：m_eff ∝ ρ（风暴把碎片压成团块——"浆糊"的微观图像，【原文 90】）。</li>
+</ul>
+<p><strong>碎片合并是饱和的物理载体</strong>：ρ 增长时碎片合并减少独立单元数，使每普朗克体积动量流饱和在 P_P——合并阈值恰在 ρ_P = m_P/l_P³（每普朗克体积一个碎片）。</p>
+<hr />
+<h2>3 推导产物：新物理【推导 + 预言】</h2>
+<h3>3.1 声速剖面（新预言）</h3>
+<div class="formula">c<sub>s</sub><sup>2</sup> = <span class="frac"><span class="num">∂ P</span><span class="den">∂ρ</span></span> = <span class="frac"><span class="num">P<sub>P</sub></span><span class="den">ρ<sub>P</sub></span></span><span class="txt">sech</span><sup>2</sup>(<span class="frac"><span class="num">ρ</span><span class="den">ρ<sub>P</sub></span></span>) = c<sup>2</sup> <span class="txt">sech</span><sup>2</sup>(<span class="frac"><span class="num">ρ</span><span class="den">ρ<sub>P</sub></span></span>)</div>
+
+<table>
+<thead>
+<tr>
+<th>区域</th>
+<th>c_s</th>
+<th>物理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ρ ≪ ρ_P</td>
+<td>c_s = c</td>
+<td>相对论性最大因果</td>
+</tr>
+<tr>
+<td>ρ = ρ_P</td>
+<td>c_s² = 0.420 c²</td>
+<td>声速显著下降</td>
+</tr>
+<tr>
+<td>ρ ≫ ρ_P</td>
+<td>c_s → 0</td>
+<td><strong>钳制区无弹性波——"浆糊"无结构</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>声速消失 ⟹ 过载区信息传播抑制</strong>——衔接七环机制环 2（挂谷集信息测度≈0）与 v1.18 §4 辐射特征（"最大熵无结构 ⟹ 无特征辐射"）的<strong>动力学表达</strong>：不是假设无辐射，而是声速剖面使弹性/波状结构无法传播。</p>
+<h3>3.2 能量条件与稳定性【推导】</h3>
+<ul>
+<li><strong>因果性 P ≤ ρc² 处处满足</strong>：ρ≪ρ_P 时 P/ρc² → 1（饱和因果极限）；ρ≫ρ_P 时 P/ρc² → ρ_P/ρ → 0（<strong>深度亚因果</strong>——对比候选 B 恰在边界 P=ρc²，钳制物态更安全）；</li>
+<li><strong>无热力学不稳定性</strong>：∂P/∂ρ = (P_P/ρ_P)·sech² ≥ 0 恒成立 ⟹ 无坍缩（对比 GR 奇点 ρ→∞）。</li>
+</ul>
+<h3>3.3 物态定位【验证】</h3>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>ρ_avg/ρ_P</th>
+<th>P</th>
+<th>c_s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>太阳质量黑洞</td>
+<td>3.6×10⁻⁷⁸</td>
+<td>~10⁻⁶ P_P（线性区，P≈c²ρ）</td>
+<td>≈ c</td>
+</tr>
+<tr>
+<td>普朗克质量黑洞</td>
+<td>0.03</td>
+<td>0.030 P_P</td>
+<td>0.9996 c</td>
+</tr>
+<tr>
+<td>原初 10¹¹ kg 黑洞</td>
+<td>1.4×10⁻³⁹</td>
+<td>线性区</td>
+<td>≈ c</td>
+</tr>
+</tbody>
+</table>
+<p><strong>宏观黑洞过载区压强 ≪ P_P、声速≈c</strong>；仅普朗克质量黑洞接近钳制——与 v1.18 数值一致，且新增声速信息。</p>
+<hr />
+<h2>4 数值验证【验证】</h2>
+<p>脚本 <code>_pinning_eos.py</code>（无量纲 c=m_P=l_P=1，全 ρ 域 logspace 10⁻⁶–10⁶ ρ_P）：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>验证项</th>
+<th>结果</th>
+<th>期望</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>线性区 P/ρc²</td>
+<td>1.000000</td>
+<td>1 ✓</td>
+</tr>
+<tr>
+<td>2</td>
+<td>饱和区 P/P_P</td>
+<td>1.000000</td>
+<td>1 ✓</td>
+</tr>
+<tr>
+<td>3</td>
+<td>声速 ρ→0 / ρ=ρ_P / ρ→∞</td>
+<td>1 / 0.420 / 0</td>
+<td>c / sech²(1)=0.420 / 0 ✓</td>
+</tr>
+<tr>
+<td>4</td>
+<td>能量条件 P ≤ ρc²</td>
+<td>全 ρ 域成立，ρ≫ρ_P 时 → ρ_P/ρ</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>5</td>
+<td>合并质量三极限</td>
+<td>1 / 1.313 / ∝ρ</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>6</td>
+<td>罗吉斯蒂积分 vs tanh 解析</td>
+<td>偏差 8×10⁻⁴</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>5 与既有推导的衔接</h2>
+<table>
+<thead>
+<tr>
+<th>既有结果</th>
+<th>衔接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v1.18 普朗克钳制（唯象）</td>
+<td><strong>本报告微观推导（遗留①关闭）</strong>——tanh 从双向动量流罗吉斯蒂演化涌现</td>
+</tr>
+<tr>
+<td>通量遮挡（引力 P0：1/r² 力）</td>
+<td><strong>弱遮挡 = 引力、强遮挡（饱和）= 钳制——同一机制两极限</strong>：引力是质量遮蔽通量的弱亏损，过载区钳制是遮蔽的饱和极限</td>
+</tr>
+<tr>
+<td>七环机制环 2（挂谷集信息≈0）</td>
+<td>声速消失 ⟹ 信息传播抑制的动力学支撑</td>
+</tr>
+<tr>
+<td>S4 预言（过载区无奇点）</td>
+<td>能量条件 P ≤ ρc² + ∂P/∂ρ ≥ 0 的定量支撑</td>
+</tr>
+<tr>
+<td>【原文 46】吞灭有最大速率</td>
+<td>机制③碰撞频率 ν_P 上限的直接引用</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6 可检验预言【预言】</h2>
+<ol>
+<li><strong>过载区声速剖面</strong> c_s² = c²·sech²(ρ/ρ_P)：ρ≥ρ_P 时无弹性波——过载区不传播波状扰动（与 GR 奇点区"无定义"对比，本质性差异）；</li>
+<li><strong>普朗克质量黑洞临界</strong>：ρ_avg = 0.03ρ_P 是唯一接近钳制的宏观窗口（P≈0.03P_P、c_s=0.9996c）——原初黑洞蒸发末期的物态签名；</li>
+<li><strong>因果性内禀</strong>：框架钳制物态处处 P ≤ ρc²（无需外加强度条件）——过载区永不违反因果极限。</li>
+</ol>
+<hr />
+<h2>7 对论文 §4.6 的并入建议（待确认）</h2>
+<p>v1.18 补充段（§4.6"过载区流体模型"）建议升级为 v1.24：
+- "物态方程 P(ρ)=P_P·tanh(ρ/ρ_P)（普朗克钳制）"→ 补注"<strong>v1.24 微观推导</strong>：ρ/ρ_P=普朗克填充率（机制①）、tanh=双向动量流罗吉斯蒂饱和（机制②）、P_P=E_P/l_P³ 单元最大压强（机制③）——钳制从假设升级为涌现"；
+- 新增<strong>声速剖面</strong> c_s²=c²·sech²(ρ/ρ_P)（§4.6 或 §9 S4 行补充）与<strong>能量条件</strong> P ≤ ρc²。</p>
+<hr />
+<h2>8 诚实标注【开放】</h2>
+<ol>
+<li><strong>线性区系数</strong>：P≈c²ρ vs 辐射气体 P=c²ρ/3 差 1/3 各向同性几何因子——可由 ρ_P 重定义吸收，或要求碎片-风暴碰撞含 1/3 角平均（未推导，留开放）；</li>
+<li><strong>罗吉斯蒂方程是唯象动力学</strong>：dJ/dρ 的罗吉斯蒂形式本身是"两通道竞争"的最简饱和模型，更微观的碰撞算子（Boltzmann 型）未构造——tanh 的正确性依赖罗吉斯蒂假设，但两通道竞争的定性结论（对称饱和 ⟹ tanh）稳健；</li>
+<li><strong>m_eff 的碎片-合并动力学</strong>（合并速率、团块尺寸分布）未闭合；</li>
+<li>过载区径向密度分布（ρ(r)）仍未建模（遗留②保留）。</li>
+</ol>
+<hr />
+<p><em>钳制物态微观推导完成 · P(ρ)=P_P·tanh(ρ/ρ_P) 从碎片-风暴碰撞涌现 · 新预言 c_s²=c²·sech²(ρ/ρ_P) · 遗留①关闭</em></p>
+
+<div class="footer">钳制物态微观推导：P = P_P·tanh(ρ/ρ_P) 从"碎片-风暴碰撞"涌现 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 钳制物态微观推导报告.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

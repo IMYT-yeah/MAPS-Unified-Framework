@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数据可追溯性报告 —— 最早边界，与「未完成分支」能追到哪一层</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">〇、一句话答</div>
+  <h1>数据可追溯性报告 —— 最早边界，与「未完成分支」能追到哪一层</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>问题来源</strong>（用户，2026-10-04）：「我记得在往期对话里有大量分支没有完成，不知道这些对话有没有数据追溯，最早能否回溯到 8-20 号？」
+<strong>轮次</strong>：第 107 轮（元任务：考古 / 盘点，非物理推演）
+<strong>脚本</strong>：<code>_trace107.py</code>（<strong>TR-1…TR-16，16 项 0 失败</strong>）＋ <code>_trace107b.py</code>（<strong>TR-17…TR-24，8 项 0 失败</strong>）
+<strong>性质</strong>：全部结论<strong>可复算</strong>；本报告只做取证，不做推断。</p>
+</blockquote>
+<hr />
+<h2>〇、一句话答</h2>
+<blockquote>
+<p><strong>能回到 8-20，而且 8-20 就是本地数据的起点</strong>（不是「缺了更早的」，而是「这里就是第一天」）。
+<strong>但要分清两件事</strong>：
+<strong>① 工作记录（日志）</strong> —— ✅ <strong>8-20 起完整</strong>；
+<strong>② 对话原文（逐句 ＋ 工具调用）</strong> —— ⚠️ <strong>本机最早只到 9-20</strong>，<strong>8-20 ～ 9-19 这 31 天的对话原文不在本机</strong>。</p>
+<p>原因已查明（有证据）：<strong>8 月的工作是在旧机上做的</strong>（日志里出现 <code>D:/Users/IMYT.YT/…</code>），
+而<strong>本机没有 D 盘</strong> ⟹ 那 31 天的对话原文随旧机一同不可及；<strong>日志被迁移过来了</strong>。</p>
+</blockquote>
+<hr />
+<h2>一、追溯能力矩阵（8 个源，均已实测）</h2>
+<table>
+<thead>
+<tr>
+<th>源</th>
+<th>粒度</th>
+<th>最早</th>
+<th>最晚</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>memory 日志（主项目 MAPS）</strong></td>
+<td>逐日工作记录（任务／产出／结论／下一步）</td>
+<td><strong>2026-08-20</strong></td>
+<td>2026-10-04</td>
+<td>✅ <strong>30 天，可回溯</strong></td>
+</tr>
+<tr>
+<td>memory 日志（第二项目 jczq）</td>
+<td>逐日工作记录</td>
+<td>2026-08-30</td>
+<td>2026-10-01</td>
+<td>✅ 19 天</td>
+</tr>
+<tr>
+<td><strong>对话原文 JSONL（主项目）</strong></td>
+<td><strong>逐句</strong>：user／assistant ＋ 工具调用</td>
+<td><strong>2026-09-20 21:36</strong></td>
+<td>2026-10-04</td>
+<td>⚠️ <strong>111.9 MB / 12 978 行；缺前 31 天</strong></td>
+</tr>
+<tr>
+<td>对话原文 JSONL（jczq）</td>
+<td>逐句</td>
+<td>2026-09-20 18:34</td>
+<td>2026-10-01</td>
+<td>⚠️ 54 个文件 / 6 468 行</td>
+</tr>
+<tr>
+<td>对话原文（第三项目）</td>
+<td>逐句</td>
+<td>2026-09-27</td>
+<td>2026-09-27</td>
+<td>与 MAPS 无关</td>
+</tr>
+<tr>
+<td><strong><code>file-history</code>（文件版本快照）</strong></td>
+<td>单文件版本（1107 个；主 session 843 个）</td>
+<td><strong>2026-08-24 04:06</strong></td>
+<td>2026-10-04</td>
+<td>⚠️ 稀疏但<strong>含 8 月痕迹</strong></td>
+</tr>
+<tr>
+<td><strong>桌面 zip（9-20 快照）</strong></td>
+<td>两项目<strong>全文件树</strong> ＋ 26 个日志</td>
+<td>2026-08-20</td>
+<td>2026-09-20</td>
+<td>✅ 静态副本（5785 条目 / 91 MB）</td>
+</tr>
+<tr>
+<td>产出物 <code>outputs/</code>、<code>notes/</code>、<code>paper/</code></td>
+<td>备忘录／脚本／数据／台账</td>
+<td>2026-08-20</td>
+<td>2026-10-04</td>
+<td>✅ 完整</td>
+</tr>
+<tr>
+<td>应用日志 <code>~/.workbuddy/logs/</code></td>
+<td>运行日志</td>
+<td>2026-09-20</td>
+<td>2026-10-04</td>
+<td>⚠️ 环境重建后才有</td>
+</tr>
+<tr>
+<td><strong>服务端检索</strong>（<code>conversation_search</code>）</td>
+<td>跨会话检索</td>
+<td><strong>2026-09-27</strong></td>
+<td>2026-10-04</td>
+<td>❌ <strong>实测窗口仅约 1 周，且本次查询 0 条</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 服务端不能作为追溯主力；完整追溯只能靠本地数据。</strong></p>
+<hr />
+<h2>二、三条边界线（为什么是这三个日期）</h2>
+<pre><code>2026-08-20 ──────────────── 2026-09-20 ──────────────── 2026-09-27 ──────→ 今天
+    │                            │                            │
+    │                            │                            └─ 服务端检索窗口起点（约 1 周）
+    │                            └─ 对话原文（JSONL）起点  ← 环境/.workbuddy 建立时间
+    └─ 日志起点 = 项目起点（工作区名就是 2026-08-20-21-43-34）
+</code></pre>
+<h3>2.1 为什么 8-20 是起点</h3>
+<ul>
+<li><strong>工作区名 = <code>2026-08-20-21-43-34</code></strong>（创建时间戳）；</li>
+<li><strong>8-20 日志的第一条</strong>就是「<strong>四种基本力统一理论框架（深度研究）</strong>」—— 从零开始的任务
+  （用户提供《杨韬和元宝的对话》PDF 1693 页），<strong>没有「接续之前」的表述</strong>；</li>
+<li>8-20 日志的 mtime = <code>Aug 21 05:19</code> ⟹ 是<strong>当时（或次日）写的</strong>，不是事后补写。</li>
+</ul>
+<h3>2.2 为什么对话原文只到 9-20</h3>
+<ul>
+<li><code>~/.workbuddy</code> 环境的关键文件（<code>device-id</code>、<code>edge-sync-mapping-v4.db</code>）mtime 都是 <strong>Sep 20 18:33</strong>；</li>
+<li>应用日志目录第一个是 <strong>2026-09-20</strong>；</li>
+<li><strong>8-20 日志里出现旧机路径 <code>D:/Users/IMYT.YT/…</code>（2 次）</strong>，而<strong>本机无 D 盘</strong>
+  ⟹ 8 月的工作在<strong>旧机</strong>上做，对话原文存在旧机的 <code>~/.workbuddy/projects/</code> 下。</li>
+<li>之前几轮也记录过同类事实：<code>D:/Users/IMYT.YT/WorkBuddy/_MAPS_explore</code> 与 <code>D:/.../MAPS-Unified-Framework</code> 都<strong>不存在</strong>。</li>
+</ul>
+<h3>2.3 一个附带证据：8 月的文件痕迹还在</h3>
+<p><code>~/.workbuddy/file-history/d265bec0-…/bcdd4821387495c4@v1</code> 的 mtime = <strong>2026-08-24 04:06</strong>（18 927 B）
+⟹ 8 月的<strong>文件版本</strong>有 1 个残留（比对话原文早 27 天）。<strong>这说明这台机器不是「9-20 才开始用」，
+而是「9-20 重建了环境，但部分旧数据被带过来了」。</strong></p>
+<hr />
+<h2>三、缺日清单（日志层面）</h2>
+<p><strong>主项目缺的 5 天</strong>：<code>08-31</code>、<code>09-14</code>、<code>09-15</code>、<code>09-25</code>、<code>09-30</code>
+<strong>第二项目（jczq）补上的</strong>：<code>08-31</code>、<code>09-14</code>、<code>09-15</code>、<code>09-25</code>（<strong>+ 09-30 仍缺</strong>）</p>
+<p>⟹ <strong>两项目日志合并后覆盖 35 天</strong>；仅 <code>09-30</code> 完全无日志。
+⚠️ 注意：<strong>第二项目的日志是另一个项目（jczq）的</strong>，它补上的是<strong>那一天</strong>的记录，不是 MAPS 的。</p>
+<hr />
+<h2>四、「未完成分支」能追到哪一层（这是本报告的重点）</h2>
+<h3>4.1 规模</h3>
+<p>在日志里按 15 个标记词（待办／未完成／尚未／未做／开放问题／下一步／剩余／缺口／TODO／☐／待定／未攻／判否／留给后续／后续工作）扫描：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>标记条数</th>
+<th>覆盖天数</th>
+<th>标记最多的 5 天</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MAPS</strong></td>
+<td><strong>337 条</strong></td>
+<td>25 天</td>
+<td>10-02(94)、08-23(62)、09-16(26)、08-20(24)、08-21(18)</td>
+</tr>
+<tr>
+<td><strong>jczq</strong></td>
+<td><strong>78 条</strong></td>
+<td>15 天</td>
+<td>——</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 分级（按「对话原文是否覆盖」）</h3>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>条数</th>
+<th>能追到什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A 级：双源可核</strong>（9-20 后）</td>
+<td><strong>174 条</strong></td>
+<td>日志 ＋ <strong>对话原文逐句</strong> ＋ 工具调用 ＋ 产出物 ⟹ <strong>能完整还原当时怎么想的</strong></td>
+</tr>
+<tr>
+<td><strong>B 级：仅日志</strong>（8-20 ～ 9-19）</td>
+<td><strong>163 条</strong></td>
+<td>日志（含「下一步/剩余问题/遗留」的<strong>结论文本</strong>）＋ 产出物（备忘录/脚本/台账）⟹ <strong>能还原「开了什么分支、做到哪、下一步是什么」，但看不到中间对话</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>⚠️ 所以「大量分支没完成」这件事：</strong>
+- <strong>9-20 之后的（约一半）</strong> —— <strong>可以完整追溯</strong>（连当时的推理过程都在）；
+- <strong>8-20 ～ 9-19 的（163 条）</strong> —— <strong>能追到「分支清单与状态」，但追不到「当时的对话过程」</strong>。</p>
+<h3>4.3 B 级的粒度实测（抽样，证明「够用」）</h3>
+<pre><code>[08-20] (下一步)  P1：微变权守恒→定理化；ε_A 截断机制+w(z)重推；因果集重写流形微变；
+                 最小作用量重写动力学；§规范群结构论文草稿。
+[08-21] (下一步)  候选：A 定理包整合进论文 §4.3；B 攻内空间编码动力学证明；
+                 C 火墙厚度判定（~l_P vs ~√(R·l_P)）。
+[08-21] (遗留)    k=4 严格证明未完成（最后一道门）；L3' 依赖「管粗细=l_P」假设；
+                 正四面体↔端点方向分布对应是物理假设。
+[08-22] (下一步)  ① 1/r 稳态与弱场 g₀₀ 系数对齐；② 非热修正观测提案；③ 英文翻译 v1.11。
+[08-23] (下一步)  A P0-3 并入论文 §5.7；B 英文翻译 v1.21（arXiv 投稿）；C 周期边界实现。
+[08-30] (待办)    剩余：B 类世界级开放项（Z₂→U(1) RG 严格化、4D 自旋 2 涌现）；
+                 投稿行政事项（CSO/arXiv）待办
+</code></pre>
+<p>⟹ <strong>日志里的「下一步/遗留」写得足够具体</strong>（含具体技术动作与文件名），
+<strong>足以重建一份「历史分支台账」</strong>，只是缺「当时为什么这么选」的对话细节。</p>
+<h3>4.4 已经结构化的部分（不用重建）</h3>
+<table>
+<thead>
+<tr>
+<th>台账</th>
+<th>大小</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>outputs/工程期望清单.md</code></td>
+<td>256 KB</td>
+<td>全量待办总账（组 I–VI 21 条）＋ <strong>「撤回/更正」表（73 条）</strong> ＋ 负面结论列</td>
+</tr>
+<tr>
+<td><code>环境交接说明.md</code></td>
+<td>295 KB</td>
+<td><strong>逐轮段</strong>（每轮做了什么、结论、剩余）</td>
+</tr>
+<tr>
+<td><code>outputs/未完成研究工作流_按依赖排序.md</code></td>
+<td>20 KB</td>
+<td>按依赖排序的未完成项</td>
+</tr>
+<tr>
+<td><code>MEMORY.md</code> ＋ 技能 <code>maps-deduction-round</code>（陷阱 1–103）</td>
+<td>——</td>
+<td>跨轮次稳定的铁律与陷阱</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>「被否掉的分支」也有记录</strong>（避免重开）；<strong>「已完成但未勾掉」的也已修过</strong>（C-59）。</p>
+<hr />
+<h2>五、如果要补齐 8-20 ～ 9-19 的对话原文：去哪找</h2>
+<p>按可能性排序（<strong>都在旧机/旧介质上，本机没有</strong>）：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>位置</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>旧机的 <code>D:/Users/IMYT.YT/.workbuddy/projects/</code></strong></td>
+<td>对话原文按其工作目录编码存放（本机的格式是 <code>c-Users-Administrator-Desktop-&lt;目录名&gt;/</code>）。旧机的对应目录应形如 <code>d-Users-IMYT-YT-WorkBuddy-&lt;工作区名&gt;/</code>。<strong>若旧机硬盘还在 ⟹ 这是唯一能拿到逐句原文的地方。</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>旧机的 <code>D:/Users/IMYT.YT/.workbuddy/file-history/</code></td>
+<td>文件版本快照（含 8 月）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>旧机的 <code>D:/Users/IMYT.YT/WorkBuddy/</code></td>
+<td>8-20 日志提到的源目录（<code>_MAPS_explore</code> 等）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>云端账号同步</td>
+<td>本机 <code>~/.workbuddy</code> 有 <code>edge-sync-mapping-v4.db</code>（账号同步映射），但<strong>实测服务端检索只覆盖 1 周</strong>，故<strong>大概率无法从云端补 8 月</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>桌面 zip（9-20 快照）</strong></td>
+<td>⚠️ <strong>已验证里面只有 <code>memory/</code> 日志，没有对话原文</strong> ⟹ 不能补</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⚠️ 若旧机不可及</strong> ⟹ <strong>8-20 ～ 9-19 的对话原文已不可恢复</strong>（这是本报告最硬的一条坏消息）。
+<strong>但工作内容不受影响</strong> —— 日志 + 产出物 + 台账已经把「分支与状态」记全了。</p>
+<hr />
+<h2>六、诚实边界</h2>
+<p><strong>是实测的</strong>：矩阵里每个日期与数字都由 <code>_trace107.py</code>／<code>_trace107b.py</code> 现场算出（可复跑）；
+「本机无 D 盘」「zip 里无对话原文」「服务端窗口 1 周」都是直接观测。</p>
+<p><strong>是推断的（并已标注依据）</strong>：
+- 「8 月的工作在旧机上做」—— 依据是 8-20 日志里的 <code>D:/Users/IMYT.YT/…</code> 路径 ＋ 本机无 D 盘；
+- 「8-20 是项目起点」—— 依据是工作区名 ＋ 8-20 日志首条是新任务（<strong>若你记得 8-20 之前还有别的对话，
+  那部分确实没有任何本地痕迹</strong>）。</p>
+<p><strong>⚠️ 未做的</strong>：
+- <strong>没有</strong>逐条核对 337 条标记与台账（那会是一轮独立的工作）；
+- <strong>没有</strong>尝试从云端账号恢复（服务端窗口 1 周，成本远高于收益）；
+- <strong>没有</strong>检查旧机之外的可能介质（移动硬盘、邮件、聊天记录 —— 那超出本机可查范围）。</p>
+<p><strong>⚠️ 一条操作建议</strong>：<code>~/.workbuddy/projects/</code> 下的 JSONL 是<strong>滚动文件</strong>（本机主项目已 111.9 MB）。
+若希望 9-20 之后的对话原文<strong>不再变薄</strong>，建议<strong>定期把该项目目录整体复制一份</strong>（与桌面 zip 同样的做法）。
+本报告的 <code>_trace107.py</code> 可直接复用为「追溯边界自检」脚本。</p>
+
+<div class="footer">数据可追溯性报告 —— 最早边界，与「未完成分支」能追到哪一层 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 数据可追溯性报告_最早边界与未完成分支索引.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

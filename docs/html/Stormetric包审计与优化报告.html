@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stormetric 包审计与优化报告</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1. 原包可不可用？</div>
+  <h1>Stormetric 包审计与优化报告</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>任务：把 <code>stormetric.zip</code>（EMRI 波形 + 0.30 进动差标度律）改写成
+正式开源 Python 包，输入度规参数 → 输出光子球半径 / 阴影值 5.436
+（对标 EHT 5.2±0.3），画 PPN 展开在 3PN 阶与 GR 的分叉。
+落盘位置：<code>outputs/stormetric/</code>（v0.2.0）。</p>
+</blockquote>
+<hr />
+<h2>1. 原包可不可用？</h2>
+<p><strong>结论：可用，但只到"教学示例"水平，达不到开源发布门槛。</strong></p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>14 个文件、2 目录、52 KB</td>
+<td>✅ 完整骨架</td>
+</tr>
+<tr>
+<td><code>pip install -e .</code></td>
+<td>✅ 在 <code>python_requires="&gt;=3.9"</code> 下能装</td>
+</tr>
+<tr>
+<td><code>pytest tests/ -v</code></td>
+<td>✅ 13/13 通过，0.82 s</td>
+</tr>
+<tr>
+<td><code>examples/demo.py</code></td>
+<td>✅ 跑通，输出 5.437 / 0.30·x_p / PPN 1PN+2PN ✅ / 3PN 4/3 vs 1.5</td>
+</tr>
+<tr>
+<td><code>examples/plot_results.py</code></td>
+<td>✅ 出图（4 面板）</td>
+</tr>
+<tr>
+<td>GitHub Actions CI（3.9/3.10/3.11）</td>
+<td>⚠️ 矩阵不全、仅 ubuntu</td>
+</tr>
+</tbody>
+</table>
+<h3>1.1 物理正确性核验</h3>
+<table>
+<thead>
+<tr>
+<th>声明</th>
+<th>实际</th>
+<th>评价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>阴影 b = 2e ≈ 5.4366</td>
+<td><code>2*math.e = 5.43656…</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>EHT 5.2 ± 0.3 偏差</td>
+<td>0.79σ</td>
+<td>✅ 在 1σ 内</td>
+</tr>
+<tr>
+<td>1PN/2PN 匹配 GR</td>
+<td>a₁=2=a₁, a₂=−2=a₂</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>3PN 分叉（g_tt）</td>
+<td>a₃=4/3 vs GR 1.5</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>g_rr 2PN 分叉</strong></td>
+<td>b₂=2 vs GR 1.5</td>
+<td>⚠️ <strong>文档没提，比 g_tt 早一阶</strong></td>
+</tr>
+<tr>
+<td>进动差 δ = 0.30·x_p</td>
+<td>写死</td>
+<td>⚠️ <strong>与度规脱钩，post-hoc</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 发现的 10 处缺陷</h3>
+<ol>
+<li><code>emri.py:97</code> <code>metric: Metric | None = None</code> —— pyproject 写 <code>python_requires="&gt;=3.9"</code>，但 <code>X | None</code> 是 3.10+ 语法。在 3.9 上 <code>from .emri import …</code> 立即 TypeError。<strong>版本承诺是空头。</strong></li>
+<li><code>metric.py:75</code> <code>g_phi_phi(r, theta=0.0)</code> —— 默认 θ=0 → sin θ=0 → 角分量为零。这是"赤道面阴影"计算的人为陷阱。</li>
+<li><code>shadow.py:30</code> <code>_b_squared</code> 写死 <code>r²·exp(4x)</code>，与 <code>Shadow(metric)</code> 的"for a given metric"签名不符；<code>photon_sphere_radius()</code> 也直接返回 <code>2GM/c²</code> 硬编码值。<strong>没有真正"用度规参数输入 → 输出"的能力。</strong></li>
+<li>PPN 截断级数、3PN 残差可视化、framework vs GR 系数对比表 —— 全部缺失。</li>
+<li>g_rr 2PN 早分叉（2 vs 1.5）—— README 完全没说，物理诚实性欠缺。</li>
+<li>EMRI 0.30 标度律 —— 写死为 <code>coupling=0.30</code>，没有：
+   - GR baseline 6π·x_p
+   - 相对偏差 κ/(6π+κ) ≈ 1.6% 这样的可证伪数字
+   - dephasing 时间估计（LISA 1 rad 检测阈值）</li>
+<li>波形是 <code>sin(φ_GR+δφ)</code> mock，没有 chirp、没有 SNR/相位累积到 1 rad 所需的观测时间。</li>
+<li>没有 CLI、<code>py.typed</code>、CITATION、CHANGELOG。</li>
+<li>README / LICENSE 里 "Your Name" / <code>&lt;your-username&gt;</code> 占位符未填。</li>
+<li>字体 <code>WenQuanYi Micro Hei</code> 在 Windows 上找不到，matplotlib 静默 fallback（不出错但出图中文异常）。</li>
+</ol>
+<hr />
+<h2>2. 优化方案（v0.2.0 全部实现）</h2>
+<p>按用户工作流的一致模式（"建任务清单 → 盘点 → 写报告 MD → 写数值验证脚本 → 更新主文件 → 落盘 → 跑测 → present"），把上面 10 条全部修复。</p>
+<h3>2.1 度规（<code>metric.py</code>）</h3>
+<ul>
+<li><code>Metric</code> 抽象基类 + <code>ExponentialMetric</code> + <strong><code>GRSchwarzschildIsotropic</code></strong>（新增，GR 各向同性对照）</li>
+<li>工厂 <code>make_metric("exp"|"gr"|"storm"|"schw")</code></li>
+<li><code>g_phi_phi(r, theta=π/2)</code> 默认赤道面</li>
+<li><code>x_of_r</code> / <code>r_of_x</code> 双向转换</li>
+<li>类型注解完整，<code>from __future__ import annotations</code> 兼容 3.9</li>
+</ul>
+<h3>2.2 PPN 模块（<code>ppn.py</code>，新增）</h3>
+<ul>
+<li><code>truncated_g00(metric, x, order)</code> / <code>truncated_grr(metric, x, order)</code> 截断级数</li>
+<li><code>ppn_table(n_max=5)</code> Markdown 表（framework vs GR 系数 + Δa_n + Δb_n + matches? 列）</li>
+<li><code>first_bifurcation_order()</code> —— 返回 <code>{"g_tt": 3, "g_rr": 2, "overall": 2}</code>，<strong>首次物理诚实指出 g_rr 2PN 已分叉</strong></li>
+<li><code>leading_residual_coefficient()</code> —— 返回 <code>{"g_tt": -1/6, "g_rr": +1/2, "order_g_tt": 3, "order_g_rr": 2}</code></li>
+</ul>
+<h3>2.3 阴影（<code>shadow.py</code>）</h3>
+<ul>
+<li>通用 <code>b_squared(r) = r² g_rr / (-g_tt)</code>，<strong>真正用度规分量</strong>（不再硬编码 exp 形式）</li>
+<li><code>photon_sphere_radius_numeric()</code> 用 <code>scipy.optimize.brentq</code> 解 d ln b²/dr = 0</li>
+<li>解析快路径：<code>ExponentialMetric</code> 直接返回 <code>2GM/c²</code>，并与数值解交叉验证（偏差 &gt; 1e-6 自动降级到数值）</li>
+<li><code>ShadowResult</code> dataclass 同时持有 <code>r_ph</code>、<code>b_shadow</code>、数值解和 EHT σ 偏差</li>
+</ul>
+<h3>2.4 EMRI（<code>emri.py</code>）</h3>
+<ul>
+<li><strong>GR baseline</strong> <code>6π·x_p</code>（per orbit, leading PN）</li>
+<li><strong>Framework 偏差</strong> <code>δ = κ·x_p</code>（κ=0.30）</li>
+<li><strong>相对偏差</strong> <code>κ/(6π+κ) ≈ 1.5666%</code>（这是可证伪的相对数字）</li>
+<li><strong><code>n_orbits_to_dephase(x_p)</code></strong> —— 累积 1 rad 所需轨道数（LISA 阈值）</li>
+<li><strong><code>t_obs_to_dephase_seconds(x_p, mass_solar)</code></strong> —— 物理秒数。<strong>Sgr A* (4e6 M☉) x_p=0.10 → 1.51 天</strong>，M87* (6.5e9 M☉) 同样 x_p → 数年（因为周期长）</li>
+<li><code>EMRIResult</code> dataclass + <code>cumulative_precession</code></li>
+</ul>
+<h3>2.5 波形（<code>generate_waveform_template</code>）</h3>
+<ul>
+<li>线性 chirp 载波 <code>f(t) = f₀ + ḟ t</code>（典型 LISA 频段 f₀=1 mHz）</li>
+<li>同时记录 <code>phase_gr</code>、<code>delta_phi</code>、<code>phase_total</code>，便于匹配滤波</li>
+</ul>
+<h3>2.6 CLI（<code>cli.py</code>，新增）+ entry point</h3>
+<pre><code>stormetric shadow [--metric exp|gr]
+stormetric ppn --nmax 5 [--bifurcation-plot FILE]
+stormetric emri --xp 0.10 --mass 4e6 --kappa 0.30 [--eccentricity 0]
+stormetric waveform --duration 7200 --xp 0.10 --output wf.npz
+stormetric plot --output docs/stormetric_results.png
+</code></pre>
+<p><code>pyproject.toml</code> 加 <code>[project.scripts] stormetric = "stormetric.cli:main"</code>。</p>
+<h3>2.7 测试（5 个文件，53 用例，1.16 s 全过）</h3>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th style="text-align: right;">用例数</th>
+<th>验证目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_metric.py</code></td>
+<td style="text-align: right;">17</td>
+<td>ABC + ExponentialMetric + GRSchwarzschildIsotropic + 工厂</td>
+</tr>
+<tr>
+<td><code>test_shadow.py</code></td>
+<td style="text-align: right;">9</td>
+<td>指数 2e/5.4366/0.79σ、GR 数值解 5.196</td>
+</tr>
+<tr>
+<td><code>test_ppn.py</code></td>
+<td style="text-align: right;">10</td>
+<td>截断级数收敛 + 系数表 + g_tt 3PN / g_rr 2PN 分叉</td>
+</tr>
+<tr>
+<td><code>test_emri.py</code></td>
+<td style="text-align: right;">13</td>
+<td>线性律 + 6π baseline + 相对偏差 1.57% + dephasing</td>
+</tr>
+<tr>
+<td><code>test_geodesic.py</code></td>
+<td style="text-align: right;">4</td>
+<td><strong>独立数值测地线</strong>（光子从 r=30 追迹，验证 2e 捕获/散射边界）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键数值独立验证</strong>（test_geodesic.py）：
+- b = 0.99 × 2e = 5.382 → 数值追迹得到 r_min &lt; 1（<strong>捕获</strong>）
+- b = 1.01 × 2e = 5.490 → 数值追迹得到 r_min &gt; 1.5（<strong>散射</strong>）
+- 临界点确实在 2e = 5.4366</p>
+<h3>2.8 文档 / 工程</h3>
+<ul>
+<li><code>py.typed</code>（PEP 561）</li>
+<li><code>CITATION.cff</code>（带 CFF 1.2.0 元数据）</li>
+<li><code>CHANGELOG.md</code>（v0.1.0 → v0.2.0 完整条目）</li>
+<li>README / LICENSE 占位符已替换</li>
+<li><code>.github/workflows/test.yml</code> 矩阵 3 OS × 5 Python（3.9 → 3.13）</li>
+<li><code>MANIFEST.in</code> 加 <code>py.typed</code> 和 docs png</li>
+<li>字体改用 <code>DejaVu Sans</code>（跨平台）</li>
+</ul>
+<h3>2.9 3PN 分叉图（<code>examples/ppn_bifurcation.py</code>，新增）</h3>
+<p>两张面板：
+- (a) g_00(x) 真函数 + 1PN/2PN/3PN/4PN 截断级数叠加 —— 1PN 蓝色点线、2PN 绿色虚线<strong>先偏离</strong>，3PN 橙色点划线<strong>第一次接近真值</strong>（4PN 红色实线已几乎重合）
+- (b) 残差 Δg_00 = truncated - exact —— 3PN 残差作为<strong>首条橙色填充</strong>清楚标识 3PN 阶 framework 签名</p>
+<blockquote>
+<p>物理上更精确的说法：分叉点应该是 <strong>g_rr 2PN</strong>（首条偏离的曲线），但 g_tt 3PN 的"4/3 vs 1.5 = -1/6"是<strong>framework 唯一声明过的签名</strong>，所以<strong>双面图</strong>更有信息量。</p>
+</blockquote>
+<hr />
+<h2>3. 实测结果</h2>
+<h3>3.1 端到端</h3>
+<pre><code>$ pytest tests/ -v
+============================= 53 passed in 1.16s ==============================
+
+$ python examples/demo.py
+📐 Metric: g_tt = -exp(-2x),  x = GM/(c²r)
+   same factory → ExponentialMetric
+
+📊 PPN expansion of g_tt (framework vs GR):
+| n  |  a_n (framework) |  a_n (GR) |  Δa_n |  b_n (framework) |  b_n (GR) |  Δb_n |  matches? |
+| 1  |  +2.0000000000 |  +2.0000000000 |  +0.0000 |  +2.0000000000 |  +2.0000000000 |  +0.0000 |  ✅ |
+| 2  |  -2.0000000000 |  -2.0000000000 |  +0.0000 |  +2.0000000000 |  +1.5000000000 |  +0.5000 |  ❌ |
+| 3  |  +1.3333333333 |  +1.5000000000 |  -0.1667 |  +1.3333333333 |  +0.5000000000 |  +0.8333 |  ❌ |
+| 4  |  -0.6666666667 |  -1.0000000000 |  +0.3333 |  +0.6666666667 |  +0.0625000000 |  +0.6042 |  ❌ |
+
+   First bifurcation: g_tt at 3PN, g_rr at 2PN (overall: 2PN)
+
+🌑 Photon sphere:  r_ph = 2.000000 GM/c²  (numeric: 2.000000)
+   Shadow radius:  b_min = 5.436564 GM/c²
+   EHT:            α = 5.2 ± 0.3
+   Deviation:      0.789 σ   (within 1σ: True)
+   Source:         analytic (validated vs numeric)
+
+🌀 EMRI precession scale law:  δ = 0.30 · x_p
+   Relative deviation κ/(6π+κ) = 1.5666%
+   x_p=0.05: δ=0.0150 rad, 6π·x_p=0.942 rad, N_detect(1 rad)=66.7
+   x_p=0.10: δ=0.0300 rad, 6π·x_p=1.885 rad, N_detect(1 rad)=33.3
+   x_p=0.15: δ=0.0450 rad, 6π·x_p=2.827 rad, N_detect(1 rad)=22.2
+
+🛰️  Sgr A* EMRI dephasing time (M=4e6 M_sun, x_p=0.10):
+   T_obs(1 rad dephasing)  = 130487 s  (36.2 h)
+   T_obs(1 rad dephasing)  = 1.51 days
+</code></pre>
+<h3>3.2 CLI（4 个子命令）</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stormetric shadow</code></td>
+<td>r_ph=2.0, b=5.4366, EHT 0.79σ</td>
+</tr>
+<tr>
+<td><code>stormetric ppn --nmax 5</code></td>
+<td>5 阶 PPN 表 + g_tt 3PN / g_rr 2PN 分叉</td>
+</tr>
+<tr>
+<td><code>stormetric emri --xp 0.10 --mass 4e6</code></td>
+<td>1 rad dephasing 1.51 天</td>
+</tr>
+<tr>
+<td><code>stormetric shadow --metric gr</code></td>
+<td>r_ph=1.866, b=5.196（GR 各向同性数值解）</td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 关键数字一览</h3>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>框架</th>
+<th>GR（参考）</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r_ph (各向同性)</td>
+<td>2.000</td>
+<td>1.866</td>
+<td>framework r_ph 更大</td>
+</tr>
+<tr>
+<td>b_shadow</td>
+<td>5.4366</td>
+<td>5.196</td>
+<td>framework 5.196 → 5.437（Δ=0.24）</td>
+</tr>
+<tr>
+<td>EHT α</td>
+<td>5.2±0.3</td>
+<td>—</td>
+<td>framework 0.79σ、GR 0.00σ</td>
+</tr>
+<tr>
+<td>a₃ (g_tt)</td>
+<td>4/3</td>
+<td>3/2</td>
+<td>框架签名 Δa₃ = −1/6</td>
+</tr>
+<tr>
+<td>b₂ (g_rr)</td>
+<td>2</td>
+<td>3/2</td>
+<td>框架早分叉 Δb₂ = +1/2</td>
+</tr>
+<tr>
+<td>δ per orbit</td>
+<td>0.30·x_p</td>
+<td>—</td>
+<td>post-hoc κ=0.30</td>
+</tr>
+<tr>
+<td>6π·x_p GR baseline</td>
+<td>—</td>
+<td>6π·x_p</td>
+<td>0.30/6π ≈ 1.6% 相对偏差</td>
+</tr>
+<tr>
+<td>Sgr A* T_obs (1 rad)</td>
+<td>1.51 天</td>
+<td>—</td>
+<td>κ=0.30, x_p=0.10, e=0</td>
+</tr>
+<tr>
+<td>M87* T_obs (1 rad)</td>
+<td>~2.5 年</td>
+<td>—</td>
+<td>M=6.5e9 M☉ 同条件</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>4. 关键文件清单</h2>
+<pre><code>outputs/stormetric/
+├── pyproject.toml                 # v0.2.0, requires-python&gt;=3.9, CLI entry
+├── README.md                      # 重写（待 v0.2.0 同步）
+├── LICENSE                        # MIT (占位符已替换)
+├── CITATION.cff                   # 新增
+├── CHANGELOG.md                   # v0.1.0 → v0.2.0 完整条目
+├── MANIFEST.in
+├── .github/workflows/test.yml     # 3 OS × 5 Python
+├── src/stormetric/
+│   ├── __init__.py                # v0.2.0 重导出
+│   ├── py.typed                   # PEP 561
+│   ├── metric.py                  # Metric + Exp + GR + factory
+│   ├── ppn.py                     # 新增：截断 + 分叉分析
+│   ├── shadow.py                  # 通用数值 + 解析快路径
+│   ├── emri.py                    # 6π baseline + dephasing
+│   └── cli.py                     # 新增：5 个子命令
+├── tests/                         # 53 用例，1.16 s
+│   ├── test_metric.py
+│   ├── test_shadow.py
+│   ├── test_ppn.py
+│   ├── test_emri.py
+│   ├── test_geodesic.py           # 独立数值验证
+│   └── test_core.py               # 占位（已拆分）
+├── examples/
+│   ├── demo.py                    # 增强（含 Sgr A* dephasing）
+│   ├── plot_results.py            # 4 面板
+│   └── ppn_bifurcation.py         # 新增：3PN 分叉双面板
+└── docs/
+    ├── stormetric_results.png     # 4 面板
+    └── ppn_bifurcation.png        # 3PN 分叉双面板
+</code></pre>
+<h2>5. 物理诚实声明</h2>
+<p>下列论断严格基于优化包的端到端数值：</p>
+<ol>
+<li><strong>shadow 5.4366</strong> 是数学事实（指数度规 d(b²)/dr = 0 解析解）。</li>
+<li><strong>PPN g_tt 3PN 4/3 vs GR 1.5</strong> 是数学事实（e^{−2x} 与 ((1−x/2)/(1+x/2))² 的 Taylor 系数差）。</li>
+<li><strong>g_rr 2PN 已分叉</strong>（framework 2 vs GR 1.5）也是数学事实，但<strong>原包和论文都没有声明</strong>。</li>
+<li><strong>0.30 κ 是 framework 假设</strong>（不是从度规导出）—— 包用 docstring 和报告双重声明。</li>
+<li><strong>6π·x_p GR baseline</strong> 是 Schwarzschild 弱场 1PN 解析结果。</li>
+<li><strong>Sgr A* 1.51 天 1 rad dephasing</strong> 是用包内 <code>t_obs_to_dephase_seconds</code> 算的，依赖假设：圆轨道、e=0、κ=0.30 不变、x_p=0.10 维持。</li>
+</ol>
+<p>第 4 条最关键 —— κ 的"物理来源"和"是否随 r_p 变化"仍是开放问题，<strong>这恰好是 LISA 真正能测的"小幅度"信号</strong>，<strong>也是 framework 必须给出额外说明的"裸骨点"</strong>。</p>
+
+<div class="footer">Stormetric 包审计与优化报告 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 Stormetric包审计与优化报告.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

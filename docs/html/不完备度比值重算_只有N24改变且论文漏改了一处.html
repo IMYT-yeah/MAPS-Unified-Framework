@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>不完备度比值重算（工作流 3.1）—— **只有 N = 24 改变，而论文漏改了那一处**</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>不完备度比值重算（工作流 3.1）—— **只有 N = 24 改变，而论文漏改了那一处**</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 78 轮 ｜ 工作流 <strong>3.1</strong>（候选池 31）｜ 核验脚本 <code>_incompleteness_78.py</code>
+<strong>UB-1 … UB-12，11 项 0 失败</strong>（4 分钟）</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p>用 <code>_tickgroup.gens_correct</code> 重算 N = 8 / 16 / 24 的不完备度比值：<strong>只有 N = 24 改变</strong>
+（生成元在 L ≤ 4 时与旧版逐元素相同，L = 6 时才分叉）⟹ <strong>5.93 → 6.03</strong>；
+趋势与结论<strong>完全不变</strong>。
+⭐ <strong>顺带查出一条内部不一致</strong>：论文第 50 轮的更正把<strong>轨道数 6224 → 6334</strong> 和 <strong>H/N 0.4330 → 0.4334</strong>
+都改了，<strong>却漏改了同一段的「5.93」</strong> ⟹ 登记 <strong>C-26</strong>。</p>
+<hr />
+<h2>一、为什么会不一样：生成元的差异（UB-1 / UB-2）</h2>
+<p>第 46 轮的 <code>_orbit_k_half.py::reduced_generators</code> 里，「移 2」写成：</p>
+<pre><code class="language-python">perm2[coords[i]] = coords[(i + 2) % L]        # ← 纯平移
+</code></pre>
+<p>这正是<strong>技能陷阱 27</strong> 明令避开的那一个 —— 「偶位 +2、奇位 −2」与「全体 +2 的纯平移」<strong>不是同一个群</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>生成元数（旧/新）</th>
+<th>逐元素相同？</th>
+<th>不同的生成元</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(2,2,2)</strong></td>
+<td>3 / 3</td>
+<td>✅ <strong>相同</strong></td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>(2,2,4)</strong></td>
+<td>7 / 7</td>
+<td>✅ <strong>相同</strong></td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>(2,2,6)</strong></td>
+<td>7 / 7</td>
+<td>❌ <strong>不同</strong></td>
+<td><strong>4</strong> 个</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键</strong>：两者在 <strong>L ≤ 4</strong> 时重合（L = 4 都退化成 <code>(0 2)(1 3)</code>），<strong>只在 L ≥ 6 分叉</strong>。</p>
+<p>群阶对照（UB-2）：</p>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>|G|_old</th>
+<th>|G|_new</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td>8</td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>128</td>
+<td>128</td>
+</tr>
+<tr>
+<td>(2,2,6)</td>
+<td><strong>648</strong></td>
+<td><strong>648</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 又一次印证<strong>陷阱 28</strong>：<strong>「阶相同」不代表「群相同」</strong> —— 必须比轨道划分，不能只比阶。</p>
+<p><strong>逐位验证（UB-10）</strong>：(2,2,4) 上两群作为<strong>集合完全相等</strong>（128 个元素逐元素比对）
+⟹ <strong>N = 16 的结果必然不变</strong>。</p>
+<hr />
+<h2>二、重算结果（UB-3 / UB-4 / UB-5 / UB-6）</h2>
+<p><strong>先复现旧值（正对照）</strong>，再给新值 —— 不复现旧值就无法把差异归因到生成元。</p>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th>轨道数（旧→新）</th>
+<th>等值集数</th>
+<th>不完备度（旧→新）</th>
+<th>H/N（旧→新）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td>14 → <strong>14</strong></td>
+<td>14</td>
+<td>1.000 → 1.000</td>
+<td>0.467874 → 0.467874</td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>16</td>
+<td>253 → <strong>253</strong></td>
+<td>155</td>
+<td>1.632 → 1.632</td>
+<td>0.433480 → 0.433480</td>
+</tr>
+<tr>
+<td><strong>(2,2,6)</strong></td>
+<td>24</td>
+<td><strong>6224 → 6334</strong></td>
+<td>1050</td>
+<td><strong>5.928 → 6.032</strong></td>
+<td>0.432986 → <strong>0.433438</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>旧群完整复现第 46 轮</strong>：轨道 14 / 253 / 6224 ✓，H/N 0.4679 / 0.4335 / 0.4330 ✓</li>
+<li><strong>新群</strong>：轨道 14 / 253 / <strong>6334</strong>（+110 条，<strong>与第 50 轮的独立结果一致</strong> ✓）</li>
+<li><strong>等值集数完全不变</strong>（14 / 155 / 1050）⟹ 符合预期：等值集只由<strong>不变量</strong>决定，<strong>与生成元无关</strong>
+  ⟹ 这是一条<strong>内部一致性检验</strong>（陷阱 26）：若它变了，说明我的轨道实现有问题</li>
+<li><strong>不完备度：1.000 → 1.632 → 6.032</strong>（旧 5.928）</li>
+</ul>
+<p><strong>H/N 的新值 0.433438 = 0.4334</strong> —— 与论文第 50 轮已更正的 <strong>0.4334</strong> <strong>完全一致</strong> ✓
+⟹ 这是对第 50 轮的一次<strong>独立复算验证</strong>。</p>
+<hr />
+<h2>三、判决：趋势与结论全不变（UB-7 / UB-8 / UB-9）</h2>
+<table>
+<thead>
+<tr>
+<th>结论</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>不完备度<strong>随 N 单调增长</strong></td>
+<td>✅ 两套群下都成立</td>
+</tr>
+<tr>
+<td>(Z₂)³ 不变量在 N ≥ 16 立即不完备</td>
+<td>✅ 不变</td>
+</tr>
+<tr>
+<td>N = 8 的「14 = 14」是<strong>偶然</strong>（不变量退化）</td>
+<td>✅ 不变（且<strong>与生成元无关</strong>）</td>
+</tr>
+<tr>
+<td><strong>H/N 在 N=16 → 24 几乎饱和</strong>（0.4335 → 0.4334）</td>
+<td>✅ 不变</td>
+</tr>
+<tr>
+<td>~~<strong>H/N ≈ 0.433 ≫ 0.25 ⟹ 面积律在能算的格点上不成立</strong>~~</td>
+<td>⚠️ <strong>【第 86 轮更正（C-39）：该表述撤回】</strong> <strong>形状口径缺失 ＋ 结论方向有误</strong>：<code>0.433</code> 只属 <strong>(2,2,L)</strong> 系列（含 <strong>2 个长度为 2 的退化方向</strong>，该方向 σ_j = 恒等）；而<strong>无退化</strong>算例 <strong>(4,4,4) = 0.1839</strong>、<strong>(6,6,6) = 0.0779</strong> <strong>均 &lt; 0.25 ⟹ 面积律在这两个算例上成立</strong>。准确表述：「<strong>H/N 在退化 ≥ 2 方向的细长格点上 ∈ [0.4334, 0.5307]（&gt; 0.25）；在无退化方向的格点上 ∈ {0.0779, 0.1839}（&lt; 0.25）</strong>」；<strong>物理宇宙对应「无退化」一组</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>3.1 的答案</strong>：<strong>更新一处数值（5.93 → 6.03）、保留全部结论</strong>。</p>
+<hr />
+<h2>四、⭐ 顺带查出：<strong>C-26（论文内部不一致）</strong></h2>
+<p>论文第 50 轮的更正（ZH 第 473 行 / EN 第 496 行）写的是：</p>
+<blockquote>
+<p>「更正后的 (2,2,L) 曲线：(2,2,6) N=24 由 0.4330 → <strong>0.4334</strong>（精确划分；<strong>轨道数 6224 → 6334</strong>）」</p>
+</blockquote>
+<p>⟹ <strong>轨道数改了、H/N 改了</strong>，但<strong>同一份记录里的不完备度仍是 5.93</strong>（ZH 第 450 / 512 行、EN 第 473 / 535 行）
+⟹ 而 5.93 是<strong>用未更正的 6224 算的</strong> ⟹ <strong>同一段文字里两个数来自不同的群</strong>。</p>
+<p><strong>这是"半改"</strong>：一次更正只改了它直接面对的那两个数，<strong>没有扫同一处的派生量</strong>。
+⟹ 与本项目此前的 C-15 / C-16 / C-21 / C-23 同族（<strong>口径/符号类的"改了这处漏了那处"</strong>），
+但<strong>新形态</strong>：不是符号撞车，是<strong>同一更正的作用域没有扫全</strong>。</p>
+<hr />
+<h2>五、诚实边界（四条）</h2>
+<ol>
+<li><strong>只算了 (2,2,L) 系列</strong>（L = 2 / 4 / 6）—— 第 46 轮的「细长格点」限制<strong>依然有效</strong>，
+   结论<strong>不外推</strong>到各向同性三维格点。</li>
+<li><strong>层口径</strong>：k = <strong>N/2 单层</strong>（C(N,k) 个构型），与第 46 轮同口径；
+   与第 40 轮的<strong>全空间 2^N</strong> 口径不同（陷阱 43）。</li>
+<li><strong>H/N 用构型等权</strong>（<code>Σ_轨道 |O|·ln|O| / M</code>，铁律 35），与第 46 / 50 轮一致。</li>
+<li><strong>N = 24 的 E 层枚举是 C(24,12) = 2,704,156</strong>（全枚举，非采样）⟹ 精确值，无采样误差；
+   但<strong>轨道大小的分布</strong>未单独输出（只用了其对数平均）。</li>
+</ol>
+<hr />
+<h2>六、判决与总账</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内容</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3.1</strong></td>
+<td>不完备度比值用更正后的群重算</td>
+<td>→ <strong>✅ 第 78 轮完成</strong></td>
+</tr>
+<tr>
+<td><strong>C-26</strong></td>
+<td>论文第 50 轮的「半改」：改了轨道数与 H/N，<strong>漏改同段的 5.93</strong></td>
+<td><strong>撤回 / 更正</strong></td>
+</tr>
+<tr>
+<td><strong>C-27</strong></td>
+<td>第 46 轮 <code>_orbit_k_half.py</code> 的「移 2」是<strong>纯平移</strong>（技能陷阱 27 的命中）</td>
+<td><strong>撤回 / 更正</strong>（实现层）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总账</strong>：更正 <strong>25 → 27</strong>；负面、难题条数不变（本轮是<strong>复算 + 更正</strong>，无新负面结论）。
+<strong>工作流第 3 批</strong>：3.1 ✅；剩 <strong>3.2（I-15 ⟨|O|⟩ 标度律）／3.3（<code>h_min·N^{−2/3}</code> 审查）</strong>。</p>
+<hr />
+<h2>七、下一步</h2>
+<table>
+<thead>
+<tr>
+<th>优先</th>
+<th>项</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>★★★</td>
+<td><strong>3.3（<code>h_min·N^{−2/3} ≈ 2.9</code> 审查）</strong></td>
+<td>最低成本：只需<strong>登记为「无机制的拟合」</strong>并检查有无误用</td>
+</tr>
+<tr>
+<td>★★★</td>
+<td><strong>4.3（77 处 ASCII 引号清理）</strong></td>
+<td>脚本可半自动；与 4.1 一起做</td>
+</tr>
+<tr>
+<td>★★</td>
+<td><strong>4.1 ＋ 3.2 ＋ H5</strong></td>
+<td>登记「格点↔面积律」不覆盖／I-15 标度律／§4.10 六处「4」复查</td>
+</tr>
+<tr>
+<td>★</td>
+<td><strong>A1 Lean 资产恢复</strong></td>
+<td>5 分钟，但需要那台机器</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>⚠️ 第 86 轮更正（C-39 / C-40）：<strong>形状口径的全链审计</strong></h2>
+<blockquote>
+<p><strong>触发</strong>：用户要求「彻底检查已有内容的冲突和验证，也许有某些是对的结论后期再算变成错的，其实它就是对的」。
+<strong>核验</strong>：<code>_shape_audit_86.py</code>（<strong>SA-1 … SA-8，8 项 0 失败</strong>）。</p>
+</blockquote>
+<h3>一、本轮更正的正是这一条</h3>
+<p>第 78 轮在结论表里写「<strong>H/N ≈ 0.433 ≫ 0.25 ⟹ 面积律在能算的格点上不成立</strong>」——
+它用的 <code>0.433</code> 只来自 <strong>(2,2,L) 系列</strong>，而那一族含 <strong>2 个长度为 2 的退化方向</strong>；
+<strong>无退化</strong>的算例 <strong>(4,4,4) = 0.1839</strong>、<strong>(6,6,6) = 0.0779</strong> 是<strong>第 48 / 49 轮就已算出</strong>的，<strong>都 &lt; 0.25</strong>。
+⟹ <strong>后期的一轮把早期正确的结论写反了</strong>（第 51 轮论文里早写着「(4,4,4) 的 0.1839 是<strong>满足</strong>」）。</p>
+<h3>二、机制（本轮补齐）</h3>
+<p>「<strong>退化方向</strong>」= <strong>线长为 2 的方向</strong>。长度 2 的环上「偶-奇配对」与「奇-偶配对」是<strong>同一个</strong>完美匹配
+（L = 2/4/6/8 逐项验证：<strong>只有 L = 2 重合</strong>）⟹ <strong>σ_j = 恒等</strong> ⟹ 该方向<strong>不贡献群元素</strong> ⟹ 轨道更小 ⟹ H/N 更大。
+<strong>这是组合事实，不是归纳。</strong></p>
+<h3>三、全表核对（15 个算例，两组完全分离）</h3>
+<table>
+<thead>
+<tr>
+<th>组</th>
+<th>退化方向数</th>
+<th>算例（H/N）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A</strong></td>
+<td><strong>≥ 2</strong></td>
+<td>0.4679 / 0.4335 / 0.4334 / 0.4617 / 0.4802 / 0.5041 / 0.5307</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td><strong>≤ 1</strong></td>
+<td>0.0779 / 0.1338 / 0.1571 / 0.1652 / 0.1802 / 0.1839 / 0.2208 / 0.2834</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ min(A) = 0.4334 &gt; max(B) = 0.2834 ⟹ <strong>空隙 (0.2834, 0.4334)</strong>。
+⟹ <strong>H/N 的主控变量是「退化方向数」（数值格点的伪影程度），不是 N</strong>。</p>
+<p>⚠️ <strong>顺带更正 C-40</strong>：第 48 轮写「0.25 <strong>落在空隙里</strong>」—— <strong>0.25 &lt; 0.2834</strong>，它<strong>不在空隙里</strong>，
+而是在<strong>组 B 内部</strong>（跨点 N ∈ (32, 48)，第 49 轮已给出）。</p>
+<h3>四、影响面（三处，均已就地更正）</h3>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>原文</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>论文 §4.8 第 78 轮块结论 ④（中英）</td>
+<td>「面积律在能算的格点上不成立」</td>
+<td>删除线 ＋ <strong>C-39</strong> 更正注</td>
+</tr>
+<tr>
+<td>论文 §4.8 第 48 轮块「0.25 落在空隙里」（中英）</td>
+<td>同上</td>
+<td>删除线 ＋ <strong>C-40</strong> 更正注</td>
+</tr>
+<tr>
+<td>本备忘录结论表 ④ / 清单 3.1 行 / 交接说明第 78 轮段</td>
+<td>同上</td>
+<td>就地更正</td>
+</tr>
+</tbody>
+</table>
+<p>✅ <strong>第 80 轮的「不覆盖」登记不需要撤回</strong> —— 其四条依据（无等式 / 无机制 / 不可证伪 / 判据适用域）
+<strong>没有一条</strong>引用 <code>H/N ≈ 0.433</code>。</p>
+
+<div class="footer">不完备度比值重算（工作流 3.1）—— **只有 N = 24 改变，而论文漏改了那一处** · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 不完备度比值重算_只有N24改变且论文漏改了一处.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

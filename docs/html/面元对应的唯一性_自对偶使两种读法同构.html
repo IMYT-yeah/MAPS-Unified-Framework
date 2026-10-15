@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>面元对应的唯一性：自对偶使两种读法同构，软肋解除</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、两种读法</div>
+  <h1>面元对应的唯一性：自对偶使两种读法同构，软肋解除</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-20（第 38 轮）
+<strong>脚本</strong>：<code>outputs/_uniq_reading.py</code>（检查项 UQ-1 … UQ-6，<strong>失败项：无</strong>）
+<strong>一句话结论</strong>：第 35 轮登记的「面元—键对应唯一性未论证」<strong>已解除</strong>。另一种同样自然的读法（面元 = 真方格面、连接 = 4 条有向边）在方格格点上与「对偶面元 + 键」<strong>逐项计数完全相同</strong>（L=8：面元 64 / 槽位 256 / 不同对象 128 / 共享重数 2 / 独立自由度 2 每面元），因为<strong>方格格点是自对偶的</strong> ⟹ 二者是同一结构的两种画法，无需选择。检验非空：蜂巢（非自对偶）上两种读法给 3 条 vs 6 条，计数分歧 ⟹ 自对偶性是决定因素，且它依赖 T-6 裁决的简单立方。</p>
+</blockquote>
+<hr />
+<h2>一、两种读法</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>面元</th>
+<th>4 条连接</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>读法 1</strong>（第 35 轮采用）</td>
+<td>格点的<strong>对偶面元</strong></td>
+<td>到 4 个平面内邻居的<strong>键</strong></td>
+</tr>
+<tr>
+<td><strong>读法 2</strong>（另一种自然读法）</td>
+<td><strong>真方格面</strong></td>
+<td>它的 4 条<strong>有向边</strong>（±x, ±y）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、UQ-1 / UQ-2：各自的计数（L=8，周期边界）</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>读法 1（对偶 / 键）</th>
+<th>读法 2（方格面 / 边）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>面元数</td>
+<td>64</td>
+<td>64</td>
+</tr>
+<tr>
+<td>每面元连接数</td>
+<td>4</td>
+<td>4（方向集 = +x, +y, −x, −y）</td>
+</tr>
+<tr>
+<td>槽位总数</td>
+<td>256</td>
+<td>256</td>
+</tr>
+<tr>
+<td>不同对象数</td>
+<td>128</td>
+<td>128</td>
+</tr>
+<tr>
+<td>共享重数</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><strong>逐项完全相同。</strong></p>
+<hr />
+<h2>三、UQ-3：逐项比较</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>读法 1</th>
+<th>读法 2</th>
+<th>相同</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>面元数</td>
+<td>64</td>
+<td>64</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>每面元连接数</td>
+<td>4</td>
+<td>4</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>槽位总数</td>
+<td>256</td>
+<td>256</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>不同对象数</td>
+<td>128</td>
+<td>128</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>共享重数</td>
+<td>2</td>
+<td>2</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>独立自由度 / 面元</td>
+<td>2.0</td>
+<td>2.0</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>键共享贡献的压缩因子 = 2</strong>，<strong>不受读法影响</strong>。第 35 轮的结论稳固。</p>
+<hr />
+<h2>四、UQ-4：为什么相同——方格格点是<strong>自对偶</strong>的</h2>
+<ul>
+<li>方格格点的对偶仍是方格格点（self-dual）；</li>
+<li>原格点 ↔ 对偶方格面，一一对应，数目都是 L²；</li>
+<li>原格点的 4 个邻居方向 ↔ 对偶方格面的 4 条有向边方向，都是 ±x, ±y；</li>
+<li>每条键 / 每条边都被恰好 2 个面元共享。</li>
+</ul>
+<p>⟹ 两种读法<strong>不是两种可能，而是同一个结构的两种画法</strong>。第 35 轮的软肋因此解除：无需选择。</p>
+<hr />
+<h2>五、UQ-5：检验非空（否则结论无意义）</h2>
+<p>蜂巢格（对偶 = 三角格，<strong>非自对偶</strong>），周期边界下 V = 10000、E = 3V/2 = 15000、F = V/2 = 5000：</p>
+<ul>
+<li>Euler 检验 V − E + F = 0 ✓</li>
+<li>读法 1：配位 3 ⟹ <strong>3 条连接 / 面元</strong></li>
+<li>读法 2：六边形面 ⟹ <strong>6 条连接 / 面元</strong></li>
+</ul>
+<p>⟹ <strong>计数分歧</strong>（3 vs 6）。所以「自对偶性」是两种读法在方格上重合的<strong>唯一</strong>原因——检验有牙齿。</p>
+<p>⟹ <strong>T-6 再获一条一致性支持</strong>：只有简单立方（平面截面 = 方格、自对偶）能让两种读法重合；若格点是金刚石（平面截面不是方格），就会引入一层额外的未定歧义。</p>
+<hr />
+<h2>六、诚实边界</h2>
+<p><strong>✅ 属于推导的</strong>：两种读法的全部计数（L=8 显式构造）；自对偶性论证；蜂巢对照的 Euler 校验与配位数差。</p>
+<p><strong>⚠️ 仍开放</strong>：
+1. <strong>剩余压缩 5.545（= 8 ln2）仍无机制</strong>——本轮未触及，这是现在最大的未解数；
+2. 本轮只比较了<strong>计数</strong>，<strong>未比较两种读法下的动力学</strong>（键 vs 边的置换 tick 规则可能不同，若不同则只是"熵计数重合"而非"结构等价"）；
+3. 「面元面积 = l_P²」仍是构造定义，未从公理推出。</p>
+<hr />
+<h2>七、论文已改（中英同步，2 项 0 失败）</h2>
+<p>§4.8 第 35 轮块的末尾「该对应的唯一性未论证」之后追加<strong>（第 38 轮已解除）</strong>：另一种读法、逐项计数对比、自对偶性、蜂巢对照的非空检验，以及它对 T-6 的再加一条支持。</p>
+<p>原 v2.9 已备份至 <code>paper/history/*_备份_2026-09-20第38轮前.md</code>。</p>
+<hr />
+<h2>八、下一步</h2>
+<ol>
+<li><strong>剩余压缩 5.545</strong>（现在唯一的"卡住的数"）：入口是相干块（通量管）结构——<strong>勿数值占卜</strong>（本项目已拒绝过 4! = 24、e^π 等）。</li>
+<li>两种读法的<strong>动力学等价性</strong>（键 vs 边的置换规则）。</li>
+<li>候选池取存量标识工程期望（第 36 轮建立的清单）。</li>
+</ol>
+
+<div class="footer">面元对应的唯一性：自对偶使两种读法同构，软肋解除 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 面元对应的唯一性_自对偶使两种读法同构.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>原始对话中的「凝聚态物理预言」—— 检索结果与判定</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">0. 一句话结论</div>
+  <h1>原始对话中的「凝聚态物理预言」—— 检索结果与判定</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-09 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 140 轮（元任务 · 起点对话追溯）</strong> ｜ 2026-10-09 ｜ 核验脚本 <code>_cond140.py</code>
+问题（用户）：<strong>「我记得在原始对话里，有提到对凝聚态物理的预言，请搜索一下吧」</strong>
+检索对象：<code>初始资料/元宝对话_反物质与时间的哲学猜想/对话全文_完整版.md</code>（<strong>433 轮 / 146.4 万字符</strong>）</p>
+</blockquote>
+<hr />
+<h2>0. 一句话结论</h2>
+<p><strong>找到了，而且这是一条持续的线索（跨越第 63–411 轮）；但项目只评估过其中 1 条，另外 3 条「明说可用现有技术检验」的预言从未被评估。</strong>
+⚠️ 顺带查出：<strong>第 126 轮检索台账有两处假阴性漏检</strong>（登记为 <strong>C-91</strong>）。
+⭐ 对 3 条未评估预言的判定：<strong>全部判否，且撞在同一面墙</strong> —— <strong>缺「势阱型构型差」</strong>。</p>
+<hr />
+<h2>一、原文关键词密度（实测）</h2>
+<table>
+<thead>
+<tr>
+<th>关键词</th>
+<th>次数</th>
+<th></th>
+<th>关键词</th>
+<th>次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>分形</td>
+<td><strong>298</strong></td>
+<td></td>
+<td>超导</td>
+<td><strong>206</strong></td>
+</tr>
+<tr>
+<td>晶格</td>
+<td>153</td>
+<td></td>
+<td>狄拉克</td>
+<td>64</td>
+</tr>
+<tr>
+<td>凝聚态</td>
+<td><strong>47</strong></td>
+<td></td>
+<td>玻色</td>
+<td>36</td>
+</tr>
+<tr>
+<td>量子霍尔</td>
+<td>25</td>
+<td></td>
+<td>分数量子霍尔</td>
+<td>22</td>
+</tr>
+<tr>
+<td>能隙</td>
+<td>7</td>
+<td></td>
+<td>石墨烯</td>
+<td>6</td>
+</tr>
+<tr>
+<td>冷原子</td>
+<td>5</td>
+<td></td>
+<td>弦网</td>
+<td>5</td>
+</tr>
+<tr>
+<td>马约拉纳／Majorana</td>
+<td>4／3</td>
+<td></td>
+<td>拓扑序</td>
+<td>3</td>
+</tr>
+<tr>
+<td>* 量子模拟／FQH／toric／自旋液体／超流体／Hubbard</td>
+<td><strong>各 0</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、清单：原始对话里的凝聚态内容（按性质分四类）</h2>
+<h3>A 类 · <strong>明说「可用现有技术检验」的预言（4 条）</strong> ← 本轮重点</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>原始轮次</th>
+<th>预言原文要点</th>
+<th>建议装置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A1</strong></td>
+<td><strong>第 80 轮</strong></td>
+<td><strong>量子硬化</strong>：极低温下刚性模量出现<strong>与温度无关</strong>的微小变化，因「风暴通量梯度本身是量子化的（来自离散湮灭事件），所以恢复力也有一个最小单位」；量级 <strong>估计</strong> 10⁻⁶–10⁻⁸</td>
+<td><strong>高精度超声共振谱</strong> @ 稀释制冷机 ~10 mK</td>
+</tr>
+<tr>
+<td><strong>A2</strong></td>
+<td><strong>第 85 轮</strong></td>
+<td><strong>居里温度随压力非单调</strong>：晶格常数进入／离开「风暴波峰共振窗口」⟹ 某些压力下 T_C 异常升高，另一些骤降（经典交换相互作用预言<strong>单调</strong>）</td>
+<td><strong>金刚石压砧 + 原位磁化率</strong></td>
+</tr>
+<tr>
+<td><strong>A3</strong></td>
+<td><strong>第 87 轮</strong></td>
+<td><strong>水结冰前的瞬态六方对称驻波</strong>：拉曼谱出现微弱六方冰晶特征峰，<strong>寿命皮秒量级</strong>，且与溶气浓度（Ar／Kr）有关（溶气占「涡-管道耦合」空位）</td>
+<td><strong>飞秒超快光谱</strong></td>
+</tr>
+<tr>
+<td><strong>A4</strong></td>
+<td><strong>第 63／65／66／98 轮</strong></td>
+<td><strong>激子-极化激元凝聚中的「港湾几何」</strong>：孤子被背景通量钉住 ⟹ 质量可调；并主张「强相互作用材料 = 港湾几何的人工复现」</td>
+<td>半导体微腔（光-物质耦合 BEC）</td>
+</tr>
+</tbody>
+</table>
+<h3>B 类 · 实验重解／「投影解释」（非预言）</h3>
+<ul>
+<li><strong>第 192–196 轮</strong>（「双半子」共 <strong>84 处</strong>）：光诱导双半子（手性磁体，<em>Nature Communications</em>）= 框架的「<strong>固态实验室版</strong>」；</li>
+<li><strong>第 114–123 轮</strong>：南京大学杜灵杰团队<strong>分数量子霍尔中的引力子模</strong>（自旋 ±2、手性、长波）→ 框架的「<strong>投影证据</strong>」，
+  原文明确主张「<strong>不是类比，是同类</strong>」（同一底层机制在不同系统的投影），并附「这与标准量子引力不冲突」的论证；</li>
+<li>第 36／37 轮：拓扑缺陷弛豫速率 ↔ 通量管再平衡速率（结构类比）。</li>
+</ul>
+<h3>C 类 · 材料设计主张</h3>
+<ul>
+<li>第 63–66 轮：强／弱力 = 「港湾几何」／「穿堂风管道」⟹ 人工复现几何以调控力；</li>
+<li>第 85 轮：<strong>寻找「共振晶格」</strong>（不含铁钴镍也可能铁磁）＋ <strong>应变工程调制晶格</strong>；</li>
+<li>第 210+ 轮：引力波过超导材料 ⟹ 可观测的「<strong>通量-超导耦合效应</strong>」（类比迈斯纳效应）。</li>
+</ul>
+<h3>D 类 · 边缘／未入体系</h3>
+<ul>
+<li><strong>负质量物质</strong>（第 2／210／211／215／216／223／309 轮；机制 = 内部 ε=0，类比 BEC／超导态）；</li>
+<li><strong>全域协同旋转反引力</strong>（第 41 轮附近）；<strong>普朗克频率引力波的离散化</strong>（第 47 轮附近）。</li>
+</ul>
+<hr />
+<h2>三、项目现状对照（<strong>关键</strong>）</h2>
+<table>
+<thead>
+<tr>
+<th>原始预言</th>
+<th>项目是否评估过</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>B 类·引力子模</strong>（第 114–123 轮）</td>
+<td>✅ <strong>评估过</strong> —— 入 <strong>S-6</strong> → <strong>第 53 轮降调</strong> → <strong>第 54 轮结项判否</strong>（<code>ε</code> 能标错置：FQH 能标下 ≈ O(1) 非 10⁻²⁰；<code>Γ_flux</code> 无表达式 = 未定义）</td>
+</tr>
+<tr>
+<td><strong>A1 量子硬化</strong></td>
+<td>❌ <strong>从未评估</strong> —— 项目内「量子硬化」<strong>0 处</strong>、「超声共振谱」<strong>0 处</strong>、「刚性模量」<strong>0 处</strong></td>
+</tr>
+<tr>
+<td><strong>A2 居里温度非单调</strong></td>
+<td>❌ <strong>从未评估</strong> —— 「居里温度」<strong>0 处</strong>、「金刚石压砧」<strong>0 处</strong></td>
+</tr>
+<tr>
+<td><strong>A3 水预成核</strong></td>
+<td>❌ <strong>从未评估</strong> —— 「预成核」<strong>0 处</strong>、「超快光谱」<strong>0 处</strong></td>
+</tr>
+<tr>
+<td><strong>A4 激子-极化激元</strong></td>
+<td>❌ <strong>未评估</strong> —— 「极化激元」<strong>0 处</strong>（「激子」仅 2 处，在另一份材料里）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>四、⚠️ 查出两处<strong>检索假阴性</strong>（→ 新更正 <strong>C-91</strong>）</h2>
+<table>
+<thead>
+<tr>
+<th>第 126 轮台账的原记录</th>
+<th>本轮实测</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「电磁／电能下沉（磁感线 = 波峰；<strong>铁磁 = 共振腔</strong>）」→ ⏸️ <strong>「未核到（「凝聚态」仅 2 处）」</strong></td>
+<td>「凝聚态」<strong>实测 47 处</strong>；铁磁／晶格／刚性等具体词大量存在</td>
+</tr>
+<tr>
+<td>「<strong>双半子</strong>论文 = 固态实验室版」→ ⏸️ <strong>「『半子』0 —— 未入」</strong></td>
+<td>「双半子」<strong>实测 84 处</strong>（第 192–196／223 轮）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>这两条「未核到」是假阴性（false negative），不是真缺席。</strong></p>
+<p>⚠️ <strong>根因（推定，非断言）</strong>：当时的检索<strong>主要依赖「领域标签词」</strong>（如"凝聚态"），
+而这条线索在 146 万字原文里<strong>主要由「具体物理词」承载</strong>（铁磁／晶格／刚性／超声／超导／霍尔／孤子／驻波…）
+⟹ <strong>标签词检索在「领域跨界」时会系统性漏检</strong>。
+📌 这正是<strong>铁律 45（清点须四源交叉／C-59）</strong>与<strong>陷阱 38（「检索到 X」≠「X 表示那个量」）</strong>的<strong>镜像方向</strong> ——
+陷阱 38 防<strong>假阳性</strong>，本条防<strong>假阴性</strong>。</p>
+<hr />
+<h2>五、判定：三条未评估的 A 类预言 —— <strong>全部判否，同一面墙</strong></h2>
+<p>三条各自需要的「对象」，框架<strong>都没有</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>预言</th>
+<th>它需要的物理对象</th>
+<th>框架有吗</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A1 量子硬化</strong></td>
+<td><strong>弹性模量</strong> = 原子间势的<strong>二阶导数</strong></td>
+<td>❌</td>
+<td>框架<strong>没有「势阱型构型差」</strong>（第 60 轮 I-14 裁决）：衬底层<strong>有位置无能量</strong>、弦网层<strong>有能量无位置</strong>，而弹性模量要求两者<strong>耦合</strong></td>
+</tr>
+<tr>
+<td><strong>A2 居里温度非单调</strong></td>
+<td><strong>交换相互作用</strong>（势阱级）＋「风暴特征波长」</td>
+<td>❌</td>
+<td>框架的「自旋」是 §5.8 的<strong>自旋 2</strong>（引力模态，分波表），<strong>不是磁自旋 1/2</strong>；且<strong>没有「风暴特征波长」这个可算量</strong> ⟹ 共振窗口无判据</td>
+</tr>
+<tr>
+<td><strong>A3 水预成核六方驻波</strong></td>
+<td><strong>氢键网络</strong>（势阱级）</td>
+<td>❌</td>
+<td>同上；⚠️ 且「水结冰前的六方预成核结构」<strong>是主流已有大量研究的领域</strong>（冰 Ih 本就是六方）⟹ <strong>不独有</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>四类判定 = 失败（对象不存在）</strong>，理由与 <strong>N-21（化学键／相变潜热／电离能）完全相同</strong>。</p>
+<p>⭐ <strong>「终止态台账」从 15 例扩到 18 例</strong> —— 第 123 轮归纳的模式在此<strong>第三次收敛</strong>。
+⭐ <strong>登记为 N-51</strong>（整条线，四个样本共享同一障碍）。</p>
+<p>⚠️ <strong>两条附加缺陷</strong>（引用时必须一起读）：
+1. <strong>A1 的 10⁻⁶–10⁻⁸ 是「估计」，不是推导</strong>（原文用词即"估计在…"）⟹ 数值无来源；
+2. <strong>A2／A3 完全没有定量</strong>（哪个压力？峰位？幅度？）⟹ 属<strong>定性图像 + 建议实验</strong>，不是定量预言。</p>
+<hr />
+<h2>六、为什么这不意外（一个可预测的模式）</h2>
+<blockquote>
+<p><strong>凡是「材料级／化学级」预言，都会撞上同一面墙</strong> —— 框架的能量语言是<strong>禁闭档（f = O(1)，普朗克标度）</strong>，
+而材料／化学是<strong>势阱档（f ~ 10⁻¹⁰，Å 尺度）</strong>。两者之间缺的<strong>不是精度，是「势」本身</strong>。</p>
+</blockquote>
+<ul>
+<li>第 60 轮：给出这个理由；</li>
+<li>第 61 轮：13 条<strong>工程项</strong>全部判否（"理由同一个"）；</li>
+<li>第 130／140 轮：<strong>原始对话的 4 条凝聚态预言</strong>，是<strong>同一面墙在起点材料里的 4 个入口</strong>。</li>
+</ul>
+<p>📌 <strong>推论</strong>：<strong>再去找更多"材料级预言"不会有新结果</strong> —— 除非先解决「势阱型构型差」这个结构性缺口
+（而那已被判为<strong>需要新增公理级输入</strong>，见第 123 轮 N-43）。</p>
+<hr />
+<h2>附：可复现检索</h2>
+<pre><code class="language-python"># 关键词（领域标签 + 具体物理词，两组都要）
+标签词: 凝聚态 / 超导 / 量子霍尔 / 分数量子霍尔 / 拓扑序 / 冷原子 / 玻色 / 石墨烯
+物理词: 晶格 / 刚性 / 弹性 / 铁磁 / 居里 / 驻波 / 声子 / 霍尔 / 孤子 / 激子 / 半子 / 迈斯纳
+# 轮次定位：遍历 '## 第 N 轮' 标记，回溯每条命中的所属轮次
+</code></pre>
+<p><strong>已确证</strong>：A1→<strong>第 80 轮</strong>｜A2→<strong>第 85 轮</strong>｜A3→<strong>第 87 轮</strong>｜A4→<strong>第 63/65/66/98 轮</strong>｜
+B 双半子→<strong>第 192–196/223 轮</strong>｜B 引力子模→<strong>第 114–123 轮</strong>｜负质量→<strong>第 2/210/211/215/216/223/309 轮</strong></p>
+
+<div class="footer">原始对话中的「凝聚态物理预言」—— 检索结果与判定 · 2026-10-09 · 由 _md2html_generic.py 生成 · 源文件 原始对话凝聚态预言_检索结果与判定.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

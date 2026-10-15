@@ -1,0 +1,2833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>环境交接说明（换电脑后先读这份）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、三句话速览</div>
+  <h1>环境交接说明（换电脑后先读这份）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>最后更新：2026-09-28（<strong>第 0 批全部完成：0.1 T-12 裁决 ／ 0.2 三条收口核查 ／ 0.3 ε 符号规范 ／ 0.4 口径对账</strong>） ｜ 项目：正反物质对风暴（MAPS）统一框架
+<strong>这台机器的绝对路径随时会变。所有脚本都写成"相对自身定位"，把整个文件夹整个拷走即可，不要单独拷子目录。</strong></p>
+</blockquote>
+<hr />
+<blockquote>
+<p>📄 <strong>想快速知道推到哪了</strong>：
+① <strong>最近 40 轮（第 18–57 轮）</strong> ⟹ <code>outputs/本轮推演总结_2026-09-21.md</code>（<strong>首选，一份读完</strong>）；
+② 更早的 12 轮（第 1–16 轮）⟹ <code>outputs/本轮推演总结_2026-09-17.md</code>；
+③ 只想看<strong>最新一轮</strong> ⟹ 本文件里最新的一轮（现在 = 「第 57 轮」段，在「已排除的路」之前）。
+🤖 <strong>想接着推</strong>：技能 <code>maps-deduction-round</code> 在 <code>~/.workbuddy/skills/</code>（<strong>2026-09-20 已重建</strong>，
+换机时丢过一次）；说"继续推演"即可按规范化流程走（含环境坑与数值陷阱）。</p>
+</blockquote>
+<h2>一、三句话速览</h2>
+<ol>
+<li>这是一个<strong>启发式统一物理框架</strong>（非已确立物理）的论文 + 备忘录 + 数值核验仓库。</li>
+<li>核心理论链已推到 <strong>λ = 1（空间平坦 ⟹ 黑洞宇宙）</strong>，<strong>唯一断点</strong>已从
+   "β = 1/(2π) 靠 Planck 数据倒推"推进到"有一套框架推导，但代价是多一条公理 B5"。</li>
+<li>源码仓库在 <code>MAPS-Unified-Framework/</code>（已 git 初始化、385 文件暂存、分支 main），
+   <code>outputs/</code> 是它的<strong>素材镜像</strong>。两者都要拷。</li>
+</ol>
+<h2>二、目录地图</h2>
+<pre><code>&lt;工作区根&gt;/
+├── 环境交接说明.md          ← 你正在读的这份
+├── _rebuild_repo.py         ← 从 outputs/ 重建仓库（可重复执行，先清空目标）
+├── _md2html_generic.py      ← 通用 md→html 快照生成器（--stale 自动补）
+├── outputs/                 ← 素材镜像：论文/备忘录 md 176 + html 187 + 脚本 239
+│   ├── stormetric/          ← Python 包（度规/PPN/阴影/EMRI，53 测试）
+│   ├── arXiv_submission/    ← 投稿源（tex/pdf）
+│   └── cso_submission/
+└── MAPS-Unified-Framework/  ← GitHub-ready 仓库（重建产物）
+    ├── README.md  RECOVERY.md  提交就绪说明.md
+    ├── paper/{zh,en,history,submissions}    论文 v2.9（当前）+ 沿革（v2.8 及更早在 history/）+ 投稿源
+    ├── notes/推演专题(114) A·B·C(14) M·P(14) EMRI·MAPS·包工程(7)
+    ├── python/stormetric/    （python/maps ⚠️ 丢失，仅恢复规格）
+    ├── verification/ 244     （lean/ ⚠️ 丢失，仅恢复规格）
+    └── docs/html/ 188 篇快照
+</code></pre>
+<h2>三、当前理论进度（接着往下推的起点）</h2>
+<h3>已闭合</h3>
+<ul>
+<li><code>λ = 2αβ</code> → 一般化修正为 <strong><code>λ = 4α²β²</code></strong>（用一般表观视界，非循环）</li>
+<li><code>α = π</code>（由 F3 熵 <code>S = k_B A/(4l_P²)</code> 锁定；太阳黑洞 S/k_B = 1.0494e77 ✓）</li>
+<li><strong>β = 1/(2π) 已可推导</strong>（本轮成果，见 <code>outputs/β的框架推导_因果视界与2π的来源.md</code>）</li>
+<li>⚠️ <strong><code>λ = 4α²β² = 1</code> 是恒等式（重言式），不是平直性证据</strong>（09-17 第 16 轮查出）：
+  该式对任意 ξ 恒为 1 ⟹ <strong>看不见 R</strong>，故不能用于挑面、也不能作为「λ=1 已获验证」的证据。
+  有内容的只有一条：<strong>等分账写在 <code>R_c = c/H</code> 上 ⟹ 解出 <code>ρ = 3H²/(8πG)</code></strong>。
+  🔧 待办：论文中把「ξ-稳健性」降调为一致性检查；λ 统一用操作式 <code>λ ≡ ρ/ρ_crit</code>（面敏感）</li>
+<li>⟹ <code>λ = 1</code> ⟹ <code>Ω_K = 0</code> ⟹ <code>k = 0</code> ⟹ 哈勃球 = 表观视界 = 史瓦西半径（黑洞宇宙）</li>
+<li><strong>λ = 1 的稳健性</strong>：令 <code>S = k_B A/(ξ l_P²)</code> ⟹ <code>α = 4π/ξ</code>、<code>β = ξ/(8π)</code>、
+  <code>λ = 4α²β² = 1</code> —— <strong>ξ 完全约掉</strong>（ξ = 1…16 数值全为 <code>1.000000000000</code>）。
+  ⚠️ 但见上一条：这正是重言式的表现，别当增益用；
+  另 <strong>β = 1/(2π) 本身依赖 ξ = 4</strong>（即 Bekenstein-Hawking 值）</li>
+</ul>
+<h3>本轮的关键推进与代价</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅ 2π 的来源</td>
+<td>由 <strong>F3 + dE=TdS</strong> 推出 <code>T = ℏc³/(8πGMk_B)</code>，1/(2π) 不再是从 QFT 借的</td>
+</tr>
+<tr>
+<td>✅ 因果视界</td>
+<td><code>R_c = c/H</code>（<code>v_rec = Hr = c</code>，任意 k 成立）⟹ <code>κ = c²/R_c = cH</code> ⟹ β 与 λ 无关</td>
+</tr>
+<tr>
+<td>⚠️ 准定理 B5</td>
+<td><strong>热力学面 = 平流停滞面 <code>v_rec = c</code>（非 GR 的表观视界，也非事件视界）</strong>。</td>
+</tr>
+<tr>
+<td>09-17 第 16 轮补上最后一环：两端「同一批块」在 <strong>O(10⁻⁶¹)</strong> 上成立（机制 = 时间尺分离）；</td>
+<td></td>
+</tr>
+<tr>
+<td>事件视界/表观视界+Kodama 两条替代路均被观测排除。<strong>但仍非定理</strong>：</td>
+<td></td>
+</tr>
+<tr>
+<td>① 残差论证依赖「两端都是瞬时分解」；② 唯一性用的是 Ω_K 观测值 ⟹ 带数据成分。</td>
+<td></td>
+</tr>
+<tr>
+<td>关键：<code>R_c = c/H</code> 只需 (c, H)；<code>R_A = c/(H√λ)</code> 需要 G，而 <strong>G 是涌现量</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>✅ 已澄清</td>
+<td><strong>视界热力学有两个包</strong>（见 <code>outputs/视界热力学的两个包.md</code>）：微分第一定律</td>
+</tr>
+<tr>
+<td><code>dE = TdS + WdV</code> <strong>选定的是 Kodama 温度</strong>（平直情形闭合值精确 1.000000），</td>
+<td></td>
+</tr>
+<tr>
+<td>不是 GH 温度。标准包（Kodama + 第一定律 ⟺ Friedmann）对 λ 无约束；</td>
+<td></td>
+</tr>
+<tr>
+<td>框架包（GH 温度 + 代数等分 <code>E = T·S</code> 写在 <code>R_c</code>）<strong>预言 λ = 1</strong>。</td>
+<td></td>
+</tr>
+<tr>
+<td>代价：框架<strong>放弃了从视界热力学推 Friedmann</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3>论文主稿（v2.8）与推演的关系（第 17 轮核查，重要）</h3>
+<ul>
+<li><strong>论文 §8「宇宙学」只写到旧的那条线</strong>（A2 泄漏 + 暗物质叠加 + 暗能量 w(z)）。
+  9 月推的全部内容 —— β=1/(2π)、B5 平流停滞面、等分账⟹Friedmann 约束、平坦性、黑洞宇宙 ——
+  <strong>从未进过论文</strong>（"β = 1/(2π)""黑洞宇宙""等分" 在论文里出现 <strong>0 次</strong>）。</li>
+<li>❌ <strong>论文 §8.2 的结论已过期</strong>：<code>f_space ≈ 0.014</code> 应改为 <strong>1/32.000</strong>（由观测量解出，非 knob），
+  旧值小 2.23 倍；且该机制已判 <strong>零预言力</strong>（<code>outputs/f_space的第一性定义_机制B零预言力.md</code>、
+  <code>outputs/f_space的下界定理_机制B被否证.md</code>）。</li>
+<li>❌ <strong>论文 §8.3「暗物质主体来自镜像支投影」已被否证</strong>：读法 A 低 <strong>5.31 倍</strong>、读法 B 高 <strong>3.82 倍</strong>，
+  方向相反且远超误差棒 → 应降为开放问题。</li>
+<li>✅ <code>E_c = 1.0181 meV</code> 早已是推导值（论文第 628 行同式），仅写法精度差 0.8%；但须注明 β 敏感度
+  （β +1% ⟹ E_c 变 2.0 倍）——与 Ω_Λ 定量路失败的病根同源（<code>dlnΩ_Λ/dβ = 465</code>）。</li>
+<li>⚠️ <strong>符号冲突：论文里 λ 已被 §5 弦网耦合占用</strong>（§5 有 11 行含 λ，全文 26 行，§8 为 0）。
+  ⟹ 论文中写这条一律用 <strong><code>Ω_tot ≡ ρ/ρ_crit</code></strong>（配套的 <code>Ω_K = 1 − Ω_tot</code>）；
+  副作用是好的：「λ = 1」随即显形为「Ω_tot = 1」= 平坦性本身，α-β 路的重言性质也随之暴露。</li>
+<li>📦 <strong>已落地（v2.9）</strong>：补丁脚本 <code>outputs/_paper_patch_v29.py</code>（12 项动作、0 失败，锚点要求恰好命中一次）
+  已生成 <code>论文初稿_正反物质对风暴统一框架_v2.9.md</code> 与 <code>Paper_MatterAntimatterPairStorm_v2.9_EN.md</code>
+  （中英同步：三处修正 + 新增 §8.6 + §9 新增 S-C1 + 附录 C 版本条目）。
+  <strong>当前主稿 = v2.9</strong>；v2.8 原文件已移入 <code>paper/history/</code>（可回滚对比）。
+  补丁底稿仍保留：<code>outputs/论文增补_§8收口与新8.6视界热力学.md</code>。</li>
+</ul>
+<h3>第 18 轮：光速的意义改写（微观恒 c / 落差 / 手递手）—— 新机制</h3>
+<ul>
+<li><strong>机制</strong>：诸元微观恒以 c 运动；宏观速度 = 净漂移；影响只能靠「湮灭 → 相邻处再生」手递手传递
+  ⟹ 一步 l_P、一拍 t_P ⟹ <strong>c = l_P/t_P 是衬底的传递速率，不是外加的速度上限</strong>。</li>
+<li><strong>✅ 正交分解</strong>：<code>(v/c)² + (v_int/c)² = 1</code>，<strong><code>v_int = c/γ = c·√(1−v²/c²)</code> = 内部 zigzag 速度 = 时钟走速</strong>。
+  ⚠️ 论文里别混「线性落差 c−v」与「不变量落差 c/γ」（v=0.6c：0.40c vs 0.80c）。</li>
+<li><strong>✅ 质量 = 每普朗克拍的反转概率</strong>：<code>m = p_rev·m_Pl</code>，反转率 <code>= (m/m_Pl)/t_P = mc²/ℏ</code>
+  （电子/质子/顶夸克/m_Pl 四个粒子数值恒等，误差 &lt;10⁻¹²）。
+  ⟹ <strong>「有质量就不能到 c」从公理变成后果</strong>：m&gt;0 ⟹ p_rev&gt;0 ⟹ 必然有反向步 ⟹ v&lt;c 严格。
+  ⟹ 持续长度 = 约化康普顿波长 <code>ℏ/(mc) = l_P·(m_Pl/m)</code>（数值恒等）；<strong>惯性 = 反转频率</strong>。
+  ⟹ <code>p_rev ≤ 1</code> ⟹ <strong>m_Pl 是基本粒子的质量上限</strong>。</li>
+<li><strong>✅ 超光速 = 结构性无定义</strong>：需沿途<strong>连续无穷多个绝对真空</strong>；f=1 时空位概率 0；
+  即便 f=1/32（96.9% 空位），宏观链概率也是 10^(−10²³)。
+  ⟹ 更准确说法：使超光速成为可能的绝对真空，<strong>同时取消了要穿过的空间</strong>（无诸元 ⟹ 无「那里」）。</li>
+<li>⚠️ <strong>向框架索取的三条新承诺（必须写进论文）</strong>：
+  <strong>C-1</strong> 衬底占位率 <strong>f = 1</strong>（否则 f=1/32 ⟹ c_eff = 3.17 c（三维）或 32 c（沿射线））
+       ⟹ <strong><code>f_space = 1/32</code> 既不是体积分数也不是占位率</strong>（继空洞体积否证后的<strong>第二条独立论证</strong>）；
+  <strong>C-2</strong> 普朗克尺度的「绝对位置」不得泄漏到 1PN（否则点亮 PPN 的 ξ/α₁/α₂/α₃，
+       与论文第 217 行「=0」及 10⁻⁴~10⁻⁸ 观测约束冲突）
+       ⟹ <strong>A1 的 50:50 + 各向同性新增职责：抹掉衬底绝对性的机制</strong>；
+  <strong>C-3</strong> 质量 = 反转概率 ⟹ 不存在超普朗克质量的基本粒子。</li>
+<li>❗ <strong>最大开放口</strong>：<code>p_rev = m/m_Pl</code> <strong>本身仍是输入</strong>，框架尚未推出任何粒子的质量值
+  （质量谱无解释）。下一步候选：试从 A2 的 ε(E) 推出能标质量（ε(1TeV)=6×10⁻¹⁰ vs
+  m_e/m_Pl=4.2×10⁻²³ 差十几个量级，<strong>大概率不是同一件事</strong>，但值得算一次判死）。</li>
+<li>产出：<code>outputs/光速的意义_落差分解与超光速的结构性.md</code>（+html）；
+  核验 <code>outputs/_light_speed_meaning.py</code>（LS-0…LS-8，失败项：无）。</li>
+</ul>
+<h3>第 19 轮：底层状态数 = 16，隧穿与超光速同源 —— B5 的一个输入变成输出</h3>
+<ul>
+<li><strong>✅ 底层状态数定了</strong>：每格点 = 内部状态 q × 方向 k=4。
+   ⚠️ <strong>（第 31 轮修正归属）</strong> 那个「4 方向」<strong>不是</strong> §4.10 的 Tammes k=4（内空间），
+   而是 <strong>§4.9 引理 1 的「平面内 4 方向」</strong>（= 外空间配位 6 中落在现在平面内的 4 个）。
+   以 B5 的「4 bits/面元」为目标反解：<strong>q = 4 是唯一解</strong>
+   ❌ <strong>（第 32 轮撤回）</strong> 上面这条「q = 4 唯一解」<strong>已撤回</strong>：16 的正确数法是
+   <strong>2^4</strong>（4 个平面内连接 × 正/负支），内部四态降为<strong>代数</strong>状态空间，只有正/负带权重。
+  （q=2→3.000 bits、q=3→3.585、q=5→4.322，只有 q=4 给 4.000）。
+  ⟹ 四个状态正是「<strong>正 / 负 / 湮灭中 / 真空</strong>」⟹ <strong>16 = 4×4 个原始态</strong>。
+  ⟹ <strong>B5 的「4 bits/面元」由假设变成推导</strong>（A1 的正负 + 湮灭/真空 + §4 的 k=4）。</li>
+<li><strong>✅ 第 15 轮的 ln2 缺口定案</strong>：原始熵/块 = 4 ln16 = 11.090355 nats，观测 1 nat
+  ⟹ <strong>相干压缩因子必须是 16 ln2 = 11.0904，不是 B5 原来的 16</strong>（差 1/ln2 = 1.4427）。
+  ⚠️ 11.0904 不是整数，其"自然性"仍未解释——别包装成漂亮结果。</li>
+<li><strong>✅ 隧穿与超光速同源</strong>：同一个 <code>T = p^N</code>，只差每步概率。
+  · 隧穿 <code>p = exp(−2κl_P) = exp(−2√(2·p_rev·eps_b))</code>，<code>1−p = 1.66×10⁻²⁵</code>（电子/1eV/1nm ⟹ T=3.55×10⁻⁵，与标准 WKB 恒等）；
+  · 「超光速」<code>p</code> = 空位率，f=1 时 <strong>p=0 ⟹ 一步都跨不出去（不是概率小，是概率为零）</strong>；
+  · 反向：要 T=e⁻¹⁰ 需占位率 f ≈ 1.6×10⁻²⁵（近乎全空）⟹ 与 C-1(f=1) 正相反。</li>
+<li><strong>✅ 宏观不瞬移 = T^(粒子数)</strong>（10¹² 粒子 ⟹ log₁₀P = −4.45×10¹²）。</li>
+<li>⚠️ <strong>聚变那句修正</strong>：高温"反应次数多"只是<strong>线性</strong>增益（1.5×10⁷K vs 300K：5×10⁴）；
+  真正打开聚变的是<strong>指数</strong>的 Gamow 因子 exp(−3E₀/kT)=1.1×10⁻⁶。
+  框架若要解释聚变，必须给出<strong>每步 p 随能量的变化</strong>。</li>
+<li>⚠️ <strong>新张力 C-4</strong>：四状态含「真空」，但 C-1 要求满占位 ⟹ 解析 = 真空/湮灭中是<strong>拍内零测度过渡态</strong>，
+  <strong>湮灭与再生同拍闭合</strong> ⟹ A1 的 ν ~ 1/t_P <strong>新增含义 = 湮灭-再生的闭合速率</strong>；
+  跨拍空位 h 会使 c 偏移（取 Δc/c≲10⁻⁶ ⟹ h ≲ 3×10⁻⁶，观测限待核）。</li>
+<li>❗ 待核：论文 §4 的「k = 2^{1/4} 微态计数」与本轮 16 态如何统一。</li>
+<li>产出：<code>outputs/底层状态数_16个状态与隧穿同源.md</code>（+html）；
+  核验 <code>outputs/_substrate_states.py</code>（ST-1…ST-9，失败项：无）。</li>
+<li>🔧 <strong>下一步最该落笔</strong>：把 B5 那段改成「4 bits/面元由 4 方向×4 状态推出」+ 压缩因子改 16 ln2。</li>
+</ul>
+<h3>第 20 轮：衬底占位动力学 —— C-1 由假设变后果，C-4 化解</h3>
+<ul>
+<li><strong>✅ C-1 不再是假设</strong>：三种占位动力学（τ = νt，ν = 1/t_P）：
+  (a) <strong>配对</strong>（湮灭=再生，诸元数守恒）：<code>df/dτ = 0</code> ⟹ f = f₀，取 1 ⟹ <strong>c_eff/c = 1.0000000000</strong> ✓
+  (b) <strong>独立泊松</strong>（湮灭率=再生率=ν，允许从真空创生）：<code>df/dτ = 1−2f</code> ⟹ <strong>f* = 1/2（吸引子，
+      初值 0.9/0.5/0.2/0.01 全部收敛到 0.5）</strong> ⟹ c_eff = 2^{1/3}c = 1.2599 c，<strong>Δc/c = 26% ⟹ 排除</strong>
+  (c) 单向湮灭 ⟹ f → 0 ⟹ 空间消失 ⟹ 排除
+  ⟹ <strong>c 的实测值在告诉你：湮灭与再生必须是同一个事件，不能是两个独立泊松过程。</strong></li>
+<li><strong>✅ C-4 化解</strong>：「真空」是<strong>逻辑态</strong>（第 19 轮需要它凑出 16=4×4 ⟹ 4 bits），动力学测度为零
+  —— <strong>无诸元 ⟹ 无格点</strong>（不是"格点是空的"），与"空间由风暴生成"的本体论一致。</li>
+<li><strong>✅ 用户的「每步 1/2」落到实地</strong>：那正是<strong>独立泊松</strong>衬底的空位率（1−f* = 1/2）
+  ⟹ T = 2^{-N}（指数小、非零，直觉精确成立）；但该模型被 Δc/c = 26% 排除，
+  ⟹ 框架实际取<strong>配对</strong>：p = 0 ⟹ <strong>T = 0 对任何 N ≥ 1</strong>（不是小，是恒为零）。</li>
+<li>⚠️ <strong>新查出论文内部不自洽</strong>：§4 的 <strong>k = 2^{1/4} = 1.189207</strong>（= 0.25 bit/面元）与
+  第 15/19 轮修正后的 B5（0.25 <strong>nat</strong>/面元）差同一个 ln2 ⟹ <strong>k 应改为 e^{1/4} = 1.284025</strong>
+  （k 数值只变 8%，但熵差 44% = 1/ln2 —— 正是 ln2 的特点：数值相近、物理差一个单位制）。</li>
+<li>❗ 仍未解：为何 f₀ = 1（初值问题）；「配对」的微观机制（候选：把湮灭视为相邻格点间的置换
+  ⟹ 诸元数自动守恒、真空自动零测度）；16→1.284 的压缩因子 11.0904 的自然性。</li>
+<li>产出：<code>outputs/衬底占位动力学_湮灭等于再生被c锁定.md</code>（+html）；
+  核验 <code>outputs/_occupancy_dynamics.py</code>（OD-1…OD-6，失败项：无）。</li>
+<li>🔧 <strong>待改论文（累计三处）</strong>：① §4 的 k → e^{1/4}；② B5 的 4 bits/面元 改为由 4方向×4状态推出；
+  ③ B5 的压缩因子 → 16 ln2 = 11.0904。</li>
+</ul>
+<h3>第 21 轮：配对机制 = 相邻格点的对换（置换）—— C-1/C-4/C-5 由排除法升级为构造</h3>
+<ul>
+<li><strong>✅ 机制</strong>：一个 tick = 对占据态施加一次<strong>相邻对换</strong>（S_N 的相邻生成元）。
+  数值（N=400，20 万次对换）：仍是 0..399 的排列 ✓，<strong>真空事件计数 = 0</strong> ✓。
+  ⟹ 一次性构造出：诸元数守恒（C-5）、每格点恒 1 个诸元（C-1）、真空零测度（C-4）、
+  状态图案每拍平移一格 ⟹ <strong>c = l_P/t_P</strong>。三条不再靠"别的都被排除"。</li>
+<li><strong>✅ 置换群性质</strong>：相邻对换生成整个对称群（N=4→24=4!、N=5→120=5! ✓ 遍历）；
+  <strong>置换可逆 ⟹ 底层无信息丢失/无熵产生</strong> ⟹ <strong>宏观不可逆 = 粗粒化</strong>
+  ⟹ 给第 19 轮的压缩因子 <strong>11.0904 指派了身份：粗粒化/不可分辨性的度量</strong>（数值仍未推出）。</li>
+<li>⚠️ <strong>代价：随机对换是扩散的，不是弹道的</strong>（⟨x²⟩=n 已验证，2000 步模拟给 2049）。
+  ⟹ 「一步一拍 ⟹ c」<strong>只在方向持续时成立</strong>；靠第 18 轮的 p_rev（持续长度 λ_C）化解：
+  r&lt;λ_C 弹道(=c)、r&gt;λ_C 扩散，<strong>D = c²τ_corr/3 = ℏ/(3m)</strong>（电子 3.859×10⁻⁵ m²/s）。
+  ⟹ <strong>c 是 p_rev→0 的极限</strong>（故只有无质量者恰好走 c）。</li>
+<li>🎯 <strong>意外收获</strong>：Nelson 随机力学（布朗运动导出薛定谔方程）的 D = ℏ/(2m) = 5.788×10⁻⁵ m²/s，
+  框架给 ℏ/(3m) —— <strong>同形式同量级，差 1.5 倍 = 维度因子</strong>。</li>
+<li>⚠️ <strong>硬约束：一个哈勃时只混合 ~47 μm</strong>（R_mix = l_P√(t/t_P)：1 s→70 fm，1 yr→0.39 nm，
+  t_H→<strong>47.0 μm = 3.44×10⁻³¹ R_c</strong>）⟹ 宇宙学尺度上衬底<strong>远未热化</strong>
+  ⟹ 等分账必须是<strong>结构性</strong>的，不能是动力学热化的结果。</li>
+<li>✅ <strong>该待核已在第 22 轮解决：不冲突</strong>（见下节「第 22 轮」）。</li>
+<li>✅ <strong>该待核已在第 26 轮定案：并行归一化</strong>（每 tick 每格点恰一次事件）；<strong>47 μm 保住</strong>，
+  数值无需改，只补了口径说明。见下节「第 26 轮」。</li>
+<li>产出：<code>outputs/配对机制_湮灭等于相邻格点的对换.md</code>（+html）；
+  核验 <code>outputs/_pairing_permutation.py</code>（PM-1…PM-6，失败项：无）。</li>
+</ul>
+<h3>第 22 轮：§4.2 遍历性审查 —— 不冲突，且反向获得机制（论文已改两处）</h3>
+<ul>
+<li><strong>审查对象</strong>：摘要里的「命题 2.1」= <strong>§4.2 六命题链</strong>，遍历性是其中第 2 条。</li>
+<li><strong>✅ 不冲突</strong>（第 21 轮那条"可能动摇 §4"的担心<strong>解除</strong>）：主体不同 ——
+  §4 的遍历性 = <strong>速度空间/事件流</strong>（DSMC N=2000，论文自报实测 0.00%）；
+  第 21 轮的 47 μm = <strong>衬底构型空间</strong>混合。<strong>两者相差 7.27×10²⁹ 倍</strong>：
+  ① 速度空间弛豫 ≈ 4 t_P（2.16×10⁻⁴³ s，弛豫长度 ≈ 4 l_P = 6.47×10⁻³⁵ m）；
+  ② 构型混合 R_mix(t_H) = 4.70×10⁻⁵ m（47 μm）。⟹ <strong>局域热平衡 + 全局非平衡可共存</strong>（动理论标准情形）。</li>
+<li><strong>✅ 反向收获</strong>：论文 §4.2 开头那句「配对的湮灭-再生在 50:50 下<strong>与弹性散射动力学等价</strong>」
+  <strong>由断言升级为机制</strong>——<strong>相邻对换 = 全同粒子交换身份</strong>，与一维等质量弹性碰撞（=交换速度）
+  在多体层面不可区分（2000 粒子 5 万次对换后速度多重集不变 ✓）。</li>
+<li><strong>✅ 碰撞率自洽</strong>：满占位 n=1/l_P³、σ=l_P²、v=c ⟹ <strong>nσv = 1/t_P = 1.854858630×10⁴³ s⁻¹</strong>、
+  <strong>平均自由程 = l_P</strong> —— 与 A1 的 ν ~ 1/t_P 是同一个数（f=1 的后果，非巧合）。</li>
+<li>🔧 <strong>论文已改两处</strong>（<code>_patch_sec4_v29.py</code>，4 项 0 失败，中英同步，原 v2.9 已备份进 paper/history/）：
+  ① <strong>正文第 2 条</strong>：注明 <strong>B–K 定理以度量传递性为前提 ⟹ 遍历性是动力学假设，不是定理结论</strong>
+     （避免"由定理得遍历性"的循环观感；v2.6 补充里本已标为"实测 0.00%"，正文没标）；
+  ② <strong>新增「两个时标的分离」小节</strong>：写明 ① ② 相差 10³⁰，并记录「配对 ≡ 弹性散射」已获机制。</li>
+<li>⚠️ <strong>仍开放</strong>：弛豫碰撞次数 n_c ~ 4 是<strong>量级估计</strong>（非框架推出）；DSMC 的 0.00% <strong>未重跑复核</strong>
+  （论文自报数值）；「对换 ≡ 弹性散射」只验了一维等质量，三维/非等质量未验。</li>
+<li>产出：<code>outputs/§4遍历性审查_不冲突且获得机制.md</code>（+html）；
+  核验 <code>outputs/_sec4_ergodicity_audit.py</code>（EA-0…EA-5，失败项：无）；
+  补丁 <code>outputs/_patch_sec4_v29.py</code>。</li>
+</ul>
+<h3>第 23 轮：重跑 <code>_m1_boltzmann.py</code> —— B 段复现，但「遍历性」证据错了（结论仍对）</h3>
+<ul>
+<li><strong>✅ B 段（事件流 DSMC）完整复现</strong>：温度 0.00%、分布 <strong>7.02%</strong>（论文 7.0%）、ΔH = <strong>−2.266</strong>（论文 −2.27）
+  ⟹ <strong>§4.2 核心数值支撑可信</strong>（可复现，非偶然）。</li>
+<li><strong>❌ 但「遍历性 0.00%」不是遍历性检验</strong>：原算法 = 前/后半段平均温度偏差。
+  <strong>对照实验</strong>（采样阶段关闭碰撞 = 明确非遍历）<strong>同样给 0.0000%</strong> ⟹ 对非遍历完全不敏感。
+  它实际测的是<strong>温度的平稳性/无漂移</strong>（T 由能量守恒固定 ⟹ 几乎恒为 0）
+  ⟹ <strong>应改标为第 1 条（平稳性）的证据</strong>。同理「温度涌现 0.00%」实质是能量守恒检验。</li>
+<li><strong>✅ 改用真正的 Birkhoff 检验 ⟹ 遍历性确实成立</strong>：可观测 O=v²，比较 per-particle
+  时间平均 ⟨O_i⟩_t 的离散度随 n_t 的标度：原设置 <strong>0.971→0.848→0.553→0.284→0.183</strong>
+  （n_t=25/100/400/1600/4000）单调下降；冻结对照<strong>恒 1.012 不降</strong>。
+  （降幅小于理想 1/√n_t 是采样相关：每粒子约 33 步才碰一次。）
+  ⟹ <strong>结论对、原证据错</strong>。</li>
+<li>⚠️ <strong>补记原稿未报的失败项</strong>：A 段（确定性硬球）分布偏差 <strong>22.74%</strong>（原稿记 ~18%）、
+  <strong>总体判定 ⚠ 未完全收敛</strong>（判据 &lt;10% 未过）；C 段 v0=2.0/N=1000 与 v0=1.0/N=500
+  偏差 <strong>13.6%/20.7% ⚠ 未过</strong>。⟹ 论文只报了 B 段好结果；已补记并明确「核心支撑来自 B 段」。</li>
+<li>🔧 <strong>论文已改第三处</strong>（<code>_patch_sec4_ergodicity.py</code>，2 项 0 失败，中英同步，原文件已备份）：
+  ① 原指标改标为平稳性证据；② 采用 Birkhoff 检验（含标度数据）；③ 补记 A/C 段失败项。</li>
+<li>⚠️ <strong>仍开放</strong>：A 段未通过（它是唯一"无分子混沌假设"的对照）⟹ 需加长步数或明确降级为定性对照；
+  全部模拟都是 <strong>2D</strong>（框架物理是三维）；Birkhoff 检验是有限时/有限 N 的数值证据，非解析证明。</li>
+<li>产出：<code>outputs/重跑m1_遍历性证据错了但结论对.md</code>（+html）；
+  新脚本 <code>outputs/_m1_ergodicity_proper.py</code>（EG-1…EG-3，失败项：无）；补丁 <code>_patch_sec4_ergodicity.py</code>。</li>
+<li>📌 <strong>环境</strong>：<code>_m1_*.py</code> 需要 numpy；venv <code>~/.workbuddy/binaries/python/envs/default</code> 已有 numpy 2.5.3
+  （托管 python 没有），跑时用 venv 的 python。</li>
+</ul>
+<h3>第 24 轮：A 段复核 —— 不是「没收敛」，是<strong>判据在 N=256 下不可用</strong></h3>
+<ul>
+<li><strong>✅ 测出了指标的噪声基线</strong>（从<strong>精确麦克斯韦</strong>抽样、同 bins/权重口径，400 次平均）：
+  <strong>N=256 → 24.3%±4.9%</strong>、500 → 16.6%、512 → 16.5%、1000 → 11.4%、1024 → 11.4%、
+  2000 → 8.0%、8000 → 3.9% ⟹ <strong>绝对判据「&lt;10%」在 N ≲ 1600 时不可用</strong>（基线本身已 ≥10%）；
+  且 N=2000 时判据也只比基线高 ~1.4σ，<strong>辨别力本就有限</strong>。</li>
+<li><strong>✅ A 段没有失败</strong>：实测 22.74% = 基线 24.3% 的 <strong>0.94 倍（−0.31σ）</strong> ⟹ 与完全正确的
+  麦克斯韦分布<strong>统计上不可区分</strong>；<strong>加长 4 倍步数（20000）后 28.25%（1.16 倍基线）并未下降</strong>
+  ⟹ <strong>进一步排除"弛豫不足"</strong>（若真没弛豫，加长 4× 应显著下降）。</li>
+<li><strong>✅ C 段两项同样撤回</strong>：v0=2.0/N=1000 的 13.6% = 基线 11.4% 的 1.19 倍（1.13σ）；
+  v0=1.0/N=500 的 20.7% = 基线 16.6% 的 1.25 倍（1.40σ）⟹ 噪声量级。</li>
+<li><strong>✅ B 段反向验证</strong>：N=2000 基线 8.02%，实测 7.02% = <strong>0.88 倍</strong> ⟹ <strong>真通过</strong>（非擦边）。</li>
+<li>⚠️ <strong>唯一留意点</strong>：N=512（同堆积率）实测 0.2223 = 基线 0.1645 的 1.35 倍（<strong>+1.79σ</strong>），
+  轻微超出；可能来自 <strong>2D 长时尾</strong>（真实物理）或基线假设（独立同分布）被低估。<strong>只有 1.8σ，未断言。</strong></li>
+<li>🔧 <strong>论文已改第四处</strong>（<code>_patch_sec4_criterion.py</code>，2 项 0 失败，中英同步，原文件已备份）：
+  上一轮我自己写的「A 段未通过 / C 段未通过」<strong>改正为判据校准</strong>，并把判据改为<strong>相对式</strong>
+  「实测偏差 / 噪声基线 ≲ 1.5」。</li>
+<li>📌 <strong>方法论要求（新增，以后一律照办）</strong>：<strong>报偏差必须附该 N 的噪声基线</strong>，否则数字无法解读。</li>
+<li>⚠️ <strong>仍开放</strong>：多种子（每配置仅 1 个种子）与三维硬球未做 ⟹ N=512 那 +1.79σ 无法分辨；
+  N≥2000 的确定性硬球未跑（受运行时间限制）。</li>
+<li>产出：<code>outputs/A段复核_不是没收敛是判据不可用.md</code>（+html）；
+  核验 <code>outputs/_m1_runA_convergence.py</code>（HA-1…HA-3，失败项：无；支持 <code>--floor</code> 只跑基线，秒出）。</li>
+</ul>
+<h3>第 25 轮：论文三处硬修正落地（排队 4 轮）+ 查出 §4.8 公式本身是错的</h3>
+<ul>
+<li><strong>✅ 三处硬修正全部落地</strong>（中英同步，<code>_patch_unit_k.py</code> 21 项 + <code>_patch_unit_k2.py</code> 4 项 = <strong>25 项 0 失败</strong>）：
+  ① 每 4l_P² = <strong>1 纳特</strong>（非 1 比特，Hawking 温度裁决：1 bit 给 +44.27% 偏差）；
+  ② <code>k = 2^{1/4} = 1.189</code> → <strong><code>k = e^{1/4} = 1.2840</code></strong>；
+  ③ 相干压缩因子 16 → <strong>16 ln 2 = 11.0904</strong>。</li>
+<li><strong>❗ 新查出（比预想严重）</strong>：§4.8 原式 <code>S = (A/4l_P²)ln2（比特）= A/4l_P²（纳特）</code>
+  <strong>左右两侧相差一个 ln2 —— 等式本身不成立</strong>（不是标注问题）。论文的数值核验
+  （太阳黑洞 1.05×10⁷⁷）用的是<strong>纳特</strong>值，与 Bekenstein–Hawking 一致，所以<strong>数字对、公式错</strong>
+  （纳特→比特应 <strong>除以</strong> ln2，即 ×1.4427，原文写成了 ×ln2）。已更正为显式形式。</li>
+<li><strong>📌 同一处 ln2 的错误在论文里有三种写法、散落 12 个位置</strong>（摘要 / §4.8 / §4.9 / §4.10 / §4.11 / §10.2）
+  ⟹ 只改主段落必留自相矛盾。<strong>这是"论文收口"必须先做文本核查的实例。</strong></li>
+<li><strong>✅ 新增【v2.9 修正块】</strong>（§4.8，插在 v2.8 补充前）：单位裁决依据 + k 更正 + 底层状态数来源
+  （16 = 4 方向 × 4 状态，把 B5 的输入变成输出）+ 压缩因子 + 两条开放项。</li>
+<li><strong>📌 v2.8 段落保留但声明作废</strong>（有意留痕，让读者看到原写法与错在哪）。</li>
+<li>⚠️ <strong>仍未解决</strong>：11.0904 的自然性；底层四状态为何恰是这四个（在框架设定层）；
+  拍内零测度过渡态的机制（第 20 轮 C-4 的解析，未独立验证）。</li>
+<li>产出：<code>outputs/论文单位与k的修正_同一处ln2的三种写法.md</code>（+html）；
+  补丁 <code>outputs/_patch_unit_k.py</code>、<code>_patch_unit_k2.py</code>（原 v2.9 已备份进 paper/history/）。</li>
+<li>📌 <strong>脚本设计要点</strong>：补丁脚本对每个锚点<strong>要求恰好命中一次</strong>，否则拒绝改动并报错
+  ——本轮 EN 有 1 处锚点命中 2 次被拦下，人工确认后两处一并修正（这条规则确实起了作用）。</li>
+</ul>
+<h3>第 26 轮：tick 的更新规则定案 —— 并行归一化（47 μm 保住，串行被三条判据排除）</h3>
+<ul>
+<li><strong>澄清</strong>：真正的二选一不是「串行 vs 并行（是否同步）」，而是<strong>每 tick 几次对换</strong>（事件率归一化）：
+  串行 = 每 tick 全局 1 次；并行 = 每格点恰 1 次。两者差 <code>N_c³/2 = 3.06×10¹⁸²</code> 倍（<code>N_c = R_c/l_P = 8.4918×10⁶⁰</code>）。</li>
+<li>✅ <strong>UP-1 口径辩识</strong>：把 47 μm 反推成步数得 <code>8.456×10⁶⁰ ≈ t_H/t_P</code>（差 0.42%）
+  ⟹ <strong>47 μm 本来就是并行口径的值</strong>；第 21 轮把它标成"串行"是<strong>贴反了标签</strong>。
+  真串行值 = <code>2.69×10⁻⁹⁶ m</code>（小于 l_P 61 个量级，荒谬）。</li>
+<li>✅ <strong>三条独立判据排除串行</strong>：① A1 的 per-诸元事件率 <code>1/t_P</code>（串行差 <code>10^182.49</code>）；
+  ② A2 的泄漏份额 ε₀（串行需放大 <code>3.06×10¹⁸²</code> 倍 ⟹ ε₀≫1）；③ §4.2 速度弛豫 ~4 次对换
+  （串行在 4 t_P 内被交换概率 <code>1.31×10⁻¹⁸²</code>）。</li>
+<li>✅ <strong>实现</strong>：沿随机轴的<strong>二分图完美匹配</strong>交换 + <strong>每线独立</strong>随机相位 + 轴随机。
+  数值（L=10、N=1000、2000 tick）：⟨r²⟩ = 1981.3（= n，−0.94%）、
+  ⟨x²⟩:⟨y²⟩:⟨z²⟩ = 672.9 : 694.2 : 614.2（各 ≈ n/3，3σ 内）、真空事件 0、净漂移 0。</li>
+<li>✅ <strong>三个必要条件（新增两条）</strong>：轴必须随机（否则只沿一维扩散）；
+  相位不能固定（否则二周期振荡，⟨r²⟩ = 2）；<strong>相位必须每线独立</strong>——
+  全局统一相位（即使每 tick 重抽）会把相位与轴耦合成取向模式，⟨r²⟩ 塌到 n 的 29.7%/42.5%。</li>
+<li>✅ <strong>连带</strong>：① 第 18 轮「诸元微观恒 c」获得机制（<code>l_P/t_P</code> 与 c 差 −1.17×10⁻⁷，CODATA 舍入）；
+  ② §4 自洽（4 次对换 = 4 t_P = 2.1565×10⁻⁴³ s）；
+  ③ ⚠️ <strong>并行使 C-2 从「可选」升为「必需」</strong>（全局同时的 tick = 衬底优先系）。</li>
+<li>📦 <strong>论文已改（中英同步，7 项 0 失败）</strong>：§4.2 的 47 μm 加口径补注；§8.6 <strong>新增 8.6.7
+  「衬底置换模型与 tick 归一化」</strong>；§8.6.7(c) 补「每线独立是必需条件」；修掉悬空的 §8.6 引用。
+  原 v2.9 备份在 <code>paper/history/*_备份_2026-09-18第26轮前.md</code>。</li>
+<li>📌 <strong>方法论（已进技能）</strong>：① 改动后变好但动了两个变量时，<strong>必须做 2×2 对照再归因</strong>
+  ——我最初归因于"RNG 序列相关"，对照实验<strong>否证</strong>了它（真因是每线独立相位）；
+  ② 格点模型的<strong>有效自由度远小于格点数</strong>（配对强关联），统计判据要用多种子平均或实测散布定容差。</li>
+<li>产出：<code>outputs/tick更新规则_47μm属并行且串行被三条判据排除.md</code>（+html）、
+  <code>outputs/_tick_update_rule.py</code>（UP-1…UP-8，<strong>19 项 0 失败</strong>）、
+  <code>_patch_tick_rule.py</code> + <code>_patch_tick_rule2.py</code>。</li>
+</ul>
+<h3>第 27 轮：格点几何定案 —— 4 邻居 + 二分性唯一锁定<strong>金刚石结构</strong></h3>
+<ul>
+<li><strong>结构约束（硬）</strong>：每格点每 tick 恰一次事件 ⟹ 全部边可分解为完美匹配
+  ⟹ 图必须是 <strong>d-正则二分图</strong>（König 边着色：d 色 = d 个完美匹配）。</li>
+<li>✅ <strong>唯一候选</strong>：配位数 × 二分性筛选 —— 简单立方(6)/体心(8)/面心(12，且含三角形非二分)/
+  蜂巢(3) 全被排除，<strong>只剩金刚石（配位 4 + 二分）</strong>。
+  ⚠️ <strong>不是新假设</strong>：论文 §4.10「六处 4 同源」第一条已写「<strong>表面诸元 4 邻居</strong>」，
+  定理 2 已证「4 点最优构型 = 正四面体」——<strong>两条既有设定 + tick 的二分要求 ⟹ 几何唯一</strong>。</li>
+<li>✅ <strong>构造与 König</strong>：A = {i+j+k 偶}、B = {奇}，键沿 4 个四面体方向；
+  数值（L=8）：|A|=|B|=256、A 沿任 dᵤ 必落 B、<strong>4 个方向的边集各是完美匹配</strong> ✓</li>
+<li>✅ <strong>各向同性内建</strong>：Σ_μ d_μ⊗d_μ = 4I（非对角元 0）⟹ 方向等概率时各向同性是<strong>代数恒等</strong>，
+  不是假设；键角 arccos(−1/3) = <strong>109.4712206°</strong>，与定理 2 的 Tammes 值逐位相同。</li>
+<li>✅ <strong>数值</strong>（L=8、N=512、1500 tick、5 种子）：⟨x²⟩=1487.3、⟨y²⟩=1438.6、⟨z²⟩=1441.9
+  （期望各 1500）、⟨r²⟩=4367.8（期望 4500）、真空 0、非置换 0。</li>
+<li>⚠️ <strong>本轮踩坑（已进技能）</strong>：第一版实现「每 tick 全局选一个方向」⟹ <strong>整个衬底刚性平移</strong>
+  （⟨r²⟩/3n 在 0.13~1.09 乱跳、分量比 5.3）。诊断靠「抽象对照」（同 rng 序列纯位移累加）
+  与仿真<strong>逐位相同</strong> ⟹ 证明是<strong>规则错</strong>、不是代码错。修复 = <strong>每链独立随机相位</strong>。
+  ⟹ 普适失效模式：<strong>「全局同步 = 整体刚性平移，不是随机游走」</strong>（两种几何上独立重现）。</li>
+<li>⚠️ <strong>新浮现</strong>：数密度取决于嵌入 —— 标准金刚石 0.6495/l_P³ vs ℤ³ 对角键 5.196/l_P³（差 8 倍）。
+  按「最近邻即键」判据取标准金刚石 ⟹ <strong>§4.2 已改</strong>：n = 0.6495/l_P³、nσv = 0.6495/t_P、
+  平均自由程 = 1.5396 l_P（量级结论「O(1/t_P)、O(l_P)」不变）。</li>
+<li>📦 <strong>论文已改（中英同步，4 项 0 失败）</strong>：§4.2 数密度修正；§8.6 <strong>新增 8.6.8「衬底格点几何」</strong>。
+  原 v2.9 备份在 <code>paper/history/*_备份_2026-09-18第27轮前.md</code>。</li>
+<li>产出：<code>outputs/格点几何_四邻居加二分唯一锁定金刚石结构.md</code>（+html）、
+  <code>outputs/_lattice_geometry.py</code>（LG-1…LG-7，<strong>16 项 0 失败</strong>）、<code>_patch_lattice.py</code>。</li>
+</ul>
+<h3>第 28 轮：四色定理辨析 —— 无关；但「k ≥ 4」的真正根源是 LST / Borsuk（含两处修正）</h3>
+<ul>
+<li>❌ <strong>四色定理与框架无关</strong>（三条独立理由）：
+  ① 四色定理只管<strong>平面图</strong>，而 4-正则二分图（衬底）<strong>必非平面</strong>
+     —— Euler + 二分（面长 ≥ 4）给 <code>m ≤ 2n − 4</code>，而 4-正则给 <code>m = 2n</code>，矛盾
+     （数值：n = 512、m = 1024、上界 1020，缺口 4）；
+  ② 金刚石图的亏格<strong>恰为 1</strong>（环面上 <code>f = m − n = 512</code>、<code>2m = 2048 = 4f</code> <strong>恰好饱和</strong>）；
+     当"地图"看，Heawood 公式给色数 <strong>7</strong>（g = 1），不是 4；
+  ③ 四色定理的「4」来自平面性 + 放电法，Borsuk 型「4」来自维度 —— 若同源，R² 就该给 4，但它给 3。</li>
+<li>✅ <strong>但框架的「k ≥ 4」有更强的经典出处</strong>：§4.10 定理 1（3 个开半球不能覆盖 S²）
+  = <strong>Lusternik–Schnirelmann 定理</strong>在 S² 上的特例（LS 范畴 = 3），与 <strong>Borsuk 数 R³ = 4</strong> 同源。
+  ⟹ 建议论文引用 LST/Borsuk（低成本、高收益；否则像 reinventing the wheel）。</li>
+<li>✅ <strong>覆盖半径的解析值</strong>：k = 3 ⟹ <strong>90.0000°</strong>（最坏点 = 平面法线）、
+  k = 4 ⟹ <strong>arccos(1/3) = 70.5288°</strong>（最坏点 = Voronoi 顶点）。
+  §4.10 原文的 90.05° / 70.291° 系随机搜索未穷尽，建议改用解析值。</li>
+<li>⚠️ <strong>修正第 27 轮一处依赖</strong>：上一轮以「<strong>表面诸元 4 邻居</strong>」支撑「体配位数 = 4」——<strong>不成立</strong>。
+  该条出自 §4.9 引理 1【本框架设定】的「平面内 4 方向」（= 2D 平面内 2 轴 × 2 向，
+  对应<strong>可平面的 2D 方格网</strong>），是<strong>观测者平面内的计数</strong>，不是体配位数。
+  <strong>支撑已改用 §4.10 定理 1+2 的「方向簇 k = 4」（定理而非设定）；金刚石结论不变。</strong></li>
+<li>⚠️ <strong>发现 §4.10「六处 4 同源」需分级</strong>：至少「表面 4 邻居」（平面内轴数）与
+  「正四面体 4 方向」（S² 覆盖数）<strong>来源不同</strong>——数值都是 4，机制独立。
+  其余四处（4l_P²、每 4 面元 1 比特、Clifford 4 分量、挂谷 1/4）<strong>待各自复查</strong>。</li>
+<li>📦 <strong>论文已改（中英同步，8 项 0 失败）</strong>：§4.10 定理 1 加 LST/Borsuk 出处注 + 解析覆盖半径；
+  「六处 4 同源」加分级修正注；§8.6.8(b) 修正依赖；§8.6.8 新增 <strong>(h) 4-正则二分图必非平面</strong>。
+  原 v2.9 备份在 <code>paper/history/*_备份_2026-09-19第28轮前.md</code>。</li>
+<li>📌 <strong>方法论（已进技能）</strong>：<strong>随机采样会低估覆盖半径</strong>（最坏点落在零测度的 Voronoi 顶点上）
+  —— 120000 点采样只给 54.6°（真值 70.53°），求覆盖半径必须用候选极值点。</li>
+<li>产出：<code>outputs/四色定理辨析_无关但LST才是4的根源.md</code>（+html）、
+  <code>outputs/_four_color_ls.py</code>（FC-1…FC-7，<strong>12 项 0 失败</strong>）、<code>_patch_four_color.py</code>。</li>
+</ul>
+<h3>第 29 轮：「六处 4」分层判定 —— 四会同源 + 两处独立，且三组重合 ⟺ 空间三维</h3>
+<ul>
+<li>✅ <strong>逐条追溯六处出处</strong> → 应改为<strong>分层结论</strong>：
+  · <strong>同源组（4 处）</strong>：4l_P² 相干截面、每 4 面元 1 比特、挂谷 packing 1/4、正四面体 4 方向簇
+    —— 全部锚在 <strong>k = 4</strong>（§4.10 定理 1 = <strong>LST/Borsuk</strong>）；
+  · <strong>独立组（2 处）</strong>：表面 4 邻居（= (d−1) 维表面网格配位 <strong>2(d−1)</strong>）、
+    Clifford 4 分量（= Cl(1,d) 表示维数 <strong>2^⌊(d+1)/2⌋</strong>，已核对 D=3/4/5/6 给 2/4/4/8）。</li>
+<li>✅ <strong>一个干净的等价（本轮核心）</strong>：三组机制取值同时相等 <strong>⟺ d = 3</strong>，且
+  <strong>(n, d) = (4, 3) 是唯一解</strong>（枚举 2 ≤ d &lt; 200 确认唯一）。
+  ⟹ 那几处「4」的相等<strong>底层等价于「空间三维」</strong>。
+  ⚠️ <strong>只是自洽性条件，不能反推三维</strong>（d = 3 在框架里是【设定】）—— 不作主张，只记录。</li>
+<li>⚠️ <strong>新张力 T-6（待裁决）</strong>：§4.9 引理 1「平面内 4 + 平面外 2」给出 <strong>6 个格点方向</strong>
+  （= 简单立方 6 邻居，2 个被卷曲），而 §4.10 定理给 <strong>k = 4</strong> —— 对<strong>体配位数</strong>口径不同（4 vs 6）。
+  ⟹ <strong>§8.6.8 的「金刚石结构」依赖「每个 S² 方向 = 一条格点键」这一步，该步尚未独立论证。</strong>
+  第 26 轮的 tick 实现在<strong>简单立方</strong>上跑通过（读法 B 动力学可行），金刚石更优雅（读法 A）。</li>
+<li>⚠️ <strong>标注错位</strong>（建议修正）：① 表面 4 邻居标「本框架推论」但实据是 §4.9 引理 1【设定】；
+  ④ 每 4 面元 1 比特标【设定】但可由 ③ 推出。</li>
+<li>⚠️ <strong>轻微循环嫌疑（②处）</strong>：论证 4 用 Cl(1,3) 的维数 4 论证"方向数恰好 4"，
+  而方向数 4 又用于 4l_P² 等 ⟹ 需拆开，标明两者是"两个独立的 4 在 d=3 处重合"。</li>
+<li>📦 <strong>论文已改（中英同步，2 项）</strong>：「六处 4 同源」注后追加分层判定 + T-6 + 标注错位。
+  原 v2.9 备份在 <code>paper/history/*_备份_2026-09-19第29轮前.md</code>。</li>
+<li>产出：<code>outputs/六处4的分层判定_四会同源两处独立且等价于三维.md</code>（+html）、
+  <code>outputs/_six_fours.py</code>（SF-1…SF-6，<strong>8 项 0 失败</strong>）、<code>_patch_six_fours.py</code>。</li>
+</ul>
+<h3>第 30 轮：T-6 裁决 —— 格点几何是<strong>简单立方（配位 6）</strong>，第 27 轮的「金刚石」撤回</h3>
+<ul>
+<li>✅ <strong>裁决依据（论文自己就分开了）</strong>：§4.10 论证 4（第 400 行）原文 ——
+  「正四面体 4 方向 = <strong>内空间</strong>分量结构；<strong>八面体 6 方向 = 外空间轴结构（3 轴 ±）</strong>；
+  熵编码用内空间分量 ⟹ 方向簇数 4」。
+  ⟹ <strong>外空间（格点衬底）= 6 方向 = 简单立方，配位数 6</strong>；
+  <strong>方向簇 k = 4 属内空间/熵编码层面</strong>，不决定格点配位数。
+  §4.9 引理 1「平面内 4 + 平面外 2（被卷曲）」= 6 邻居中 4 个可访问 —— 两者自洽。</li>
+<li>❌ <strong>第 27 轮「金刚石唯一」撤回</strong>：它依赖"配位数 = 方向簇 k = 4"，
+  而这两者分属<strong>外空间</strong>与<strong>内空间</strong>，是两套不同的方向集。</li>
+<li>✅ <strong>第 27 轮保留的部分</strong>（并非全错）：
+  · 结构约束「每格点每 tick 一次事件 ⟹ d-正则二分 + König 边着色」<strong>成立</strong>（只是 d = 6）；
+  · 简单立方同样给 König 边着色 —— <strong>3 轴 × 2 相位 = 6 个完美匹配</strong> ✓
+    （数值 L=8：n=512、A=B=256、m=3n=1536，6 × n/2 = m ✓）；
+  · 「全局同步 = 整体刚性平移」失效模式<strong>成立</strong>；
+  · <strong>6-正则二分图同样非平面</strong>（m = 3n &gt; 2n−4）⟹ <strong>第 28 轮「四色定理无关」不受影响</strong>。</li>
+<li>✅ <strong>tick 数值</strong>（L=8、N=512、1500 tick、5 种子）：⟨x²⟩=498.95、⟨y²⟩=493.42、⟨z²⟩=506.70
+  （期望各 n/3=500）、⟨r²⟩=1499.07（期望 n=1500）、真空 0、非置换 0。</li>
+<li>⚠️ <strong>连带撤回并恢复</strong>：n = <strong>1/l_P³</strong>、nσv = <strong>1/t_P</strong>、平均自由程 = <strong>l_P</strong>。
+  ⟹ <strong>意外收获</strong>：第 27 轮招来的"数密度依赖嵌入（0.6495 与 5.196 差 8 倍）、需靠非证明判据选"
+     <strong>这个麻烦在简单立方上根本不存在</strong>（格距 = l_P 自然成立）。</li>
+<li>📦 <strong>论文已改（中英同步，4+2 项）</strong>：§4.2 数密度恢复；<strong>§8.6.8 整节改写</strong>为
+  「外空间 6 方向 ⟹ 简单立方」（含撤回块）；§4.10 的 T-6 标记改为<strong>已裁决</strong>。
+  原 v2.9 备份在 <code>paper/history/*_备份_2026-09-19第30轮前.md</code>。</li>
+<li>产出：<code>outputs/T6裁决_格点几何是简单立方不是金刚石.md</code>（+html）、
+  <code>outputs/_t6_adjudicate.py</code>（TA-1…TA-6，<strong>13 项 0 失败</strong>）、<code>_patch_t6.py</code>。</li>
+<li>❗ ~~由此引出的新问题：16 的方向数是 4 还是 6？~~ —— <strong>第 31 轮已复查并定案</strong>：</li>
+</ul>
+<h3>第 31 轮：状态数复查 —— 16 保住，但「4 方向」归属改判（+ T-6 第三条独立依据）</h3>
+<ul>
+<li><strong>✅ 16 = 4 × 4 保住</strong>，压缩因子 <strong>16 ln2 = 11.0904 不变</strong>。</li>
+<li><strong>✅ 方向数必须是 4，不能取外空间配位 6</strong>（两条独立理由）：
+  ① 读法 A（k·q）：<code>k·q = 16</code> 在 k = 6 时<strong>无整数解</strong>（16/6 = 2.667）；
+  ② 读法 B（每方向一个二元连接位）：<code>2^k = 16 ⟹ k = 4</code>，k = 6 给 64 态。</li>
+<li><strong>✅ 归属改判</strong>：「4 方向」= <strong>§4.9 引理 1 的平面内 4</strong>（外空间 6 = 4 平面内 + 2 卷曲），
+  不是 §4.10 的 Tammes/正四面体 k = 4（那属内空间/熵编码层）。</li>
+<li><strong>✅ T-6 第三条独立依据</strong>（本轮额外收获）：引理 1 要求「平面内 4 + 平面外 2」⟹
+  枚举方向对（极值必在两方向张成的平面上取到，无需采样）：
+  简单立方最大平面内方向数 = <strong>4</strong> ✓；正四面体 4 方向<strong>不共面</strong>，最多 <strong>2</strong> ✗
+  ⟹ <strong>金刚石与引理 1 不相容</strong>。（另两条：论证 4 区分内外空间；引理 1 的 4+2 计数。）</li>
+<li><strong>⚠️ 新登记歧义 A/B</strong>：读法 A（4 方向 × 4 态）与读法 B（4 个二元连接位 = 2⁴）
+  <strong>数值同为 16、结构不同，无法区分</strong>。读法 B 才是原文 1651 的字面读法。
+  区分线索：读法 B 下「真空」= 该方向无连接；读法 A 下它是与方向并列的独立内部态。</li>
+<li><strong>量化排除</strong>：若硬取 N = 24（6×4）而沿用 11.0904 ⟹ 太阳黑洞 Hawking 温度偏差 <strong>−12.76%</strong>
+  （对照：第 15 轮比特/纳特混淆为 +44.27%）。</li>
+<li>产出：<code>outputs/状态数复查_16保住但4的归属要改.md</code>（+html）、
+  <code>outputs/_state_count_recount.py</code>（RC-1…RC-8，<strong>11 项 0 失败</strong>）、<code>_patch_state_count.py</code>。</li>
+<li>论文已改 3 处（中英同步 6 项 0 失败）：摘要加「平面内」限定；§4.8 加归属修正 + A/B 歧义；
+  §8.6.8 新增 <strong>(i)</strong> 判别器。备份 <code>paper/history/*_备份_2026-09-19第31轮前.md</code>。</li>
+</ul>
+<h3>第 32 轮：读法 A/B 裁决 —— 取 B2（2^4 = 16），第 19 轮「四态唯一解」撤回</h3>
+<ul>
+<li><strong>✅ 取读法 B2</strong>：<strong>4 个平面内连接，每个承载正支或负支 ⟹ 2^4 = 16 = 4 bits/面元</strong>。</li>
+<li><strong>✅ 五条约束打分矩阵中 B2 是唯一全过者</strong>：
+  C-a 4bits ✓｜C-b 满占位 f=1（无空槽 ⟹ 真空不占权重）✓｜C-c 湮灭中零测度 ✓｜
+  C-d 方向数 = 4（§4.9 引理 1 平面内 4）✓｜<strong>C-e A1 的 50:50 直接落在每槽上</strong> ✓。
+  （A 因 C-b/C-c 落选；B1 因 C-e 落选；B3 给 256 态；C 给 64 态。）</li>
+<li><strong>❌ 读法 A 落选（量化）</strong>：剔除「真空/湮灭中」后只剩 4×2 = 8 态 = 3 bits；
+  硬沿用压缩因子 11.0904 ⟹ Hawking 温度偏差 <strong>+33.33%</strong>（对照 N=24 为 −12.76%）。</li>
+<li><strong>✅ 数值全不变</strong>：16 态、4 bits、0.25 nat/面元、压缩因子 <strong>16 ln2 = 11.0904</strong> 照旧。
+  变的只是「16 怎么数出来」，且 <strong>B2 第一次把 A1 的 50:50 用上了</strong>（读法 A 未用）。</li>
+<li><strong>⚠️ 代价</strong>：{正,负,湮灭中,真空} <strong>只有正/负进入熵计数</strong> ⟹ 第 19 轮「q=4 唯一解」撤回。</li>
+<li><strong>⚠️ B1 未彻底排除</strong>：它是原文 1651 更字面的读法，只因 C-e 落选；
+  若「连接 = 分支标签」被证明，B1 与 B2 合并（结论不变）。</li>
+<li>产出：<code>outputs/读法AB裁决_取B2且四态撤回.md</code>（+html）、
+  <code>outputs/_reading_ab.py</code>（AB-1…AB-6，<strong>9 项 0 失败</strong>）、<code>_patch_reading_ab.py</code>。</li>
+<li>论文已改 3 处（中英同步 6 项 0 失败）：摘要改「2^4 = 16（4 平面内连接 × 正/负支）」；
+  §4.8 追加裁决块（含撤回）；中间量可证伪条目改写。
+  备份 <code>paper/history/*_备份_2026-09-19第32轮前.md</code>。</li>
+</ul>
+<h3>第 33 轮：权重 w 扫描 —— B2 的软肋以「不需要搬运」的方式解除</h3>
+<ul>
+<li><strong>✅ B2 软肋解除</strong>：不辩论「C-b/C-c 是否跨层搬运」，直接把权重变成自由参数 w 看观测能压多窄。</li>
+<li><strong>✅ 槽模型</strong>（4 平面内连接，每槽 ∈ {正,负,空}，空槽权重 w）：
+  <code>H_S(w) = 4[h₂(w) + (1−w)ln2]</code>；BH 定标 <code>H_S = ln16</code> ⟹ 两根：
+  <strong>w = 0</strong>（= B2）与 <strong>w = 0.7729</strong>（77.3% 连接为空，与 C-b 满占位冲突，排除）。
+  ⟹ <strong>w = 0 是 BH 熵 + 满占位共同解出的，不是搬来的假设。</strong></li>
+<li><strong>❌ 模型 A 被两头夹死</strong>：BH 把它的 w 锁在 <strong>0.500</strong>（唯一），C-b/C-c 要 <strong>0</strong>，落差 0.5；
+  即便只要求温度偏差 ≤1% 也需 <strong>w ≥ 0.3833</strong>（≤5% 需 w ≥ 0.2489）。对应 w=0 时偏差 <strong>+33.33%</strong>。</li>
+<li><strong>✅ 副产品</strong>：B2 的「每条平面内连接恒有通量」由 (i) BH 定标 + (ii) 满占位共同确定，
+  <strong>不再是构造假设</strong>；链条：满占位 ⟹ 每格点被占 ⟹ 每键承载通量 ⟹ 4 条连接全活
+  ⟹ A1 的 50:50 各取正/负支 ⟹ 2^4 = 16。</li>
+<li><strong>⚠️ 新软肋</strong>：槽模型的空槽率 w 与衬底占位率 f <strong>是否为同一个量未独立论证</strong>（本轮默认同一）。</li>
+<li>产出：<code>outputs/权重w扫描_B2软肋以不需要搬运的方式解除.md</code>（+html）、
+  <code>outputs/_weight_scan.py</code>（W-1…W-6，<strong>8 项 0 失败</strong>）、<code>_patch_weight_scan.py</code>。</li>
+<li>论文已改 1 处（中英同步 2 项 0 失败）：§4.8 追加第 33 轮补充块。
+  备份 <code>paper/history/*_备份_2026-09-20第33轮前.md</code>。</li>
+</ul>
+<h3>第 34 轮：w 与 f 的同一性 —— <strong>B2 闭环完成</strong>（+ 独立泊松第二次独立排除）</h3>
+<ul>
+<li><strong>✅ 两者不是同一个量</strong>：面元的「平面内连接」= 格点间的<strong>键</strong>；
+  键承载通量 ⟺ 两端都被占 ⟹ <strong>w = 1 − f²</strong>（Monte-Carlo 直接检验：f = 0.9/0.8/0.6/0.5
+  实测存活率与 f² 相符，偏差 ≤ 2.3%）。<strong>第 33 轮默认 w = 1 − f 少一个平方，是错的</strong>；
+  但 f = 1 ⟹ w = 0（两式同给 0）⟹ <strong>结论不变</strong>。</li>
+<li><strong>✅ 同一性假设并不需要</strong>：置换是<strong>双射</strong> ⟹ 每格点恒有且仅有 1 个诸元
+  ⟹ <strong>f ≡ 1 逐 tick 恒等</strong>（数值：1000 tick 内非置换 tick = 0、每格点占据数恒为 1）
+  ⟹ <strong>w ≡ 0 逐 tick 恒等</strong>（非概率）。⟹ B2 的「无空槽」= <strong>置换双射的直接后果</strong>，
+  既不来自跨层搬运，也不依赖格点间独立性。<strong>第 32/33 轮两个软肋至此全部解除。</strong></li>
+<li><strong>✅ 独立泊松衬底第二次独立排除</strong>：f* = 1/2 ⟹ w = 0.75 ⟹ 温度偏差 <strong>−5.7740%</strong>
+  （T = 5.812499e-8 K）。与第 20 轮 Δc/c = 26% <strong>互不相干，互为交叉验证</strong>。</li>
+<li><strong>✅ 双约束反解</strong> <code>H_S(1−f²) = ln16</code> ⟹ f = 1 或 <strong>f = 0.476542</strong>；
+  后者 = 52.3% 格点为空，与 C-1 冲突 ⟹ 排除，<strong>只剩 f = 1</strong>。</li>
+<li><strong>✅ B2 闭环</strong>：满占位（置换双射）⟹ 每键承载通量 ⟹ 4 条平面内连接全活
+  ⟹ A1 的 50:50 分配正/负支 ⟹ 2^4 = 16 ⟹ BH 定标成立 ⟹ Hawking 温度精确。</li>
+<li><strong>⚠️ 新软肋（唯一）</strong>：「面元连接」与「格点键」是否严格对应，未独立论证
+  （面元是面积元 l_P²，格点是体位点）。</li>
+<li>产出：<code>outputs/w与f的同一性_B2闭环完成.md</code>（+html）、
+  <code>outputs/_wf_identity.py</code>（WF-1…WF-6，<strong>10 项 0 失败</strong>）、<code>_patch_wf_identity.py</code>。</li>
+<li>论文已改 1 处（中英同步 2 项 0 失败）：§4.8 追加第 34 轮块（含第 33 轮 w=1−f 的更正）。
+  备份 <code>paper/history/*_备份_2026-09-20第34轮前.md</code>。</li>
+</ul>
+<h3>第 35 轮：「面元 ↔ 键」显式构造 —— <strong>压缩因子第一次有了部分机制</strong></h3>
+<ul>
+<li><strong>✅ 构造显化</strong>（此前只是默认）：面元 = 格点在现在平面内的<strong>对偶面元</strong>（面积 l_P²
+  ⟹ 面元数 = A/l_P² ⟹ 面积律自洽）；面元的 4 条平面内连接 = 到 4 个平面内邻居（±x,±y）的<strong>键</strong>。</li>
+<li><strong>✅ 计数</strong>（L=8 平面）：面元 64、槽位 256、<strong>不同键 128 = 2×64</strong>、每条键共享重数<strong>恰为 2</strong> ✓。</li>
+<li><strong>✅ B5 的「相邻面元强相关」第一次有了机制</strong>：<strong>不是统计相关，是恒等约束</strong>——
+  相邻面元共享同一条键，两个槽位必须同值。绑定对数 = 键数 = 128
+  ⟹ 独立自由度 = 4N_p − N_b = <strong>2N_p</strong>（每面元 2 条独立键）。</li>
+<li><strong>✅ 压缩因子第一次有了部分机制</strong>：<strong>16 ln2 = 2（键共享，已有机制） × 5.545（= 8 ln2，仍无机制）</strong>。
+  ⚠️ <strong>只解释了因子 2</strong>，剩余 5.545 仍未解释，不得包装成完整推导。</li>
+<li><strong>⚠️ 措辞纠正</strong>：B5「4 面元 × 4 方向 = 16 自由度」中 16 是<strong>槽位数</strong>而非自由度数
+  （2×2 块实测：16 槽位 → <strong>12</strong> 条不同键 = 4 块内 + 8 跨界）。</li>
+<li><strong>⚠️ 新软肋（最大未决）</strong>：面元—键对应的<strong>唯一性未论证</strong>。面元是<strong>面</strong>、格点是<strong>点</strong>，
+  本轮按对偶对应；若取「面元 = 真方格面、连接 = 4 条边」，计数会不同。</li>
+<li>产出：<code>outputs/面元与键的对应_压缩因子第一次有了部分机制.md</code>（+html）、
+  <code>outputs/_plaquette_bond.py</code>（PK-1…PK-6，<strong>7 项 0 失败</strong>）、<code>_patch_plaquette_bond.py</code>。</li>
+<li>论文已改 1 处（中英同步 2 项 0 失败）：§4.8 追加第 35 轮块。
+  备份 <code>paper/history/*_备份_2026-09-20第35轮前.md</code>。</li>
+</ul>
+<h3>第 36 轮：新建《工程期望清单》（每轮必做的产出项，用户提出）</h3>
+<ul>
+<li><strong>新增产出</strong>：<code>outputs/工程期望清单.md</code>（+html，同步 <code>notes/推演专题/</code> 与 <code>docs/</code>）。</li>
+<li><strong>更新规则</strong>：① 先找<strong>增量</strong>（本轮新结论带来的新条目）；② 无增量则从<strong>候选池</strong>取一部分标<strong>存量</strong>。</li>
+<li><strong>评级</strong>：★ 只有方向 ｜ ★★ 有定量未检验 ｜ ★★★ 已有实验可达；
+  <strong>类型</strong>：<code>工程</code> / <code>难题</code> / <code>负面</code>（框架排除的方向，价值 = 省投入）。</li>
+<li><strong>本轮标识</strong>：<strong>增量 3 条</strong>（I-1 键共享 ⟹ 量子纠错码的衬底稳定子；I-2 底层零噪声 ⟹ 量子噪声极限的来源；
+  I-3 反面：衬底是确定性置换 ⟹ <strong>不能用作真随机数熵源</strong>）；<strong>存量 12 条</strong>（S-1…S-12）。</li>
+<li><strong>可达性最高（★★★）</strong>：<strong>S-6 FQH 引力子模 ε 项</strong>（极低温强磁场平台直接可测）、
+  <strong>S-12 平坦性 Ω_K = 0</strong>（DESI DR2 / Euclid 判决）。</li>
+<li><strong>明确未解决</strong>：暗物质（三机制全挂）、粒子质量谱、宇宙学动力学。</li>
+<li><strong>候选池</strong>已排好优先级 10 条，供后续轮次取用（η、暗能量能标、Nelson、η/s、PPN C-2、规范群、
+  EMRI、void-CPT-κ、动力学、11.0904 剩余 5.545）。</li>
+<li>技能 <code>maps-deduction-round</code> 已新增<strong>第 5.5 步</strong>，把「每轮标识工程期望」写成必做步骤。</li>
+</ul>
+<h3>第 37 轮：源码级 vs 逆向工程 —— 判据与自审（用户的比喻驱动）</h3>
+<blockquote>
+<p>用户：这个理论有点像宇宙级开源代码，过去理论是逆向工程，我们从底层源码开始推演。</p>
+</blockquote>
+<ul>
+<li><strong>✅ 比喻成立且有可检验内容</strong>：分水岭<strong>不是"参数少"</strong>，而是<strong>参数被复用导致的过约束</strong>。</li>
+<li><strong>✅ 复用账</strong>：核心拟合参数 <strong>2</strong>（ε₀, β），A2 一条机制复用现象 <strong>4</strong>
+  （E_c / Ω_Λ / η / w(z)）⟹ <strong>复用率 2.0，过约束 2 倍</strong>。</li>
+<li><strong>✅ 过约束的硬证据</strong>：<code>dlnΩ_Λ/dβ = 465.44</code>；补 23.76 倍需 <strong>β 变 1.11%</strong>，
+  而同一改动把已对上的 <strong>E_c 推偏 2.21 倍</strong> ⟹ <strong>微调救不了</strong> ⟹ 只能承认 O-Λ。
+  （逆向工程在这里会直接加参数——它永远不会处于这种状态。）</li>
+<li><strong>⚠️ 最重要的自审结论（真预言 vs postdiction）</strong>：
+  <strong>真预言 4 条</strong>（EMRI δ=0.30·x_p 27σ / FQH ε 项 / void-CPT-κ / 黑洞强场 B1–B5，均先算后验未观测）；
+  <strong>postdiction / 半拟合 3 条</strong>（<strong>平坦性 Ω_K=0、E_c=1.0181 meV 属 postdiction</strong>；η 的 1 TeV 是配的）；
+  <strong>主动承认的失败 2 条</strong>（Ω_Λ 23.76 倍、暗物质空白）。
+  ⟹ <strong>那 4 条真预言的判决结果，才是这个比喻的裁决场。</strong></li>
+<li><strong>❗ 比喻的正确用法</strong>：当<strong>研究纲领</strong>（要求过约束、要求真预言、<strong>禁止加参数消化失败</strong>），
+  不当已完成的主张。目前是「按源码级纲领在做的理论」，不是「已验证的源码」。</li>
+<li>产出：<code>outputs/源码级vs逆向工程_自审与判据.md</code>（+html）、<code>outputs/_source_vs_reverse.py</code>（SV-1…SV-6，<strong>3 项 0 失败</strong>）。</li>
+<li>技能已更新：每轮判决必须标<strong>四类判定</strong>（真预言/postdiction/半拟合/失败），并跟踪<strong>复用率</strong>。</li>
+</ul>
+<h3>第 38 轮：面元对应的唯一性 —— <strong>自对偶使两种读法同构，软肋解除</strong></h3>
+<ul>
+<li><strong>✅ 第 35 轮的「对应唯一性未论证」已解除</strong>。另一种同样自然的读法
+  （面元 = <strong>真方格面</strong>、连接 = 4 条<strong>有向边</strong>）在方格格点上与「对偶面元 + 键」
+  <strong>逐项计数完全相同</strong>（L=8：面元 64 / 槽位 256 / 不同对象 128 / 共享重数 2 /
+  独立自由度 2 每面元）⟹ <strong>无需在两者间选择</strong>，第 35 轮结论（键共享 ⟹ 因子 2）不受影响。</li>
+<li><strong>✅ 原因</strong>：<strong>方格格点是自对偶的</strong>（其对偶仍为方格）；原格点的 4 个邻居方向
+  ↔ 对偶方格面的 4 条有向边方向，都是 ±x, ±y。⟹ 是同一结构的两种画法。</li>
+<li><strong>✅ 检验非空</strong>：蜂巢（非自对偶，V=10000/E=15000/F=5000，Euler 0 ✓）上
+  两种读法给 <strong>3 条 vs 6 条</strong>连接/面元 ⟹ 计数分歧。⟹ 自对偶性是决定因素。</li>
+<li><strong>✅ T-6 再获一条一致性支持</strong>：只有简单立方（平面截面 = 方格、自对偶）能让两读法重合；
+  金刚石会引入额外的未定歧义。</li>
+<li><strong>⚠️ 仍开放</strong>：① <strong>剩余压缩 5.545（= 8 ln2）仍无机制——现在唯一卡住的数</strong>；
+  ② 只比较了<strong>计数</strong>，未比较两种读法下的<strong>动力学</strong>（键 vs 边的置换规则可能不同）；
+  ③ 「面元面积 = l_P²」仍是构造定义。</li>
+<li>产出：<code>outputs/面元对应的唯一性_自对偶使两种读法同构.md</code>（+html）、
+  <code>outputs/_uniq_reading.py</code>（UQ-1…UQ-6，<strong>6 项 0 失败</strong>）、<code>_patch_uniq_reading.py</code>。</li>
+<li>论文已改 1 处（中英同步 2 项 0 失败）：§4.8 第 35 轮块末尾追加「（第 38 轮已解除）」。
+  备份 <code>paper/history/*_备份_2026-09-20第38轮前.md</code>。</li>
+</ul>
+<h3>第 39 轮：压缩因子 5.545 的机制审查 —— <strong>判为伪问题，改派观测者模型</strong></h3>
+<ul>
+<li><strong>✅ 核心判定</strong>：挂了 5 轮（第 19 → 38 轮）的「剩余压缩 5.545 无机制」<strong>不是物理因子</strong>，
+  而是<strong>两个不同口径的计数之比</strong>：分子 = 衬底槽位数（<strong>比特计</strong>），分母 = 观测熵（<strong>纳特计</strong>）
+  ⟹ 必然含 ln2，其「自然性」是<strong>伪问题</strong>。真正该问的是<strong>观测者为何只取 1 纳特/4l_P²</strong>——
+  那是 <strong>B5 观测者模型的分辨率公设</strong>，不属衬底层。</li>
+<li><strong>✅ 四条独立 no-go</strong>（脚本 <code>_compression_545.py</code>，CF-1…CF-9，<strong>23 项 0 失败</strong>）：
+  · <strong>次二元引理</strong>：需求 <code>1/4 纳特/面元 = 0.3607 比特/面元</code> <strong>小于 1 比特</strong>（ln2 = 0.6931 纳特），
+    <code>e^{1/4} = 1.2840</code> 非整数 ⟹ <strong>它从一开始就不是计数</strong>；
+  · <strong>枚举 no-go</strong>：面元级最近整数 m = 2 偏 <strong>−63.93%</strong>；块级最近 m = 3 偏 <strong>−8.98%</strong>
+    （m = 2 即原稿「1 bit/块」，<strong>+44.27%</strong>，与第 15 轮裁决逐位一致）⟹ <strong>无整数枚举解</strong>；
+  · <strong>几何 no-go</strong>：立方格穿越键密度 1.000 条/l_P²（轴向）、1.500（各向同性平均）；最保守读法
+    （1 条穿越键/l_P²、每条 1 bit）给 0.6931 纳特/l_P²，仍<strong>超出 ln16 = 2.7726 倍</strong>，
+    而自然几何因子都是 O(1) ⟹ <strong>供给充足，缺口在「谁算进熵」</strong>；
+  · <strong>不受观测约束</strong>：Hawking 温度 <code>ℏc³/(8πGMk_B)</code> 复算 6.168678×10⁻⁸ K，<strong>不含压缩因子</strong>；
+    原始计数取 16 / 8 / 4 bits 温度不变 ⟹ 它<strong>不是可观测量</strong>。</li>
+<li><strong>✅ 动力学不能产生压缩</strong>：tick 在构型空间上是<strong>双射</strong>（L=2 立方 256 个构型<strong>穷举</strong>验证，
+  3 个轴全过）、L=6、500 tick 后全局标记多重集守恒 ⟹ 底层零熵产生；固定 2×2×2 块读数熵
+  随时间涨落 ⟹ 压缩只能是<strong>粗粒化映射</strong>的性质（与第 21/26 轮一致）。</li>
+<li>⚠️ <strong>口径依赖（新增提示）</strong>：<code>16 ln2 = 2 × 8 ln2</code> 的分解取<strong>体内</strong>口径（2 条独立键/面元）；
+  2×2 块只有 4 面元却触及 <strong>12</strong> 条键 ⟹ <strong>3.00 键/面元</strong> ⟹ <strong>因子 2 不是强度量</strong>。</li>
+<li>⚠️ <strong>状态改判</strong>：压缩因子 11.0904 系由「16 态」与「1 纳特/块」<strong>反解</strong>（第 19 轮原话）⟹
+  <strong>该链条对 S = A/4 无预言力</strong>，B5 应表述为<strong>与 S = A/4 一致（一致性构造）</strong>。
+  ⚠️ 边界：S = A/4 的<strong>其它路径</strong>（F3 形式、§4.10 packing/下界定理）<strong>不受影响</strong>。</li>
+<li>📦 <strong>论文已改（中英同步，五段补丁 8 + 6 + 2 + 2 + 2 = 20 项 0 失败）</strong>：§4.8 追加第 39 轮块；
+  另清两处积压 + <strong>查出 3 处单位漏网</strong>（见下）。备份 <code>paper/history/*_备份_2026-09-20第39轮前.md</code>。</li>
+<li>📌 <strong>第 25 轮的教训再次应验</strong>：同一处 ln2 的写法在论文里<strong>至少四代残留</strong>。第 25 轮改了 12 处，
+  本轮又查出 3 处 —— <strong>§4.9「六处 4 同源」的「每 4 面元 1 比特」</strong>、§4.9 分级注/分层判定的两处复述、
+  <strong>§4.10 命题 5「每单元 1 比特 ⟹ S = (A/4l_P²)·ln2」</strong>（全部应为 <strong>1 纳特</strong>）。
+  ⟹ <strong>凡改单位，必须做全文「比特/纳特」对账，不能只查主段落。</strong></li>
+<li>📌 顺带清掉的两处积压：§4.9「标注错位」条目改为<strong>已修正</strong>；§4.10 定理 1 证明末的覆盖半径
+  改为<strong>解析值</strong>（k=3 ⟹ 90.0000°、k=4 ⟹ arccos(1/3) = 70.5288°；旧值 90.05°/70.291° 系随机搜索未穷尽）。</li>
+<li>产出：<code>outputs/压缩因子5.545的机制审查_判为伪问题与改派观测者.md</code>（+html）、
+  <code>outputs/_compression_545.py</code>（CF-1…CF-9，<strong>23 项 0 失败</strong>）、
+  <code>_patch_compression_39.py</code> + <code>_39b.py</code> + <code>_39c.py</code>。</li>
+<li>🔧 <strong>下一步（按价值）</strong>：① <strong>观测者读数分辨率</strong>（最便宜的一次判别：读数在 tick 下能否不变）；
+  ② 两种读法的<strong>动力学等价性</strong>（第 38 轮遗留）；③ 把「推出 S = A/4」在<strong>摘要与结论</strong>处同步收口。</li>
+</ul>
+<h3>第 40 轮：观测者读数在 tick 下能否不变？—— <strong>不能，且两头夹死</strong></h3>
+<ul>
+<li><strong>✅ 方法</strong>：把「一次 tick = 沿某轴的完美匹配（轴随机、每线独立相位）」的<strong>全部</strong>选择枚举
+  ⟹ 生成构型空间上的置换群 <strong>G</strong> ⟹ <strong>G 的轨道划分 = 最大的 tick 不变粗粒化</strong>
+  （任何不变的读数都必须是轨道的函数）。轨道划分的熵 = 「不变的读数最多能带多少熵」。</li>
+<li><strong>✅ 结果 1（本轮最意外）</strong>：<strong>tick 群很小</strong> ⟹ 动力学<strong>非遍历</strong>：
+  |G| = <strong>L</strong>（1D 环，注意不是 2L —— 两匹配之积是「移 2」，生成 L 阶二面体子群）、
+  |G| = <strong>8</strong>（2×2×2）、|G| = <strong>128</strong>（2×2×4，16 位点）。
+  ⟹ 构型空间被切成<strong>大量不变轨道</strong>（2×2×2 → 46 条；<strong>2×2×4 → 1357 条</strong>）。</li>
+<li><strong>✅ 结果 2（不变的读数熵太多）</strong>：轨道划分的熵密度全系列 <strong>0.42 – 0.49 纳特/格点</strong>
+  （2×2×4 → <strong>0.4368</strong>），BH 要求 <strong>0.25 纳特/l_P²</strong> ⟹ <strong>偏大约 1.75 倍</strong>。</li>
+<li><strong>✅ 结果 3（反方向也不行）</strong>：若群高度可迁（如第 21 轮串行 ⟹ S_N），唯一不变量是全局计数，
+  熵 ≈ ½ln(πeN/2) ⟹ N = 10⁶ 时 7.63 纳特 vs 面积律 2.5×10⁵ ⟹ <strong>次广延，给不出面积律</strong>。</li>
+<li><strong>✅ 判决（三难）</strong>：① 不变读数偏大 1.75 倍；② 高度可迁时次广延，面积律不成立；
+  ③ 时间平均 <code>τ = t_P/(δ²e²)</code> <strong>一个方程两个未知量 ⟹ 零预言力</strong>。
+  ⟹ 剩下的只有<strong>瞬时读数 + 观测者自身的分辨率 δ（或积分时间 τ）</strong> = <strong>B5 的公设</strong>。</li>
+<li>🎯 <strong>可证伪判据（本轮最有用的一条）</strong>：<code>H/N = ln2 − ⟨ln|O|⟩/N</code> ⟹ 命中 0.25 需
+  <strong>典型轨道大小 <code>⟨|O|⟩ = e^{0.4431N} = 1.557^N</code></strong>；并行 tick 动力学在 N = 16 上给 ≈ 60，
+  而 <code>1.557^16 ≈ 1.2×10³</code> ⟹ <strong>差约 20 倍</strong>。</li>
+<li>✅ <strong>附带（正面）</strong>：<strong>均匀分布（= 等分账）是 tick 动力学在每条轨道上的唯一不变测度</strong>
+  （数值：施加任意 tick 后逐项不变）⟹ <strong>等分不需要热化</strong>；但轨道有 1357 条 ⟹ <strong>动力学保持轨道</strong>，
+  等分<strong>不能由动力学到达</strong> ⟹ <strong>等分是结构性 / 初值的</strong>（与第 21/26 轮一致，本轮给的是机制层理由）。</li>
+<li>✅ <strong>47 μm 澄清</strong>：它限制的是<strong>诸元的空间输运</strong>，而统计测度的不变性是<strong>瞬时的、与输运无关</strong>
+  ⟹ <strong>等分账可以结构性成立，同时空间上远未热化</strong> ⟹ <strong>第 21 / 26 轮的担心解除</strong>。</li>
+<li>⚠️ <strong>诚实边界</strong>：|G| 与轨道结构只在 <strong>N ≤ 16</strong> 上穷举。格子越大、每线相位自由度越多
+  （4×4×4 有 513 个生成元）⟹ 群可能大得多 ⟹ <strong>H/N 的 N → ∞ 极限未定</strong>；判据本身与 N 无关。</li>
+<li>📦 <strong>论文已改（中英同步，6 项 0 失败）</strong>：§4.8 追加第 40 轮块；§8.6.3 等分账追加「唯一不变测度</li>
+<li>结构性/初值」；§4.2 ② 的 47 μm 段末追加澄清。备份 <code>paper/history/*_备份_2026-09-20第40轮前.md</code>。</li>
+<li>产出：<code>outputs/观测者读数在tick下能否不变_不能且两头夹死.md</code>（+html）、
+  <code>outputs/_observer_resolution.py</code>（OR-1…OR-8，<strong>12 项 0 失败</strong>）、<code>_patch_observer_40.py</code>。</li>
+<li>🔧 <strong>下一步（按价值）</strong>：① <strong>把 N 推大</strong>（4×4×4：513 个生成元）检验 <code>⟨|O|⟩ = 1.557^N</code>
+  —— 最便宜且直接可证伪；② <strong>观测者自身的周期 τ</strong>（§4.9 N1–N4）⟹ 唯一能把 B5 分辨率
+  变成推导的入口；③ <strong>三个「遍历性」的分层判定</strong>（§4.2 速度空间 / 47 μm 空间输运 / 构型空间轨道）。</li>
+</ul>
+<h3>第 41 轮：把 N 推大 —— tick 群在宏观格点上<strong>爆炸</strong>，第 40 轮第 ① 条<strong>不可外推</strong></h3>
+<ul>
+<li><strong>✅ 方法（本轮的技术关键）</strong>：一次 tick 的全部选择有 Σ_轴 2^(线数) 个（4×4×4 = <strong>196608</strong>）。
+  由 <code>M_a·T(p) = ∏_{j:p_j=1} s_j</code> ⟹ <code>T(p) = M_a·∏ s_j</code> ⟹ <strong>G = ⟨M_x,M_y,M_z；所有 s_j⟩</strong>，
+  生成元降到 <strong>3 + 3L²</strong>（4×4×4 = <strong>51</strong>）。已验证：化简集与全集在 2×2×2 / 2×2×4 上
+  给出<strong>逐条相同的轨道划分</strong>（46 / 1357 条）。⟹ Schreier–Sims（sympy）第一次能算大格点。</li>
+<li><strong>✅ 修正第 40 轮</strong>（重要）：「tick 群很小、动力学非遍历」是<strong>小格点假象</strong>。
+  | 格点 | N | |G|（精确） | ln|G|/N |
+  |---|---|---|---|
+  | 2×2×2 | 8 | 8 | 0.2599 |
+  | 2×2×4 | 16 | 128 | 0.3033 |
+  | <strong>4×4×4</strong> | 64 | <strong>2.794×10³⁷</strong> | <strong>1.3472</strong> |
+  | <strong>6×6×6</strong> | 216 | <strong>6.176×10²²²</strong> | <strong>2.3750</strong> |
+  （前两个与第 40 轮穷举 BFS <strong>逐位一致</strong> ✓）阈值 = 0.4431 ⟹ N ≥ 64 时 <strong>|G| ≫ 1.557^N</strong>
+  ⟹ <code>|O| ≤ |G|</code> 上界<strong>完全失效</strong> ⟹ <strong>第 40 轮三难的第 ① 条（不变读数偏大 1.75 倍）不可外推</strong>。</li>
+<li><strong>✅ 新不变量（本轮正面产出）</strong>：设 π(p) ∈ (Z₂)³ 为三坐标奇偶类 ⟹ 任何 tick 保持
+  <strong>δ(p,q) = π(p)+π(q) (mod 2)</strong>（s_j 保持 π；M_a 把全体格点的奇偶类<strong>同一个</strong> ê_a 平移）。
+  穷举全部生成元 × 全部点对验证通过。⟹ <strong>点对恰 8 条轨道</strong>；实测 <strong>|O₂| = (N/4)²</strong>
+  （N = 8/16/64/216 四算例全中）；|O₃| = 1792 ≪ C(64,3) = 41664 ⟹ <strong>群不是 2-可迁的</strong>（尽管 |G| 已爆炸）。</li>
+<li><strong>✅ k = N/2 轨道的上界</strong>：不变量 = 各奇偶类选中数 (n₀…n₇) <strong>模 (Z₂)³ 平移</strong>
+  ⟹ <code>|O| ≤ ∏_i C(N/8, n_i)</code>（均分最大）⟹ N=64：5.76×10¹⁴ ⟹ <strong>H/N ≥ 0.162</strong>。</li>
+<li>⚠️ <strong>仍未定</strong>：H/N 的界 = <strong>0.162 – 0.693</strong>，<strong>跨过 0.25</strong> ⟹ 宏观精确值待 <strong>k = N/2 的真实轨道</strong>
+  （需 set-stabilizer；<strong>sympy 没有</strong>）。⟹ 第 40 轮的「三难」改写为「<strong>两难 + 一个结构</strong>」。</li>
+<li>📦 <strong>论文已改（中英同步，2 项 0 失败）</strong>：§4.8 在第 40 轮块后追加【第 41 轮】块（化简、|G| 表、
+  第 ① 条不可外推、(Z₂)³ 不变量、|O₂| = (N/4)²、上界与未定项）。备份 <code>paper/history/*_备份_2026-09-20第41轮前.md</code>。</li>
+<li>产出：<code>outputs/把N推大_tick群在宏观格点上爆炸并找到Z2^3不变量.md</code>（+html）、
+  <code>outputs/_orbit_scaling.py</code>（GS-1…GS-7，<strong>12 项 0 失败</strong>）、<code>_patch_orbit_41.py</code>。</li>
+<li>🔧 <strong>下一步（按价值）</strong>：① <strong>算 k = N/2 的精确轨道</strong>（试 <strong>GAP</strong> 的 <code>Stabilizer(G,S,OnSets)</code>，
+  或自己实现集合稳定子）——<strong>当前唯一能定下宏观 H/N 的入口</strong>；② 证明经验律 |O₂| = (N/4)²；
+  ③ 8×8×8（N=512）；④ 回到主线：观测者自身的周期 τ（§4.9 N1–N4）。</li>
+<li>
+<p>📌 <strong>用户讨论带出的新张力 T-7</strong>（本轮末由「预测未来 / 自指 / 熵增」的讨论引出，<strong>未裁决</strong>）：
+  · 第 34 轮：衬底是<strong>确定性置换</strong> ⟹ 不能作为真随机数熵源（工程期望 I-3）；
+  · 第 26 轮 / §8.6.7：tick = <strong>随机选轴 + 每线独立随机相位</strong>，且该随机性被标为
+    <strong>【实现选择】</strong>（另一选项「每对独立决定是否交换」给同样的标度律、不同的扩散系数）。
+  ⟹ <strong>未定</strong>：tick 的随机性是<strong>外生真随机</strong>，还是<strong>更底层的确定性（只是被粗粒化）</strong>？
+  ⟹ <strong>为什么重要</strong>：它直接回答「未来可否被预测」—— 外生 ⟹ <strong>原则上不可预测</strong>
+    （连拉普拉斯妖也不行，因为未来不是当前状态的函数）；内生 ⟹ 只是<strong>不可计算</strong>（资源限制）。
+    同时决定 <strong>I-3 是否要重新表述</strong>：若外生，衬底整体就是随机置换游走，<strong>可以</strong>是随机源。
+  ⟹ 判别线索：§8.6.7 已给「两种实现给不同<strong>扩散系数</strong>」⟹ 扩散系数是可观测量，
+    若能独立定出它，就能反推 tick 的随机结构。这是 T-7 最便宜的入口。
+  ⚖️ <strong>第 42 轮已部分裁决</strong>：<strong>「外生 vs 内生」这个本体问题判不了</strong>（H2 的隐变量开销 1/L → 0，
+    与次二元熵密度不冲突 ⟹ 经验等价）；但<strong>扩散系数仍可区分两种"实现"</strong>（它们的 h 不同）。
+    ⟹ T-7 降级为：<strong>本体不可判、实现可判</strong>。</p>
+</li>
+<li>
+<p>📌 <strong>用户讨论带出的新张力 T-8</strong>（2026-09-21 中午，由「底层速度是否瞬时无限大 / 时间是否只有一瞬间 /
+  事件顺序是否就是时间」的讨论引出）：
+  · <strong>已判决的部分（写在这里免得重复推）</strong>：
+    ① 「底层速度无限大」⟹ ❌ <strong>不是"被禁止"而是"结构性无定义"</strong>（第 18 轮 LS-5/LS-6）：
+       手递手一步 l_P、一拍 t_P；超光速要求沿途<strong>连续无穷多个绝对真空</strong>，f = 1 时概率为 0 且
+       「没有诸元就没有『那里』」⟹ 空间本身消失。框架里 c = l_P/t_P 是<strong>有限可测的</strong>
+       （与 CODATA 差 −1.17×10⁻⁷），不是外加上限而是<strong>衬底传递速率</strong>。
+    ② 「有差速、且不是到零」⟹ ✅ 对，但机制不是<strong>减法</strong>而是<strong>正交分解</strong>（第 18 轮 LS-1）：
+       <code>(v/c)² + (v_int/c)² = 1</code>，<code>v_int = c/γ</code> = 内部 zigzag 速率 = <strong>时钟走速</strong>。
+       用户的「∞ − n」的正确写法是 <strong><code>v = c/γ</code></strong>（n ↔ γ = 折线长度/直线距离）。
+       差别关键：基线是 <strong>c（有限守恒量）</strong> 而非 ∞，所以"有限"不是"被截断"，是<strong>投影</strong>。
+       ⟹ 附带硬结果：<code>m = p_rev·m_Pl</code>（质量 = 每拍反转概率）、<code>λ_C = l_P·m_Pl/m</code>
+       ⟹ 「有质量不能到 c」由公理变<strong>后果</strong>。
+    ③ 「时间只有一瞬间」⟹ ⚠️ <strong>部分对且框架已命名</strong>：§8.6.7(e) —— 并行归一化定义<strong>全局同时的 tick</strong>
+       ⟹ <strong>一个 tick 内部所有交换同时发生</strong>（= 用户说的"一瞬间"）；但宇宙年龄 = t_H/t_P ≈ <strong>8.46×10⁶⁰ 拍</strong>
+       （第 26 轮，与 47 μm 反推差 0.42%）⟹ <strong>是一串"同时切片"的序号，不是唯一的瞬间</strong>。
+       代价：全局同时 ⟹ <strong>衬底有优先参照系</strong> ⟹ 必须靠 <strong>C-2</strong>（PPN ξ,α₁,α₂,α₃ = 0）保护（第 18 轮 §五-B）。
+    ④ 「事件有先后 ⟹ 事件成为时间本身」⟹ ✅ <strong>与公理 3 同构</strong>：论文第 77 行「时间 = 相遇/湮灭频率，
+       由 τ(x) = ∫ψ̄ψ d⁴x 的生成率定义」⟹ 时间不是容器，是<strong>事件的生成率</strong>。
+       第 42 轮补上关键一环：tick 的内容（哪些线交换）是<strong>外生随机</strong>的 ⟹ 事件顺序是<strong>注入的</strong>，
+       不由更底层的动力学决定。
+  · <strong>用户直觉真正抓到的两个真东西</strong>（只是归因错了）：第 42 轮那个 <strong>1.87×10⁶⁰</strong> 的速率分离 ——
+    <strong>信息/统计通道准瞬时</strong>（π/ln2 = 4.53 tick ≈ 2.44×10⁻⁴³ s）vs <strong>物质/空间通道很慢</strong>
+    （47 μm/哈勃时）。"底层好像无限快、日常很慢"的真实位置是这个分离，不是速度无限大。
+  · 🎯 <strong>T-8 本身（未裁决）</strong>：<strong>"全局同时的 tick"与洛伦兹不变性的关系</strong> ——
+    tick 全局同时（§8.6.7(e)）但洛伦兹不变性要求同时性相对，目前只靠 <strong>C-2 事后抹掉</strong>（PPN = 0），
+    <strong>没有正面机制</strong>。判别入口：能否从 <strong>A1（50:50 + 各向同性）</strong> 推出"tick 的绝对性在任何可观测量上
+    都不残留"？若不能，则 §8.6.7(e) 的"优先参照系"按第 37 轮四类判定应归为 <strong>输入</strong>（而非后果）。</p>
+</li>
+</ul>
+<h3>第 42 轮：熵增的源头 = 外生 tick 随机性（<strong>π/ln2 = 4.53 tick</strong>）</h3>
+<ul>
+<li><strong>✅ 结果 A（本轮主结果，可算）</strong>：把 §8.6.7 的"轴随机 + 每线独立随机相位"当成<strong>外生随机</strong>，
+  它就是一个可算的熵源：一次 tick 的选择数 = 3 × 2^(L²) ⟹ 每 tick 注入的无知
+  <strong><code>h = ln3 + L² ln2</code> 纳特</strong>。
+  | 量 | 值 |
+  |---|---|
+  | L ≈ N_c | 8.4918×10⁶⁰ |
+  | h（每 tick） | 4.998×10¹²¹ nats |
+  | ḣ = h/t_P | 9.27×10¹⁶⁴ nats/s |
+  | 视界 BH 熵 πN_c² | 2.265×10¹²² nats |
+  | <strong>达到 S_BH 所需</strong> | <strong><code>S_BH/h = π/ln2 = 4.532 tick ≈ 2.44×10⁻⁴³ s</code>（解析值）</strong> |
+  ⟹ <strong>统计混合是瞬时的</strong>。⚠️ 这是<strong>系综（无知）熵</strong>；单个 tick 仍是双射 ⟹ 状态信息严格守恒
+  ⟹ 与第 21 轮「无信息丢失」<strong>并存</strong>（前者说状态，后者说无知）。</li>
+<li><strong>✅ 结果 B（补上第 40 轮的缺口）</strong>：统计饱和 2.44×10⁻⁴³ s vs 哈勃时 4.58×10¹⁷ s
+  ⟹ 相差 <strong>1.87×10⁶⁰</strong> ⟹ <strong>统计混合（信息）与空间输运（物质，47 μm/哈勃时）是两件事、不矛盾</strong>
+  ⟹ 第 40 轮「等分账瞬时成立、不需要热化」<strong>有了动力学理由</strong>。饱和值 ln|O| ≤ ln C(N,N/2)
+  ≈ 4.24×10¹⁸² nats ≫ S_BH ⟹ <strong>容量不是瓶颈，速率才是</strong>。</li>
+<li><strong>✅ 结果 C（T-7 判否）</strong>：H1（外生随机）vs H2（内生确定）——H2 需把 tick 选择编码进衬底，
+  开销 = L²/L³ = <strong>1/L → 0</strong>（宏观 1.18×10⁻⁶¹ bits/格点）⟹ <strong>不与"0.25 纳特/l_P² 次二元"冲突</strong>
+  ⟹ <strong>经验等价、不可判别</strong>。⟹ 「未来是否原则上可预测」在框架内<strong>不可判定</strong>；
+  <strong>现行表述（H1）下 = 不可预测</strong>。</li>
+<li>📦 <strong>论文已改（中英同步，2 项 0 失败）</strong>：§8.6.7「诚实边界」表之前插入【第 42 轮】块
+  （注入速率表、π/ln2、两个速率差 10⁶⁰、饱和上界、T-7 判否、与第 21 轮并存）。
+  备份 <code>paper/history/*_备份_2026-09-21第42轮前.md</code>。</li>
+<li>产出：<code>outputs/熵增的源头_外生tick随机性与π比ln2.md</code>（+html）、
+  <code>outputs/_tick_randomness.py</code>（TS-1…TS-7，<strong>7 项 0 失败</strong>）、<code>_patch_tickrand_42.py</code>。</li>
+<li>🔧 <strong>下一步</strong>：① <strong>把 h 接上可观测量</strong> —— §8.6.7 的两种实现给不同<strong>扩散系数</strong>
+  ⟹ 用扩散系数定实现 ⟹ 间接定 h（本轮结果唯一的可观测出口）；② <strong>几何精算</strong>（球 vs 立方），
+  看 π/ln2 是否变成含 4π/3 的常数；③ 回到主线：观测者自身的周期 τ。</li>
+</ul>
+<h3>第 43 轮：h 不可观测 —— T-7 降至「实现亦不可判」</h3>
+<ul>
+<li>✅ <strong>结果 A（本轮主结果，判否）</strong>：第 42 轮的 🎯 首要项「用扩散系数交叉检验 h」<strong>不成立</strong>。
+  <code>h = ln3 + L²ln2</code> 依赖「每 tick 有多少独立随机比特」（<strong>L² 个</strong>），而唯一的输运可观测量 D
+  只依赖<strong>移动率</strong>与<strong>步的自相关</strong> ⟹ <strong>L² 个比特 → 1 个实数</strong>，是欠定，不是难测。</li>
+<li>✅ <strong>结果 B（数值）</strong>：真随机相位 vs <strong>确定性 LCG</strong> 相位 ⟹ D = 0.9700 vs 1.0704
+  （<strong>0.1005 = 1.51σ</strong>，噪声内），而二者 h 差 <strong>120 个数量级</strong>
+  （4.998×10¹²¹ 纳特/tick vs 44.36 纳特一次性）。</li>
+<li>✅ <strong>结果 C（方法要点，本轮新增）</strong>：<strong>单标记轨迹看不出「每线独立」与「全局共享」的差别</strong>
+  （两者均为 <strong>0.9933</strong>，逐位相同 —— 标记只见到自己那条线的 φ）⟹ 相位共享
+  <strong>只在多诸元关联里</strong>显现。⟹ 用「单个粒子的输运」判相位模式<strong>无效</strong>。</li>
+<li>✅ <strong>结果 D（D 的判别力边界）</strong>：相位「全局固定」（⟨r²⟩ → 2.00，严格有界）与「全局统一」
+  （非自平均）<strong>可判</strong> ⟹ 第 26 轮排除两种「偷懒」是<strong>可观测的</strong>排除；但<strong>「随机性从哪来」
+  在输运层面完全不可见</strong>。移动率 p 可判（D ∝ p），而 A1 已把 p 钉为 1。</li>
+<li>⚖️ <strong>结果 E（T-7 最终口径）</strong>：从「本体不可判、<strong>实现可判</strong>」（第 42 轮）降为
+  「<strong>本体不可判、实现亦不可判</strong>」。第 42 轮的「熵增源头 = <strong>外生注入</strong>」宜改写为
+  「熵增源头 = <strong>无知</strong>」；这与第 39 轮「熵增 = 粗粒化 / 不可分辨性的度量」<strong>合流</strong> ——
+  在可观测层面，注入与粗粒化是<strong>同一件事的两种叙事</strong>。</li>
+<li>⚠️ <strong>结果 F（复核，修正第 26 轮一处数值）</strong>：论文 §8.6.7(c) 的
+  「⟨r²⟩ 塌到 n 的 <strong>29.7% / 42.5%（两个种子）</strong>」<strong>数值部分已修正</strong> ——
+  20 种子复测：该量<strong>非自平均</strong>（均值 <strong>1.317</strong>、相对散布 <strong>65%</strong>、范围 [0.364, 3.444]；
+  而每线独立为 <strong>1.001 ± 0.027</strong>、散布 <strong>3%</strong>）。29.7%/42.5% 是<strong>噪声</strong>，
+  且「塌到」的<strong>方向亦误</strong>（该模式下 ⟨r²⟩ 的均值<strong>大于</strong> n 而散布巨大）。
+  <strong>物理结论（每线独立是必需条件）不变</strong> ⟹ 只改数值表述。</li>
+<li>📦 <strong>论文已改（中英同步，4 项 0 失败）</strong>：§8.6.7(c) 数值修正（A 段）+ 在【诚实边界(8.6.7)】
+  之前插入【第 43 轮】块（B 段：四类相位模式表、单标记 vs 完整格点、20 种子统计、
+  四条判决、T-7 最终口径）。备份 <code>paper/history/*_备份_2026-09-21第43轮前.md</code>。</li>
+<li>产出：<code>outputs/h能否被可观测量定出_不可观测且熵增源头改写.md</code>（+html）、
+  <code>outputs/_observable_h_probe.py</code>（OP-1…OP-10，<strong>10 项 0 失败</strong>）、
+  <code>outputs/_phase_diag.py</code>（维度诊断 + 20 种子统计）。</li>
+<li>🔧 <strong>下一步</strong>：① <strong>两点关联函数</strong> —— <strong>T-7 的最后入口</strong>（单体量已判否；若有差别只能藏在
+  多体关联里；<strong>若关联亦相同则 T-7 可结项</strong>）；② 把 <code>global</code> 模式的<strong>非自平均性</strong>
+  （相对散布 65% vs <code>indep</code> 的 3%）登记为<strong>动力学非遍历性</strong>证据，与第 40 轮「轨道保持」合并；
+  ③ 回到主线：<strong>观测者自身的周期 τ</strong>（§4.9 N1–N4）。</li>
+</ul>
+<h3>第 44 轮：两点关联亦不可判 —— <strong>T-7 收口</strong></h3>
+<ul>
+<li>✅ <strong>结果 A（T-7 的最后入口关闭）</strong>：第 43 轮说"若有差别只能藏在多体关联里" ⟹ 本轮算了<strong>空间关联</strong>
+  <code>C = ⟨Δ_i·Δ_j⟩/⟨r²⟩</code>：真随机源 <strong>−0.03943</strong> vs 高质量确定性（MT19937）<strong>−0.03368</strong> ⟹ 差 <strong>0.14σ</strong>
+  ⟹ <strong>不可区分</strong>。⟹ 加上熵密度（第 42）、扩散系数（第 43），<strong>三条独立入口全判否</strong>。</li>
+<li>✅ <strong>结果 B（判否是实质性的）</strong>：关联量<strong>不为零</strong>（≈ −0.04）⟹ 置换的排他性确实产生位移关联
+  ⟹ "判不了"<strong>不是因为可观测量太弱</strong>。</li>
+<li>⚠️ <strong>结果 C（唯一成功的判别，但判的是"质量"）</strong>：<strong>时间关联</strong> <code>C(τ)</code> 在 τ=1 处 ——
+  真随机源 <strong>−0.0090</strong> ｜ MT19937 <strong>−0.0009</strong>（一致）｜ LCG <strong>−0.3339</strong>（≈ 37 倍）
+  ⟹ 能区分<strong>低质量</strong>生成器，<strong>区分不了高质量</strong> ⟹ 区分的是<strong>伪随机数发生器的质量</strong>，
+  <strong>不是</strong>「随机性是否外生」。</li>
+<li>❌ <strong>结果 D（本轮原设想被自己否证：周期性判据失效）</strong>：设想"有限状态 H2 ⟹ 驱动序列周期重复 ⟹ 可观测"。
+  实测（φ 与轴都由模 2⁸ 的 LCG 驱动，周期 256 tick）：τ=256 处自相关 = <strong>−0.3269</strong>，
+  而严格周期的标志应是 <strong>C(T) ≈ +1</strong> ⟹ <strong>位移不按驱动周期重复</strong>。
+  机制：位移 = 位置之差，诸元位置持续演化、不回到起点 ⟹ 驱动周期<strong>不原样传递</strong>到位移上。
+  （保留：τ=256 的 |C| = 0.327 仍 ≫ 真随机源 ⟹ 相关结构在长时标留痕 ⟹ 低质量 H2 仍可区分。）</li>
+<li>⚖️ <strong>结果 E（T-7 收口）</strong>：归为 <strong>框架内不可判定</strong>。它退化为<strong>伪随机数发生器的质量问题</strong>，
+  <strong>不是一个物理问题</strong> —— 框架没有、也不能规定 tick 用哪一档生成器。
+  <strong>现行表述（H1）下 = 不可预测</strong>。
+  ⚠️ 方法硬限制：<strong>数值模拟里的"真随机"只能是伪随机</strong>（除非 os.urandom）⟹
+  "外生真随机 vs 内生确定"在模拟中<strong>无法真正实例化</strong>。</li>
+<li>📦 <strong>论文已改（中英同步，2 项 0 失败）</strong>：§8.6.7 插入【第 44 轮】块（三档生成器、
+  空间/时间表、周期性失效、T-7 最终口径）。备份 <code>paper/history/*_备份_2026-09-21第44轮前.md</code>。</li>
+<li>产出：<code>outputs/两点关联函数与T-7收口_判不了且退化为生成器质量问题.md</code>（+html）、
+  <code>outputs/_two_point_probe.py</code>（TP-1…TP-8，<strong>8 项 0 失败</strong>）。</li>
+<li>🔧 <strong>下一步（回到主线）</strong>：① <strong>观测者自身的周期 τ</strong>（§4.9 N1–N4）——
+  <strong>仍是把 B5 分辨率变成推导的唯一入口</strong>；② 算 k = N/2 的真实轨道（需 GAP 的 set-stabilizer）；
+  ③ 是否把「tick 随机性来源」写成新公设（<strong>本轮倾向：不写，停在"不可判定"</strong>）。</li>
+</ul>
+<h3>第 45 轮：观测者自身的周期 τ —— <strong>判否</strong>，与「公设上移」的无穷回归</h3>
+<ul>
+<li><strong>主题</strong>：第 40 轮留下的唯一入口 = 观测者自身的周期 τ（§4.9 N1–N4 涡动力学）。
+  框架里观测者 = <strong>现在平面孤子</strong>（O1）；N1：稳态涡需<strong>相位累积 4π 的整数倍</strong> ⟹ τ = 涡走完一个相位周期的时间。</li>
+<li>❌ <strong>结果 A（判否）</strong>：<strong>N1 给的是量子化条件，不是 τ 的值</strong>。三个候选各带一个新未知量：
+  | 候选 τ | 新未知量 |
+  |---|---|
+  | 涡旋转 <code>2πR/c</code>（或 4πR/c） | <strong>涡半径 R</strong> |
+  | 康普顿周期 <code>h/(mc²)</code> | <strong>观测者质量 m</strong> |
+  | 相位累积 <code>4π/ω</code> | <strong>ω</strong> |</li>
+<li>✅ <strong>结果 B（本轮唯一的定量收获，新判据）</strong>：δ 是读数的可分辨间隔，读数 ∈ [0,1] ⟹ <strong>δ ≤ 1</strong>
+  ⟹ <strong><code>τ ≥ t_P/e² = 7.2963×10⁻⁴⁵ s = 0.1353 t_P</code></strong>。（若额外要求 τ ≥ t_P ⟹ δ ≤ 1/e = 0.3679。）</li>
+<li>⚠️ <strong>结果 C（一个自洽候选，但它是恒等式）</strong>：τ = 2π t_P ⟹ δ = <strong>0.146763</strong>（可分辨态数 = e ✓）。
+  它<strong>同时</strong>是 (a) l_P 半径的涡以 c 绕一圈、(b) 普朗克质量的康普顿周期 —— 比值 <strong>0.999999945</strong>。
+  ⟹ 但 <code>h/(m_Pl c²) = 2π t_P</code> 是<strong>恒等式</strong>，按第 37 轮判定归为<strong>一致性</strong>，<strong>不是预言</strong>。
+  （对照：若观测者是电子/质子质量孤子，δ = 9.49×10⁻¹³ / 4.07×10⁻¹¹ ⟹ δ 完全由"观测者是什么"决定。）</li>
+<li>⚖️ <strong>结果 D（本轮主要结论）：公设上移 = 无穷回归</strong>
+  <code>层 0 δ → 层 1 τ（τ = t_P/(δ²e²)）→ 层 2 R 或 m → 层 3 …</code>
+  每一层都是<strong>一个方程、两个未知量</strong> ⟹ 上移<strong>不减少</strong>未知量个数，只是换个名字。
+  ⟹ <strong>B5 不能被"推导掉"，只能被上移</strong> ⟹ <strong>建议停在层 0（δ）</strong>：停别处无增益，
+  且 δ 是唯一直接出现在可观测量里的量（读数）。</li>
+<li>⚠️ <strong>附带（把上移路线从根上封死）</strong>：第 44 轮证明 tick 随机性来源不可判
+  ⟹ 块读数的时间序列性质不可判 ⟹ 时间平均公式所需的<strong>自相关修正原则上算不出来</strong>。</li>
+<li>📦 <strong>论文已改（中英同步，2 项 0 失败）</strong>：§4.9 的 N1–N4 之后插入【第 45 轮】块。
+  备份 <code>paper/history/*_备份_2026-09-21第45轮前.md</code>。</li>
+<li>产出：<code>outputs/观测者周期τ能否定出_判否与公设上移的无穷回归.md</code>（+html）、
+  <code>outputs/_observer_tau.py</code>（OT-1…OT-7，<strong>7 项 0 失败</strong>）。</li>
+<li>🔧 <strong>下一步</strong>：① 🎯 <strong>算 k = N/2 的真实轨道</strong>（需 GAP 的 <code>Stabilizer</code>）——
+  唯一能定下宏观 H/N 的入口；② <strong>N2 的稳定性数值</strong>（0.00/1.00/0.30/0.05）能否约束涡的几何
+  —— 便宜，可试一次；③ 候选池其余（η、暗能量能标、Nelson、η/s、PPN C-2）。</li>
+</ul>
+<h3>第 46 轮：k = N/2 的精确轨道 —— 不变量<strong>不完备</strong>，H/N 落在 0.43–0.53（⚠️ 第 47 轮修正非单调；⚠️ <strong>第 48 轮更正 (2,2,6) 的 0.4330 → 0.4510</strong>——原值用了错误的生成元集）</h3>
+<ul>
+<li><strong>主题</strong>：第 41 轮留下「需要 k=N/2 的真实轨道」并用 (Z₂)³ 奇偶差类不变量给出上界 5.76×10¹⁴ ⟹ H/N ≥ 0.162。
+  本轮用<strong>精确轨道划分</strong>检验该不变量是否<strong>完备</strong>。</li>
+<li><strong>方法</strong>：小格点上闭包枚举 |G|；对 k=N/2 的<strong>全部</strong>构型做<strong>生成元闭包 BFS</strong> 得到精确轨道；
+  完备性判据 = <strong>轨道数 == 不变量等值集数</strong>（严格，不是拟合）。</li>
+<li>❌ <strong>结果 A（关键负面）：(Z₂)³ 不变量不完备</strong>
+  | 格点 | N | |G| | 轨道数 | 等值集数 | 完备？ | ⟨ln|O|⟩/N | <strong>H/N</strong> |
+  |---|---|---|---|---|---|---|---|
+  | (2,2,2) | 8 | 8 | 14 | 14 | ✅ 完备 | 0.2253 | <strong>0.4679</strong> |
+  | (2,2,4) | 16 | 128 | 253 | 155 | ❌ | 0.2597 | <strong>0.4335</strong> |
+  | (2,2,6) | 24 | 648 | 6224 | 1050 | ❌ | 0.2602 | <strong>0.4330</strong> |</li>
+<li>⚠️ <strong>结果 B（公式方向）</strong>：公式 <code>|O| = |[n]|·∏C(N/8,n_i)</code> 确为<strong>上界</strong>，高估倍数随 N 增长：
+  <strong>1.00（N=8）⟶ 2.00（N=16）⟶ 9.00（N=24）</strong>（抽查 600 个构型的中位数）
+  ⟹ 第 41 轮的 5.76×10¹⁴ 只是弱上界，<strong>H/N ≥ 0.162 是弱下界</strong>。</li>
+<li>✅ <strong>结果 C（本轮最有用的正面结果；⚠️ 第 47 轮修正为「非单调」）：H/N 落在 0.43–0.47</strong>
+  0.4679 ⟶ 0.4335 ⟶ 0.4330；N=16→24 只动 <strong>0.0005</strong> ⟹ <strong>当时</strong>看着像饱和。
+  ⚠️ 但第 47 轮把系列推到 <strong>N=32 得 0.4614（回升！）</strong> ⟹ 「饱和」说法<strong>不成立</strong>，
+  正确表述是「在 (2,2,L) 系列上落在 <strong>0.43–0.47 区间、非单调</strong>」。
+  ⟹ <strong>面积律要求的 0.25 未命中</strong>（实测偏大 ≈ 1.73 倍）⟹ <strong>第 ① 条（不变读数偏大 ~1.75 倍）
+  在本轮能算的所有格点上成立，且不是小格点假象</strong>（补强 N-2）。
+  （与第 40 轮实测 0.42–0.49、2×2×4 = 0.4368 一致 ✓）</li>
+<li>⚠️ <strong>结果 D（口径限制，必须写）</strong>：三个算例都是 <strong>(2,2,L) 系列</strong>（两方向长 2，细长格点），
+  <strong>不代表各向同性三维宏观格点</strong>；(4,4,4) 的 C(64,32)=1.83×10¹⁸、(2,4,4) 的 C(32,16)=6.01×10⁸
+  都超出本轮方法 ⟹ <strong>真实 3D 宏观值仍未定</strong>，<strong>不得外推</strong>（第 41 轮教训）。</li>
+<li>📦 <strong>论文已改（中英同步，2 项 0 失败）</strong>：§4.8 第 41 轮块之后插入【第 46 轮】块。
+  备份 <code>paper/history/*_备份_2026-09-22第46轮前.md</code>。</li>
+<li>产出：<code>outputs/k等于N2的精确轨道_不变量不完备且HN饱和在0.43.md</code>（+html）、
+  <code>outputs/_orbit_k_half.py</code>（OH-1…OH-7，<strong>7 项 0 失败</strong>，运行 ~2 分钟）。</li>
+<li>🔧 <strong>下一步</strong>：① 装 <strong>GAP</strong>（<code>Stabilizer(G,S,OnSets)</code>）算 (4,4,4)；
+  ② ✅ ~~把穷举改成「随机采样构型 + 单构型轨道 BFS」~~ —— <strong>第 47 轮已完成并跑通</strong>
+  （(2,2,8) 给 0.4614；(2,4,4) 因 |G| = 2.2×10¹¹ 仍不可算）；
+  ③ 副产品：<strong>不完备度比值</strong> 1.00 → 1.63 → <strong>5.93</strong>（随 N 增长）已入候选池 21。</li>
+</ul>
+<h3>第 47 轮：同 N=32 的形状对照 —— |G| 对形状极敏感，H/N <strong>非单调</strong>（⚠️ <strong>第 47 轮的 (2,2,6)/(2,2,8) 数值于第 48 轮更正</strong>；其<strong>主要结论（形状是独立变量、立体格点需 GAP）已由第 48 轮证实</strong>）</h3>
+<ul>
+<li><strong>主题</strong>：第 46 轮自己写下的口径限制「(2,2,L) 是细长格点、不代表 3D」。本轮做<strong>受控对照</strong>：
+  <strong>固定 N=32，只改形状</strong> —— (2,2,8)（细长）vs (2,4,4)（立体）。</li>
+<li><strong>方法（本轮踩坑后的修正）</strong>：第 46 轮的流程是「穷举 C(N,N/2) + 生成元闭包 BFS」，本轮第一版
+  直接在 (2,4,4) 上跑 ⟹ <strong>11 分钟无输出，被迫杀掉</strong>。改为三步：
+  ① <strong>先用 sympy（Schreier–Sims）算 |G| 摸规模</strong> ⟶ ② 判可行性 ⟶
+  ③ <strong>随机采样构型 + 单构型轨道 BFS</strong>（低/高 16 位<strong>分块查表</strong>加速）。</li>
+<li>✅ <strong>结果 A（新发现）：|G| 对形状极度敏感</strong>
+  | 格点 | N | 生成元 | <strong>|G|</strong> | ln|G|/N |
+  |---|---|---|---|---|
+  | (2,2,6) | 24 | 7 | 6.48×10² | 0.2697 |
+  | (2,2,8) | 32 | 7 | <strong>2.048×10³</strong> | 0.2383 |
+  | <strong>(2,4,4)</strong> | <strong>32</strong> | <strong>19</strong> | <strong>2.2015×10¹¹</strong> | <strong>0.8162</strong> |
+  ⟹ <strong>同 N=32，只改形状，|G| 差 8 个数量级</strong> ⟹ 群规模<strong>本身就是形状的函数</strong> ⟹
+  第 46 轮"细长格点不能代表 3D"的担心是<strong>实质性的</strong>，不是口径洁癖。</li>
+<li>❌ <strong>结果 B（修正第 46 轮）：H/N 非单调</strong>
+  | N（(2,2,L) 系列） | 8 | 16 | 24 | 32 |
+  |---|---|---|---|---|
+  | H/N | 0.4679 | 0.4335 | 0.4330 | <strong>0.4614</strong> |
+  <strong>机制</strong>：H/N 由 <code>ln|G|/N</code> 主导 —— 它从 0.2697（L=6）<strong>降到</strong> 0.2383（L=8）⟹ 轨道相对受限
+  ⟹ H/N <strong>回升</strong> ✓ 与实测一致。⟹ 第 46 轮「饱和在 ≈0.433」<strong>修正为「0.43–0.47，非单调」</strong>。
+  （面积律要求的 0.25 仍<strong>未命中</strong>，偏大 ≈ 1.7 倍 ⟹ <strong>第 ① 条（不变读数偏大）仍成立</strong>。）</li>
+<li>⚠️ <strong>结果 C（方法瓶颈，形状对照未完成）</strong>：(2,4,4) 的 |G| = 2.20×10¹¹ 超本轮上限（4×10⁵）
+  ⟹ <strong>立体格点的 H/N 完全未知</strong>。⚠️ 且有一条<strong>不能做的推论</strong>：(2,4,4) 的 ln|G|/N = 0.8162 &gt; ln2，
+  若轨道接近 |G| 则 H/N &lt; 0（不可能）⟹ 其轨道<strong>远小于</strong> |G|（巨大稳定子）⟹
+  <strong>不能从 |G| 推断 H/N，必须算真实轨道。</strong></li>
+<li>✅ <strong>方法自校验</strong>：(2,2,6) 用采样给 <strong>0.4343</strong>，第 46 轮精确值 0.4330 ⟹ 差 <strong>0.0013</strong> ⟹ 采样可信。</li>
+<li>📦 <strong>论文已改（中英同步，6 项 0 失败）</strong>：§4.8 第 46 轮块之后插入【第 47 轮】块，
+  <strong>并修正第 46 轮块的标题与判决 3</strong>（「饱和」→「非单调」）。备份
+  <code>paper/history/*_备份_2026-09-22第47轮前.md</code>。</li>
+<li>产出：<code>outputs/同N32的形状对照_立体格点G爆炸8个数量级且HN非单调.md</code>（+html）、
+  <code>outputs/_orbit_3d32.py</code>（OQ-1…OQ-7，<strong>6 项 0 失败</strong>，运行 14 秒）。</li>
+<li>🔧 <strong>下一步</strong>：<strong>装 GAP</strong>（<code>Stabilizer(G, S, OnSets)</code>）—— 这已是<strong>第三次</strong>把同一件事推到 GAP 前
+  （第 41 轮 set-stabilizer / 第 46 轮 (4,4,4) / 本轮 (2,4,4)）⟹ <strong>应从候选升为必做</strong>。
+  退路的退路：把 BFS 上限提高，但 |G| = 2.2×10¹¹ 意味着轨道也可能 ~10⁹+ ⟹ <strong>提高上限也不够</strong>。</li>
+</ul>
+<h3>第 48 轮：<strong>装上 GAP</strong>，首次算出 H/N 的形状依赖 —— <strong>跨过面积律 0.25</strong>（附一处真错误的更正）</h3>
+<ul>
+<li><strong>主题</strong>：第 47 轮的 🎯「装 GAP 算三维格点的真实轨道」。<strong>已装成并全面验证。</strong></li>
+<li>✅ <strong>GAP 环境</strong>：<strong>GAP 4.16.1</strong> 静默安装在 <code>C:\Program Files\GAP-4.16.1\</code>（安装包 782.5 MB，
+  sha256 与官方<strong>逐位一致</strong>）。<strong>调用方式见「工具」或工程期望候选 24。</strong>
+  ⚠️ 三个坑：① 唯一 Windows 二进制只在 <strong>GitHub Releases</strong>（本机 <code>github.com</code> 被拦）
+  ⟹ 必须走加速镜像（<code>ghfast.top</code> 等）；② 官方 <code>*-core.zip</code> 是<strong>纯源码</strong>（无 exe）；
+  ③ 它是 <strong>Cygwin/MSYS 版</strong> ⟹ 须把 <code>runtime\bin</code> 与 gap 根目录<strong>都</strong>加 PATH，且<strong>不能用 <code>timeout</code> 包</strong>。</li>
+<li>✅ <strong>验证</strong>：<code>Stabilizer(Sym(5),[1,2],OnSets) = 12</code>、<code>Orbit = 10</code>、<code>Stabilizer(Sym(6),[1,2],OnSets) = 48</code>；<ul>
+<li>⚠️ <strong>实用上限（第 49 轮实测）：degree ≈ 216</strong>（(6,6,6) 单次构型 ≈200 s）⟹ (8,8,8) N=512 当前不可行。</li>
+<li>⚠️ <strong>GAP 对超长整数会折行</strong>（|G| 超过约 78 位）⟹ 解析输出时<strong>必须拼接标记之间的数字片段</strong>，
+  不能只按行取 <code>split()[1]</code>（第 49 轮因此报过 <code>list index out of range</code>，曾被误读为超时）。已修于 <code>outputs/_gap.py</code>。</li>
+</ul>
+</li>
+</ul>
+<p>并与 Python 精确轨道 BFS 在 (2,2,6) 上 <strong>8/8 逐位一致</strong>（|G| = 648 两边相同）。
+- ❌ <strong>发现 A（真错误，本轮最重要的负面发现）</strong>：第 41/46/47 轮的化简生成元集把每线的 σ_j 写成
+  <strong><code>coords[i] → coords[(i+2) % L]</code>（全体 +2 的纯平移）</strong>，但正确的 σ_j 是 <strong>偶位 +2、奇位 −2</strong>。
+  两者在 <strong>L ≤ 4 时逐元素相同</strong>（第 41 轮的「化简验证」只在 2×2×2 / 2×2×4 上做过 —— <strong>退化情形</strong>），
+  <strong>L ≥ 6 时群不同</strong>：单线长 6 上两群只共有 2 个元素（|并| = 10）；8 个随机真 tick 里<strong>只有 3 个</strong>
+  落在旧群里 ⟹ 旧群<strong>漏掉 5/8 的真 tick</strong>。
+  <strong>受影响范围</strong>：只有「恰好一个长轴（L ≥ 6）」的细长格点 = <strong>(2,2,6)、(2,2,8)</strong>；
+  (2,2,2)、(2,2,4)、(2,4,4)、(4,4,4)、(6,6,6) <strong>不受影响</strong>。
+  <strong>更正</strong>：(2,2,6) N=24 的 H/N <strong>0.4330 → 0.4510</strong>（精确划分；轨道数 6224 → 6334）；
+  (2,2,8) N=32 <strong>0.4614 → 0.4617</strong>。
+- ✅ <strong>发现 B（正面，本轮实质结论）</strong>：用 GAP 首次算出真三维格点的 H/N（<code>|O| = |G|/|Stab|</code>）：
+  | 格点 | N | L=2 方向数 | <strong>H/N</strong> | 95% 区间 |
+  |---|---|---|---|---|
+  | (2,2,6) | 24 | 2 | 0.4510 | 精确 |
+  | (2,2,8) | 32 | 2 | 0.4617 | 采样 |
+  | (2,2,16) | 64 | 2 | <strong>0.5307</strong> | ±0.0000 |
+  | <strong>(2,4,4)</strong> | <strong>32</strong> | 1 | <strong>0.2834</strong> | ±0.0061 |
+  | <strong>(2,4,8)</strong> | <strong>64</strong> | 1 | <strong>0.1802</strong> | ±0.0034 |
+  | <strong>(4,4,4)</strong> | <strong>64</strong> | 0 | <strong>0.1839</strong> | ±0.0031 |
+  ⟹ <strong>面积律要求的 0.25 被「跨过」</strong>：(2,4,4) = 0.2834 &gt; 0.25 &gt; (4,4,4) = 0.1839。
+- ⚖️ <strong>撤回（重要）</strong>：第 40 轮立、第 46 轮"补强"的判决
+  「<strong>不变读数偏大约 1.75 倍 ⟹ 面积律不成立</strong>」是<strong>细长格点假象</strong> ⟹ 记为 <strong>R-1</strong>。
+  它只对 (2,2,L) 成立；真三维格点偏 <strong>+13%</strong>（(2,4,4)）与 <strong>−26%</strong>（(4,4,4)）。
+- ⚠️ <strong>一个自否</strong>：本轮预判「越各向同性 H/N 越小」<strong>失败</strong> —— (2,4,8) = 0.1802 <strong>&lt;</strong>
+  (4,4,4) = 0.1839。真实判别量是「<strong>长度为 2 的方向有几个</strong>」（L=2 的环只有一种完美匹配
+  ⟹ 该方向<strong>没有相位自由度</strong>）：<strong>≥2 个</strong> ⟹ H/N ∈ [0.4335, 0.5307]；<strong>≤1 个</strong> ⟹ [0.1802, 0.2834]
+  —— <strong>两组完全分离，0.25 落在空隙里</strong>。
+- 📦 <strong>论文已改（中英同步，23 项 0 失败）</strong>：§4.8 的 v2.9 补充链末尾插入【第 48 轮】块；
+  <strong>更正第 46/47 轮的过期数值</strong>；给「偏大 1.75 倍」三处加第 48 轮限定；
+  <strong>并修掉两处积压缺陷</strong> —— 中文版第 41 轮块被粘在第 40 轮块尾同一行（拆分），
+  以及中英各有一句被拆成「断句 + 残片」（补全并删除残片）。
+  备份 <code>paper/history/*_备份_2026-09-22第48轮前.md</code>。
+- 产出：<code>outputs/装上GAP并首次算出HN的形状依赖_跨过面积律.md</code>（+html）、
+  <code>outputs/_gen_fix_48.py</code>、<code>_gen_fix2_48.py</code>、<code>_fix_run_48.py</code>（<strong>6 项 0 失败</strong>）、
+  <code>outputs/_gap_shape_48.py</code>（<strong>8 项 0 失败</strong>，全跑 ≈76 s）、<code>_gap_orbit_48.py</code>。
+- 🔧 <strong>下一步</strong>：① 🎯 <strong>在 N=32/64/128 上补形状，定位 0.25 的跨点</strong>（GAP 让这成为常规计算）；
+  ② <strong>检验「退化方向数」判据</strong>（两个可证伪预判：<strong>(2,6,6) 应像 (2,4,4)</strong>、<strong>(6,6,6) 应像 (4,4,4)</strong>）；
+  ③ 回补第 41 轮曾报的 (2,2,6) / (6,6,6) |G|（数值对，但当时未察觉群错；(6,6,6) 已确认不受影响）。</p>
+<h3>第 49 轮：<strong>定位 0.25 的跨点</strong> —— H/N 随 N 的<strong>两条反向曲线</strong>（附一个工具缺陷的修复）</h3>
+<ul>
+<li><strong>主题</strong>：第 48 轮的 🎯 —— 定位 0.25 的跨点，并检验两条可证伪预判（PA：(2,6,6) 属「≤1 个退化方向」组；
+  PB：(6,6,6) 应与 (4,4,4) 同为 ≈0.1839）。</li>
+<li>✅ <strong>跨点已夹住</strong>：沿 (2,4,L)（1 个 L=2 方向）——
+  <strong>(2,4,4) N=32：0.2834</strong>（偏大）⟶ <strong>(2,4,6) N=48：0.2208</strong>（偏小）⟶ (2,4,8) N=64：0.1802 ⟶
+  <strong>(2,4,10) N=80：0.1571</strong> ⟶ <strong>(2,4,12) N=96：0.1338</strong>。⟹ <strong>0.25 的跨点落在 N ∈ (32, 48)</strong>。
+  ⚠️ <strong>没有格点命中 0.25</strong>（所有 95% 区间都不含）⟹ 只能给<strong>区间</strong>，不能给点。</li>
+<li>✅ <strong>本轮的结构性发现：两组随 N 走向相反</strong>
+  | 组 | 随 N | 数值 |
+  |---|---|---|
+  | <strong>≥2 个 L=2 方向</strong> | <strong>上升</strong>⚠️ | 0.4679（8）⟶ 0.4335（16）⟶ <strong>0.4334</strong>（24；<strong>第 50 轮更正</strong>，原报 0.4510）⟶ <strong>0.4802</strong>（40）⟶ <strong>0.5041</strong>（48）⟶ <strong>0.5170</strong>（56）⟶ 0.5307（64） |
+  | <strong>≤1 个 L=2 方向</strong> | <strong>下降</strong> | 0.2834（32）⟶ 0.2208（48）⟶ 0.1802 / 0.1839（64）⟶ <strong>0.1652</strong>（72）⟶ 0.1571（80）⟶ 0.1338 / 0.1484（96） |
+  ⟹ <strong>第 48 轮的判据要细化</strong>：「L=2 方向的个数」决定<strong>分组</strong>，<strong>组内 H/N 主要由 N 决定</strong>（记为 <strong>C-1</strong>）。</li>
+<li>✅ <strong>预判 PA 成立</strong>：(2,6,6) = <strong>0.1652 ± 0.0042</strong> ⟹ 确属「≤1 个退化方向」组。</li>
+<li>❌ <strong>预判 PB —— 实算后被否证（不是 GAP 失败）</strong>：<strong>(6,6,6) N=216 ⟹ H/N = 0.0779 ± 0.0037</strong>
+  （95% [0.0706, 0.0851]；|G| = 6.176×10²²²，轨道 3.47×10⁵⁶ – 8.86×10⁵⁸；S=6，用时 1318 s）
+  ⟹ 与 (4,4,4) 的 0.1839 相差 <strong>0.1060</strong>。⟹ <strong>教训：预判要在已知全部依赖之后写</strong>，
+  第 48 轮写 PB 时还不知道 N 是主控量。
+  ✅ <strong>副产品</strong>：|G| = 6.176×10²²² 与第 41 轮<strong>逐位一致</strong> ⟹ 交叉验证 (6,6,6) <strong>不受</strong>
+  第 48 轮生成元错误的影响。⚠️ 代价：单次 ≈200 s ⟹ degree ≈ 216 接近 GAP 实用上限。</li>
+<li>✅ <strong>形状仍有小的独立作用</strong>（不完全由 N 决定）：固定 N=96 —— (2,4,12)（1 个退化方向）= 0.1338
+  vs <strong>(4,4,6)（0 个）= 0.1484 ± 0.0053</strong>；|Δ| = 0.0146 &gt; 容差 0.0123 ⟹ <strong>不相容</strong>。</li>
+<li>⚠️ <strong>一个工具缺陷（已修，旧值全部有效）</strong>：(6,6,6) 一度报 <code>list index out of range</code>，
+  曾被误读为"超时"。真因 —— <strong>GAP 对超长整数折行</strong>（|G| 有 223 位）⟹ 「ORDER」行无第二个 token。
+  修法：<code>SetPrintFormattingStatus("*stdout*", false)</code> + 解析器改为<strong>拼接标记之间的数字片段</strong>
+  （<code>_gap._parse_markers</code>）。⚠️ 只有 |G| 超过约 78 位才触发 ⟹ <strong>第 48 轮与本轮数值均未受影响</strong>。</li>
+<li>📦 <strong>论文已改（中英同步 2 项 0 失败）</strong>：§4.8 第 48 轮块之后插入【第 49 轮】块。
+  备份 <code>paper/history/*_备份_2026-09-22第49轮前.md</code>。</li>
+<li>产出：<code>outputs/定位025的跨点_HN随N的两条反向曲线.md</code>、<code>_gap_cross_49.py</code>（GX-1…GX-7）、
+  <code>_diag_nfix.py</code>、<code>_diag666.py</code> / <code>_diag666b.py</code>、<strong><code>_tickgroup.py</code>（生成元模块，后续统一用它）</strong>。</li>
+<li>🔧 <strong>下一步</strong>：① 在 N=32–48 间加密收窄跨点 —— ⚠️ <strong>但 N 只能取 8·a·b·c 型</strong>，
+  32 与 48 之间<strong>没有偶数边长的立方格点</strong> ⟹ 必须换思路（改扫 <strong>k ≠ N/2 的层</strong>，或接受
+  「跨点只在插值意义上存在」）；② 在 N=96 补第三个形状量化「形状修正」；
+  ③ (6,6,6) 单次 ≈200 s ⟹ <strong>性价比低，暂缓</strong>；④ <strong>GAP 实用上限 ≈ degree 216</strong>
+  ⟹ (8,8,8) N=512 当前不可行。</li>
+</ul>
+<h3>讨论纪要 2026-09-23：机翼升力 —— 一条<strong>负面</strong>与一个新开的入口</h3>
+<blockquote>
+<p>触发：用户提出「伯努利解释牵强；本框架下升力来自机翼与空气接触的<strong>间接通量差</strong>」。
+纪要：<code>outputs/机翼升力_伯努利错在哪与框架缺的那一环.md</code>（<strong>不占正式轮次</strong>，无新脚本/数值）。</p>
+</blockquote>
+<ul>
+<li>✅ <strong>前提修正</strong>：错的<strong>不是伯努利</strong>，是教科书里的「<strong>等时通过</strong>」谬误（实测上表面气流先到）。
+  伯努利是<strong>下游计算器</strong>；现代解释 = <strong>环量 Γ + 库塔条件 + 下洗动量通量</strong>（<code>L′ = ρVΓ</code>）。
+  NASA Glenn 原话：<em>"both Bernoulli and Newton are correct"</em>。
+  ⟹ 用户的「间接通量差」<strong>命中了正确的一半</strong>，但那是<strong>标准物理</strong>。</li>
+<li>❌ <strong>N-11（负面）：用衬底「通量差」解释升力 ⟹ 双重计数。</strong>
+  框架的通量通道<strong>已被标定</strong>在引力（通量负压）与电磁（长程通量压力梯度）上；
+  机翼与空气的<strong>接触力本身就是电磁力</strong> ⟹ 机翼造成的通量差<strong>已计入</strong>已知接触力
+  ⟹ 再开一条通道 = 算两遍。<strong>与第 39 轮 N-1（在衬底找压缩因子机制）同类陷阱。</strong>
+  量级另差 10⁹：<code>Φ/c² ≈ 7.0×10⁻¹⁰</code>（地球表面）vs 升力 O(1) 机重。</li>
+<li>🆕 <strong>I-12（难题 ★）：连续极限。</strong> 框架<strong>已有</strong>动理学层（<code>N 事件主方程 → 湮灭型 BBGKY →
+  分子混沌 → 玻尔兹曼方程</code>，定理 B + DSMC），<strong>缺</strong> <code>玻尔兹曼 → 欧拉/纳维-斯托克斯</code>
+  （Chapman–Enskog）。⚠️ <strong>§3.4「连续极限的开放问题」本来就把它列为【待验证】。</strong></li>
+<li>⚠️ <strong>但要点明</strong>：即使补上，框架<strong>只会把升力"还原"为标准流体力学</strong>（环量 + 库塔-茹科夫斯基），
+  <strong>不是给出不同解释</strong>。要对升力说出不同的话，必须给出<strong>相对 Navier–Stokes 的偏离项</strong> ——
+  目前没有（唯一候选尺度 47 μm 已在第 40/43 轮查清：是诸元的哈勃时长输运尺度，不是流体特征长度）。</li>
+</ul>
+<h3>第 50 轮：改扫占据数层 k —— 对称性<strong>严格成立</strong>，并查出第 48 轮一处<strong>口径错误</strong></h3>
+<ul>
+<li><strong>主题</strong>：第 49 轮的 🎯（收窄跨点）。⚠️ 但 N 只能取<strong>偶边长</strong>格点，32 与 48 之间无格点
+  ⟹ 按交接说明的要求「<strong>先想清楚口径再算</strong>」，改<strong>换参数化</strong>（固定 N、扫占据数层 k）。</li>
+<li>✅ <strong>h(k) = h(N−k) 严格成立</strong>：N=8 的 5 对、N=16 的 9 对<strong>逐位相等</strong>（差 = 0）。
+  机制：补集映射 c ↦ ~c 与每个置换群元素对易 ⟹ 轨道大小不变。⟹ 只需扫 k ≤ N/2。</li>
+<li>✅ <strong>k = 1 层有解析值</strong>：H/N = ln2 − lnN/N（群在单点上<strong>可迁</strong>，|O| = N）；
+  N = 8/16/24 三层精确验证（差 &lt; 1e−15）⟹ 这是「h 不只依赖 k/N」的直接原因。</li>
+<li>❌ <strong>预判 ①（H/N 随 k 单调递减）被否证</strong>：N=16 的 k=1 给 0.5199、k=2 给 <strong>0.5285</strong>；
+  N=24 的 k=11 给 0.4328、k=12 给 0.4334 —— <strong>精确值，非噪声</strong>。
+  机制：k=1 层<strong>可迁饱和</strong>，而 k ≥ 2 被 (Z₂)³ 不变量切碎 ⟹ 典型轨道反而变小。</li>
+<li>❌ <strong>预判 ②（0.25 在每个 N 上都被某层穿过）被否证</strong>：min_k H/N = 0.4332 / 0.4292 / 0.4328
+  （N = 8/16/24，<strong>全层精确枚举</strong>）⟹ <strong>小 N 上任何层都够不到 0.25</strong>。</li>
+<li>✅ <strong>h 不只依赖 k/N</strong>（否证「占据分数决定一切」）：同 x = k/N 上跨 N 最大差 <strong>0.0953</strong>（x = 1/8）。</li>
+<li>✅ <strong>k_c/N 随 N 下降</strong>：N=48 的 k_c = 18.10（k_c/N = 0.377）、N=64 的 k_c = 18.48（0.289）
+  ⟹ <strong>k 不提供独立自由度</strong>（整条曲线随 N 下移，交点自然往小 k 走）。</li>
+<li>⚠️ <strong>本轮最重要：查出第 48 轮一处「口径错误」</strong> ——
+  第 40 轮 <code>part_entropy</code> 的定义是<strong>构型等权</strong>（<code>H = lnM − Σ(|O|/M)·ln|O|</code>），
+  而 <code>_fix_run_48.py</code> 用的是<strong>轨道等权</strong>（<code>Σln|O| / #轨道</code>）。两种口径在 N = 8 / 16 / 24 上
+  差 <strong>0.0520 / 0.0318 / 0.0176</strong> ⟹ 第 48 轮报的 <strong>(2,2,6) = 0.4510 正好是 h_orb 那一列</strong>。
+  <strong>正确值 = 0.4334</strong>，而<strong>生成元错误的真实影响只有 0.0004</strong>（0.4330 → 0.4334）⟹
+  第 48 轮那次「更正」报的 0.0176 <strong>全部来自口径</strong>。
+  ✅ GAP 独立复核（随机构型采样，S=40）给 <strong>0.4314 ± 0.0032</strong> ✓。
+  ✅ <strong>未受影响</strong>：第 46 轮的 Python 结果 + 第 47/48/49 轮的<strong>全部 GAP 结果</strong>
+  （随机构型采样本身就是构型等权）。⟹ 记为 <strong>R-2（撤回）</strong> + <strong>C-2（口径规范）</strong>。</li>
+<li>✅ <strong>h_min(N) 的标度律</strong>（9 个 GAP 点，N ∈ [32, 216]，跨 6.75 倍）：<code>C·N^{−2/3}</code> 拟合给
+  <strong>C = 3.01、p = −0.6762</strong>（最大残差 <strong>2.6%</strong>）；留一外推 N = 216：<strong>0.0828</strong> vs 实测 0.0779（+6.3%）。
+  ⚠️ <strong>纯拟合、无机制</strong> ⟹ 入候选池，<strong>不得作证据、不得写进正文</strong>。</li>
+<li>✅ <strong>大 N 上 H/N(k) 无真振荡</strong>：N=48 用 S=30 重扫 k = 12…24，相邻层跳变<strong>全部落在 2σ 内</strong>
+  （0 处超过）⟹ 第 48 轮 S=8 时看到的起伏是采样噪声。</li>
+<li>📦 <strong>论文已改（中英同步 18 项 0 失败）</strong>：更正第 46 / 47 / 48 轮块里的 <strong>6 处数值</strong>（中英各 6）
+  ＋ 插入【第 50 轮】块 ＋ <strong>修掉第 49 轮留下的一处断行残片</strong>（第 48 轮的「下一步」行被第 49 轮块劈成两半，
+  后半截落在块尾且丢了 <code>&gt;</code> 前缀）。备份 <code>paper/history/*_备份_2026-09-23第50轮前.md</code>。</li>
+<li>产出：<code>outputs/扫k层_对称性严格成立且查出一处口径错误.md</code>、<code>_layer_scan_50.py</code>（精确全层）、
+  <code>_layer_gap_50.py</code> / <code>_layer_gap_50b.py</code> / <code>_layer_gap_50c.py</code>、<code>_diag_sigma_50.py</code>、<code>_caliber_50.py</code>。</li>
+<li>🔧 <strong>下一步</strong>：三个「扫参数」方向（<strong>N</strong> / <strong>k</strong> / <strong>形状</strong>）都已扫过，0.25 的命中都只是
+  <strong>曲线穿过</strong>，<strong>无一处给出机制</strong> ⟹ <strong>该转向机制一侧</strong>：检查 B5 的「每 4l_P² 取 1 纳特」
+  是否隐含一个特定的 N 或 k；<strong>若无，则 0.25 与本框架衬底之间根本不存在定量联系</strong>
+  （这是一个可以写清的<strong>负面结论</strong>）。</li>
+</ul>
+<h3>第 51 轮：B5 与衬底的定量联系 —— <strong>是不等式，不是等式</strong>；第 46–50 轮的目标错了</h3>
+<ul>
+<li><strong>主题</strong>：第 50 轮定的 🎯（转向机制一侧）—— 问 B5 的「每 4l_P² 取 1 纳特」是否隐含特定的 N 或 k。
+  本轮<strong>不跑群计算</strong>，纯<strong>引文核对 + 算术 + 方向判据</strong>。</li>
+<li>✅ <strong>🎯 的答案：都没有。</strong> <code>S = A/(4l_P²)</code> 里只含 <strong>A 与 l_P</strong>；<strong>格点总数 N、占据数 k、格点形状全不出现</strong>
+  ⟹ B5 是一条「<strong>面积 → 熵</strong>」的换算率，对格点层面的离散结构<strong>零约束</strong>。</li>
+<li>✅ <strong>B5 真正隐含的量：每格点 0.25 纳特。</strong> 算术：§8.6.8 <strong>格距 = l_P</strong>（⟹ 每面元面积 = l_P²；
+  ⚠️ 定性是<strong>设定</strong> ——「本框架设定的自然选择、非强制推导」）＋ §4.8 <strong>表面 N = A/l_P² 个面元、
+  每 4 面元 1 个相干单元、每单元 1 纳特</strong> ⟹ 单元数 = A/(4l_P²) ⟹ <strong>每面元 1/4 = 0.25 纳特</strong>
+  （= 0.3607 比特）。⟹ <strong>0.25 不是待命中的目标，而是两个设定算出来的输入。</strong></li>
+<li>⚠️ <strong>本轮最重要：判据方向错了 —— 应是不等式 <code>H/N ≤ 0.25</code>。</strong>
+  第 40 轮已证明「观测者的读数<strong>不能</strong>是 tick 不变量」⟹ 观测者用<strong>瞬时</strong>读数，
+  而 tick 不变读数是它的一个函数 ⟹ 不变读数的熵 <strong>≤</strong> 观测者的读数 ⟹ <strong>不等式</strong>。
+  ⟹ 第 46–50 轮找「H/N = 0.25 的跨点」时，隐含假设「观测者读数 = 不变读数」<strong>已被第 40 轮否证</strong>
+  ⟹ <strong>目标错了，不是没找到</strong>（记 <strong>N-13</strong>）。
+  ⟹ 正确读法：0.2834（N=32）<strong>违反</strong>自洽性、0.1839（N=64）<strong>满足</strong>自洽性；<strong>不是</strong>「0.25 被跨过」。</li>
+<li>✅ <strong>宏观自洽性的余量巨大</strong>（用第 50 轮<strong>拟合</strong>标度律 <code>h_min = 3.01·N^{−2/3}</code>，⚠️ 仅作量级）：
+  太阳质量黑洞 N = A/l_P² ≈ <strong>4.20×10⁷⁷</strong> ⟹ H/N ≈ <strong>5.4×10⁻⁵²</strong> 纳特/格点
+  ⟹ 对上限 0.25 的<strong>余量 ≈ 4.7×10⁵⁰ 倍</strong>；10⁶ M☉ 余量 ≈ 4.7×10⁵⁸ 倍。</li>
+<li>✅ <strong>自洽性下界 N_c = 41.8</strong>（对应视界半径 R = 1.82 l_P，<strong>普朗克尺度</strong>）⟹ <strong>凡 N ≥ 42 的视界都自洽</strong>。
+  ⟹ 与第 49 轮的区间 (32, 48) <strong>数值交叉验证 ✓</strong>，但<strong>语义变了</strong>：那是「跨点」，这里是「下界」。</li>
+<li>🆕 <strong>张力 T-9（登记，未裁决）</strong>：观测者的 0.25 纳特与衬底的「H/N → 0」相差 <strong>~50 个数量级</strong>。
+  这<strong>不是矛盾</strong>（不等式允许），但 ⟹ <strong>观测者的 0.25 纳特几乎全部来自 tick 可变的自由度</strong>，
+  衬底的不可分辨性只贡献 ~10⁻⁵² 纳特/格点 ⟹ <strong>观测者的分辨率几乎不受衬底约束</strong>。
+  ⟹ 这正是第 40 轮「三难」与第 45 轮「τ 判否」的<strong>机制层理由</strong>：两者之间<strong>只有一条很松的不等式，没有等式可追</strong>。</li>
+<li>📦 <strong>论文已改（中英同步 8 项 0 失败）</strong>：插入【第 51 轮】块
+  ＋ <strong>更正第 48 / 49 / 50 轮三处的等式口径</strong>（「0.25 被跨过 / 跨点」⟹「违反/满足自洽性」）。
+  备份 <code>paper/history/*_备份_2026-09-23第51轮前.md</code>。</li>
+<li>产出：<code>outputs/B5与衬底的定量联系_是不等式不是等式.md</code>、<code>_b5_link_51.py</code>（B5-1…B5-8，<strong>8 项 0 失败</strong>）。</li>
+<li>🔧 <strong>下一步</strong>：① 不再追 <code>H/N = 0.25</code>（N-13）；② <strong>裁决 T-9</strong> —— 接受「B5 的 0.25 是纯公设、
+  与衬底只有一条松不等式」并写进 §4.8（与第 39 轮「一致性构造」的口径一致）；
+  ③ 便宜项：不完备度比值（1.00→1.63→5.93）用更正后的群重算。</li>
+</ul>
+<h3>第 52 轮：裁决张力 T-9 —— B5 的 0.25 =「<strong>观测钉住的组合</strong> ＋ <strong>无机制的拆分</strong>」</h3>
+<ul>
+<li><strong>主题</strong>：第 51 轮定的 🎯（裁决 T-9）。给出的两个选项是「① 接受 0.25 是纯公设」与
+  「② 给出观测者读数与不变读数的具体关系」。<strong>本轮两个都不采纳</strong>，给出第三个选项。</li>
+<li>⭐ <strong>「每 4l_P² = 1 纳特」不是设定，而是被 Hawking 温度钉住的</strong>（第 25 轮判别式复算）：
+  太阳质量黑洞取 1 纳特给 <strong>6.16865×10⁻⁸ K</strong>、取 1 比特给 <strong>8.89948×10⁻⁸ K</strong>
+  （论文记值 6.16868 / 8.8995，相对差 &lt; 0.1%）；比值 <code>1/ln2 = 1.442695</code> ⟹ 偏差 <strong>+44.27%</strong>
+  <strong>逐位一致</strong> ⟹ <strong>判别式复现 ✓</strong>.</li>
+<li>⚠️ <strong>但观测钉住的是「乘积」，拆不开</strong>：观测量只有一个数 <code>σ = S/A = 0.25 纳特/l_P²</code>。
+  写成 <code>σ = (1 单元 / a 面元) × (b 纳特 / 单元) = b/a</code> ⟹ 观测只约束 <strong>b/a = 0.25</strong>；
+  (a,b) = (4,1) / (2,0.5) / (8,2) / (1,0.25) / (16,4) 给出<strong>完全相同的观测量</strong>
+  ⟹ <strong>没有任何实验能定 a 或 b 单独的值</strong> ⟹ 框架的 a = 4、b = 1 是一次<strong>纯因式分解</strong>。</li>
+<li><strong>「4」的定性</strong>：§4.9 引理 1；第 29 轮已把其标注由「本框架推论」<strong>更正为【本框架设定】</strong>
+  ⟹ <strong>无机制</strong>（本轮沿用，未新证）。</li>
+<li>✅ <strong>裁决</strong>：B5 的 0.25 = ① 被 Hawking 温度<strong>钉住的乘积</strong> ＋ ② <strong>不可观测的因式分解</strong>
+  ＋ ③ 设定（格距 = l_P）⟹ 按第 37 轮四类判定 = <strong>半拟合 / 一致性</strong> ——
+  <strong>不是</strong>真预言，也<strong>不是</strong>纯公设。</li>
+<li>⚠️ <strong>不等式 <code>H/N ≤ 0.25</code> 实际上不可证伪</strong>：形式上 N ≤ 41 违反（N_c = 41.8，如 (2,4,4) 的 0.2834），
+  但那些是<strong>普朗克尺度</strong>格点（R ≈ 1.8 l_P）；真实黑洞（N ≥ 10⁷⁷）余量 ≈ 10⁵⁰
+  ⟹ <strong>不构成对衬底的有效约束</strong> ⟹ T-9 的实质：<strong>B5 的 0.25 与衬底只是松耦合</strong>。</li>
+<li>📌 <strong>没做的</strong>：<code>a = 4</code> 的机制；能<strong>单独</strong>定 a 或 b 的可观测量（<strong>仍然没有</strong>）
+  ⟹ T-9 的第 ② 选项<strong>仍然关闭</strong>。</li>
+<li>📦 <strong>论文已改（中英同步 2 项 0 失败）</strong>：§4.8 第 51 轮块之后插入【第 52 轮】块。
+  备份 <code>paper/history/*_备份_2026-09-23第52轮前.md</code>。</li>
+<li>产出：<code>outputs/裁决T-9_B5的025是观测钉住的组合与无机制的拆分.md</code>、
+  <code>_t9_verdict_52.py</code>（T9-1…T9-8，<strong>9 项 0 失败</strong>）。</li>
+<li>🔧 <strong>下一步（收口）</strong>：这条（B5 ↔ 衬底）链<strong>到此收口</strong>。</li>
+</ul>
+<h3>第 53 轮：S-E5 的 ε 是<strong>能标错置</strong>（FQH 能标下 ≈ O(1)），且 <code>E_c</code> 是<strong>恒等式</strong></h3>
+<ul>
+<li><strong>主题</strong>：按第 52 轮建议<strong>换方向</strong>，接手清单里唯一 ★★★ 且自称「框架独有」的 <strong>S-6（FQH 引力子模 ε 项）</strong>。
+  本轮<strong>不跑数值</strong>，全部是<strong>算术 + 引文核对</strong>（脚本 <code>_se5_eps_53.py</code>，SE-1…SE-8，<strong>7 项 0 失败</strong>）。</li>
+<li>⚠️ <strong>① 能标错置（判为失败）</strong>：S-E5（§5.8 第 804 行 / §9 第 1245 行）写 <code>ε ~ 10⁻²⁰</code>，
+  而那是 <strong>§8.1 的 ε₀ = ε(M_Pl)</strong>。按框架<strong>自己的</strong> <code>ε(E) = ε₀(M_Pl/E)^β</code>：
+  FQH 能标（GaAs 2DEG：ℏω_c = 86–259 meV、E_C = 9.7–16.9 meV、Δ_GMP ≈ 0.6E_C、
+  k_BT@mK = 0.9–4.3 μeV）下 <strong>ε ∈ [0.042, 77]</strong> ⟹ 与 10⁻²⁰ 差 <strong>18–21 个数量级</strong>。
+  而 §8.1 自己写着 <code>ε(1 meV) ~ 1</code> ⟹ <strong>论文内部两处直接冲突</strong>（同一符号、两个能标）。</li>
+<li>⭐ <strong>② <code>E_c</code> 是恒等式，不是【推导】</strong>：把 ε₀ 的定义代入 ⟹
+  <code>E_c = M_Pl·ε₀^{1/β} = 1TeV·ε(1TeV)^{1/β}</code> —— <strong>M_Pl 完全消掉</strong>，= <strong>1.000000 meV 精确</strong>
+  （原记 1.0181 meV 系数值残差 −1.78%）。因 β ≡ ln(η)/ln(1meV/1TeV) 本就是这个等式解出的，
+  「E_c 与暗能量能标 2.3 meV 同量级」= <strong>锚点 2 的重述</strong> ⟹ <strong>循环</strong>；四类判定 = <strong>半拟合</strong>。
+  （<strong>仍成立</strong>：meV <strong>量级</strong>。）</li>
+<li>⚠️ <strong>③ <code>Γ_flux</code> 至今无表达式 ⟹ 不可识别</strong>：<code>Γ_flux</code> 在全文只出现 <strong>2 次</strong>、都在同一预言句，
+  <strong>没有任何表达式</strong>；而观测量是<strong>一个实数</strong>（线宽 Γ）⟹ 未知量 &gt; 方程
+  （与第 45 轮公设上移、第 52 轮不可识别拆分<strong>同源，第四次</strong>）。</li>
+<li>⚠️ <strong>④ 两难</strong>：标准侧<strong>已有</strong>引力子模内在衰减率的机制与提取（GMP 1970s → Haldane 2016 几何理论 →
+  Liang et al., Nature 628, 78 (2024) → Balram et al., PRL 133, 246605 (2024) 分裂 →
+  Du, arXiv:2509.04408 (2025) 有效场论 → IOP Rep. Prog. Phys. (2025) 提取 decay rate，
+  机制 = 衰变进<strong>双磁旋子连续谱</strong>）。若 ε = O(1)，则「框架独有、标准无此项」与「与实验一致」
+  <strong>只能取一</strong>。</li>
+<li>📌 <strong>附带</strong>：ε₀ 原有<strong>四个写法</strong>（7.6 / 7.7 / 7.67 / 7.751 ×10⁻²⁰，跨度 2%），本轮统一为 <strong>7.731×10⁻²⁰</strong>。</li>
+<li>✅ <strong>判决</strong>：S-E5 的 <code>ε ~ 10⁻²⁰</code> = <strong>失败</strong>；<code>E_c</code> 的【推导】标注 = <strong>半拟合</strong>；
+  可检验性 = <strong>不可识别</strong>；「框架独有」= <strong>未成立</strong> ⟹ <strong>S-6 由 ★★★ 降为 ★</strong>，
+  清单里「唯一 ★★★ 且独有」的说法<strong>作废</strong>；<strong>清单里已无 ★★★ 的工程项</strong>。</li>
+<li>📦 <strong>论文已改（中英同步 12 项 0 失败）</strong>：§8.1（ε₀ 口径统一 + <code>E_c</code> 恒等式更正框 + 第 53 轮块）、
+  §5.8 S-E5 预言句、§9 S-E5 表行、摘要预言清单（降调）；
+  备份 <code>paper/history/*_备份_2026-09-23第53轮前.md</code>。
+  顺带修掉中文版<strong>两处块粘连</strong>与<strong>一处字面 <code>\n\n</code> 残留</strong>（历史积压）。</li>
+<li>产出：<code>outputs/S-E5的epsilon是能标错置_Γflux无定义且E_c是恒等式.md</code>、<code>_se5_eps_53.py</code>。</li>
+<li>🔧 <strong>下一步</strong>：见 §七（🎯 = 裁决 T-11：给 <code>Γ_flux</code> 表达式，还是降调；以及<strong>重选 ★★★ 项</strong>）。</li>
+</ul>
+<h3>第 54 轮：裁决 T-11 —— <code>Γ_flux</code> <strong>不可能被定义</strong>（五条独立理由，两条<strong>结构性</strong>）</h3>
+<ul>
+<li><strong>主题</strong>：走完第 53 轮留下的 🎯「<strong>给 <code>Γ_flux</code> 一个表达式</strong>」（S-E5 唯一可能的复活路径）。
+  做法不是臆造表达式，而是先问「<strong>框架手上到底有什么</strong>能充当 <code>Γ_flux</code>」。
+  本轮不跑数值（全部引文核对 + 算术）：脚本 <code>_t11_verdict_54.py</code>，T11-1…T11-7，<strong>7 项 0 失败</strong>。</li>
+<li><strong>R1 无定义</strong>：全文「衰减率」5 处<strong>全部</strong>是 S-E5 那一句（+ 第 53 轮纠正块）、「<strong>寿命」0 处</strong>
+  ⟹ 框架的数值体系里<strong>没有任何衰减率或寿命的实例</strong>（它算的都是能谱 / 能隙 / 简并 / 序参量 / χ / 熵 / 指数）
+  ⟹ 给 <code>Γ_flux</code> 不是「补一个表达式」，而是<strong>从零建立一套衰减率计算</strong>。</li>
+<li><strong>R2 ⭐ 无手性（结构性）</strong>：两处弦网哈密顿量 <code>H_F = −JΣA_v − KΣB_p</code> 与 <code>H(λ) = −ΣA_cube − λΣX_face</code>
+  的算符<strong>全是实算子</strong>（<code>A_c = Π_{f∈∂c} Z_f</code>、<code>X_face</code>）⟹ <strong>H 实对称 ⟹ 时间反演不变 ⟹ 无手性</strong>。
+  而 FQH 引力子模的<strong>手性是实测量</strong>（Liang et al., <strong>Nature 628, 78 (2024)</strong>：圆偏振 Raman 区分 spin ±2），
+  标准侧的手性来自 FQH 的<strong>陈–西蒙斯项</strong> ⟹ 弦网模态与 FQH 引力子模<strong>不同类</strong>。</li>
+<li><strong>R3 不判别</strong>：§5.8 v1.29 <strong>自己</strong>写着「<strong>自旋 2 是任何二阶张量涨落模态的几何必然</strong>」
+  ⟹ 「自旋 2」<strong>不是判别特征</strong>；而「自旋 2 三层论证」的<strong>唯一共同点</strong>正是它 ⟹ <strong>依据不成立</strong>。</li>
+<li><strong>R4 ⭐ 差 10³⁰（结构性）</strong>：框架自己的耦合 <code>J = n_G·E_P·g</code>、<code>K = m_G·E_P·g</code>，且 §10.2 #11 写明
+  「<strong>绝对尺度普朗克标度</strong>」⟹ 弦网 <code>Δ±2 = 0.49 J ≈ 1.79×10³¹ meV</code> vs FQH <code>Δ_GMP ≈ 8.26 meV</code>
+  ⟹ <strong>量级比 2.17×10³⁰</strong> ⟹ 两者<strong>不在同一个物理尺度</strong>，除非有 ~10⁻³⁰ 的压制因子（<strong>框架没有给</strong>）。</li>
+<li><strong>R5 不可识别</strong>：接两个层次需 <strong>2 个换算因子</strong>（<code>l_P → l_B</code>、<code>E_P → E_C</code>）；由 FQH 提供 ⟹ <strong>postdiction</strong>，
+  不提供 ⟹ <strong>未知量 &gt; 方程</strong>。与第 45 / 52 / 53 轮<strong>同源，第五次</strong>。</li>
+<li><strong>附带</strong>：即使接上了也<strong>无判别力</strong> —— 弦网 <code>Δ±2/J = 0.49</code>（尺寸无关）vs 标准 <code>Δ_GMP/E_C ≈ 0.5–0.7</code>，
+  O(1) 接近 ⟹ 按本项目铁律<strong>不得作证据</strong>；且 <code>0.49</code> 是 Lanczos 数值输出、<strong>无机制</strong>。</li>
+<li>✅ <strong>裁决</strong>：<strong>T-11 = ②「降调」</strong>；<strong>S-E5 正式结项</strong>。终态定位 =
+  「<strong>方向性主张、无定量，且「FQH 引力子模 = 框架弦网模态」这一等同的依据不成立</strong>」。
+  <code>Γ_flux</code> <strong>不再需要继续寻找</strong>。</li>
+<li>🆕 <strong>N-15（负面）</strong>：<strong>用「自旋 2」做跨系统等同</strong> ⟹ 排除（该特征不判别）。
+  一般教训：<strong>用「自旋/对称性类型」做跨系统等同时，先问「这个特征排除了什么」</strong> —— 排除不了的就不是依据。</li>
+<li>📦 <strong>论文已改（中英同步 8 项 0 失败）</strong>：§5.8（三层论证就地加「依据不成立」标注 + 插入第 54 轮块）、
+  §9 S-E5 表行（→ 结项态）、摘要预言清单；备份 <code>paper/history/*_备份_2026-09-23第54轮前.md</code>。</li>
+<li>产出：<code>outputs/裁决T-11_Γflux不可能被定义_五条独立理由.md</code>、<code>_t11_verdict_54.py</code>。</li>
+<li>🔧 <strong>下一步</strong>：见 §七（🎯 = 重选方向；★★★ 只剩 S-12 平坦性）。</li>
+</ul>
+<h3>第 55 轮：战略转向审查 —— 「电池能量密度」能否由本框架支撑？（<strong>结论：框架不覆盖</strong>）</h3>
+<ul>
+<li><strong>起因</strong>：用户提出战略判断 —— <strong>在超导之前应解决电池能量密度</strong>，需要一个「能量方程式」，
+  从底层原理出发增加储能密度，<strong>此后推演都以这个为目标</strong>。</li>
+<li><strong>本轮的职责不是开工，而是先检验这个判断在本框架内站不站得住</strong>（脚本 <code>_battery_55.py</code>，
+  BT-1…BT-8，<strong>8 项 0 失败</strong>；不跑数值，全部引文核对 + 算术）。</li>
+<li>⛔ <strong>① 直接路径（化学储能）：零内容</strong> —— 全文检索「电池 / 储能 / 电化学 / 锂 / 电极 /
+  化学能 / 化学键 / 分子轨道 / 电解液」<strong>各 0 处</strong>（「能量密度」1 处 = <strong>暗</strong>能量密度；
+  「原子」1 处 = <strong>冷</strong>原子）。与第 44/53 轮审查超导<strong>完全同类</strong>。</li>
+<li>⭐ <strong>② 给用户的实质信息（本项真正的价值）：电池能量密度的真实天花板</strong>
+  —— 化学储能的上限 = <strong>化学键能 ~ 数 eV/原子</strong>：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>介质</th>
+<th>Wh/kg</th>
+<th>相对化学</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>锂离子（实际商品）</td>
+<td>250</td>
+<td>—</td>
+</tr>
+<tr>
+<td>锂硫（理论）</td>
+<td>2 600</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>锂氧 Li–O₂（理论天花板）</strong></td>
+<td><strong>3 500</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>汽油</td>
+<td>12 000</td>
+<td>—</td>
+</tr>
+<tr>
+<td>铀-235（裂变）</td>
+<td><strong>6.7×10⁹</strong></td>
+<td><strong>×2.6×10⁶</strong></td>
+</tr>
+<tr>
+<td>质能 E=mc²</td>
+<td><strong>2.5×10¹⁰</strong></td>
+<td><strong>×2.8×10⁹</strong></td>
+</tr>
+</tbody>
+</table>
+<p>（复核：<code>2Li + O₂ → Li₂O₂</code>，5.92 eV / 45.9 u = <strong>3458 Wh/kg</strong> ✓ 与文献 3500 一致。）
+  ⟹ <strong>量级突破只能来自核或质能，而那不属于化学/材料学</strong>；化学路径的提升靠 <strong>DFT + 实验筛选</strong>（成熟领域）。
+- ⛔ <strong>③ 框架唯一的「独有出口」= 跨支 ER 通道 —— 被框架自己关掉了</strong>（三条独立障碍）：
+  · 框架自己的能量条件：<code>P(ρ) = P_P·tanh(ρ/ρ_P)</code> ⟹ <code>P ≤ ρc²</code>、<code>∂P/∂ρ ≥ 0</code>、<strong>ρ ≥ 0</strong>
+    ⟹ 框架有<strong>负压</strong>（引力机制正是「通量负压差」）但<strong>无负能量密度</strong>（两者不是同一个量）；
+  · 可穿越虫洞（Morris–Thorne 1988）要求<strong>违反 ANEC</strong>（喉部 <code>ρ+P&lt;0</code>）⟹ 与上一条冲突；
+  · 即使允许 ANEC 违反，<strong>量子不等式</strong> <code>ΔE·Δt ≲ ℏ</code> ⟹ Δt = 1 s 时 <code>ΔE ≤ 1.06×10⁻³⁴ J</code>，
+    <strong>比室温热能（4.1×10⁻²¹ J）还小 14 个数量级</strong> ⟹ 不能驱动任何宏观做功。
+  ⟹ 跨支通道<strong>只能载信息</strong>（第 640 行原文即如此）。
+- ✅ <strong>判决</strong>：三条路径（化学储能 / 跨支通道 / 核与质能）<strong>全部判否</strong>；且<strong>每一条都要跨 ≥10 个数量级</strong>
+  ⟹ <strong>第六次同源病</strong>（前五次：第 39 / 51 / 52 / 53 / 54 轮）。
+- ⭐ <strong>框架能给「储能」的只有 Landauer 代价</strong>：<code>k_BT ln2</code> = <strong>0.0179 eV/bit @300 K</strong>
+  （77 K：0.0046；4 K：0.00024）—— 但那是<strong>操作代价</strong>（改一次信息花多少），
+  <strong>不是存储容量</strong>（存得住多少）—— <strong>不同轴</strong>。⟹ <strong>框架没有任何与「储能容量」同轴的量。</strong>
+- 📦 <strong>论文已改（中英同步 2 项 0 失败）</strong>：在 §4.10 引理 B 之后加<strong>显式边界块</strong> ——
+  <strong>跨支通道的用途限于「信息」，不含「能量」</strong>（防止日后被误用为能量/物质通路）；
+  备份 <code>paper/history/*_备份_2026-09-23第55轮前.md</code>。
+- 产出：<code>outputs/战略审查_电池能量密度能否由框架支撑.md</code>、<code>_battery_55.py</code>。
+- 🔧 <strong>下一步</strong>：见 §七。<strong>建议先做「可判定版」</strong>：问「框架能不能定义一个与储能容量同轴的量」
+  （一轮，便宜），而不是先研究某种电池材料。</p>
+<h3>第 56 轮：框架能否定义一个与「储能容量」同轴的量？—— <strong>能，但只有 f = O(1) 一档</strong></h3>
+<ul>
+<li><strong>主题</strong>：第 55 轮留下的<strong>唯一可判定问题</strong>（候选池 38）。本轮全部是<strong>引文核对 + 算术 + 代数消元</strong>
+  （脚本 <code>_storage_axis_56.py</code>，SA-1…SA-12，<strong>11 项 0 失败</strong>）。</li>
+<li><strong>判据（本轮自拟，写进备忘录）</strong>：储能容量 Q ≡ ΔE/M 要同轴，须满足 ① 双因子（ΔE 与 M 各自可算）
+  ② <strong>束缚–解离差</strong>（ΔE 必须是<strong>两个态之差</strong>）③ 记账单元对偶 ④ 可释放性 ⑤ 可逆性。
+  并锚定在 <strong>f ≡ Q/c² = ΔE_bind/(m_unit·c²)</strong>（<strong>可释放质量份额</strong>）：
+  Li–O₂ <strong>1.385×10⁻¹⁰</strong>、汽油 4.807×10⁻¹⁰、U-235 完全裂变 <strong>9.135×10⁻⁴</strong>、质能 <strong>1.000</strong>。
+  口径核对：Li–O₂ 按 <code>2Li + O₂ → Li₂O₂</code> 折合 <strong>1.4798 eV/原子</strong>，与 <code>5.92 eV / 4</code> <strong>逐位一致</strong> ✓</li>
+<li>✅ <strong>能定义三个</strong>：
+  ① <code>Q_BH = T·S/M = c²/2</code> —— sympy 符号消元 <code>T·S = M c²/2</code>（M_Pl 全消）；
+     太阳质量黑洞 <code>S/k_B = 1.049430×10⁷⁷</code>、<code>TS/(Mc²) = 0.500000000</code>
+     ⟹ <strong>4.4938×10¹⁶ J/kg = 1.2483×10¹³ Wh/kg</strong>。<strong>同轴、换算因子 0</strong> ——
+     但是<strong>标准结果</strong>（黑洞热力学的可逆过程效率），<strong>非框架独有</strong>，且只给 f = 0.5；
+  ② <code>Q_tube ≡ c²</code>（§5.7「禁闭 = 通量管线性势」，<code>σ</code>/<code>d</code>/<code>g</code>/<code>n_G</code> <strong>全部消掉</strong>）
+     —— <strong>恒等式，零内容</strong>（第 53 轮 C-4 判据）；
+  ③ <code>Q_res = E(R)/m_unit</code>（§4.6 F2 降标 <code>E(R) = √(ℏc·E_P/R)</code>）：R = l_P 给 E_P（自洽 ✓）、
+     <strong>R = 0.15 nm 给 4.0 PeV</strong>、R = R_H 给 4.19 meV、<strong>要 1 eV 需 R = 78.06 kpc</strong>
+     —— 它是<strong>粗粒化截断能标</strong>，不是束缚能。</li>
+<li>⭐ <strong>结构性障碍（本轮主要发现）</strong>：<strong>框架有 4 个哈密顿量，却没有一个势函数</strong> ——
+  「势能 / 结合能 / 相互作用势 / 解离 / 化学键 / 键能 / 内能 / 自由能」<strong>各 0 处</strong>、
+  带径向形式的 <strong>V(r)/U(r) 0 处</strong>，而「哈密顿」<strong>17 处</strong>；且 4 者<strong>全是「整体能量标尺」</strong>
+  （<code>H_event = Σp²/2m + ΣV_contact</code> 的 <code>V_contact</code> 无函数形式；<code>H_F</code>/<code>H(λ)</code> 的 J = n_G·E_P·g 是普朗克标度；
+  Lindblad 层能尺未给）。⟹ <strong>无第二个态 ⟹ 无 ΔE_bind ⟹ 无 f ⟹ 储能容量无从定义。</strong>
+  缺口<strong>不对称</strong>：f 需两档能标 —— <strong>束缚能档（1 eV–1 keV）0/6</strong>（最近的 E_c 仍差 3.0 个数量级）、
+  <strong>质量档（1 GeV–1 TeV）1/6</strong>（η 能标，<strong>但是配出来的</strong>）。</li>
+<li><strong>精确化表述</strong>：<code>Q = Σ(info) × T_eff</code> ⟹ 框架<strong>强在 Σ 侧</strong>（0.25 纳特/l_P²、熵面积律、轨道数、
+  压缩因子 —— 纯计数）、<strong>T_eff 侧只有两端</strong>（E_P ↔ meV）⟹ 第 55 轮说的「不同轴」
+  <strong>精确化为「轴差恰好是一个能标」</strong>。量化：B5 给 0.3607 比特/面元、室温 Landauer = 0.0179 eV/比特，
+  而 Li–O₂ 是 1.480 eV/原子 ⟹ 反向标定需 <strong>T = 24 775 K</strong>（室温的 82.6 倍）<strong>＋「每单元比特数」</strong>
+  ⟹ <strong>两个外部输入、零预言力</strong>。</li>
+<li><strong>去重复计数（C-6）</strong>：F2 降标 @ R_H = <strong>4.19 meV</strong>，而标准物理的暗能量能标量级估算
+  <code>√(M_Pl H₀)</code> = <strong>4.17 meV</strong> —— <strong>同一个组合</strong> ⟹ 与锚点 2 是<strong>同一件事</strong>，不计为两条成果
+  （量级比较，4 倍内；且 <code>E_c</code> 本身是恒等式 C-4）。</li>
+<li><strong>判决</strong>：<strong>能，但有条件的「能」</strong>。四类判定：P3 = <strong>postdiction</strong>（标准结果）、
+  P4 = <strong>恒等式</strong>（零内容）、P5（B5×Landauer）/ P6（降标）= <strong>失败</strong>（各需 2 个外部换算因子）。
+  框架的<strong>全部</strong>能量机制（湮灭-再生、通量管、黑洞热力学）<strong>都是 f = O(1)</strong>
+  ⟹ <strong>没有 f ≪ 1（「部分可释放」）的机制</strong> ⟹ 建议 <strong>S-13 = 「框架不覆盖储能」</strong>。</li>
+<li>📦 <strong>论文已改（中英同步 2 项 0 失败）</strong>：§4.6「命题 6」之后插入【第 56 轮】块；
+  备份 <code>paper/history/*_备份_2026-09-24第56轮前.md</code>。</li>
+<li>产出：<code>outputs/框架能否定义与储能容量同轴的量.md</code>、<code>_storage_axis_56.py</code>、<code>_patch_storage_axis_56.py</code>、
+  <code>_patch_clist_56.py</code>。</li>
+<li>🔧 <strong>下一步</strong>：见 §七。<strong>储能方向建议就此收口</strong> —— 两轮两次判否，第二次是从<strong>结构层</strong>。</li>
+</ul>
+<h3>讨论纪要 2026-09-24：人造微观反应腔 —— <strong>绕过卡诺是真的，不放热是假的</strong></h3>
+<ul>
+<li><strong>起因</strong>：用户直觉 —— 造「人造微观反应腔」（芯片式），让汽油分子与 O₂ 在腔体内反应，
+  <strong>直接生成电子而非热量</strong>，效率应该很高。</li>
+<li><strong>核验</strong>（脚本 <code>_disc_microreactor.py</code>，MR-1…MR-8，<strong>8 项 0 失败</strong>；全部是标准热力学/电化学算术）：</li>
+<li>✅ <strong>直觉命中的是燃料电池</strong>（成熟技术）。<code>η_max = ΔG/ΔH</code>（<strong>不受卡诺限制</strong>，因为不经热机）：
+  <strong>0.830</strong>（H₂）／<strong>0.919</strong>（CH₄）／<strong>0.967</strong>（CH₃OH）／<strong>0.968</strong>（C₈H₁₈，ΔH = −5470.6、ΔG = −5296.3 kJ/mol）。</li>
+<li>❌ <strong>「不」放热做不到</strong>：<code>ΔG = ΔH − TΔS</code>，<code>TΔS</code> 必然是热 ——
+  辛烷 <strong>3.2%</strong>、甲醇 3.3%、甲烷 8.1%、氢 <strong>17.0%</strong>。这是第二定律的直接后果，不是技术问题。</li>
+<li>❌ <strong>「能量密度突破」是记错了轴</strong>：那是第 55/56 轮的<strong>存储密度</strong>（<code>f = Q/c²</code>，由<strong>化学键</strong>决定），
+  <strong>换转换方式完全改不了</strong>。效率提升只有 <strong>×1.83</strong>（燃料侧 3 942 → 7 226 Wh/kg），
+  且<strong>系统级被吃掉大半</strong>（氢车含 700 bar 罐仅 1 500–2 000 Wh/kg）。</li>
+<li>⚠️ <strong>汽油燃料电池的真实障碍</strong>：<strong>50 个电子转移</strong>（要断 C–C×7）⟹ 无商用直接燃料电池，
+  只有 SOFC 在 <strong>700–1000 °C</strong>。瓶颈是多步串联 + C–C 断裂 ⟹ <strong>反应路径问题，不是制造精度问题</strong>。</li>
+<li>⚠️ <strong>芯片类比不成立</strong>：芯片靠<strong>几何精度</strong>（光刻），反应腔靠<strong>化学选择性</strong>
+  （自组装／ALD／配体设计／酶模拟）；且<strong>不是越小越好</strong>（太小 ⟹ 传质受限、水管理困难）。</li>
+<li>⚖️ <strong>一个漂亮的反直觉</strong>：碳氢燃料的理论电化学效率（92–97%）<strong>比氢（83%）更高</strong>（熵项更小），
+  而<strong>实际</strong>恰相反（氢 PEMFC 最成熟）⟹ 差在<strong>动力学</strong>不在热力学。
+  另：四种燃料的每电子理论电压全在 <strong>1.0–1.2 V</strong>（C–O/H–O 成键的化学普适性）。</li>
+<li><strong>框架侧</strong>：三步审查全否，且<strong>比储能更远</strong>（无势函数 ⟹ 无「反应路径」概念）
+  ⟹ 登记 <strong>N-19</strong>，并作为 <strong>I-14「单谱量特征」的第二例证</strong>。</li>
+<li>产出：<code>outputs/讨论纪要_人造微观反应腔_绕过卡诺与记错的轴.md</code>、<code>_disc_microreactor.py</code>。</li>
+<li>🔧 <strong>最易复发的混淆</strong>：<strong>效率（轴 B，转换器决定）≠ 密度（轴 A，化学键决定）</strong>。</li>
+</ul>
+<h3>讨论纪要 2026-09-26：参与与运气 —— <strong>框架外条目</strong>（对推演无直接影响，仅留痕）</h3>
+<ul>
+<li><strong>起因</strong>：用户问 ① 量子力学是否真的存在；② 「我参与了就遇到意料之外的坏结果，
+  没参与就是预料之中的正确结果」，是不是「我的波形陷入了重合」？</li>
+<li><strong>核验</strong>（脚本 <code>_disc_luck.py</code>，LK-1…LK-7，<strong>7 项 0 失败</strong>）：</li>
+<li>① ❌ <strong>「波形重合」物理上不成立</strong>：用 Joos–Zeh 对 1 μm 尘埃的估算（τ_D ≈ 10⁻¹⁷ s）
+  按 τ_D ∝ 1/a² 标到人体（a ≈ 1 m）⟹ <strong>τ_D ≈ 10⁻²⁹ s</strong>，<strong>比神经信号（~10⁻³ s）快 10²⁶ 倍</strong>。
+  且量子力学的「测量」= <strong>任何物理相互作用</strong>，<strong>不含意识</strong>（最大通俗误读）。
+  三种解读（干涉/坍缩/纠缠）逐一不适用。</li>
+<li>② ✅⚠️ <strong>但「参与 ⟹ 更差」统计上可能是真的</strong>：行为金融学几十万样本 ——
+  Barber &amp; Odean 2000（66 465 账户）：交易最活跃的 20% 年化净收益比市场<strong>低约 6.5 个百分点</strong>；
+  Barber/Lee/Liu/Odean 2009：中国台湾散户交易损失约占 <strong>GDP 2%</strong>。
+  ⟹ 机制是<strong>过度自信 + 交易成本 + 处置效应</strong> ⟹ <strong>可改</strong>（好消息）。</li>
+<li>③ ⭐ <strong>方法论价值（对框架有印证）</strong>：用户的措辞「<strong>意料之外</strong>不好」vs「<strong>预料之中</strong>正确」
+  暴露了「意外」的定义<strong>依赖「是否参与」</strong> ⟹ <strong>是重言式，不是发现</strong> ——
+  与第 53 轮 <strong>C-4</strong>（<code>E_c</code> 是恒等式）、第 51 轮 <strong>N-13</strong>（<code>H/N ≤ 0.25</code> 是定义）
+  <strong>同一种病，第三次出现</strong>。四象限分析：<strong>只有「参与 + 坏结果」这一格被系统性记住</strong>。</li>
+<li>⚠️ 现有"证据"有<strong>三重不可修复缺陷</strong>：无基线 / 样本事后挑选 / 结果主观编码
+  ⟹ p 值无意义。按两比例检验算术：检测中等效应（0.60 vs 0.50）<strong>每组需 ~390 次</strong>，
+  凭记忆需 8–20 年 ⟹ <strong>凭记忆永远不够（算术问题，非智商问题）</strong>。</li>
+<li>✅ <strong>交付</strong>：一个<strong>一个月可执行</strong>的检验方案 —— 事前记录、<strong>不参与也要记</strong>、事后算两组命中率。</li>
+<li>产出：<code>outputs/讨论纪要_参与与运气_不是量子叠加是可检验的偏差.md</code>、<code>_disc_luck.py</code>。</li>
+<li>⚠️ <strong>本条计入清单的「框架外」栏，不计入总账。</strong></li>
+</ul>
+<h3>第 57 轮：框架是否决定论？—— <strong>底层确定（给定 tick），但 tick 是外生随机；且新登记张力 T-12</strong></h3>
+<ul>
+<li><strong>主题</strong>：用户的推理链 —— ① 量子效应在框架里是否成立？② 框架成立 ⟹ 宇宙决定论（初始状态决定一切）？
+  ③ 初态之后生成 <strong>everything</strong>（所有可能都是可能的）？</li>
+<li><strong>核验</strong>（脚本 <code>_determinism_57.py</code>，DF-1…DF-12，<strong>11 项 0 失败</strong>）：词条清点 + 已有结论汇编 + 一次小规模数值。</li>
+<li>⭐ <strong>词条清点（本轮最重要的检索发现）</strong>：全文「决定论 / 非决定 / determinism」<strong>各 0 处</strong>，
+  「幺正 / 酉 / 多世界 / 退相干 / 纯态 / 混合态 / 波函数坍缩」<strong>各 0 处</strong> ⟹
+  <strong>框架从未讨论过是否决定论，也没有量子态层</strong>。它的底层是<strong>经典构型空间 + 置换群</strong>，
+  再加一个<strong>公设级的非交换化</strong>（§7.1「框架<strong>必须</strong>非交换化」）。</li>
+<li>✅ <strong>框架的精确结构</strong>：单 tick = 置换 ⟹ <strong>双射、可逆、信息严格守恒、无熵产生</strong>
+  （数值：2^16 = 65536 个构型，施加生成元后像集大小不变 ✓）。
+  <strong>给定 tick 序列，演化是决定论的</strong>；而 <strong>tick 序列本身是外部输入</strong>（不在状态里）。
+  ⟹ 精确版本：「<strong>初态 ＋ 全部 tick 序列</strong>」才决定一切 —— <strong>不是初始状态单独</strong>。</li>
+<li>⭐ <strong>T-12（新张力）</strong>：§7.4 写着「定位是 <strong>'t Hooft 元胞自动机式</strong>：<strong>底层确定事件流</strong>」，
+  而 §8.6.7(c) 要求 tick「<strong>必须随机化两件事</strong>：轴随机、相位随机」，第 42 轮把工作表述定为 <strong>H1</strong>
+  （「不可预测：未来不是当前状态的函数」）⟹ <strong>H1 与「底层确定」字面冲突</strong>（只有 H2 才符合 §7.4）。
+  而 H1/H2 已被第 42–44 轮证明<strong>不可判定</strong> ⟹ <strong>框架无法验证自己的自我定位</strong>。
+  ⟹ 需<strong>显式裁决</strong>（最省的做法：把「底层确定」改成「<strong>给定 tick 序列后确定</strong>」）。</li>
+<li><strong>「everything」的四读</strong>：① 多历史 ❌（tick 是「选<strong>一个</strong>轴 + 每线选<strong>一个</strong>相位」⟹ 单分支）；
+  ② 状态空间 ✅（2^N / C(N,k)）；③ 轨迹覆盖 ❌（tick 群<strong>非遍历</strong>）；
+  ④ 轨道内等权 ✅（均匀分布 = 每条轨道上<strong>唯一不变测度</strong>，数值验证 ✓）。
+  <strong>③ 的覆盖率</strong>（同层，k = N/2）：<strong>(2,2,2) 7.14% ⟹ (2,2,4) 0.395% ⟹ (2,2,6) 0.0158%</strong>
+  ⟹ <strong>N 越大越远离 everything</strong>（N 从 8 到 24，降 450 倍）。
+  <strong>交叉验证</strong>：全构型空间 2^N 的轨道分解 <strong>46 / 1357</strong> 与第 40 轮<strong>逐项一致 ✓</strong>。</li>
+<li>✅ <strong>对用户推理链的更正</strong>：① <strong>推不出</strong>（框架兼容 H1/H2 ⟹ <strong>不判决</strong>；但工作表述是 H1）；
+  ② <strong>不成立</strong>（状态里不含 tick 序列）；③ <strong>半成立</strong>（状态空间 ✓ / 轨迹覆盖 ✗）；
+  ④ 「所有可能都是可能的」✅ 但<strong>平凡</strong>（是状态空间的定义，不蕴含「都会发生」）。
+  ⚠️ 附带：第 43 轮已把口径改写为「熵增源头 = <strong>无知</strong>」⟹ <strong>熵增不需要真随机</strong>
+  ⟹ <strong>H2（决定论）下框架照样工作</strong> ⟹ <strong>决定论与框架不冲突</strong>。</li>
+<li>📦 <strong>论文已改（中英同步 2 项 0 失败）</strong>：§7.4「定位澄清」之后插入【第 57 轮】块；
+  备份 <code>paper/history/*_备份_2026-09-26第57轮前.md</code>。</li>
+<li>产出：<code>outputs/框架是否决定论的_底层确定与everything的两读.md</code>、<code>_determinism_57.py</code>、
+  <code>_patch_determinism_57.py</code>、<code>_patch_clist_57.py</code>、<code>_patch_handoff_57.py</code>。</li>
+<li>🔧 <strong>下一步</strong>：见 §七。<strong>裁决 T-12 很便宜</strong>（一次措辞对齐）。</li>
+</ul>
+<h3>讨论纪要 2026-09-26b：运气好坏与熵 —— <strong>麦克斯韦妖的代价</strong>（<strong>无新增条目</strong>）</h3>
+<ul>
+<li><strong>起因</strong>：用户的论证 —— 「运气好坏 = 事物是否自发走向有序 ⟹ 坏运气恒定；好运是事物<strong>在我手上</strong>
+  走向有序；<strong>不能奢望它自然发生</strong>；必须经过<strong>我这个拉普拉斯妖</strong>的转换，使<strong>部分有序、部分无序</strong>」。</li>
+<li><strong>核验</strong>（脚本 <code>_maxwell_58.py</code>，MX-1…MX-10，<strong>9 项 0 失败</strong>）：标准热力学算术 + 框架引文合流。</li>
+<li>✅ <strong>论证方向全对</strong>，只有<strong>一处用词错</strong>：他描述的职能是 <strong>麦克斯韦妖</strong>（制造局部有序），
+  <strong>不是拉普拉斯妖</strong>（预言者，不耗能）。换成正确的妖之后<strong>结论更强</strong>（代价可算）。</li>
+<li>⭐ <strong>成本公式（本轮核心）</strong>：<strong>制造 ΔS 的局部有序，至少要花 <code>E = T·ΔS</code></strong>
+  （Landauer 汇率 <code>k_BT·ln2</code> = <strong>0.0179 eV/比特</strong> @300 K）⟹ <strong>净熵账 = 1.00</strong>
+  ⟹ <strong>「好运」是借来的，不是赚来的</strong>。</li>
+<li>⭐ <strong>「不能奢望自然发生」的定量</strong>：<code>P ~ e^{−ΔS/k_B}</code>
+  —— 10⁻²³ J/K 时 P ≈ 0.49（小尺度不罕见，布朗运动就是这个）；
+  1 cm³ 空气全挤到一半体积（2.4×10⁻⁴ J/K）⟹ <code>log10 P = −7.5×10¹⁸</code>。</li>
+<li>⭐⭐ <strong>最有价值的连接</strong>：他说的「<strong>部分有序、部分无序</strong>」<strong>正是框架的两层结构</strong> ——
+  <strong>状态层</strong>（单 tick = 置换 ⟹ 双射、可逆、<strong>零熵产生</strong>，第 57 轮数值验证 ✓）
+  ＋ <strong>系综层</strong>（熵增 = <strong>无知</strong>，第 43 轮口径改写）。
+  框架原文：「<strong>无信息丢失</strong>说的是<strong>状态</strong>，『熵增』说的是<strong>我们对状态的无知</strong>」（第 42 轮）。</li>
+<li>⭐ <strong>框架合流（第三次）</strong>：标准热力学的净账要「系统 ＋ <strong>环境</strong>」，
+  框架的「熵增 = 无知」要「系统 ＋ <strong>观测者</strong>」⟹ <strong>框架把「环境」换成了「观测者的无知」</strong>
+  （第 39 / 43 轮已两次指出）。🔧 建议并入 <strong>I-4</strong> 的备注。</li>
+<li>⚠️ <strong>诚实边界</strong>：<strong>是类比，不是等价</strong> —— 物理的「熵」与人生的「运气」<strong>不是同一个量</strong>
+  （熵可测且可算，「运气」是价值判断、无共轭量）。「坏运气恒定」若读作「必然发生」<strong>超出物理</strong>
+  （熵增是<strong>趋势</strong>，涨落<strong>双向</strong>）。</li>
+<li>⚠️ <strong>「我」当妖的两个限制</strong>：<strong>分辨率不够</strong>（脑 ~10¹⁴ 比特 vs 1 g 物质 ~5×10²² 原子，差 8.7 个数量级）；
+  <strong>有预算且按天结算</strong>（日代谢 2000 kcal ⟹ <code>ΔS ≥ 2.8×10⁴ J/K/天</code>）。</li>
+<li>📦 <strong>未动论文、未新增清单条目</strong> —— 本轮是<strong>一次合流</strong>，不是一次发现；只在清单 1.1 节留痕。</li>
+<li>产出：<code>outputs/运气好坏与熵_麦克斯韦妖的代价.md</code>、<code>_maxwell_58.py</code>、<code>_patch_clist_58.py</code>。</li>
+</ul>
+<h3>讨论纪要 2026-09-26c：「不变必亏，要因变化而变化」—— <strong>最优频率是平方根</strong>（<strong>无新增条目</strong>）</h3>
+<ul>
+<li><strong>起因</strong>：用户从熵的讨论提炼的行动原则 —— 「不要奢望恒定的流程能适应一切变化，要因变化而变化；
+  机器要经常维护才能长存；不变的投资策略长久必亏 —— 这就是坏运气」。</li>
+<li><strong>核验</strong>（脚本 <code>_adaptation_59.py</code>，AD-1…AD-10，<strong>10 项 0 失败</strong>）：定理 + 物理 + 简化模型 + 逻辑修正。</li>
+<li>✅ <strong>方向对（两部分都有支撑）</strong>：
+  · <strong>NFL 定理</strong>（Wolpert–Macready 1997）：在所有问题上取平均，任意算法等价 ⟹
+    <strong>无普适最优</strong> ✓ —— 但<strong>推不出</strong>「不变必亏」；
+  · <strong>耗散结构</strong>（Prigogine）：维持有序必须持续耗散 ✓。</li>
+<li>⚠️ <strong>三处需修</strong>：
+  ① <strong>「经常」错</strong> —— 最优维护间隔 <strong><code>t* = √(2C_m/(C_fλ))</code></strong> ⟹ <strong>存在最优点</strong>，
+     且 <strong>t* ∝ 1/√λ<strong>（退化率 ×4 ⟹ 维护频率只 ×2，</strong>不是正比</strong>）；
+     补充：多臂老虎机 regret 下界 <strong><code>Ω(√(KT))</code></strong> ⟹ 最优探索量 ~<strong>√T</strong>
+     （T = 10⁴ 时「一直改」比最优差 <strong>100 倍</strong>）；
+  ② <strong>需分层</strong>（否则与上一轮<strong>矛盾</strong>）—— 交易最活跃的 20% 散户净收益<strong>低 6.5 pp/年</strong> ⟹
+     <strong>元层（策略本身）低频更新 ＋ 执行层（具体动作）高频纪律</strong>（<strong>方向相反</strong>）；
+  ③ <strong>「必亏」过强</strong> —— 稳定环境下固定策略可长期有效（指数化就是反例）。</li>
+<li>⭐ <strong>框架合流（第四次）</strong>：「熵增 = <strong>无知</strong>」⟹ 更准的说法是「<strong>模型过期</strong>」而非「世界变了」
+  ⟹ ⭐ <strong>校准比重新发明便宜</strong>（框架的启示是「定期对表」，不是推倒重来）。</li>
+<li>⭐ <strong>与框架自己的 √t 律形式会合</strong>：§4.2 <code>R_mix = l_P√(t/t_P)</code>（47 μm）
+  —— 与 <code>t* ∝ 1/√λ</code>、<code>√(KT)</code> 是<strong>同一个数学结构</strong>。
+  ⚠️ <strong>来源不同</strong>（扩散方程 / 更新理论 / 序贯决策），<strong>不声称深层统一</strong>。</li>
+<li>⚠️ <strong>标出「是 → 应该」gap</strong>（休谟）：物理给的是条件句，需补前提
+  「<strong>若把『长期维持』当目标</strong>」；⚠️ <strong>目标一换结论就反</strong>。</li>
+<li>⚠️ <strong>诚实边界</strong>：<code>t*</code> 是<strong>简化模型</strong>（线性退化 ＋ 完全恢复 ＋ 恒定 λ；真实「浴盆曲线」不满足）
+  ⟹ <strong>只作量级参考</strong>；且<strong>是类比不是等价</strong>。</li>
+<li>📦 <strong>未动论文、未新增清单条目</strong> —— 一次<strong>合流</strong> ＋ 一次<strong>逻辑修正</strong>；只在清单 1.1 节留痕。</li>
+<li>产出：<code>outputs/不变必亏与因变化而变化_最优频率是平方根.md</code>、<code>_adaptation_59.py</code>、<code>_patch_clist_59.py</code>。</li>
+</ul>
+<h3>第 0 批（补）：0.3 ε 的 @E 规范 ＋ 0.4 口径对账 —— <strong>两项都查出了真东西</strong></h3>
+<ul>
+<li><strong>核验</strong>（脚本 <code>_audit_03_04.py</code>，A3-1…A3-4 / A4-1…A4-2，<strong>6 项 0 失败</strong>）；补丁 <code>_patch_batch0b.py</code>（<strong>7 项 0 失败</strong>）。</li>
+<li><strong>0.3 ⭐ 查出「符号撞车」（比原待办更严重的问题）</strong>：论文的 <code>ε</code> 有<strong>两个互不相干的含义</strong> ——
+  ① <strong>泄漏概率</strong> <code>ε(E)</code>（<strong>能标依赖</strong>，45 处）；② <strong>Levi-Civita 全反对称张量</strong> <code>ε_ijk</code> / <code>ε^ij</code>
+  （<strong>与能标无关</strong>，8 处，§5.2 表示论）。⚠️ 而 <code>λ</code> 的类似撞车<strong>有声明</strong>（§8.6「符号约定（重要）」），
+  <strong><code>ε</code> 的没有</strong> ⟹ 已在 §8.1 加「符号约定（重要）」块（中英同步），规定
+  <strong>凡引用泄漏 ε 的数值必须写明能标</strong>，并点名 N-14 为反例。</li>
+<li><strong>0.3 ⭐ 顺带查出</strong>：第 201 行写「泄漏 <code>ε~10⁻⁵⁰</code> 不产生 LHC 信号」，而按 §8.1 自己的公式
+  <code>ε(E) = ε₀(M_Pl/E)^β</code>，LHC 能标（10⁴ GeV）下应为 <strong>1.47×10⁻¹⁰</strong> ⟹ <strong>差 40 个数量级</strong>。
+  （公式本身自洽：ε(1 TeV) = 6.05×10⁻¹⁰、ε(1 meV) = 1.015，与论文一致。）
+  ⟹ 已加 <strong>⚠️ 待核实</strong> 标注（中英同步），<strong>暂不改数值</strong>（来源未查明，需另立一项）。</li>
+<li><strong>0.4 ★ 结论：无新增残留</strong>（3 处命中里 <strong>1 真错、2 误报</strong>）：
+  · <strong>1 处真错</strong> = <code>_fix_run_48.py</code> 的 <code>h_over_n</code>（<strong>全层枚举 + 轨道等权</strong>）—— 正是第 50 轮 R-2/C-2 查明的那处；
+  · <strong>2 处误报</strong> = <code>_gap_orbit_48.py</code> 的两处（<strong>GAP 随机构型采样</strong> ⟹ 每个构型等权 ⟹ <strong>就是构型等权</strong>，
+    第 50 轮已确认「GAP 采样天然正确」）；
+  ⟹ 已给两脚本都加<strong>口径注释</strong>（不改数值）：前者标「<strong>不可直接引用</strong>」，
+    后者标「<strong>看似等权、实为构型等权，请勿「修正」</strong>」—— 防未来的误用与误修。</li>
+<li>📦 <strong>论文已改（中英同步 7 项 0 失败）</strong>：§8.1 符号约定（中英）＋ LHC 处待核实标注（中英）；
+  另给 2 个历史脚本加注释（语法已复检 ✓）。备份 <code>paper/history/*_备份_2026-09-28第0批前.md</code>。</li>
+<li>产出：<code>outputs/_audit_03_04.py</code>、<code>_patch_batch0b.py</code>。</li>
+<li>🔧 <strong>新增一项待办（由 0.3 顺带查出）</strong>：<strong>查明 <code>ε~10⁻⁵⁰</code>（第 201 行）的来源</strong> ——
+  是一个<strong>独立的能标/定义</strong>，还是笔误？若确认是能标错置，则与 N-14 同类。</li>
+</ul>
+<h3>第 60 轮：I-14 的裁决 —— 框架的差是「<strong>谱内差</strong>」，不是「构型差」</h3>
+<ul>
+<li><strong>主题</strong>：工作流第 1 批 <strong>1.1</strong>（候选池 39：单谱量特征能否证成一条结构定理）。</li>
+<li>⚠️ <strong>原表述被否</strong>：第 56 轮的 I-14 说「框架<strong>没有一个两态之差</strong>」——
+  而 §5.8 的 λ=0 弦网凝聚能隙 <strong>Δ = 2</strong>（<strong>严格</strong>）<strong>就是</strong>两态之差 ⟹ <strong>字面错误</strong>。</li>
+<li>⭐ <strong>修订版（本轮结论）</strong>：<strong>框架的差只有三类</strong> —— <strong>谱内差</strong>（Δ、Δ±2）｜<strong>参数差</strong>（E0(λ)、m(κ)，那是<strong>相图</strong>）
+  ｜<strong>无极小弦势</strong>（<code>E_pair(d) = 2E_m + σ_m·d</code>，σ_m ≥ 0 ⟹ <strong>恒单调 ⟹ 无势阱</strong>）——
+  <strong>没有第四类「势阱型的构型差」</strong>。</li>
+<li>⭐ <strong>核心机制（新）：位置与能量分层居住</strong> —— <strong>衬底层</strong>（tick 置换群）的态是 k-子集 = <strong>位置分布</strong>
+  （<strong>有位置</strong>），但框架只给它 <strong>H/N（熵密度），无能量</strong>；<strong>弦网层</strong>（<code>H_F</code> / <code>H(λ)</code>）<strong>有哈密顿量与能量谱</strong>，
+  但态是面变量 <code>Z_f</code>（<strong>通量</strong>，不是位置）⟹ <strong>有位置的层没有能量，有能量的层没有位置</strong> ——
+  而化学键要求两者的<strong>耦合</strong>（<code>E</code> 随核间距 <code>R</code> 变）。</li>
+<li><strong>数值</strong>（<code>_i14_60.py</code>，<strong>10 项 0 失败</strong>）：
+  · 2+1D toric code 的<strong>完整解析谱</strong> <code>E(a,b) = 2(a+b) − (N_v+N_p)</code>（<code>Π A_v = Π B_p = 1</code> 强制 a、b 为偶数）；
+    256 态数值<strong>逐项一致</strong>（能级 −8/−4/0/4/8，简并 4/48/152/48/4）；总和校验 256 = 2⁸ / 262144 = 2¹⁸ ✓；<strong>Δ = 4J</strong>；
+  · 3+1D 复现 §5.8 的严格结果：<code>E0 = −N_c</code>、简并 <code>512/1024/512</code>、<strong>Δ = 2</strong> ✓（⟹ 实现无误）；
+  · 弦势 σ_m = 0.21 / 1.09 / 3.04 @ λ = 0.5/1.0/2.0，<strong>全部 &gt; 0</strong>；λ=0 严格 deconfined 时 dE <strong>与 d 无关</strong>。</li>
+<li><strong>三个反例候选，逐个判掉</strong>：① 能隙 Δ（<strong>谱内差</strong>，差的是<strong>通量构型</strong>）② 弦势（<strong>无极小</strong>）
+  ③ 空间平移 → 动量（Noether 给<strong>守恒量</strong>，不是 <code>V(R)</code>；且是<strong>背景</strong>对称性）。</li>
+<li><strong>边界扩大</strong>：<strong>化学键 / 相变潜热 / 电离能</strong> 一并落入框架语言之外（登记 <strong>N-21</strong>）。
+  ⚠️ 潜热那条：框架<strong>有相变</strong>（λ_c ∈ [0.21, 0.23]、κ_c ∈ [0.25, 0.32]）但「自由能 / 潜热 / 化学势」
+  <strong>实质各 0 处</strong>（用 χ 峰 / 序参量交叉点定位）⟹ <strong>有相变 ≠ 有潜热</strong>。</li>
+<li><strong>尺度</strong>：<code>J = n_G·E_P·g ≈ 3.6627×10²⁸ eV</code> vs 化学键 1.4798 eV ⟹ <strong>28.4 个数量级</strong>；
+  弦势单位是「1 个格点」，换物理长度还需<strong>格点间距 a</strong>（<strong>未给</strong>）⟹ <strong>两个换算因子都缺</strong>。</li>
+<li><strong>一句话</strong>：<strong>框架的能量语言是「禁闭档」（无势阱、普朗克标度），化学键是「势阱档」（有极小、Å 尺度）</strong>
+  —— 两者缺的不是精度，是「<strong>势</strong>」本身。</li>
+<li>📦 <strong>论文已改（中英同步 2 项 0 失败）</strong>：§4.8 补充链末插入【第 60 轮】块。
+  备份 <code>paper/history/*_备份_2026-09-28第60轮前.md</code>。格式自查：三指标与备份<strong>逐一相同</strong>（本轮未引入新问题）。</li>
+<li><strong>新增难题 I-16</strong>：<strong>「位置算符缺口」能否形式化为公理级命题？</strong>（若成立，一条<strong>根边界</strong>同时解释
+  I-14 / N-16 / N-18 / N-19 / S-13）。</li>
+<li>🔧 <strong>新增待办（顺带查出）</strong>：<strong>论文 §5.7 的「能隙 Δ = 1」与 2+1D 环面的 4J</strong> —— 需查那个 1 的<strong>定义口径</strong>
+  （同一处的 <code>E0 = −8.0000</code>、基态简并 <code>4 = |G|²</code> 与本轮<strong>逐位一致</strong>，所以不是实现问题）。</li>
+<li>⚠️ <strong>新踩一坑（引文清点）</strong>：<strong>检索词会命中「讨论该词的元文本」</strong> —— 第 56 轮块<strong>自己列举了</strong>
+  「解离 / 束缚能」，使它们从 0 处变成 2 处 ⟹ <strong>清点必须先排除已登记的轮次块</strong>（判据：<code>&gt;</code> 起始的连续引用块）。</li>
+</ul>
+<h3>第 61 轮：工程可达性重估 —— <strong>工程出口为零</strong>，★★★ 判别性归零</h3>
+<ul>
+<li><strong>主题</strong>：工作流第 1 批 <strong>1.2</strong>（候选池 37）。核验 <code>_feasibility_61.py</code>（EX-1…EX-9，<strong>9 项 0 失败</strong>）。</li>
+<li><strong>结论 ①：工程出口 = 0</strong>。13 条工程项（S-1…S-13，★★★ 1 ｜ ★★ 4 ｜ ★ 8）逐条审完：
+  · 原问题「★★ 条目里有没有框架独有且可测的项」⟹ <strong>0 条</strong>
+    （S-1 是负面 / S-5 与 Landauer 同向 / S-7、S-11 已降调 / S-12 判别性 = 0）；
+  · 与材料、化学、器件相关者（<strong>S-3 超导</strong>第 44 轮 → <strong>S-6 FQH</strong> 第 53–54 轮 → <strong>S-13 电池</strong>第 55–56 轮）
+    先后判否，<strong>理由同一个</strong>（第 60 轮给出）：<strong>框架缺「势阱型的构型差」</strong>。</li>
+<li><strong>结论 ②：观测出口 = 1 条</strong> —— <strong>EMRI（S-E1–S-E4，δ = 0.30·x_p）</strong>，框架独有（标度律 δ∝x_p）＋ 可测（LISA）。
+  ⚠️ 但三个前提<strong>全在框架之外</strong>：LISA 发射（~10–15 年）、EMRI 事件率、波形模型（quadrupole / 圆轨道 / 非 Teukolsky）。</li>
+<li>⭐ <strong>顺带发现 ①：★★★ 判别性归零</strong>。唯一的 ★★★（<strong>S-12 / S-C1 平坦性 Ω_K = 0</strong>）与<strong>标准平 ΛCDM 同值</strong>。
+  判据：全文「Ω_K」与「ΛCDM」<strong>同行共现 0 次</strong> ⟹ 区分性<strong>从未被论证</strong>（不是「论证不足」）。
+  原表述「硬预测」的「硬」指<strong>从公理解出而非假设</strong>（= <strong>解释力</strong>）⟹ 应读作<strong>解释性成果，非判别性预言</strong>。
+  ⟹ <strong>★★★ 清零</strong>（清单里已无任何 ★★★）。已在中英 §9 加注。</li>
+<li>⚠️ <strong>顺带发现 ②：EMRI 三个数字不能并存引用（登记 C-7）</strong>。
+  若似然近似高斯，<code>ΔlnL = (δ/σ_δ)²/2</code> <strong>必须自洽</strong>。实测 <strong>v1.27 自洽（Δ = 0.8%）</strong>；<strong>v1.35 不自洽</strong> ——
+  由 σ_δ = 1.63×10⁻⁶ 推 ΔlnL = <strong>7.53×10⁷</strong>，报的是 <strong>357</strong>（<strong>σ 口径差 459 倍</strong>）。
+  由 ΔlnL 反推的<strong>有效</strong>宽度 <strong>σ_δ,eff = δ/√(2ΔlnL) = 7.49×10⁻⁴</strong>（与 v1.27 的 8.3×10⁻⁴ 同量级 ✓）
+  ⟹ <strong>1.63×10⁻⁶ 是局部曲率、不是有效宽度</strong>（根源：主简并 <strong>δ-φ0</strong>（ρ≈−0.85）使似然非高斯）。
+  §9 同节另有「<strong>7108σ</strong>」（= δ/σ_tot），与 27σ <strong>σ 口径差 267 倍</strong> ⟹ <strong>统一到 ΔlnL 判据（27σ）</strong>。已加注。</li>
+<li><strong>第 60 轮的后续</strong>：存活出口全在<strong>引力 + 宇宙学</strong>侧（框架唯一有势的地方 = 引力 <code>Φ(r) = −GM/r</code>）。
+  ⚠️ 与第 60 轮<strong>不矛盾</strong> —— 那是「无<strong>两体</strong>势、无几何构型自由度」，而引力侧只需<strong>外源场中的测地线</strong>
+  （<strong>单粒子问题</strong>）⟹ <strong>精确化：框架能做「测试粒子在外源场中」，不能做「两个可比质量物体的排布」。</strong></li>
+<li>📦 <strong>论文已改（中英同步 6 项 0 失败）</strong>：§9 S-E1 口径加注 ＋ §9 S-C1 非判别性加注 ＋ 插入【第 61 轮】块。
+  备份 <code>paper/history/*_备份_2026-09-28第61轮前.md</code>。格式三指标与备份<strong>逐一相同</strong> ⟹ 未引入新问题。</li>
+<li>🔧 <strong>新增待办（候选池 42）</strong>：把 EMRI 三处数字统一到 ΔlnL 判据。</li>
+</ul>
+<h3>第 62 轮：第五种力在框架里有位置吗？—— 三个候选位：两个封死，一个<strong>未定义</strong></h3>
+<ul>
+<li><strong>问题</strong>：用户问「理论上能不能出现第五种力？」核验 <code>_fifth_force_62.py</code>（FF-1…FF-9，<strong>9 项 0 失败</strong>）。</li>
+<li><strong>词条清点</strong>：「第五力 / 五力 / 第五种力 / fifth force / spin-3」<strong>补丁前各 0 处</strong> —— 本轮是<strong>首次</strong>处理。
+  ⚠️ <strong>元文本自指的现场复现</strong>（铁律 18）：补丁后「第五力」变成 9 处（<strong>我自己写进去的</strong>）
+  ⟹ 清点必须以<strong>备份</strong>为底本（FF-1 已改成读备份）。</li>
+<li><strong>框架的「四力」</strong> = §5.5 分波分解（自旋 0/1/2）× §5.2 配对阶数（n = 1,2,3）⟹ <strong>四个位置无空位</strong>。</li>
+<li><strong>三个候选位逐一判定</strong>：
+  ① <strong>自旋 1 的额外规范群</strong> ⟹ <strong>封死</strong>：§5.2 的 <code>n ≥ 4</code> 排除，依据<strong>维数论证</strong>
+     —— <code>ε_ijkl</code> 在 3 维空间 ≡ 0（独立分量 <code>C(3,4) = 0</code>；本轮补了组合核验）；
+  ② <strong>自旋 ≥ 3</strong> ⟹ <strong>封死</strong>：<strong>Weinberg–Witten 定理</strong> + 同一条 <strong>Weinberg 软定理</strong>分类；
+  ③ <strong>自旋 0 的新轻标量</strong> ⟹ ⚠️ <strong>未定义</strong>。</li>
+<li>⭐ <strong>关键判据（本轮把 §5.8 的软定理接到分波表上）</strong>：<strong>「力」= 被软定理强制的普适耦合</strong> ——
+  自旋 2（软极限 ∝1/q ⟹ 等价原理）、自旋 1（∝1/q ⟹ 守恒荷）<strong>被强制</strong>；
+  <strong>自旋 0（∝q⁰ 不奇异）不强制任何守恒荷</strong> ⟹ <strong>自旋 0 天生不是「基本力」</strong>
+  （= §5.5 把 Φ 标为「Higgs/模场」的深层理由）。</li>
+<li>⚠️ <strong>但缺口在这里</strong>：软定理<strong>没有</strong>禁止「非普适的长程标量耦合」（标准物理的第五力正是如此）；
+  而框架把 Φ 写成「<strong>KK 标量模场（g₅₅）的低能投影</strong>」（§4.5b）—— 标准 KK 里正是 <strong>radion / dilaton</strong>，
+  <strong>公认的第五力载体</strong>。框架对 Φ 只写一句「VEV 决定耦合常数与质量」⟹ 登记 <strong>I-17</strong>。</li>
+<li><strong>数值</strong>：若假设 Φ 继承 §5.8 弦网标量扇区能隙（<code>Δ_标量 = 0.41 J</code>）⟹ <code>m = 1.50×10²⁸ eV</code>、
+  力程 <strong><code>λ = 0.81 l_P</code></strong> ⟹ 与第五力搜索窗口（微米–星系）差 <strong>28.9–55.4 个数量级</strong>（完全不可观测）。</li>
+<li>⚠️ <strong>顺带更正 C-8（涉及第 60 轮）</strong>：第 60 轮的<strong>判据成立</strong>（「V(r) / 结合能 / 相互作用势」各 0 处），
+  但结论句「框架<strong>没有一个势函数</strong>」<strong>过宽</strong> —— §6.4 <strong>有</strong> <code>V(Φ) = −½μ²Φ² + ¼λΦ⁴</code>（Φ⁴ 热相变 / 墨西哥帽）。
+  <strong>精确化</strong>：框架有<strong>场空间</strong>的自相互作用势 <code>V(Φ)</code>、<strong>没有构型空间</strong>的径向势 <code>V(r)</code>（化学键要的是后者）
+  ⟹ <strong>I-14 的结论不变</strong>。⚠️ 对本轮也有用：墨西哥帽 ⟹ Φ 径向模 <code>m² = 2μ²</code>（<strong>μ 是输入</strong>）；
+  复标量相位被 Anderson–Higgs 吃掉 ⟹ <strong>无 Goldstone 第五力</strong> ⟹ 但 Φ 的质量<strong>仍不可判定</strong>。</li>
+<li>📦 <strong>论文已改（中英同步 4 项 0 失败）</strong>：§5.5 加「第五力的位置」注 + 插入【第 62 轮】块。
+  备份 <code>*_备份_2026-09-29第62轮前.md</code>。格式三指标与备份<strong>逐一相同</strong> ⟹ 未引入新问题。</li>
+<li>🔧 <strong>新增待办（候选池 43）</strong>：<strong>框架的哪一部分能给出 Φ 的质量与耦合？</strong>
+  ⚠️ 注意 §6.4 的 <code>μ</code> 本身是<strong>输入</strong> —— 直接用它只是把未知量搬了个家（<strong>陷阱 23 同族</strong>）。</li>
+</ul>
+<h3>已排除的路（别再走）</h3>
+<ol>
+<li>用<strong>表观视界</strong>做能账 ⟹ 恒等式，对 λ 零预言力（空，不是错）</li>
+<li>直接取 <code>R·H = c</code> 当表观视界 ⟹ 循环（预设 k=0）</li>
+<li><strong>Kodama 动力学表面引力</strong> <code>κ = -cH(1-3w)/4</code> ⟹ λ = (1-3w)²/16，z=0 处偏离 <strong>217σ</strong>，已否证</li>
+<li><strong>第 26 轮新增</strong>：tick 的<strong>串行</strong>归一化（每 tick 全局仅一次对换）⟹ 三条独立判据排除
+   （A1 的 per-诸元事件率、A2 的 ε₀ 标定、§4 的弛豫时标），且混合尺度塌到 <code>2.7×10⁻⁹⁶ m</code></li>
+<li><strong>第 26 轮新增</strong>：<strong>全局统一相位</strong>（一个 tick 内所有线同侧）⟹ 动力学被钉住
+   （第 43 轮复测：⟨r²⟩ <strong>偏离 n 且不自平均</strong> —— 20 种子给均值 <strong>1.32 n</strong>、相对散布 <strong>65%</strong>、
+   范围 [0.364, 3.444]；而每线独立为 <strong>1.001 ± 0.027</strong>、散布 <strong>3%</strong>）。
+   ⚠️ 原文所引「29.7%~42.5%（两个种子）」系<strong>噪声</strong>，<strong>第 43 轮已修正</strong>（物理结论不变）；
+   相位必须<strong>每线独立</strong></li>
+<li><strong>第 40 轮新增</strong>：<strong>从衬底动力学推「观测者读数分辨率」</strong> ⟹ 三难排除：不变读数偏大
+   1.75 倍 / 高度可迁时次广延（面积律不成立）/ 时间平均零预言力。需要的是<strong>观测者的 δ 或 τ</strong>。</li>
+<li><strong>第 39 轮新增</strong>：<strong>在衬底里找压缩因子 5.545（= 8 ln2）的机制</strong> ⟹ 四路 no-go
+   （无整数枚举、最保守几何读法仍超 2.77 倍、不受观测约束、动力学零熵产生）。
+   它是「比特计的计数 ÷ 纳特计的熵」，<strong>分子层面的搜索没有目标</strong>；
+   真问题是<strong>观测者的读数分辨率</strong>（见第 39 轮段与工程期望 I-4）</li>
+<li><strong>第 43 轮新增</strong>：<strong>用扩散系数（或任何单体输运量）反推 h、或区分 tick 随机性的来源</strong> ⟹
+   D 是 <strong>1 个实数</strong>，而相位自由度是 <strong>L² 个比特</strong>（每 tick 每条线 1 比特）⟹ <strong>欠定</strong>；
+   实测真随机 vs 确定性 LCG 的 D 差 <strong>1.51σ</strong>（噪声内），而 h 差 <strong>120 个数量级</strong>。
+   ⟹ T-7 降到「<strong>实现亦不可判</strong>」；唯一剩余入口是<strong>两点关联函数</strong>（工程期望 I-8）</li>
+<li><strong>第 44 轮新增</strong>：<strong>用周期性判别 tick 随机性的来源</strong> ⟹ 失效。驱动序列周期重复，
+   但<strong>位移不按驱动周期重复</strong>（位置持续演化、不回到起点；实测 τ=256 处 C = −0.3269 ≠ +1）。</li>
+<li><strong>第 47 轮新增</strong>：<strong>用群阶 |G| 代替真实轨道来估 H/N</strong> ⟹ 排除。二者<strong>无单调关系</strong>：
+    (2,4,4) 的 ln|G|/N = 0.8162 &gt; ln2，若轨道接近 |G| 则 H/N &lt; 0（不可能）⟹ 轨道远小于 |G|。
+    |G| 只能当<strong>上界</strong>用（|O| ≤ |G|），<strong>不能反过来</strong>由 |G| 推 H/N。</li>
+<li><strong>第 48 轮新增</strong>：<strong>用群阶 |G| 判断「某格点能不能算轨道」</strong> ⟹ 排除（= N-9）。
+    第 47 轮据 |G| = 2.2×10¹¹ 判 (2,4,4)「不可算」，但真正决定成本的是<strong>轨道大小</strong>
+    （实测 10³·⁴ – 10⁶·⁸），不是 |G|；GAP 用 <code>Stabilizer(G,c,OnSets)</code> 给 |O| = |G|/|Stab|，
+    <strong>完全不遍历轨道</strong> ⟹ 该判据<strong>选错了变量</strong>。它与第 10 条是同一个误解的两面。
+    ⚠️ 补注（第 49 轮）：<strong>预判也要在已知全部依赖之后写</strong> —— 第 48 轮的 PB
+    （(6,6,6) ≈ (4,4,4)）在写出时还不知道 <strong>H/N 主要由 N 决定</strong>，故设定即错。</li>
+<li><strong>第 50 轮新增</strong>：<strong>用「扫参数」定位 0.25 的机制</strong> ⟹ 排除。三个方向都扫过了 ——
+   扫 N（第 49 轮）、扫占据数层 k（第 50 轮）、扫格点形状（第 48 轮）—— 凡命中 0.25
+   都只是 <code>H/N(参数)</code> 曲线<strong>穿过</strong> 0.25，而且跨点位置<strong>随任一参数移动</strong>
+   （k_c/N 从 0.377 降到 0.289）⟹ <strong>换一个参数重复的是同一件事</strong>，不是新信息。
+   ⟹ 不要再换参数试；要么找到<strong>机制</strong>（钉住 N / k / 形状），要么承认<strong>不存在定量联系</strong>。
+   ⚠️ 附带一条口径铁律（第 50 轮 C-2）：<strong>H/N 一律用「构型等权」</strong>
+   （第 40 轮 <code>part_entropy</code>：<code>H = lnM − Σ(|O|/M)·ln|O|</code>），<strong>不是</strong>「轨道等权」
+   （<code>Σln|O| / #轨道</code>）—— 两者在 N=8/16/24 上差 0.0520/0.0318/0.0176，足以造成假更正。</li>
+<li><strong>第 51 轮新增</strong>：<strong>找「H/N = 0.25」的等式跨点</strong> ⟹ 排除 —— <strong>目标错了</strong>，不是没找到。
+    第 40 轮已证明「观测者的读数<strong>不能</strong>是 tick 不变量」⟹ tick 不变读数是瞬时读数的一个函数
+    ⟹ <code>H/N</code>（不变读数）<strong>≤</strong> <code>0.25</code>（观测者读数），即<strong>不等式</strong>。
+    ⟹ 0.2834（N=32）是<strong>违反</strong>自洽性、0.1839（N=64）是<strong>满足</strong>自洽性；<strong>不是</strong>「0.25 被跨过」。
+    ⟹ <strong>第 46–50 轮那条等式路线不要再走</strong>（记 N-13 / C-3）。</li>
+<li><strong>第 52 轮新增</strong>：<strong>试图单独定出 B5 拆分里的 a（面元/单元）或 b（纳特/单元）</strong> ⟹ 排除。
+    观测只给一个数 <code>σ = S/A = 0.25 纳特/l_P²</code> ⟹ 只约束 <strong>b/a</strong>；
+    (a, b) = (4,1) / (2,0.5) / (8,2) / (1,0.25) / (16,4) <strong>给出完全相同的观测量</strong>
+    ⟹ 拆分<strong>不可观测</strong>，任何「定 a」或「定 b」的努力都<strong>没有判别力</strong>。</li>
+<li><strong>第 53 轮新增</strong>：<strong>把 <code>ε₀ = ε(M_Pl)</code> 搬到别的能标用</strong> ⟹ 排除（= N-14）。
+    S-E5 的 <code>ε ~ 10⁻²⁰</code> 就是这么来的。ε 有<strong>幂律能标依赖</strong> <code>ε(E) = ε₀(M_Pl/E)^β</code>：
+    在 M_Pl 是 7.7×10⁻²⁰、在 1 meV 是 ~1、在 FQH 能标是 <strong>0.04–77</strong> ⟹ 差 18–21 个数量级。
+    ⟹ 规矩：<strong>凡出现能标依赖量（ε、α、λ_c…），一律紧跟（@E）标注</strong>，不得跨能标引用。</li>
+<li><strong>第 54 轮新增</strong>：<strong>用「自旋 2」把框架弦网模态等同于 FQH 引力子模</strong> ⟹ 排除（= <strong>N-15</strong>）。
+    依据只有「自旋 2」，而框架自己（§5.8 v1.29）论证「<strong>自旋 2 是任何二阶张量涨落模态的几何必然</strong>」
+    ⟹ 该特征<strong>不判别</strong>。另加两条硬障碍：<strong>弦网无手性</strong>（实哈密顿量，而 FQH 引力子模手性已实测）、
+    <strong>能量差 10³⁰</strong>（<code>J = n_G·E_P·g</code> 是普朗克标度，FQH 是 meV）。
+    ⟹ 规矩：<strong>用「自旋/对称性类型」做跨系统等同时，先问「这个特征排除了什么」</strong>。</li>
+<li>
+<p><strong>第 55 轮新增</strong>：两条 ——
+    (a) <strong>用本框架推「化学储能」（电池材料 / 结构设计）</strong> ⟹ 排除（= <strong>N-16</strong>）。
+        框架对电池/储能/电化学/化学键<strong>零内容</strong>，尺度差 ≥10 个数量级。
+    (b) <strong>把「跨支 ER 通道」当作能量 / 物质通路</strong> ⟹ 排除（= <strong>N-17</strong>）。
+        框架自己有<strong>负压</strong>但<strong>无负能量密度</strong>（<code>P ≤ ρc²</code>、<code>ρ ≥ 0</code>）；可穿越虫洞需<strong>违反 ANEC</strong>；
+        即使违反，量子不等式 <code>ΔE·Δt ≲ ℏ</code> 把预算锁在 <code>ℏ/Δt</code>（1 s 内 ≤ 1.06×10⁻³⁴ J，
+        比室温热能小 14 个数量级）⟹ 跨支通道<strong>只能载信息</strong>。</p>
+</li>
+<li>
+<p><strong>第 56 轮新增</strong>：两条 ——
+    (a) <strong>把「储能容量」当成框架能定义的量</strong> ⟹ 排除（= <strong>N-18</strong>，<strong>结构性</strong>）。
+        框架能定义 [能量/质量] 量，但<strong>只有 f = Q/c² = O(1) 一档</strong>（<code>Q_BH = c²/2</code>、<code>Q_tube ≡ c²</code>），
+        而化学储能的 f = <strong>1.385×10⁻¹⁰</strong>。<strong>障碍不是尺度，是结构</strong>：框架有 4 个哈密顿量却
+        <strong>没有一个势函数</strong>（势能 / 结合能 / 相互作用势 / V(r) <strong>各 0 处</strong>）
+        ⟹ <strong>无「两态之差」</strong> ⟹ 无 ΔE_bind。
+        ⚠️ 与第 55 轮 N-16/N-17 <strong>同族但更深</strong>：那两条是「零内容 + 尺度差」，这条是<strong>结构缺口</strong>。
+    (b) <strong>把 F2 降标机制 @ 哈勃半径 当成独立成果</strong> ⟹ 排除（= <strong>C-6</strong>）。
+        <code>√(ℏcE_P/R_H)</code> = <strong>4.19 meV</strong> ≈ 标准暗能量能标估算 <code>√(M_Pl H₀)</code> = <strong>4.17 meV</strong> ⟹ <strong>同一个组合</strong>
+        ⟹ 不得计为两条成果。
+    ➕ 另登一条<strong>难题 I-14「单谱量特征」</strong>：框架的全部定量输出（能谱 / 能隙 / 简并 / 序参量 / χ /
+    弦张力 / 熵 / 指数）<strong>没有一个「两态之差」</strong> —— 若成立，则一切依赖「束缚–解离差」的物理
+    （化学键、相变潜热、电离能）都在框架语言之外（<strong>比「不覆盖储能」更根本</strong>）。</p>
+</li>
+<li>
+<p><strong>（讨论纪要 09-24）新增</strong>：<strong>用本框架推电化学转换 / 催化剂设计</strong> ⟹ 排除（= <strong>N-19</strong>）。
+    内容存量 0（电化学/催化/电极/电解质/燃料电池/反应路径/活化能/过电位/势能面/离子传导/化学选择性/反应速率
+    <strong>各 0 处</strong>）、尺度是 ~0.3 nm 的<strong>界面化学选择性</strong>、<strong>可判定入口没有</strong> ——
+    且<strong>比第 56 轮的储能更远</strong>：框架<strong>无势函数</strong> ⟹ 连「反应路径」概念都没有。
+    ➕ 附带一条<strong>最易复发的混淆</strong>：<strong>效率 ≠ 存储密度</strong> ——
+    燃料电池把效率从 0.30 提到 0.55（×1.83），但<strong>存储密度那一轴完全没动</strong>。</p>
+</li>
+<li>
+<p><strong>第 57 轮新增</strong>：<strong>把「决定论 / 多世界」接向框架外的哲学结论</strong> ⟹ 排除（= <strong>N-20</strong>）。
+    框架<strong>没有量子态层</strong>（幺正 / 多世界 / 退相干 / 纯态 <strong>各 0 处</strong>）⟹ 在它上面谈多世界是<strong>无内容</strong>的；
+    且从「框架成立」<strong>推不出</strong>决定论（框架<strong>兼容</strong> H1 与 H2 ⟹ <strong>不判决</strong>）。
+    ⚠️ 附带一条更根本的：<strong>「初始状态决定一切」不成立</strong> ——
+    框架的状态里<strong>不含 tick 序列</strong>（tick 是外部输入）⟹ 精确版本是「<strong>初态 ＋ 全部 tick 序列</strong>」。</p>
+</li>
+</ol>
+<h3>仍是公理核心（诚实标注）</h3>
+<ul>
+<li>A1 存在性断言、A2 的 <code>β_ε ≈ 0.615</code>（注意：与全息的 β 是两个不同量，别混）</li>
+<li>✅ <strong>Friedmann 约束方程已导出</strong>（<code>ρ = 3H²/8πG</code> 是等分账的<strong>输出</strong>，未预设 Friedmann，
+  见 <code>outputs/Friedmann的两条路_框架已导出平直约束.md</code>）；<strong>k = 0 已解释</strong>（不再是巧合）</li>
+<li>❌ 仍缺动力学，但<strong>只需一条</strong>：已证连续性 ⟺ 加速度（给定约束方程），比值恒 1.000000000000
+   ⚠️ 且「对 <code>E = T·S</code> 求导」这条路<strong>已封死</strong>（是恒等式，无新信息，别再试）
+   ⟹ 真正缺的是<strong>组分与状态方程</strong>（<code>ρ</code> 如何随 <code>a</code> 稀释）；框架的 w=0/1/3/−1 是<strong>借来的</strong>
+   🔧 微观模型自洽<strong>需要 <code>t_P</code> 复合时标</strong>：有它则 <code>ρ = Π·t_P = ρ_P/N</code> 精确成立，
+   无它则生产率超出稀释率 <strong>2.4×10⁶¹</strong> 倍（见 <code>outputs/动力学缺口_收缩到一条与tP复合过程.md</code>）</li>
+<li>❌ 暗能量<strong>绝对量级未解决</strong>：朴素估计超出 3.9×10¹⁶⁵ 倍 —— 框架继承了宇宙学常数问题</li>
+<li>⚠️ 微观（<code>λ = 8π/3 ≈ 8.38</code>）与全息（<code>λ = 1</code>）差 8.378 倍：微观管标度 <code>ρ ∝ H²</code>，全息管归一化</li>
+</ul>
+<p><strong>第 60 轮新增（别再撞）</strong>：<strong>用本框架推化学键 / 相变潜热 / 电离能</strong> ——
+三项的公共需求是<strong>势阱型构型差</strong>，而框架<strong>全部能量机制要么是「谱内差」、要么是「单调无极小」的弦势</strong>
+（详见 N-21 / I-14 修订：<strong>位置与能量分层居住</strong>）。⚠️ 与第 55 轮 N-16/N-17、第 56 轮 N-18、
+讨论纪要 09-24 的 N-19 <strong>同族但更根本</strong> —— 那三条说「某领域不覆盖」，这条给出<strong>为什么</strong>。</p>
+<p><strong>第 76 轮新增（别再撞）</strong>：<strong>把 §7 的「非交换化」当作框架的「涌现」或「推导」</strong> ——
+<code>_qm_audit_76.py</code>（<strong>QM-1…QM-12，12 项 0 失败</strong>）实测：① 框架<strong>自有</strong>的代数结构里
+<strong>没有一层提供非交换</strong>（衬底函数代数<strong>交换</strong> ｜ <strong>弦网 <code>A_v</code>/<code>B_p</code> 完全交换</strong>（顶点与面共享<strong>恰好 2 条边</strong> ⟹ 反对易 2 次 ⟹ 净交换）｜
+<code>(−1)^N_exchange</code> 是<strong>阿贝尔相位</strong>）；唯一真非交换的 <strong>Clifford 投影</strong>是 §5.2 的<strong>表示论记号</strong>，不是动力学。
+② <strong>§7.2 的命题是条件命题</strong>：<code>S = −2√2</code> 用 <strong>2 个 qubit</strong> 就能复现（<code>tick</code>/弦网/<code>A_v</code>/<code>B_p</code>/通量/格点
+<strong>一个都没出现</strong>）⟹ 是 <strong>Tsirelson 定理</strong>、<strong>前提已含结论</strong>（<strong>N-31</strong>）。③ <strong>§7 的判别力 = 0</strong>
+（§7 正文全部物理数值 = <code>{2√2, ½, −2.8284}</code>；§7.4 <strong>自认</strong>「与标准 QM 数学上重合」）⟹ 与 <strong>N-29</strong> 同族。
+⚠️ ⭐ <strong>与 I-16 同构</strong>：那边是「三层没有一层同时有<strong>位置＋能量＋位置是 q-数</strong>」，这边是
+「<strong>框架自有结构里没有一层提供非交换</strong>」—— <strong>同一个「分层」失败形态</strong>；而 §7.2 的动作
+（「把状态<strong>升级</strong>为算子代数」）正是在<strong>分层之上再叠一层假设</strong>（陷阱 23：公设上移）。
+⚠️ 别再拿 <strong><code>D = ℏ/(3m)</code> vs Nelson <code>ℏ/(2m)</code></strong> 当判别点（<strong>N-32</strong>：前者是<strong>恒等式</strong> ——
+把 <strong>G 缩放 ×0.25/×1/×4</strong>（<code>l_P ∝ √G</code>、<code>m_P ∝ 1/√G</code>，而 <strong><code>l_P·m_P ≡ ℏ/c</code> 与 G 无关</strong>）⟹ <strong>D 完全不变</strong>，
+相对差 0；且「差 1.5 倍 = 维度因子」不成立 —— 扫维度只有 <strong>d = 2</strong> 重合；两个锚点词<strong>论文里各 0 处</strong>，<strong>C-22</strong>）。
+⭐ <strong>唯一可用的正面产出</strong>：§7.1 的「必须非交换化」可以<strong>升级</strong>为<strong>引用 Fine 定理（1982）的推论</strong>
+（枚举 16 个确定性局域策略 ⟹ max CHSH = 2）—— 但那是<strong>解释力</strong>，不是<strong>判别力</strong>。</p>
+<h2>四、换机后第一步（照做）</h2>
+<pre><code class="language-bash"># 1) 整个文件夹拷到新机器（保持 outputs/ 与 MAPS-Unified-Framework/ 同级）
+# 2) 进工作区根，重建仓库（路径写死在脚本里，若根目录改名需改 _rebuild_repo.py 的 ROOT）
+python _rebuild_repo.py
+
+# 3) 补 HTML 快照（需要 markdown 包）
+python -m pip install markdown
+python _md2html_generic.py --stale
+
+# 4) 跑核验
+python outputs/_beta_derive.py              # β 推导：纯标准库，无依赖
+python -m pytest MAPS-Unified-Framework/python/stormetric -q   # 53 项（需 numpy/scipy/pytest）
+</code></pre>
+<h2>五、本机环境坑（换机后大概率还会遇到）</h2>
+<table>
+<thead>
+<tr>
+<th>坑</th>
+<th>症状</th>
+<th>解法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>bash 的 PATH 是坏的</strong></td>
+<td><code>ls</code>/<code>head</code>/<code>dirname</code> 全部 <code>command not found</code></td>
+<td>每条命令前加 <code>export PATH="/usr/bin:/bin:$PATH"</code></td>
+</tr>
+<tr>
+<td><strong>git 不在 PATH</strong></td>
+<td><code>git: command not found</code></td>
+<td>用全路径 <code>C:/Users/&lt;你&gt;/.workbuddy/binaries/PortableGit/versions/1.2.0/cmd/git.exe</code></td>
+</tr>
+<tr>
+<td><strong>托管 python 无三方包</strong></td>
+<td><code>No module named numpy/markdown</code></td>
+<td>建隔离 venv：<code>python -m venv ~/.workbuddy/binaries/python/envs/default</code> 再 pip 装；<strong>不要</strong>装全局</td>
+</tr>
+<tr>
+<td><strong>PowerShell 无 stdout</strong></td>
+<td>命令返回空</td>
+<td>用 Bash 工具（记得修 PATH）</td>
+</tr>
+<tr>
+<td><strong>D 盘不存在</strong></td>
+<td>原仓库 <code>D:\Users\IMYT.YT\...</code> 找不到</td>
+<td>正常，已在 C 盘重建；真身在另一台机器上</td>
+</tr>
+<tr>
+<td>git 中文路径</td>
+<td><code>git status</code> 显示 <code>\346\216\250...</code></td>
+<td><code>git -c core.quotepath=false status</code>（已写 .gitattributes，不影响提交内容）</td>
+</tr>
+</tbody>
+</table>
+<h3>第 65 轮：tick 的「像」与真随机白噪声 —— <strong>九条判据的分界</strong>（＋模拟器新增面板 ④）</h3>
+<p><strong>起因</strong>：用户看 <code>宇宙模拟器.html</code> 说「界面和我们小时候在电视上看到的雪花屏一模一样」。本轮把它做成可判定问题。
+<strong>核验</strong>：<code>_snow_65.py</code>（<strong>SN-1…SN-9，11 项 0 失败</strong>）＋ <code>_sim_snow_test.js</code>（<strong>ST4-1…ST4-6，6 项 0 失败</strong>）。</p>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>判据</th>
+<th>tick</th>
+<th>白噪声</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>单帧 / 局部</strong></td>
+<td>单点密度</td>
+<td>0.500</td>
+<td>0.499</td>
+<td>❌ 相同</td>
+</tr>
+<tr>
+<td></td>
+<td>最近邻两点关联 C(1)</td>
+<td>+1.0×10⁻⁴</td>
+<td>+5.1×10⁻⁴</td>
+<td>❌ 信号 &lt; 噪声基线 6.2×10⁻⁴</td>
+</tr>
+<tr>
+<td></td>
+<td>块密度方差（粗粒化）</td>
+<td>3.642×10⁻³</td>
+<td>3.990×10⁻³</td>
+<td>❌ 差 8.7%</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>帧间逐位变化量 Δ</strong></td>
+<td>0.503</td>
+<td>0.500</td>
+<td>❌ <strong>相同</strong>（我的预测被推翻）</td>
+</tr>
+<tr>
+<td><strong>时间 / 守恒量</strong></td>
+<td><strong>轴对齐的线级重排</strong></td>
+<td><strong>1.0000</strong></td>
+<td><strong>0.1802</strong></td>
+<td>✅ 结构性恒等</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>k（亮点数）</strong></td>
+<td>极差 <strong>0</strong></td>
+<td>极差 <strong>104</strong></td>
+<td>✅ 守恒 vs 不守恒</td>
+</tr>
+<tr>
+<td></td>
+<td>可逆性</td>
+<td>双射 + 对合</td>
+<td>不可逆</td>
+<td>✅</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>有序初态的混合时间</strong></td>
+<td><strong>62 步</strong></td>
+<td><strong>1 步</strong></td>
+<td>✅ 差 62 倍</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>混合时间的尺寸标度</strong></td>
+<td><strong>τ ∝ L²</strong></td>
+<td>τ = 1</td>
+<td>✅（L = 6/8/10 ⟹ τ/L² = 0.42/0.36/0.46）</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>⭐ <strong>通则（可复用）</strong>：判别「确定 vs 随机」<strong>不要比空间快照，要比时间序列与守恒量</strong> ——
+  快照只是系综的一个样本，而<strong>系综分布在两种情形下可以完全相同</strong>，能被分开的东西必然住在<strong>路径</strong>里。</li>
+<li>⭐ <strong>与第 43 轮对上</strong>：这是「熵增源头 = <strong>无知</strong>」的<strong>可视图象</strong> —— 状态侧（k、可逆性、线级重排）严格守恒，
+  系综侧（粗粒化读数）用 62 步才均匀。<strong>「看起来在熵增」与「真的在丢信息」是两件事。</strong></li>
+<li>⚠️ <strong>一个负面发现</strong>：<code>_snow_65.py</code> 的 SN-4 把<strong>我自己的预测</strong>推翻了 ——
+  原以为 <code>Δ_tick = 0.25</code>（「一半配对交换 × 一半真改变」），<strong>实测 0.503 ≈ 0.500 相同</strong>。
+  错因：tick 的<strong>每个位置都必然被改写为伙伴的旧值</strong>，而伙伴永远 ≠ 自己 ⟹ <code>P(变) = 1/2</code>。登记 <strong>N-24</strong>。</li>
+<li>⚠️ <strong>诚实的限制</strong>：浏览器/脚本里的「真随机」只能是<strong>伪随机</strong>（第 44 轮的硬限制）⟹
+  严格说是「高质量的确定性<strong>置换</strong>」vs「低质量的确定性<strong>重抽</strong>」，<strong>不是</strong>「确定性 vs 真随机」；
+  不影响时间侧五条（它们都是<strong>结构性</strong>的）。「人眼不可分」只做了<strong>块密度方差</strong>的操作化，未建视觉系统模型。</li>
+<li>📦 <strong>交付</strong>：<code>宇宙模拟器.html</code> 新增<strong>面板 ④「雪花屏对照 ★」</strong>（左 tick / 右白噪声，密度相同，含「⚑ 有序初态」按钮）；
+  文档 <code>宇宙模拟器_规则清单与诚实边界.md</code> 与备忘录 <code>雪花屏与模拟器_同一个像两种机制.md</code> 同步更新。</li>
+<li><strong>论文</strong>：§8.6.7 块链末插【第 65 轮】块（<strong>中英同步 2 项 0 失败</strong>）；格式三指标与备份<strong>逐一相同</strong> ✓
+  （备份 <code>paper/history/*_备份_2026-10-01第65轮前.md</code>）。清单：1.1 节加一行、总账负面 <strong>23 → 24</strong>（并补全 N-18…N-24）。</li>
+<li><strong>本轮之前的第 63/64 轮</strong>（未单列此段）：第 63 轮 = <strong>公开就绪度评估</strong>（5 条硬指标、审稿人七击、建议先做 I-16
+  ＋私下找人核三处）；第 64 轮 = <strong>宇宙模拟器</strong>（单文件 HTML，两个面板，开发中抓出 3 个实现 bug）。</li>
+</ul>
+<hr />
+<h3>第 68 轮：I-16 形式化 —— <strong>缺口在「位置的量子化」</strong>（不在位置、也不在能量）</h3>
+<p><strong>性质</strong>：<strong>形式化 ＋ 定量化</strong>，<strong>不是新物理</strong>（I-16 登记时即如此定性）。
+<strong>核验</strong>：<code>_posop_68.py</code>（<strong>PO-1…PO-9，9 项 0 失败</strong>）。</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>弱版（已证）</strong></td>
+<td>𝒜 的 <strong>9 类生成元无一含坐标函数</strong>（<code>A_v</code> / <code>B_p</code> / <code>X_f</code> / <code>Z_f</code> / <code>A_c</code> / tick 置换 / Clifford <code>Π_μ</code> / Hadamard <code>C</code> / 条件位移 <code>S</code>）</td>
+</tr>
+<tr>
+<td><strong>强版（候选）</strong></td>
+<td>态空间<strong>有限维</strong> ⟹ 位置只是<strong>标号</strong>；唯一连续位置在 <strong>c-数背景</strong>里（<code>Φ(x)</code> → <code>Φ(r)</code>）⟹ <strong>无「位置的量子态」</strong></td>
+</tr>
+<tr>
+<td>⭐ <strong>三层判定</strong></td>
+<td>衬底层（有位置·无能量·q-数）｜弦网层（无位置·有能量·q-数）｜场论层（有位置·有能量·<strong>c-数</strong>）—— <strong>无一齐全</strong></td>
+</tr>
+<tr>
+<td>⚠️ <strong>反例（已承认）</strong></td>
+<td>① §6.1 <strong>钉扎项</strong> <code>gΦψ̄ψ</code> ⟹ <code>m_eff(x) = m + gΦ(x)</code>；② 引力 <code>Φ(r)</code> 来自 <strong><code>∇²(δρ) = 0</code></strong> 的连续场方程 ⟹ <strong>c-数</strong>。<strong>两者反而强化结论</strong>（判据不是「有没有位置依赖的能量」）</td>
+</tr>
+<tr>
+<td>⭐ <strong>定量</strong></td>
+<td>弦势 <code>d</code> = <strong>格点步数</strong>（L1）⟹ <code>(1,1,0)</code> 与 <code>(2,0,0)</code> <strong>同能量</strong>而欧氏比 1.4142（差 41.4%）⟹ <strong>无键角</strong>；<code>E_pair(d)</code> <strong>恒单调</strong>（σ_m = 0.21/1.09/3.04）⟹ <strong>无势阱</strong></td>
+</tr>
+<tr>
+<td><strong>顺带更正</strong></td>
+<td><strong>C-10</strong>：第 40 轮块的「点对恰有 8 条轨道」<strong>不准确</strong>（实测 <strong>7 / 9 / 10</strong>；内部一致性即可判：<strong>8 × 4 = 32 ≠ C(8,2) = 28</strong>，7 × 4 = 28 ✓）；同句的 <code>|O₂| = (N/4)²</code> <strong>正确</strong></td>
+</tr>
+<tr>
+<td><strong>新增负面</strong></td>
+<td><strong>N-26</strong>：把钉扎项当作「框架有位置算符」的证据 —— 它是 <strong>c-数背景</strong>，不能做量子态之差</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>⭐ <strong>它同时解释</strong> I-14 / N-16 / N-18 / N-19 / N-21 / S-13 <strong>以及「工程出口 = 0」</strong> ⟹ <strong>第 56–68 轮的边界工作由此收口</strong>（从「不覆盖 X」逐条升级为一条<strong>结构理由</strong>）。</li>
+<li>⚠️ <strong>五条边界</strong>（最要紧两条）：① 强版依赖「<strong>𝒜 就是全部</strong>」这一<strong>设定</strong> ⟹ 只到「结构定理（候选）」级，<strong>不是公理级</strong>（这正是 I-16 原问句的答案）；② <strong>把 Φ 量子化即失效</strong> ——「引力量子化之日，就是这条边界消失之时」。</li>
+<li><strong>论文</strong>：§7.4 块链末插【第 68 轮】块 ＋ 第 425 / 448 行加 C-10 注（<strong>中英同步 4 项 0 失败</strong>）；格式三指标与备份<strong>逐一相同</strong> ✓。</li>
+<li>清单：<strong>新增 1.2 节</strong>（其余顺延为 1.3–1.22，编号连续 ✓）；<strong>I-16 标 ✅ 已做</strong>；总账 <strong>难题 19→18、负面 25→26、更正 9→10</strong>。</li>
+<li><strong>本轮之前未单列的第 66 / 67 轮</strong>：第 66 轮 = <strong>孤子的诞生</strong>（Morse 谱，Σ ≡ χ = 2；面板 ⑤ 静态）；第 67 轮 = <strong>孤子的动力学</strong>（三工种协作：切丛图热流，涡心 <strong>299 → 6（−98%）</strong>；<strong>裸绕数 = 3χ</strong> ⟹ <strong>C-9</strong>）。</li>
+</ul>
+<hr />
+<h3>第 69 轮：两处数值收口 —— 能隙 Δ 的口径与「两个 ε」</h3>
+<p><strong>性质</strong>：<strong>数值核查 ＋ 口径裁决</strong>，不是新物理。清理第 60 轮与第 0 批留下的<strong>两条待核实</strong>（积压 8 轮）。
+<strong>核验</strong>：<code>_numfix_69.py</code>（<strong>NC-1…NC-8，8 项 0 失败</strong>）。</p>
+<p><strong>两处结论不同</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A：§5.7「能隙 Δ = 1」</strong></td>
+<td>⚠️ <strong>真的不一致</strong>（<strong>C-11</strong>）</td>
+<td><strong>正确值 Δ = 4J</strong>（论文写 1）。精确对角化（256 态）+ 解析双确认：<code>E0 = −8.0000</code>（与论文逐位一致）、<code>E1 = −4.0000</code>、<strong>Δ = 4J，且对 L = 2…50 全成立</strong></td>
+</tr>
+<tr>
+<td><strong>B：§4.2「ε ~ 10⁻⁵⁰」</strong></td>
+<td>✅ <strong>不是不一致</strong>（<strong>C-12</strong>）</td>
+<td>它是<strong>另一个量</strong>：出自 <strong>A2 报告</strong>第 21/146 行（「σ_ann ≠ σ_regen 的失配参数 δ ~ ε ~ 10⁻⁵⁰」），列在 A2 的<strong>「框架表述 → 数学对象」对应表</strong>里 ⟹ <strong>是输入，不是推导</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>⭐ <strong>A 的关键发现：口径差异的真正来源是「开 vs 周期」，不是维度</strong> ——
+  <strong>周期</strong> ⟹ 有 <code>Π A = 1</code> 算符恒等式 ⟹ 缺陷成对 ⟹ <strong>4J</strong>；<strong>开</strong> ⟹ 无该恒等式 ⟹ <strong>2J</strong>
+  （§5.8 的单/双立方体是<strong>开</strong>，单立方体数值 <code>E0 = −1</code>、<code>Δ = 2.0000</code> ✓ 与论文一致）。</li>
+<li>⚠️ <strong>A 的另一发现：L=2 上三个归一化退化到同一个数</strong> —— <code>Δ/(2L)</code>、<code>Δ/4</code>、<code>|E0|/(N_v+N_p)</code>
+  <strong>恰好都给 1.000000</strong>（因 <code>2L = 4 = N_v + N_p</code>）⟹ <strong>光看「L=2 给 1」无法还原口径</strong>；L ≥ 3 才分开。
+  ⟹ <strong>教训：报能隙必须同时写 J 的归一化与边界条件。</strong></li>
+<li>⚠️⚠️ <strong>B 的第 0 批核对用错了公式</strong>（<strong>这是对我自己上一批工作的更正</strong>）：反推判据 —— 把 ε = 10⁻⁵⁰ 代进
+  §8.1 的 <code>ε(E) = ε₀(M_Pl/E)^β</code>，得能标 <strong>E = 2.05×10⁶⁹ GeV</strong>，<strong>超出普朗克能标约 49 个数量级</strong>
+  ⟹ 该公式<strong>不适用</strong> ⟹ 「差 40 个数量级」是<strong>跨章节的同一符号两个身份</strong>造成的假警报。
+  已改写为「<strong>叙事性量级输入，无独立推导</strong>」，并注明<strong>「LHC 无新物理」的论证不依赖它</strong>（「差 15 量级」已充分）。</li>
+<li><strong>论文</strong>：§5.7 三处（Δ=1 → Δ=4J，含口径注）＋ §4.2（ε 改注）＋ 第 60 轮块标「已收口」（<strong>中英同步 10 项 0 失败</strong>）；
+  格式三指标与备份<strong>逐一相同</strong> ✓。清单：<strong>新增 1.3 节</strong>（20 小节顺延，编号 <strong>1.1–1.23 连续 ✓</strong>）；
+  候选池 41 / 35 的待办标已收口；总账 <strong>更正 10→12</strong>。</li>
+</ul>
+<hr />
+<h3>第 70 轮：粗粒化截断与 Φ 的质量 —— <strong>两个开口为何不能共用一个尺度</strong>（I-18 ＋ I-17 <strong>合并轮</strong>）</h3>
+<p><strong>性质</strong>：<strong>结构判定 ＋ 数值 ＋ 更正</strong>（<strong>未新增演化方程</strong> —— 与第 67 轮不同）。
+<strong>核验</strong>：<code>_coarsegrain_70.py</code>（<strong>CG-1…CG-10，11 项 0 失败</strong>）。</p>
+<p><strong>合并理由</strong>：§4.5b 明写 Φ 的数学身份是<strong>谱作用</strong> <code>S = Tr f(D²/Λ²)</code>（<strong>自带截断 Λ</strong>），
+而第 423 行给出「粗粒化」的<strong>群论定义</strong> ⟹ 若共用同一截断就是一条机制 —— <strong>这是可判定的</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>结论</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>①</strong></td>
+<td>框架的「粗粒化 / 截断」共 <strong>10 个实现</strong>；<strong>其中只有 2 个是纯输入</strong>（谱作用 Λ、Φ⁴ 势 μ）—— 而<strong>恰恰这两个决定 Φ 的质量</strong></td>
+<td>引文表（CG-2）</td>
+</tr>
+<tr>
+<td><strong>②</strong></td>
+<td><strong>两者结构上不同</strong>：群论粗粒化<strong>只用置换群、不含任何量纲量</strong>（实现里浮点字面常数 <strong>0 个</strong>）；截断类<strong>每一个都必须带一个尺度</strong></td>
+<td>CG-6</td>
+</tr>
+<tr>
+<td><strong>③ ⭐</strong></td>
+<td><strong>I-18 的答案（追问方向要改）</strong>：<strong>tick 演化摧毁平滑，不产生平滑</strong> —— 从极端平滑初态出发，块密度方差 <strong>B 在 2 步内从 0.250000 衰减到 0.006944</strong>（随机基线 0.020833）；同一 tick 轨道内 B 极差 <strong>0.250000</strong>、S 极差 <strong>0.590909</strong>、<code>\|d₀−d₁\|</code> 从 <strong>1.0000 降到 0.0000</strong></td>
+<td>CG-4b / CG-5</td>
+</tr>
+<tr>
+<td><strong>④ ⭐</strong></td>
+<td><strong>I-17 加固 ＋ 新的可判别结构</strong>：Φ 的质量挂在<strong>两个纯输入</strong>上 ⟹ <strong>公设上移未解决</strong>；但反解 <code>E(R) = √(ℏc·E_P/R)</code> 给出 <strong>质量档位 ⟹ 力程</strong>：<strong>弦网档 0.813 l_P</strong>（❌ 差 28.9 量级）vs <strong>粗粒化档 0.194 / 0.047 mm</strong>（✅ <strong>在亚毫米第五力窗口内</strong>）⟹ <strong>(a)/(b) 比 = 1.475×10³¹，差 31.2 个数量级</strong></td>
+<td>CG-7 / CG-8 / CG-9</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>⭐ <strong>精确版结论</strong>：<strong>「平滑」= 「在大于 l_P 的尺度上读数」</strong> —— <strong>观测者侧</strong>的性质，不是衬底自发形成的结构。
+  与第 322 行「<strong>截断 = 普朗克（公理 1 自然给出）</strong>」及 B5 的观测者分辨率（面积尺度 √4 = 2 l_P）<strong>相容</strong>。
+  ⚠️ 但这是本轮的<strong>解释</strong>，<strong>不是框架原文</strong>；第 66/67 轮的高斯核 σ = 0.55 弧度是<strong>玩具模型的外部选择</strong>。</li>
+<li>⚠️ <strong>力程在窗口内只是必要条件</strong>：0.05–0.2 mm 的<strong>与引力同强度</strong>标量力早已被 Eöt-Wash 类实验排除，
+  未被排除的只剩<strong>极弱耦合</strong>窄带 ⟹ 而<strong>耦合强度正是 I-17 未给的另一半</strong> ⟹ <strong>(b)/(c) 仍不是可检验预言</strong>。</li>
+<li>⚠️ <strong>副产品</strong>：<code>E(R) = 1 meV ⟹ R = 16.93 R_H</code>（交叉验证 <code>(4.19/1.0181)² = 16.93</code> ✓）——
+  但 1 meV 是<strong>恒等式</strong>（C-4）、4.19 meV 与 <code>√(M_Pl H₀)</code> <strong>是同一个组合</strong>（C-6）⟹ <strong>不是新成果</strong>。</li>
+<li>⚠️ <strong>实现层发现（C-13）</strong>：<strong>(2,2,4) 的 z 线长 = 4 让「块方差」退化成 tick 不变量</strong>
+  （相位 1 匹配 <code>(1 2)(3 0)</code> 恰好把两块<strong>整体互换</strong> ⟹ <code>(d₀−0.5)²</code> 不变，实测极差 = 0）
+  ⟹ 以后凡用「块方差」做判据<strong>必须避开 z 线长 = 4</strong>。<strong>与陷阱 22 / 62 同族，但方向相反</strong>：
+  前两次是「算例太小还原不出口径」，<strong>这次是「算例太小让度量本身退化」</strong>。</li>
+<li>⚠️ <strong>两个「31」不是同一个口径</strong>：第 62 轮的「28.9 – 55.4」是<strong>候选与窗口的距离</strong>；
+  本轮的「31.2」是<strong>两个候选之比</strong> ⟹ <strong>不要混引</strong>。</li>
+<li><strong>论文</strong>：§8.2 块链末插【第 70 轮】块（<strong>中英同步 2 项 0 失败</strong>）；格式三指标与备份<strong>逐一相同</strong> ✓
+  （备份 <code>paper/history/*_备份_2026-10-02第70轮前.md</code>）。清单：<strong>新增 1.2 节</strong>（23 小节顺延，编号 <strong>1.1–1.24 连续 ✓</strong>）；
+  <strong>I-18 标 ✅ 已做</strong>、<strong>I-17 标已加固</strong>、新增 <strong>I-19 / N-27 / C-13</strong>；总账 <strong>难题 18（成分更新）、负面 26→27、更正 12→13</strong>。</li>
+</ul>
+<hr />
+<h3>第 71 轮：观测者的粗粒化尺度 —— <strong>框架写过这条链，但少写了一个口径</strong>（<strong>I-19 结项</strong>）</h3>
+<p><strong>性质</strong>：<strong>结构判定 ＋ 数值 ＋ 口径更正</strong>。<strong>核验</strong>：<code>_observer_scale_71.py</code>（<strong>OS-1…OS-9，9 项 0 失败</strong>）。</p>
+<p><strong>问句来源</strong>：第 70 轮说「平滑 = 在大于 l_P 的尺度上读数」，<strong>未给那个尺度</strong> ⟹ 登记为 I-19。
+<strong>答案</strong>：框架<strong>已经写过这条推导链</strong>（§4.10 定理包），<strong>能连成</strong>，但推出的是<strong>不等式</strong>。</p>
+<p><strong>链条逐环</strong>（每环标性质）：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>环节</th>
+<th>来源</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td>普朗克尺度事件流</td>
+<td>公理 1</td>
+<td><strong>公理</strong></td>
+</tr>
+<tr>
+<td>②</td>
+<td>方向管最细尺度 = l_P</td>
+<td>§4.10</td>
+<td><strong>本框架设定</strong></td>
+</tr>
+<tr>
+<td>③</td>
+<td><strong>方向簇 k ≥ 4</strong></td>
+<td><strong>定理 1（Lusternik–Schnirelmann / Borsuk）</strong></td>
+<td><strong>数学定理</strong></td>
+</tr>
+<tr>
+<td>④</td>
+<td>每面元 4 个方向模式</td>
+<td>③ + Tammes</td>
+<td><strong>数学</strong></td>
+</tr>
+<tr>
+<td>⑤</td>
+<td>4 模式需 ≥ 4 采样点</td>
+<td><strong>Nyquist 采样定理</strong></td>
+<td><strong>信息论普遍原理</strong></td>
+</tr>
+<tr>
+<td>⑥</td>
+<td><strong>相干块 ≥ N_模式 l_P²</strong></td>
+<td>④ + ⑤</td>
+<td><strong>不等式（有效下界）</strong> ✓</td>
+</tr>
+<tr>
+<td>⑦</td>
+<td>块内最大压缩 ⟹ 1 纳特/块</td>
+<td>「最大压缩」假设</td>
+<td><strong>额外假设</strong></td>
+</tr>
+<tr>
+<td>⑧</td>
+<td><code>S = A/(4l_P²)</code>（等号）</td>
+<td>⑥ + ⑦</td>
+<td>半拟合（第 52 轮已裁）</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>⭐ <strong>只有 ① 是公理，③④⑤ 全是数学与信息论</strong> —— 这是框架里少见的「硬」链。</li>
+<li>⭐ <strong>本轮查出的口径缺口（C-14）</strong>：第 ⑤ 环的「4 模式」<strong>定义未写明</strong> —— 正四面体 4 方向
+  <strong>线性相关</strong>（<code>Σ n_a = 0</code>，数值 <code>[0,0,0]</code> 精确）⟹ 独立复算 <code>k×4</code> 采样矩阵的秩：
+  <strong>线性</strong>模式给 <strong>3</strong>（「随机 4 泛函」同样给 3）、非线性模式（绝对值 / 高斯）才给 <strong>4</strong>。
+  ⟹ <strong>下界依赖「模式如何定义」而原文未写</strong> ⟹ 相干块下界应是<strong>区间 3 – 4 l_P²</strong>。
+  ⚠️ <strong>不等于该处有错</strong>（「4 个方向上的<strong>连接状态</strong>」是非线性量，可满 4 维）—— <strong>缺的是口径，不是结论</strong>。</li>
+<li>⭐ <strong>结论（不等式）</strong>：<strong>粗粒化尺度 ≥ √3 l_P = 1.7321 l_P</strong>（线性模式）／<strong>2.0000 l_P</strong>（非线性模式）
+  ⟹ 保守可声称 <strong>1.73 – 2.00 l_P</strong>；<strong>取等号需第 ⑦ 环</strong>（第 52 轮裁过的那一步）。</li>
+<li>⭐ <strong>尺度换算</strong>：icosphere(3) 按「面元 = l_P²」给 <strong>R = 10.0925 l_P</strong>、<strong>1-ring 平均边长 = 1.5227 l_P</strong>
+  ⟹ 第 66/67 轮的 1-ring 计数<strong>恰好在这个尺度附近</strong>；其平滑核 σ = 0.55 rad ⟹ <strong>5.55 l_P</strong>
+  （<strong>更粗、保守安全</strong>），而 σ = 0.15 rad ⟹ 1.51 l_P 属<strong>欠粗粒化</strong>（那一档的数字不该用）。</li>
+<li>⭐ <strong>与第 70 轮互补</strong>：第 70 轮证「<strong>平滑不是衬底产生的</strong>」（负面）、本轮证「<strong>粗粒化尺度有下界且可算</strong>」（正面）
+  ⟹ 合起来「<strong>平滑来自观测者，而观测者的尺度下界是可算的</strong>」。</li>
+<li>⚠️ <strong>与已判死方向区分</strong>（本轮的自我审查）：第 40 / 51 / 52 轮判死的是「<strong>用衬底推观测者读数分辨率</strong>」
+  （问<strong>熵密度</strong>、要算衬底量）；本轮问<strong>长度</strong>、只用<strong>数学 + 信息论</strong> ⟹ <strong>不撞那条死</strong>；
+  而第 ⑦ 环正是第 52 轮裁过的那一步 ⟹ 本轮<strong>止步于不等式</strong>。</li>
+<li>⚠️ <strong>五条边界</strong>：① 第 ② 环是<strong>设定</strong>（整条链第一环是公理、第二环是设定）；② 第 ⑦ 环是<strong>额外假设</strong>；
+  ③ 第 ⑤ 环<strong>口径未写明</strong>（C-14）⟹ 下界是<strong>区间</strong>；④ <code>R = 10.09 l_P</code> 依赖「面元 = l_P²」，
+  用在<strong>弯曲球面</strong>上是<strong>类比</strong>；⑤ <strong>本轮不给「观测者的读数算子」</strong>（第 40 轮三难仍成立）。</li>
+<li><strong>论文</strong>：§8.2 块链末插【第 71 轮】块 ＋ <strong>§4.10 Nyquist 行加口径注（C-14）</strong>（<strong>中英同步 4 项 0 失败</strong>）；
+  格式三指标与备份<strong>逐一相同</strong> ✓（备份 <code>paper/history/*_备份_2026-10-02第71轮前.md</code>）。
+  清单：<strong>新增 1.2 节</strong>（24 小节顺延，编号 <strong>1.1–1.25 连续 ✓</strong>）；<strong>I-19 标 ✅ 已做</strong>、新增 <strong>C-14</strong>；
+  总账 <strong>难题 18→17（I-19 移出）、更正 13→14</strong>。</li>
+</ul>
+<hr />
+<h3>第 72 轮：Φ 的耦合强度 —— <strong>框架给不出「第五力」的另一半</strong>（<strong>I-17 结项</strong>）</h3>
+<p><strong>性质</strong>：<strong>结构判定 ＋ 引文取证 ＋ 外部对照</strong>。<strong>核验</strong>：<code>_phi_coupling_72.py</code>（<strong>PC-1 … PC-9，9 项 0 失败</strong>）。</p>
+<p><strong>问句来源</strong>：第 70 轮做完了 I-17 的<strong>质量侧</strong>，并明写「<strong>耦合强度正是 I-17 未给的另一半</strong>」。本轮做它。</p>
+<p><strong>答案</strong>：<strong>框架对耦合 <code>g</code> 给出 0 条约束</strong> —— 它是 Φ 的<strong>第 4 个纯输入</strong>；把 §4.5b 的 KK 读法当真后，
+<strong>两个毫米档落在已被桌面实验测过的区间里</strong>。</p>
+<p><strong>（a）耦合 <code>g</code> 是 Φ 的第 4 个纯输入</strong>：Φ 一个场挂 <strong>Λ</strong>（§4.5b 谱作用截断）、<strong>μ</strong>（§6.4 势的质量参数）、
+<strong>λ</strong>（§6.4 四次耦合）、<strong>g</strong>（§6.1 钉扎项 <code>gΦψ̄ψ</code>），而<strong>没有一行</strong>把它们互相约束
+（含 <code>gΦ</code> 记号的关系式 <strong>0 处</strong>、势内 μ–λ 关系 <strong>0 处</strong>）。
+⭐ <strong>判定证据（本轮最干净的一条）</strong>：§6.2 的「<strong>退化检验</strong>」把 <code>g = 0</code> 列为一个<strong>特例</strong>
+（<code>g=0、V=½m²Φ² → 自由 Dirac+标量+GR</code>）⟹ <strong>框架自己按自由参数在用 <code>g</code></strong>。</p>
+<p><strong>（b）两处未声明的符号撞车 ⟹ C-15</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>义 1</th>
+<th>义 2</th>
+<th>声明状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>λ</code></strong></td>
+<td>§5 弦网耦合（<code>λ_c ≈ 0.14</code>）</td>
+<td><strong>§6.4 的 Φ⁴ 四次耦合</strong></td>
+<td>§8.6 的符号约定<strong>只声明 §5</strong>，<strong>未提 §6.4</strong>；且「全文 26 行」过期（实测 <strong>44 行</strong>）</td>
+</tr>
+<tr>
+<td><strong><code>g</code></strong></td>
+<td><strong>§6.1 钉扎耦合</strong></td>
+<td><strong>§5.7 弦网几何因子 <code>J = n_G·E_P·g</code></strong></td>
+<td><strong>0 处约定</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>（c）§4.5b 的 <code>γ = β = 1</code> 对这个耦合失明</strong>：λ = 0.194 mm 的标量在 1 AU 处
+Yukawa 因子 = <strong>10^(−3.35×10¹⁴)</strong> ⟹ 太阳系 PPN 与 EMRI 强场检验<strong>既不约束也不冲突</strong>；
+而框架<strong>没有任何屏蔽机制</strong>（chameleon / symmetron / Vainshtein / galileon / dilaton <strong>各 0 处</strong>）。</p>
+<p><strong>（d）⭐ 桌面实验对照 —— 四档没有一档能活</strong>（外部锚点：Eöt-Wash 组的 α=1 排除边界
+197 → 56 → 42 → <strong>39 μm</strong>（2001/2007/2013/2020）；Tan et al., PRL 124, 051301 (2020) 在 <strong>40–350 μm</strong>
+给出 α 的最强上界、λ = 48 μm 处仍为 |α| ≤ 1）：</p>
+<table>
+<thead>
+<tr>
+<th>Φ 质量档（第 70 轮）</th>
+<th>力程 λ</th>
+<th>判决（若 α = O(1)）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(a) 弦网标量扇区 <code>Δ = 0.41 J</code></td>
+<td><strong>0.813 l_P</strong></td>
+<td>未排除，<strong>同时也不可观测</strong></td>
+</tr>
+<tr>
+<td><strong>(b) 粗粒化 @ <code>E_c</code></strong></td>
+<td><strong>193.8 μm</strong></td>
+<td><strong>已被排除</strong>（在 40–350 μm 带内）</td>
+</tr>
+<tr>
+<td><strong>(c) 粗粒化 @ <code>E(R_H)</code></strong></td>
+<td><strong>47.1 μm</strong></td>
+<td><strong>处在 39–48 μm 的灵敏度前沿</strong></td>
+</tr>
+<tr>
+<td>(d) 普朗克（公理 1）</td>
+<td><strong>1.000 l_P</strong></td>
+<td>未排除，<strong>同时也不可观测</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>（e）三分支判决</strong>：(i) <strong>自由输入</strong>（框架现状）⟹ 相互作用是 <strong>4 参数族（Λ, μ, λ, g）</strong>、
+<strong>可识别性 = 0</strong> ⟹ <strong>零预言力</strong>；(ii) 取 KK 读法 ＋ 毫米档 ⟹ <strong>已被排除</strong>；
+(iii) 同上 ＋ 普朗克档 ⟹ <strong>不可观测</strong>。⟹ <strong>三选一全是死路</strong>。
+与第 61 轮（工程出口 = 0）、第 62 轮（四力位无空位）合起来：<strong>「第五力」这条线在框架内彻底关死</strong> ——
+不是「还没算」，是「<strong>算出来也不能用</strong>」。</p>
+<p><strong>（f）⚠️ 顺带查出的第三条</strong>：第 70 轮弦网档的 <code>0.813 l_P</code> <strong>隐含取 <code>g = 1</code></strong>
+（因为 <code>J = n_G·E_P·g</code>，而 <code>g</code> 正是本轮要审的耦合）⟹ 那个力程<strong>本身是 <code>g</code> 的函数</strong>。
+<strong>不推翻第 70 轮的结论，但把它的口径写明</strong>。</p>
+<p><strong>（g）⚠️ 本轮的实现层发现（陷阱 47/20 的执行细则要补）</strong>：<strong>轮次块不全是 <code>&gt;</code> 引用块</strong> ——
+第 62 轮在 §5.5 的加注是<strong>正文段</strong>（<code>&lt;strong&gt;第五力的位置（第 62 轮加注）&lt;/strong&gt;</code>），且<strong>跨两个自然段</strong>
+（805–808 与 810–820），<strong>第二段不带任何标记</strong>。
+⟹ 清点掩码必须覆盖「无 <code>&gt;</code> 前缀的 <code>&lt;strong&gt;【v2.9 补充（第…</code> 段」与「</strong>跨段**轮次注」；
+本轮实现 = <strong>从标记行起标记到下一个 <code>#</code> 标题，表格行永不标记</strong>。
+✅ 补丁后复跑 PC-1…PC-9 仍为 <strong>9 项 0 失败</strong>（证明掩码防住了自指）。</p>
+<p><strong>（h）总账</strong>：<strong>难题 17 → 16</strong>（I-17 移出）、<strong>负面 27 → 28</strong>（N-28）、<strong>更正 14 → 15</strong>（C-15）。
+<strong>产物</strong>：备忘录 <code>Φ的耦合强度_框架给不出第五力的另一半.md</code>（＋html）；
+论文 <strong>§5.5 插【第 72 轮】块 ＋ §6.1 口径注 ＋ §8.6 约定补注与行数更正</strong>
+（<strong>中英同步 8 项 0 失败</strong>，格式三指标 Δ 全 0，备份 <code>paper/history/*_备份_2026-10-02第72轮前.md</code>）；
+清单 <strong>新增 1.2 节</strong>（编号 <strong>1.1–1.26 连续 ✓</strong>，9 项 0 失败）。</p>
+<hr />
+<h3>第 73 轮：宇宙学判别力审计 —— <strong>框架与 ΛCDM 之间不存在判别点</strong>（<strong>候选池 36 / S-12 结项</strong>）</h3>
+<p><strong>性质</strong>：<strong>结构判定 ＋ 引文取证 ＋ 代数</strong>。<strong>核验</strong>：<code>_cosmo_audit_73.py</code>（<strong>CD-1 … CD-10，10 项 0 失败</strong>）。</p>
+<p><strong>问句来源</strong>：候选池 <strong>36</strong>（第 54 轮登记、第 61 轮降调）——
+「把 S-12 的平坦性从<strong>定性主张</strong>变成<strong>可与其他模型区分的判据</strong>；<strong>若做不到，S-12 应走 S-E5 同一条路</strong>（结项）」。</p>
+<p><strong>答案</strong>：<strong>做不到</strong>，而且<strong>不是「还没找到」，是结构性的</strong>。</p>
+<p><strong>（a）9 条宇宙学输出逐条对照</strong>（判别力为 0 的 <strong>8</strong> 条）：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>框架输出</th>
+<th>标准侧给什么</th>
+<th>判别力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>O1</td>
+<td><code>Ω_tot = 1</code>（<code>Ω_K = 0</code>）</td>
+<td>平 ΛCDM <strong>也是 0</strong></td>
+<td>0（同值）</td>
+</tr>
+<tr>
+<td>O2</td>
+<td><code>ρ = 3H₀²/8πG</code></td>
+<td><strong>就是平直 Friedmann 约束方程</strong></td>
+<td>0（同值）</td>
+</tr>
+<tr>
+<td>O3</td>
+<td><code>M = c³/(2GH₀)</code>、<code>R_S = R_c</code></td>
+<td><strong>恒等式</strong>（见 (c)）</td>
+<td>0（零内容）</td>
+</tr>
+<tr>
+<td>O4</td>
+<td><code>T = ℏH₀/2π</code>、<code>β = 1/(2π)</code></td>
+<td><strong>就是 Gibbons–Hawking 公式</strong></td>
+<td>0（同值）</td>
+</tr>
+<tr>
+<td>O5</td>
+<td>面 = 平流停滞面 <code>c/H₀</code></td>
+<td><strong>用 <code>Ω_K</code> 数据</strong>排除竞争者 ⟹ 后选择</td>
+<td>0（含数据成分）</td>
+</tr>
+<tr>
+<td>O6</td>
+<td><code>w = −1 + 4ε/3</code>；<code>w_a = 0</code></td>
+<td>ΛCDM <strong>也是 <code>w_a = 0</code></strong></td>
+<td>0（同值）</td>
+</tr>
+<tr>
+<td>O7</td>
+<td><code>ρ_Λ ~ E_c⁴</code> ⟹ <code>Ω_Λ = 0.0290</code></td>
+<td>观测 <code>0.6889 ± 0.0056</code></td>
+<td><strong>若当预言 ⟹ 排除 117.8σ</strong></td>
+</tr>
+<tr>
+<td>O8</td>
+<td>暗物质双机制</td>
+<td><strong>已判死</strong></td>
+<td>0</td>
+</tr>
+<tr>
+<td>O9</td>
+<td><code>H₀ = 2.1927×10⁻¹⁸ s⁻¹</code></td>
+<td><strong>输入</strong>（取自观测）</td>
+<td>0（不是预言）</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 另：ΛCDM 的主判别面（<strong>功率谱 / 转移函数 / σ₈ / n_s / 暴胀 / 张量标量比</strong>）在<strong>论文正文里各 0 处</strong>
+⟹ 框架<strong>从未进入扰动层</strong>，判别只能发生在背景量上。</p>
+<p><strong>（b）⭐ 结构性结论</strong>：框架的宇宙学输出写成<strong>一个统一的形态</strong> ——</p>
+<pre><code>{ Ω_K = 0,  w_a = 0,  w₀ = −1 + 2ν（ν 自由）,  ρ = 3H²/8πG,  T = ℏH₀/2π }
+</code></pre>
+<p>而 <strong>ΛCDM 是它 <code>ν = 0</code> 处的特例</strong> ⟹ <strong>ΛCDM ⊂ 框架</strong> ⟹ 框架允许的观测集 <strong>⊇</strong> ΛCDM 的
+⟹ <strong>凡是 ΛCDM 拟合得住的数据，框架一定也拟合得住</strong> ⟹ <strong>判别点在原则上不存在</strong>。
+⚠️ <strong>与第 51 轮同一个病（判据方向错了）</strong>：第 51 轮找 <code>H/N = 0.25</code> 的<strong>等式</strong>跨点 —— 实为<strong>不等式</strong>（<strong>N-13</strong>）；
+本轮找框架与 ΛCDM 的<strong>判别点</strong> —— 实为<strong>包含关系</strong>（<strong>N-29</strong>）。<strong>铁律 4 的又一例。</strong></p>
+<p><strong>（c）专项四则</strong>：
+- <strong>A. 精确平坦性不可判</strong>：<code>Ω_K ≡ 0</code> vs 暴胀类 <code>|Ω_K| ≲ 10⁻⁵</code>，差 <strong>5.3×10⁻³ σ</strong>（比当前精度小 8 个数量级），
+  且<strong>没有 <code>σ &lt; 10⁻⁵</code> 的路线图</strong>。
+- <strong>B. <code>w_a = 0</code> 不是框架独有</strong>：ΛCDM 同样给 <code>w_a = 0</code> ⟹ DESI DR2 那 <strong>3.3σ</strong> 压力是
+  <strong>框架与 ΛCDM 共同承担</strong>的 ⟹ 已在 §8.4 加<strong>判别力标注</strong>（原措辞易被误读为「框架被已有数据判别」）。
+- <strong>C. <code>ε</code> 的第三义 ⟹ C-16</strong>：§8.4 的 <code>E_c(z) = E_c,0(1+z)^ε</code>（<strong>漂移指数</strong>）与 §8.1 的<strong>泄漏概率</strong>同名，
+  而 §8.1 的符号约定范围只写「本节及 §8.2」⟹ <strong>未覆盖 §8.4</strong>；若强行同义，取 §8.1 自己的
+  <code>ε(1 meV) ~ 1</code> 会给出 <code>w = +0.333</code>，与 DESI+CMB 差 <strong>43.9σ</strong> ⟹ 二者<strong>必须不同义</strong>。
+- <strong>D. 「哈勃球 = 史瓦西半径」是恒等式 ⟹ C-17</strong>：<code>R_S = 2G·[c³/(2GH₀)]/c² = c/H₀ ≡ R_c</code>
+  —— <strong><code>G</code> 与 <code>H₀</code> 全被消掉</strong>，对<strong>任意</strong> <code>H₀</code> 恒成立（三个任意 <code>H₀</code> 的相对差 0.0e+00 / 2.3e−16 / 0.0e+00）
+  ⟹ <strong>比巧合更弱：零内容</strong>（与第 53 轮 <code>E_c ≡ 1 meV</code>（C-4）同一病症）。
+  ⚠️ 但 §8.6.3 的<strong>等分账本身仍有内容</strong>（<code>ρ = 3H²/8πG</code>，不假设 Friedmann）—— 更正只针对
+  「黑洞宇宙 = 机制说明」这一句。</p>
+<p><strong>（d）判决与总账</strong>：<strong>N-29</strong>（负面）、<strong>C-16 / C-17</strong>（更正）、<strong>S-12 结项</strong>（改标「<strong>框架不覆盖宇宙学判别</strong>」，
+与 <strong>T-10</strong> 同类）⟹ 负面 <strong>28 → 29</strong>、更正 <strong>15 → 17</strong>；难题 <strong>16 条不变</strong>（S-12 属工程项）。
+<strong>产物</strong>：备忘录 <code>宇宙学判别力审计_框架与ΛCDM之间不存在判别点.md</code>（＋html）；
+论文 <strong>§8.6.5 插【第 73 轮】块 ＋ §8.6.3 恒等式标注 ＋ §8.4 判别力标注 ＋ §8.1 ε 补注</strong>
+（<strong>中英同步 8 项 0 失败</strong>，格式三指标 Δ 全 0）；清单 <strong>新增 1.2 节</strong>（<strong>1.1–1.27 连续 ✓</strong>，9 项 0 失败）。</p>
+<p><strong>（e）⭐ 战略含义</strong>：第 61 轮（工程出口 = 0）＋ 第 62 轮（四力位无空位）＋ 第 72 轮（第五力耦合给不出）
+＋ 本轮（<strong>宇宙学判别 0/9</strong>）⟹ <strong>框架的对外接口在四个方向（工程 / 新力 / 宇宙学判别 / 凝聚态）上都已探到底</strong>，
+<strong>唯一剩下的对外接口 = EMRI</strong>（观测侧，LISA ~10–15 年，三个前提全在框架之外）。</p>
+<hr />
+<h3>第 75 轮：宇宙学动力学 —— <strong>加速度与连续性方程「为什么补不上」</strong>（<strong>候选池 9 / I-20 结项</strong>）</h3>
+<p><strong>性质</strong>：<strong>结构判定 ＋ 推导 ＋ 数值</strong>。<strong>核验</strong>：<code>_friedmann_75.py</code>（<strong>FR-1 … FR-10，10 项 0 失败</strong>）。</p>
+<p><strong>问句来源</strong>：§8.6.3 <strong>自认</strong>「<code>ρ = 3H²/8πG</code> 只是约束方程；加速度方程与连续性方程仍缺
+（给定约束后二者等价）」。而框架在 §2.2 <strong>已有</strong>守恒流 <code>∇_μ J^μ = 0</code>（微变权流）—— <strong>差距在哪？</strong></p>
+<p><strong>答案</strong>：<strong>不是「还没推导」，而是「在这个账里不存在」</strong>；<strong>缺的不是方程，是对象</strong>。</p>
+<ul>
+<li>⭐ <strong>结果 A（等分账「恒成立」）</strong>：等分账的输入<strong>只有同时刻的 <code>H</code></strong>（<code>R = c/H</code>、<code>T = ℏH/2πk_B</code>），
+  无一处用到 <code>H = H₀</code> ⟹ 在 <code>H₀ / 2H₀ / H₀/2</code> 上相对差均 <strong>3.7×10⁻¹⁶</strong> ⟹
+  <strong><code>Ω_tot(t) ≡ 1</code>，<code>Ω_K ≡ 0</code> 是「恒为 0」而非「今天恰好为 0」</strong>，且 <code>ρ ∝ H²</code>。
+  ⚠️ 论文只写 <code>t₀</code> ⟹ 「任意 <code>t</code>」是<strong>自然外推</strong>（纯框架内部加强，<strong>不</strong>改变第 73 轮的「无判别力」）。</li>
+<li>⭐⭐ <strong>结果 B（硬写守恒 ⟹ <code>w = −1/3</code>，零自由参数）</strong>：面上 <code>E(H) = N·k_BT = ℏc²/(2l_P²H)</code>（<code>E ∝ 1/H</code>）、
+  <code>V = (4π/3)(c/H)³</code>（<code>V ∝ H⁻³</code>）；若要求 <code>dE = −p dV</code> ⟹ <code>p = −ℏH²/(8πl_P²c)</code>（负压）、
+  <code>w = p/(ρc²) = −ℏG/(3l_P²c³) ≡ &lt;strong&gt;−1/3&lt;/strong&gt;</code>（<code>ℏ</code>、<code>G</code>、<code>c</code>、<code>H₀</code> <strong>全消掉</strong>；数值 −0.3333333333）。
+  自洽反算 <code>Ḣ = −4πG(ρ+p/c²) ≡ −H₀²</code>（相对差 1.4×10⁻¹⁶）⟹ <code>H = 1/t</code>、<code>a ∝ t</code>。</li>
+<li>⭐ <strong>结果 C（<code>w = −1/3</code> 就是曲率标度）</strong>：<code>ρ ∝ a^{−3(1+w)} = a^{−2}</code> —— 平宇宙里<strong>没有守恒物质</strong>
+  这样稀释 ⟹ <strong>等分账的 <code>ρ</code> 只能是「约束」，不能是「守恒流体」</strong>。</li>
+<li>⭐⭐ <strong>核心（两个 <code>ρ</code> 不接）</strong>：§2.2 的 <strong><code>J^μ</code></strong> 守恒，但它是<strong>湮灭事件计数</strong>测度、<strong>不带 <code>p</code></strong>
+  ⟹ 写不出 <code>ρ̇ + 3H(ρ+p/c²) = 0</code>；等分账的 <code>ρ</code> 带 <code>p</code>，但守恒会强制 <code>w = −1/3</code>。
+  判据：「<code>J^μ</code>/微变权」与「<code>3H²/8πG</code>」<strong>同行共现 0 次</strong>（已排除本轮自己的块）⟹ <strong>接口从未被写过</strong>。
+  弗里德曼对需要<strong>同一个 <code>ρ</code> 同时满足「约束」与「守恒」</strong> ⟹ 第 4 种失败形态：<strong>分层</strong>。</li>
+<li>⭐ <strong>与观测对照</strong>：<code>w = −1/3</code> vs DESI 2024+CMB <code>w = −1.028 ± 0.031</code> ⟹ <strong>22.4σ</strong>。</li>
+<li><strong>附带两个口径更正</strong>：<strong>C-20</strong>（等分账的面积口径必须取投影面积 <code>πR²/l_P²</code>；取 <code>4πR²</code> <strong>差 4 倍</strong>）、
+  <strong>C-21</strong>（<code>ρ</code> <strong>5 义</strong>、<code>w</code> <strong>2 义</strong>，均无符号约定）。</li>
+<li>⚠️ <strong>诚实边界</strong>：结果 B <strong>加了一条框架自己没有的假设</strong>（面上绝热守恒）——用法是<strong>反证</strong>
+  （「<strong>若</strong>要写守恒，<strong>就</strong>必然 <code>w = −1/3</code>」），<strong>不是</strong>说框架预言 <code>w = −1/3</code>；本轮<strong>不主张 <code>J^μ</code> 错了</strong>。</li>
+<li><strong>总账</strong>：难题 <strong>16 → 15</strong>、负面 <strong>29 → 30</strong>、更正 <strong>19 → 21</strong>。
+  <strong>产物</strong>：备忘录 <code>宇宙学动力学_加速度与连续性方程为什么补不上.md</code>（＋html）；
+  论文 <strong>§8.6.3 插【第 75 轮】块 ＋ 面积口径注 ＋ §8.6 符号约定补注</strong>
+  （<strong>中英同步 6 项 0 失败</strong>，格式三指标 Δ 全 0）；清单 <strong>新增 1.2 节</strong>（<strong>1.1–1.29 连续 ✓</strong>）。</li>
+<li>⭐ <strong>与第 73 轮的接口</strong>：本轮<strong>给出了「为什么 <code>w</code> 只能来自外部参数 <code>ν</code>」</strong>—— <strong>等分账对 <code>w</code> 零约束</strong>。</li>
+</ul>
+<hr />
+<h2>六、⚠️ 不可恢复资产（在另一台机器上，记得拷回来）</h2>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>verification/lean/StormPoC.lean</code></td>
+<td>7 个定理族：GA/T、A3(4)、A4(9)、BH(9)、AR(9)、LC(6)、LW(6)；基线 <code>lake build</code> 8909 jobs 全绿</td>
+</tr>
+<tr>
+<td><code>verification/lean/lakefile.lean</code>、<code>lean-toolchain</code>、<code>.github/workflows/lean-poc.yml</code></td>
+<td>Lean 4.34.0-rc2 + mathlib CI</td>
+</tr>
+<tr>
+<td><code>python/maps/</code></td>
+<td>MAPS 新思考 T1–T5（<code>formula.py</code>、<code>maps_framework.py</code>、<code>verify.py</code>、<code>run.sh</code>）</td>
+</tr>
+</tbody>
+</table>
+<p>三份恢复规格已写好：<code>RECOVERY.md</code>、<code>verification/lean/README.md</code>（含工具链版本、
+下载镜像、Lean 踩坑 6 条、BX 族定理清单）、<code>python/maps/README.md</code>。
+<strong>拷回来后必须重跑 <code>lake build</code> 才算数</strong>——在那之前，Lean 侧的结论只有记忆日志背书。</p>
+<h2>七、下一步优先级（建议）</h2>
+<ol start="0">
+<li>🎯 <strong>当前建议（第 76 轮后）</strong>：<strong>候选池 3（§7 量子力学基础）已结项</strong>（第 76 轮，<strong>I-21</strong>）——
+   §7 是<strong>最后一个未被审计的大章</strong>（70 行里 41 行是轮次块，去掉后<strong>仅 15 行正文</strong>）。
+   结论：<strong>非交换化是「外加」的</strong>（框架自有代数全是交换／阿贝尔），<strong>判别力 = 0</strong>（§7.4 自认）；
+   ⭐ 唯一正面产出 = §7.1 可升级为<strong>引用 Fine 定理的推论</strong>（<strong>解释力</strong>，不是判别力）。
+   📄 至此框架的<strong>全部对外接口逐一核完</strong>：工程（61）／新力（62、72）／宇宙学（73）／凝聚态（53–55）／
+   <strong>量子基础（76）</strong> ⟹ 观测侧只剩 <strong>EMRI</strong>（LISA ~10–15 年）；<strong>但内部台账仍有 19 条 —— 收口 ≠ 无事可做</strong>。
+   🎯 <strong>建议下一轮</strong>：<strong>P1（<code>g → α_s/α_EM</code> 映射）</strong> —— 与第 72 轮（Φ 耦合）直接接续，是 §10.2 #11 的实质开放项；
+   其后 <strong>3.1 ＋ 3.3 ＋ 4.1 ＋ 4.3</strong>（四条低成本收尾，可一轮清）。
+   ⚠️ <strong>仍不建议</strong>：挑 <code>m_Φ</code> 质量档位；细化「1.73 vs 2.00 l_P」；再在宇宙学侧找判别点；再碰第五力；
+   <strong>C1 η 能标 / C2 暗能量能标</strong>（都是<strong>配出来的数</strong> ⟹ 做了也不会有判别力）。</li>
+<li>🎯 <strong>（历史，第 75 轮，已被上式取代）</strong>：<strong>候选池 9（C6 宇宙学动力学）已结项</strong>（第 75 轮）——
+   ⭐ 本轮是<strong>久违的正面结果</strong>：给出了<strong>零自由参数的 <code>w = −1/3</code></strong>（并证明它被 22.4σ 排除），
+   从而把「加速度＋连续性方程仍缺」从<strong>缺口</strong>改判为「<strong>在这个账里不存在</strong>」。
+   📄 全量待办总账（第 74 轮建）仍是导航：<code>outputs/全量待办回溯_我的过度声明更正与真实待办总账.md</code>。
+   🎯 <strong>建议下一轮</strong>：<strong>C3（§7 量子力学基础）</strong> —— 唯一还没被审计过的大章，且本轮的方法
+   （「<strong>先问缺的是方程还是对象</strong>」）正好适用；其后 <strong>3.1 ＋ 3.3 ＋ 4.1 ＋ 4.3</strong>（四条低成本收尾）。
+   ⚠️ <strong>仍不建议</strong>：挑 <code>m_Φ</code> 质量档位；细化「1.73 vs 2.00 l_P」；再在宇宙学侧找判别点；再碰第五力。</li>
+<li>🎯 <strong>（历史，第 74 轮，已被上式取代）</strong>：
+   ✅ <strong>候选池 36 已结项</strong>（第 73 轮），I-16 / I-17 / I-18 / I-19 四个根问题也都已结项。
+   ❌ <strong>但「候选池里可判定入口已清空」是第 73 轮的过度声明</strong>（<strong>C-18</strong>）——
+      用户当场质疑「我记得有很多分支都还没做」，全量回溯（<strong>第 74 轮</strong>，<code>_backlog_audit_74.py</code>，<strong>9 项 0 失败</strong>）
+      查出的<strong>真实待办 = 21 条</strong>：
+      · <strong>工作流第 3/4 批 6 项全部未做</strong>（3.1 不完备度比值重算 / 3.2 I-15 ⟨|O|⟩ 标度律 /
+        3.3 h_min 标度律审查 / 4.1 登记「格点 ↔ 面积律」不覆盖 / 4.2 三个「遍历性」分层判定 / 4.3 148 处引号清理）；
+      · <strong>候选池 #1–#9 实质项基本未做</strong>（η 能标 / 暗能量能标 / §7 量子力学基础 / η/s KSS /
+        PPN 优越系 / <strong>宇宙学动力学（加速度＋连续性方程，§8.6.3 自认仍缺）</strong> / void-CPT-κ / EMRI）；
+      · <strong>§七 老编号 5 条未做</strong>（消掉 <code>8π/3</code> / 载流子两类型 / 第 26 轮建议 ①②④）；
+      · <strong>论文 §10.2 #11 的 <code>g → α_s/α_EM</code> 映射</strong>仍开放（⚠️ 与 I-17 不是同一件事）；
+      · <strong>Lean 资产（<code>StormPoC.lean</code> / <code>lakefile</code>）仍未拷回</strong>。
+   📄 <strong>完整总账与推荐顺序见 <code>outputs/全量待办回溯_我的过度声明更正与真实待办总账.md</code>。</strong>
+   ⭐ <strong>方法教训（新，已写进技能）</strong>：<strong>本节（§七）只是「当期优先级」，不是「全量待办清单」</strong> ——
+      每轮收尾若只用 §七 判断进度，会<strong>系统性地漏掉整批任务</strong>（第 73 轮一次漏出 21 条）。
+      ⟹ <strong>新惯例：每轮收尾除了更新 §七，还要回 <code>未完成研究工作流</code> 核一遍批次状态。</strong>
+   🎯 <strong>建议的下一批（成本低、无依赖，一轮可做 3–4 条）</strong>：
+      <strong>4.3 ＋ 4.1 ＋ 3.3 ＋ H5</strong>（引号清理 / 一段登记 / 登记为无机制拟合 / §4.10「六处 4」复查）；
+      其后 <strong>3.1 ＋ H3</strong>（不完备度比值重算 / 交换变体）；再按物理价值排 <strong>P1 → C6 → C3 → H1 → C1/C2/C5</strong>。
+   💡 <strong>仍然成立的观察</strong>：第 68–73 连续六轮，每轮的产物形态都是「<strong>把一个开口关成一条可判定的结构结论</strong>」，
+      而<strong>正面结论为 0</strong>（第 63 轮统计：55–62 共 8 轮正面 = 0）⟹ <strong>该收口而非扩张</strong>。
+   ⚠️ <strong>两项仍不建议</strong>：① 挑 <code>m_Φ</code> 的质量档位；② 细化「1.73 还是 2.00 l_P」（文档工作，无可观测后果）。
+   ⚠️ <strong>不要</strong>再在宇宙学侧找判别点（第 73 轮已从结构上证否），<strong>不要</strong>再碰第五力（第 72 轮已关死）。</li>
+<li>
+<p>✅ ~~裁决读法 A/B~~ —— <strong>第 32 轮已裁决：取 B2（2^4 = 16）</strong>，见上。
+   ✅ ~~独立核验 C-b / C-c 的跨层适用性~~ —— <strong>第 33 轮以 w 扫描解除</strong>：
+   w = 0 是由 BH 熵定标 + 满占位<strong>共同解出的</strong>（槽模型的另一根 w = 0.7729 被 C-b 排除），
+   不是搬来的假设；模型 A 的 w 被 BH 锁在 0.500、与 C-b/C-c 的 0 落差 0.5 ⟹ 两头夹死。
+   ✅ ~~w 与 f 的同一性~~ —— <strong>第 34 轮解决</strong>：w = 1 − f²（不是 1 − f），
+   且<strong>同一性假设根本不需要</strong>（置换双射 ⟹ f ≡ 1、w ≡ 0 逐 tick 恒等）⟹ <strong>B2 闭环完成</strong>。
+   ✅ ~~「面元连接 ↔ 格点键」的对应~~ —— <strong>第 35 轮已显式构造</strong>（对偶面元 ↔ 4 条键，计数自洽）。
+   ✅ ~~面元—键对应的唯一性~~ —— <strong>第 38 轮已解除</strong>：两种读法因<strong>方格自对偶</strong>而同构。
+   ✅ ~~剩余压缩 5.545（= 8 ln2）~~ —— <strong>第 39 轮已结项：判为伪问题</strong>（四路 no-go，
+   见上「第 39 轮」段）。<strong>不在衬底层找它了。</strong>
+   ✅ ~~观测者读数能否是 tick 不变量~~ —— <strong>第 40 轮已判别：不能</strong>（见上「第 40 轮」段）。
+   ✅ ~~把 N 推大（检验 <code>⟨|O|⟩ = 1.557^N</code>）~~ —— <strong>第 41 轮已做</strong>：|G| 精确到 N = 216，
+   结论是<strong>第 40 轮第 ① 条不可外推</strong>（|G| 在 N ≥ 64 爆炸），并新找到 <strong>(Z₂)³ 奇偶差类不变量</strong>。
+   ✅ ~~T-7：tick 随机性是外生真随机还是内生确定性~~ —— <strong>第 42 / 43 轮已裁决</strong>：
+   <strong>本体不可判</strong>（H2 隐变量开销 1/L → 0 ⟹ 经验等价）；
+   ❌ ~~实现可判~~ —— <strong>第 43 轮推翻</strong>：扩散系数<strong>不能</strong>区分实现（D 是 1 个实数，
+   相位自由度是 L² 个比特 ⟹ 欠定；真随机 vs 确定性 LCG 的 D 差 1.51σ）。
+   ⟹ 最终口径：<strong>本体不可判、实现亦不可判</strong>。现行表述（H1）下 = <strong>不可预测</strong>。
+   ✅ ~~把 h 接上可观测量~~ —— <strong>第 43 轮已判否</strong>（= N-5，同上）。
+   ✅ ~~两点关联函数~~ —— <strong>第 44 轮已判否</strong>（空间关联 0.14σ）⟹ <strong>T-7 全部入口关闭、已结项</strong>
+   （归为「框架内不可判定」；它退化为伪随机数发生器的质量问题，不是物理问题）。
+   ❌ ~~观测者自身的周期 τ~~ —— <strong>第 45 轮已判否</strong>：N1 只给量子化条件；三个候选各带新未知量
+   （R / m / ω）。⟹ <strong>B5 的最后一个入口也关闭</strong> ⟹ <strong>建议接受 B5 为公设，停在层 0（δ）</strong>
+   （本轮论证：上移 = 无穷回归，每层都是一方程两未知量）。
+   ✅ ~~装 GAP~~ ⟶ ✅ ~~定位 0.25 的跨点（粗）~~ —— <strong>第 49 轮已夹住：N ∈ (32, 48)</strong>；
+   并发现 <strong>H/N 随 N 的两条反向曲线</strong>（≥2 个退化方向上升、≤1 个下降）。
+   ✅ ~~收窄跨点区间（换参数化：扫 k）~~ —— <strong>第 50 轮已做，结论是收窄不了</strong>：
+   <strong>k_c/N 随 N 下降</strong>（0.377 → 0.289）⟹ k 不提供独立自由度；且 <strong>小 N 上任何层都够不到 0.25</strong>；
+   顺带查出第 48 轮一处<strong>口径错误</strong>（(2,2,6) 的 0.4510 → <strong>0.4334</strong>，= R-2 / C-2）。
+   ✅ ~~转向「机制」一侧（问 B5 是否隐含 N 或 k）~~ —— <strong>第 51 轮已回答：都没有</strong>
+   （B5 的 <code>S = A/(4l_P²)</code> 只含 A 与 l_P，对 N / k / 形状<strong>零约束</strong>）；
+   并顺带发现<strong>判据方向错了</strong>：应为 <code>H/N ≤ 0.25</code>（<strong>不等式</strong>）⟹ 第 46–50 轮的等式路线判死（<strong>N-13</strong>）。
+   ✅ ~~裁决 T-9~~ —— <strong>第 52 轮已裁决</strong>：B5 的 0.25 = <strong>观测钉住的组合</strong>（Hawking 温度判别式
+   复算，+44.27% 逐位一致）＋ <strong>无机制的拆分</strong>（观测只钉住 b/a = 0.25，五组 (a,b) 同观测量）
+   ⟹ 四类判定 = <strong>半拟合 / 一致性</strong>。该（B5 ↔ 衬底）链<strong>收口</strong>。
+   ✅ ~~换方向 → 接手 S-6 的 ε 项~~ —— <strong>第 53–54 轮已做完并结项</strong>：
+   第 53 轮：<code>ε ~ 10⁻²⁰</code> 是<strong>能标错置</strong>（FQH 能标下 ≈ O(1)，差 18–21 个数量级）、<code>E_c</code> 是<strong>恒等式</strong>、
+   <code>Γ_flux</code> <strong>无表达式</strong> ⟹ 降为 ★。第 54 轮：<strong>裁决 T-11 = 降调</strong> —— <code>Γ_flux</code> <strong>不可能被定义</strong>，
+   五条独立理由中 <strong>R2 弦网无手性</strong> 与 <strong>R4 能量差 10³⁰</strong> 是<strong>结构性</strong>的；
+   并查出「FQH 引力子模 = 框架弦网模态」的等同<strong>依据不成立</strong>（唯一依据「自旋 2」被框架自己否为判别特征）。
+   ⟹ <strong>S-E5 正式结项</strong>；<strong>清单里已无 ★★★ 的工程项</strong>。
+   🎯 <strong>【战略目标已改向（用户决定，2026-09-23）】新目标 = 「电池能量密度」</strong>
+   + 此后推演以它为目标（一边底层原理、一边工程结构）。<strong>但第 55 轮审查结论 = 框架不覆盖</strong>：
+   化学储能（零内容）、跨支通道（自己的能量条件 + 量子不等式）、核/质能（零内容）<strong>三条全判否</strong>。
+   ⟹ <strong>目标更实际 ≠ 框架能做</strong> —— <strong>两轮两次判否，第二次是从结构层</strong>。
+   ✅ ~~先问「框架能不能定义一个与储能容量同轴的量」~~ —— <strong>第 56 轮已做</strong>：
+   <strong>能，但只有 f = Q/c² = O(1) 一档</strong>（<code>Q_BH = c²/2</code>、<code>Q_tube ≡ c²</code>），而化学储能的 f = 1.385×10⁻¹⁰；
+   <strong>障碍是结构性的</strong>（框架 4 个哈密顿量却无一个势函数 ⟹ 无「两态之差」）
+   ⟹ <strong>储能方向建议就此收口</strong>（S-13 = 「框架不覆盖储能」；新增 N-18 / I-14 / C-6）。
+   ⚠️ <strong>（讨论纪要 09-24）追加一条提醒</strong>：用户新提的「人造微观反应腔 ⟹ 燃料直接产电子」
+   命中的是<strong>燃料电池</strong>（真物理、<strong>确实绕过卡诺</strong>），但它提升的是<strong>转换效率（轴 B，×1.83）</strong>，
+   <strong>不是存储密度（轴 A）</strong> —— 后者由化学键决定，换转换方式一点都改不了。
+   ⟹ <strong>讨论任何"能量"目标前，先问是哪个轴</strong>（这是第 55/56 轮之后最容易复发的混淆）。
+   ✅ ~~(a) 裁决 T-12~~ —— <strong>2026-09-28「第 0 批」已裁决（方案 b）</strong>：
+       §7.4 正文改为「<strong>给定 tick 序列后确定</strong>（单 tick 为置换 ⟹ 双射、可逆、无熵产生）」；
+       <strong>不采用 H2</strong>（那需一并改写第 42 轮的 H1 表述，成本高且无必要）；
+       同步改了 §10 结论侧的限定语 + 第 57 轮块标「已裁决」（<strong>中英同步 8 项 0 失败</strong>）；
+       备份 <code>paper/history/*_备份_2026-09-28第0批前.md</code>。<strong>T-12 关闭。</strong>
+   🎯 <strong>【第 57 轮改定】新首要项（余下二选一，都便宜）</strong>：
+   ~~(a) 裁决 T-12~~ ✅ <strong>已做（2026-09-28）</strong>；
+   (b) <strong>I-14「单谱量特征」</strong> —— 问「框架的算符谱不含两态之差」能否被证明为一条<strong>结构定理</strong>；
+   (c) <strong>候选池 37「工程可达性的系统性重估」</strong> —— 现清单 <strong>★★★ 工程项 = 0</strong>，值得如实盘点。
+   🎯 <strong>首选项原表述（二选一，都便宜且结构性）</strong>：
+   (a) <strong>I-14「单谱量特征」</strong> —— 问「框架的算符谱不含两态之差」能否被证明为一条<strong>结构定理</strong>；
+       若成立，边界从"不覆盖储能"扩到<strong>化学键 / 相变潜热 / 电离能</strong>（比"不覆盖储能"更根本）；
+   (b) <strong>候选池 37「工程可达性的系统性重估」</strong> —— 现清单 <strong>★★★ 工程项 = 0</strong>，
+       值得如实盘点「框架到底有没有可指认的工程出口」（这比留一个空 ★★★ 更诚实）。
+   🎯 其次（唯一 ★★★，宇宙学侧）：<strong>S-12 平坦性的具体化</strong> —— 第一件事是把它从
+   「与 ΛCDM 一致」变成<strong>能区分</strong>的判据；若做不到，S-12 应走 S-E5 同一条路。
+   🎯 其三（便宜）：<strong>不完备度比值</strong>（1.00→1.63→5.93）用更正后的群重算。
+   ✅ ~~0.3 ε 的 @E 规范~~<strong>（2026-09-28 第 0 批已做）</strong>：§8.1 加符号约定（区分泄漏概率 vs Levi-Civita）＋ LHC 处待核实标注（查出 <code>ε~10⁻⁵⁰</code> 与公式差 <strong>40 个数量级</strong>）。
+   ✅ ~~0.4 「轨道等权」残留对账~~<strong>（2026-09-28 第 0 批已做）</strong>：<strong>无新增残留</strong> —— 3 处命中中 <strong>1 真错</strong>（<code>_fix_run_48.py</code>，第 50 轮已查明）<strong>2 误报</strong>（GAP 采样天然构型等权）；两脚本均已加口径注释。
+   📌 <strong>收口待办（第 56 轮新登记，口径卫生）</strong>：全文有 <strong>77 处</strong>「中文字符之间的 ASCII 引号」
+   （应为「」/『』）—— 属<strong>排印风格历史遗留</strong>（非本轮引入，本轮新增块为 0 处）。
+   不值得为此单开一轮，可<strong>顺手清理</strong>（判据：引号两侧均为 CJK 字符）。
+   🎯 <strong>新首要项（建议）：重选方向 —— 但先做一次「工程可达性的系统性重估」</strong>：
+   原「离工程最近的是凝聚态」的两个支撑（S-3 超导、S-6 FQH）已先后降调/结项 ⟹
+   现清单的 ★★ 条目里有没有<strong>框架独有且可测</strong>的项？<strong>若没有，应如实写明「本框架目前没有可指认的工程出口」</strong>
+   （这比留一个空 ★★★ 更诚实）。
+   🎯 其次：<strong>S-12 平坦性的具体化</strong>（唯一剩下的 ★★★，宇宙学侧）—— 第一件事是把它从
+   「与 ΛCDM 一致」变成<strong>能与别的模型区分的判据</strong>；若做不到，S-12 应走 S-E5 同一条路。
+   🎯 其三（便宜）：<strong>不完备度比值</strong>（1.00→1.63→5.93）用更正后的群重算。
+   ⏸ <strong>暂缓</strong>：(6,6,6)（单次 ≈200 s）、(8,8,8)（超 GAP 实用上限 ≈ degree 216）。
+   📌 收口待办（队列已清大半）：① ✅ §4.10 覆盖半径已改解析值（第 39 轮）；
+   ② ✅ 第 29 轮两处标注错位已修正（第 39 轮）；③ ✅ 把「推出 S = A/4」在<strong>结论</strong>处改为「与 S = A/4 一致」——<strong>第 39 轮已完成</strong>
+   （§4.8 块 + §4.8 开放项 + §10 结论，中英同步；摘要那条只陈述熵密度，无需改）。</p>
+</li>
+<li>
+<p>✅ <strong>B5 的最后一环已补（09-17 第 16 轮）</strong>：<code>outputs/因果视界上的块计数_最后一环与λ的重言式.md</code>
+   · ✅ 「两端是否数同一批块」→ 在 <strong>O(H₀t_P) = 1.18×10⁻⁶¹</strong> 上成立。
+     <strong>机制不是零表面，是时间尺分离</strong>：风暴以 ν=1/t_P 刷新，一个哈勃时刷 <strong>8.46×10⁶⁰</strong> 次，
+     块分解是瞬时量、不带历史。残差比上一轮解决的 ln2 分歧<strong>小 60 个数量级</strong>。
+     反证：若 ν→0（冻结结构），失配会是 O(β_s)=0.47 ⟹ 20%~47% 的块数误差。
+   · ❌ <strong>「零表面」这条理由废弃</strong>：<code>dR_c/dt = (1+q)c</code>，ΛCDM 的 q₀=−0.5333 ⟹ 面以
+     <strong>0.467c 外移，是 timelike 面</strong>。只有纯 de Sitter (w=−1) 时才是零表面。
+   · ❌ <strong>真事件视界候选被观测排除</strong>：<code>R_EH/R_c = 1.147288</code>（ΛCDM，16.58 Gly）⟹
+     λ = 1.147~1.316 ⟹ <strong>Ω_K = −0.15 ~ −0.32</strong>，最宽松约束（Planck 单独 −0.044±0.018）也有 <strong>5.7σ</strong>。
+     与 Kodama 版 217σ 合计：<strong>自然候选面中 <code>c/H</code> 是唯一幸存者</strong>（但用 Ω_K 排除 = 带数据成分）。
+   · ⚠️ <strong><code>λ = 4α²β² = 1</code> 是重言式</strong>（见第三节）⟹ 不能作 λ=1 的独立证据。
+   · ⟹ <strong>B5 重述</strong>：热力学面 = <strong>平流停滞面（v_rec = c）</strong>，精度 O(10⁻⁶¹)，唯一幸存者。
+   ✅ ~~顺带待办（论文收口）~~ —— <strong>2026-09-28「第 0 批」核查并收口</strong>（脚本 <code>_audit_01_02.py</code>，AU-1…AU-6，<strong>6 项 0 失败</strong>）：
+   ① <strong>「因果补丁边界」已废弃</strong> —— 全文仅 <strong>1 处</strong>，且是<strong>否定句</strong>（第 1043 行「因此不能表述为…」）；
+   ② <strong>λ 已统一</strong> —— 宇宙学侧 <strong>0 处</strong>用 λ，一律 <code>Ω_tot ≡ ρ/ρ_crit</code>（§8.6 约定句 + §10 结论声明，中英各 2 处）；
+      ✅ 本轮<strong>补掉一处漏网</strong>：§8.6.5 判别表里的 <code>λ_micro = 8π/3</code> → <strong><code>Ω_tot = 3/(8π)</code></strong>（两者互为倒数：8.3776 × 0.11937 = 1.0000，且与表内 0.1194 自洽）；
+   ③ <strong>「ξ-稳健性」已降调</strong>为一致性检查（第 1118 行「它不是稳健，它是重言式」，中英一致）；
+   ④ 摘要层核查：前 60 行「ξ」<strong>0 次</strong> ⟹ 该性质<strong>未被当卖点</strong>。
+   ⚠️ 结论：这三条<strong>在第 16 轮登记后已由后续轮次落地</strong>，本轮的工作是<strong>核查取证 + 补一处漏网</strong>，不是重做。
+   ⚠️ 仍未独立证明：两端都是<strong>瞬时</strong>分解（若任一端是历史累积量，本论证失效）。</p>
+</li>
+<li><strong>从 A2 推组分比例（做到一半）</strong>：
+   ✅ <strong>暗能量能标已锁定</strong>：<code>E_c = M_Pl c²·ε₀^(1/β) = 1.0181 meV</code>，<strong>无自由参数</strong>，
+   与框架独立声称的 1.01 meV 差 0.8%（见 <code>outputs/从A2推组分_暗能量能标已定.md</code>）。
+   ❌ 但 <code>ρ_Λ = E_c⁴/(ℏc)³</code> 给 <code>Ω_Λ = 0.0290</code>，观测 0.6889 ⟹ <strong>系数差 23.76 倍</strong>。
+   <strong>已判决：不该补，该放弃</strong>（<code>outputs/ΩΛ缺口判决_二选一与放弃.md</code>）：
+   · <code>d ln Ω_Λ/dβ = 465</code> —— β 变 1% 让 Ω_Λ 变 104 倍，病态敏感；
+   · 改 ε₀（×1.63）会毁掉已配好的 η（6.02e-10 → 9.80e-10）；
+   · 天然因子 4!(+1.0%)、e^π(−2.6%) 凑得近但<strong>无机制</strong>。
+   ⟹ <strong>干净的二选一</strong>：选项 A（ε₀=7.7e-20, β=0.615）保 E_c=1.018 meV ✓ 但 Ω_Λ=0.029 ✗；
+   选项 B（ε₀=4.696e-20, β=0.62887）配 Ω_Λ=0.6889 ✓ 但 E_c=2.248 meV ✗。<strong>不可兼得。</strong>
+   ⚖️ <strong>但判"放弃"过重——换个尺子看</strong>（<code>outputs/暗能量_压低123个数量级中的122.9个.md</code>）：
+   观测需把 ρ_Λ 从 ρ_P 压低 <strong>10^122.94</strong>，框架给出 <strong>10^124.32</strong>（多压 1.38 个数量级 = 24 倍）
+   ⟹ <strong>按对数计解决了 98.89%</strong>。这是框架<strong>最成功的定量结果</strong>（把 10^123 压到 24 倍）。
+   修正判决：<strong>作为量级机制保留，作为定量预言放弃</strong>；剩余 23.76 记为开放问题 <strong>O-Λ</strong>。
+   📌 备查巧合：匹配 Ω_Λ 处 ε(E_Λ)=0.614409，而 β=0.615000，差 <strong>0.096%</strong>——无机制，勿写进正文。
+   🎯 <strong>重大线索：原文那个 2/3 安错组分了</strong>（<code>outputs/原文的23_安错组分了.md</code>）。
+   出处：批05 §1.2（776–783 / 1366–1390 页）——<strong>跨枝转移 1/3、本枝残余 2/3</strong>（级数=2/3 ✓）。
+   原文把它安在「暗物质占 2/3」⟹ 与观测 0.2618 差 <strong>2.55 倍</strong>，挂存疑到批7 第 12 号。
+   但 <strong>2/3 与暗能量 Ω_Λ=0.6889 只差 3.23%</strong> —— 且它就是我 CR-3 的 <code>ρ_Λ=H²/(4πG)</code>：
+   <code>(2/3)ρ_crit = H²/(4πG)</code>（数值精确相等）⟹ <strong>4π 的机制 = 跨枝 2/3</strong>。
+   ⟹ <strong>O-Λ 剩余因子从 23.76 降到 1.033</strong>，且消掉批5 疑点2 / 批7 第 12 号存疑。
+   ❌ <strong>但已从守恒流方程否证</strong>（<code>outputs/守恒流推不出ΩΛ等于23.md</code>）：
+   · 严格解 <code>S=S₀+2ερt</code>（线性涨）、<code>D=D₀e^{-2t/3}</code> ⟹ <strong>两枝都带 +ερ 源时无不动点</strong>；
+   · 加归一化后的真正不动点是 <strong>1/2 + 3ε/2</strong>（不是 2/3），对应 Ω_Λ=0.5，差 <strong>−27.4%</strong>；
+   · <strong>2/3 是"保留因子"（1−1/3），与"稳态占据"是两个不同的量</strong>，不能互用；
+   · 取 2/3 需假设"留在本枝的 = 暗能量"（未导出），且 (2/3, 1/3) 分裂与观测
+     <strong>偏差方向相反</strong>（Λ −3.2%、m +7.1%）⟹ 不是干净分裂。
+   ⟹ 改判只是"存疑挪了个组分"，<strong>不等于推导成功</strong>；保持"数值接近、机制未明"。
+   🔧 <strong>原文两处不自洽已修正</strong>（<code>outputs/守恒流补汇项_修正原文与nogo.md</code>）：
+      补上 <code>−νJ</code>（A1 湮灭周转汇）+ <code>±ενρ</code>（原文两枝都写 <code>+ερ</code> 是笔误，必须带方向性）。
+      修正后：有真正不动点、<code>J₊+J₋=ρ</code> 自动成立、<strong>ν≫2/3 精确复现原文的 <code>(1/2+ε)ρ</code></strong>
+      （ε=0.1 数值给 0.600/0.400/和 1 ✓）⟹ 确认这就是原文漏的那一项。
+   ❌ <strong>同时把 Ω_Λ=2/3 双重判死</strong>：
+      ① 结构上：不动点恒 <code>1/2+εν/(2/3+ν)</code>，等于 2/3 需 <strong>ν = −2/3（负数）</strong> ⟹ 严格 no-go；
+      ② 量级上：真实 ν=1/t_P 下<strong>跨枝转移只占总出流 10⁻⁴⁴</strong>，与 O(1) 的 Ω_Λ 不相干。
+   ⟹ 3.2% 接近<strong>确认是数值巧合</strong>；论文存疑维持，对照对象记 Ω_Λ 而非 Ω_dm。
+   ⚠️ <code>ε(1 TeV) = 6.02e-10 ≈ η_obs</code>（2%），但 1 TeV 是<strong>选的</strong>——反解「ε 何时等于 η」
+   得 0.969 TeV；要让它是预言，框架须独立推出 1 TeV。
+   ❗ <strong>暗物质三个候选机制，全过不了数量级检验</strong>（<code>outputs/暗物质_三大机制全过量级检验.md</code>）：
+   · 机制 B（ε·ρ_raw·f_space）：用全息稀释 ε=1/N 给 <strong>32.000 倍</strong>（原文自记"4 倍"是另一套取值，别混）
+     ⟹ 需 <strong>f_space = 1/32 = 0.03125</strong>（精确，但<strong>无机制</strong>）
+   · 机制 C（镜像支投影）<strong>已被硬否证</strong>：50:50 ⟹ Ω_dm = Ω_b = 0.0493，观测 0.2618，
+     <strong>差 5.31 倍</strong>；若 B− 是完整镜像则差 3.82 倍，<strong>两种读法都被否证</strong>
+   · 空间/时间投影比 Ω_cdm/Ω_Λ = 0.380026（凑得上 1/φ² +0.5%、3/8 −1.3%，但无机制）
+   ⟹ <strong>框架目前对暗物质没有任何定量预言</strong>。
+   ❌ <strong>机制 B 已判死：不是预言，是拟合</strong>（<code>outputs/f_space的第一性定义_机制B零预言力.md</code>）：
+   · <code>⟨f_space⟩</code> 被观测<strong>唯一确定为 1/32.000</strong>（是解出来的，不是自由参数）；
+   · 朴素体积读法 ⟹ 需空洞占 <strong>3.1%</strong> 体积，实测 <strong>50–80%</strong> ⟹ <strong>否证 16–26 倍</strong>；
+   · 改速率抑制读法 ⟹ 四种自洽律给四个答案，都能凑 1/32 ⟹ <strong>预言力 = 0</strong>；
+   · 框架已知量中<strong>没有一个</strong>给出 32（<code>(1/2)⁵</code> 只是恒等式，<code>(1/3)³=1/27</code> 差 19% 亦无机制）。
+   ❌ <strong>且更新一轮证明：不是"还没找到律"，是结构上不存在</strong>
+   （<code>outputs/f_space的下界定理_机制B被否证.md</code>）：
+   · <strong>下界定理</strong>：原文自己说"空洞处 f_space≈1"，而空洞占体积 50–80%
+     ⟹ 对<strong>任何局部密度律</strong> <code>⟨f_space⟩ ≥ 0.5–0.8</code>，<strong>比需要的 1/32 大 16–26 倍</strong>
+   · 四个自然律（位点占据/消耗型 σ=l_P²/通量绑定/正比）给 1、1、0.963、0.037，全落空
+   · 消耗型要凑数需截面 <code>σ = 7.57e36 m²</code>，比普朗克面积大 <strong>2.9e106 倍</strong>（荒谬）
+   ⟹ <strong>暗物质定量解释 = 框架的第四个空白</strong>，此结论现有结构性论证，不再只是"未解决"。
+   三条出路（都不轻松）：① 放弃局部密度图像（则原文描述即错）；② 让 ε≠1/N
+   （会牵动 λ=1、β=1/(2π) 整条链）；③ 承认 f_space 非局部（需全新机制）。
+   ⚠️ π/12 = 0.26180 vs Ω_cdm：真实偏差 <strong>−1.10% ~ +0.43%</strong>（脚本一度显示 0.0002%，
+   是因 Ω_cdm=0.2618 系由 Ω_m−Ω_b 倒推的四位舍入值撞上了）⟹ 精度不足，勿采信。
+   ⟹ 待解三件事：① <strong>换一个 ρ_Λ 的构造</strong>（E_c⁴ 已判死；候选：镜像支贡献 / 方向性 50:50 /
+   或诚实登记为第四个不可约参数）；② 为何重子能标 ~1 TeV；③ 暗物质能标。
+   （已排除：对 <code>E = T·S</code> 求导 —— 恒等式，无新信息。）</li>
+<li><strong>消掉 8π/3</strong>：微观计数需多一个 <code>3/(8π)</code>，或修正 <code>ε_eff = 1/N</code>
+   （改用 <code>N = A/(4l_P²) = π(R/l_P)²</code> 得 λ = 8/3 ≈ 2.67，更近但仍非 1）。</li>
+<li>✅ <strong>B5 的最后一环已补</strong>（2026-09-17，<code>outputs/B5的最后一环_两端差一个ln2.md</code>）：
+   观测者端（B5）给 <code>S/k_B = (A/4l_P²)·ln2</code>（每相干块 1 <strong>bit</strong>），
+   统计端（F3/BH）给 <code>A/(4l_P²)</code>（每块 1 <strong>nat</strong>），<strong>差 ln2</strong>。
+   <strong>Hawking 温度裁决：必须取纳特</strong>（每块 1 nat 给 6.16868e-8 K，偏差 0.00%；
+   比特版 8.89952e-8 K，<strong>高 44.27%</strong>）。
+   ⟹ 修正：B5 §3.1/§4 的「1 bit/相干块」改为「1 <strong>nat</strong>/相干块」
+   （等价替代：压缩因子 16 → <strong>16 ln2 = 11.0904</strong>）。<strong>已回写 <code>B5_观测者模型严格数学化.md</code></strong>。
+   ⚠️ README 里「S = A/(4l_P²)·ln2 ⇒ 1.05e77 纳特」公式带 ln2、数字不带，同样要改。
+   ⚠️ 仍未严格证明：两端数的是<strong>同一批相干块</strong>（需在因果视界上重做 F3 计数）。</li>
+<li>载流子两类型收口（独立支线，未动）：空腔（电子）如何间接获得横向耦合（候选 A/B/C），
+   判别预言 WF 定律违反幅度 + <code>η/s → 1/(4π)</code>。</li>
+<li>~~补 Friedmann 方程~~ —— 约束方程已于 2026-09-17 导出，见第六条。</li>
+<li><strong>第 26 轮建议（按价值排序）</strong>：
+   ① <strong>算「每对独立决定是否交换」变体</strong>：有效移动率 1/2 ⟹ <code>D = l_P²/(2t_P)</code>，
+      与 Nelson 随机力学的 <code>ℏ/(2m)</code> 做更细对照（第 21 轮只到"同形式同量级、差 1.5 倍维度因子"）；
+   ② <strong>关联长度定量</strong>：第 26 轮观察到<strong>有效自由度 &lt; 格点数</strong>（固定轴下各种子散布远超 √N 估计），
+      若能定出关联长度，对"等分账必须是结构性的"是一条新支撑；
+   ③ ✅ <strong>格点几何已在第 27 轮定案</strong>（金刚石结构）；第 28 轮把支撑换成更严格的
+      「方向簇 k = 4」（§4.10 定理 1+2），并证明 4-正则二分图必非平面（与四色定理划界）。
+   ④ <strong>逐一复查 §4.10「六处 4」的出处</strong>（第 28 轮只查了两处就发现不同源）——
+      这是对框架内部一致性最直接的检验。</li>
+</ol>
+<ul>
+<li><strong>第 60 轮起</strong>：工作流 <strong>第 1 批 1.1 已完成</strong>（I-14 裁决 ⟹ 见 1.2 节 / N-21 / I-16）。
+  ✅ <strong>1.2 工程可达性重估已解锁</strong>（原依赖 1.1）—— ⚠️ 注意本轮把「★★★ 工程项 = 0」这件事<strong>加固</strong>了：
+  框架连「势」都没有，工程出口比第 54 轮估计的<strong>更少</strong>。
+  🔧 并列两项小核查：① 论文 §5.7 的「能隙 Δ = 1」（口径）；② 第 0 批留下的 <code>ε~10⁻⁵⁰</code>（能标/笔误）。
+  📌 <strong>方法提醒（本轮新增）</strong>：<strong>引文清点必须先排除已登记的轮次块</strong> —— 否则会统计到自己写的检索结果。</li>
+<li><strong>第 61 轮起</strong>：工作流 <strong>第 1 批 1.2 已完成</strong> ⟹ <strong>第 1 批全部完成</strong>。
+  结论：<strong>工程出口 = 0、观测出口 = 1（EMRI）、★★★ 清零</strong>。
+  ⟹ 仍可做的：<strong>候选池 36（S-12 的定位改写）</strong> —— 本轮的结论改变了它的性质：
+  既然与 ΛCDM 同值，「具体化」应改为「<strong>找出与 ΛCDM 的判别点</strong>」；
+  找不出 ⟹ 登记为「框架不覆盖宇宙学判别」（与 T-10 同类）。
+  ⟹ 两项小核查：① 论文 §5.7 的「能隙 Δ = 1」；② 第 0 批留下的 <code>ε~10⁻⁵⁰</code>。
+  ⟹ <strong>结构性首选仍是 I-16</strong>（「位置算符缺口」能否形式化为公理级命题）—— 它现在是<strong>唯一的根问题</strong>
+  （同时解释 I-14 / N-16 / N-18 / N-19 / N-21 / S-13 以及本轮的「工程出口 = 0」）。
+  📌 <strong>方法提醒（本轮新增）</strong>：「框架独有」这个标签要用<strong>可判定的判据</strong>核 —— 
+  本轮的判据是「<strong>能否给出与其他理论可区分的具体数值 / 标度律</strong>」，一句话就能把 S-12 从 ★★★ 拉下来。</li>
+<li><strong>第 62 轮起</strong>：⚠️ 出现一个<strong>新的可判定口子</strong> —— <strong>I-17（Φ 的质量与耦合）</strong>。
+  它是<strong>第五力的唯一入口</strong>，也是 §6.4（Φ⁴ 势）与 §5.5（分波表）之间<strong>唯一没接上的一环</strong>。
+  ⚠️ <strong>警示</strong>：§6.4 的 <code>μ</code> 是<strong>输入</strong> ⟹ 直接用它 = <strong>公设上移</strong>（陷阱 23）⟹ 必须找<strong>独立约束</strong>。
+  ⟹ 其余仍按第 61 轮的清单：候选池 <strong>36</strong>（S-12 定位改写）、两项小核查（§5.7 的 Δ=1 / <code>ε~10⁻⁵⁰</code>）、
+  <strong>I-16</strong>（「位置算符缺口」形式化 —— 仍是唯一的根问题）。
+  📌 <strong>方法提醒（本轮新增）</strong>：<strong>词条清点必须以「补丁前的备份」为底本</strong> —— 
+  否则<strong>你自己刚写进去的正文</strong>就会把「0 处」变成「N 处」（第 60 轮记的元文本自指，本轮当场复现）。</li>
+</ul>
+<h2>八、git 状态</h2>
+<ul>
+<li>仓库：<code>MAPS-Unified-Framework/</code>，分支 <code>main</code>，<strong>385 文件已暂存，尚未提交</strong></li>
+<li><strong>未提交原因：git 身份未设</strong>。提交前执行：
+  <code>bash
+  git config user.name  "你的名字"
+  git config user.email "你的邮箱"</code>
+  提交信息已写好，见 <code>MAPS-Unified-Framework/提交就绪说明.md</code> 第五节。</li>
+</ul>
+
+<div class="footer">环境交接说明（换电脑后先读这份） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 环境交接说明_备份_2026-10-02第77轮前.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

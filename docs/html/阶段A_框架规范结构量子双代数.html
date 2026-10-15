@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阶段 A：框架规范结构 = 量子双代数（定理包 A1–A6）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">0. 执行摘要</div>
+  <h1>阶段 A：框架规范结构 = 量子双代数（定理包 A1–A6）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>YM 等价系列·第六份</strong>（前五份：YM纲领 → 配对表示 → YM推进 → σβ模型 → 涌现规范场数学路线）
+<strong>对标</strong>：§4.10 packing 定理包（引力侧：挂谷→1/4）的<strong>规范侧版本</strong>（量子双→规范结构）
+<strong>日期</strong>：2026-08-23
+<strong>性质标注</strong>：【定理】= 已确立数学结果；【推导】= 本框架内推导；【数值】= 本次数值验证；【框架】= 框架主张；【引用】= 文献定理；【待证】= 需进一步证明；【开放】= 千禧年级</p>
+</blockquote>
+<hr />
+<h2>0. 执行摘要</h2>
+<p>阶段 A 的目标是把桥梁 B1–B4 形式化为定理链，证明<strong>"框架的规范结构 = 量子双代数 D(G)"</strong>——即从框架公理（事件流、配对阶数、湮灭-再生）出发，规范结构是<strong>涌现的</strong>，而非外生的。</p>
+<p><strong>本批成果</strong>：
+1. <strong>定理链 A1–A6</strong>（事件流→Hopf 代数；配对阶数→群选择；湮灭-再生→规范算符；通量管=禁闭弦；涌现规范对称性主定理；为什么 n=3）；
+2. <strong>四项数值验证全部通过</strong>：Kitaev 格点模型 Z₂（16 态）/Z₃（81 态）/S₃（216 态）+ D(S₃) 任意子——A_v/B_p 投影性、对易性、基态维数=1、D²=|G|²、融合维数恒等式；
+3. <strong>核心结论</strong>：规范对称性（A_v）与通量闭合（B_p）是离散代数结构的<strong>涌现性质</strong>【引用：Kitaev 2003 定理】——框架"事件流⟹规范结构"获得严格数学模板的支撑。</p>
+<hr />
+<h2>1. 定理 A1（事件流 → Hopf/量子双代数）【框架→结构】</h2>
+<p><strong>命题</strong>：框架公理 1 的事件流（相遇—湮灭—再生三操作）在 P2-A 非交换化后，生成一个 Hopf 代数结构；其最自然的离散实现是<strong>量子双 D(G) = C[G] ⋉ F(G)</strong>（Drinfeld double）。</p>
+<p><strong>对应表</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>框架公理元素</th>
+<th>Hopf 代数元素</th>
+<th>量子双实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>相遇（两个事件配对）</td>
+<td>乘法 m</td>
+<td>C[G] 卷积</td>
+</tr>
+<tr>
+<td>湮灭（配对取消）</td>
+<td>对合 S（antipode）</td>
+<td>g → g⁻¹</td>
+</tr>
+<tr>
+<td>再生（一对分叉成两个）</td>
+<td>余乘法 Δ</td>
+<td>函数代数 F(G)</td>
+</tr>
+<tr>
+<td>时间箭头分叉（公理 3）</td>
+<td>余单位 ε / 单位 η</td>
+<td>δ_e / 1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>严格性</strong>：D(G) 是<strong>已确立的 Hopf 代数</strong>（Drinfeld 1986）【定理】；"事件流三操作 ↔ Hopf 三结构"是<strong>结构对应</strong>【框架】——此映射的完全严格化是阶段 B 的任务（哈密顿量构造）。</p>
+<hr />
+<h2>2. 定理 A2（配对阶数 → 群选择）【定理】</h2>
+<p><strong>命题</strong>：框架配对阶数 n=1/2/3 确定群 G 的表示类型，并对应量子双的离散模拟：</p>
+<table>
+<thead>
+<tr>
+<th>配对阶数</th>
+<th>规范群</th>
+<th>Frobenius-Schur</th>
+<th>离散模拟 G</th>
+<th>D(G) 任意子类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>n=1</td>
+<td>U(1)</td>
+<td>实（FS=+1）</td>
+<td>Z_n</td>
+<td>纯阿贝尔</td>
+</tr>
+<tr>
+<td>n=2</td>
+<td>SU(2)</td>
+<td>伪实（FS=−1）</td>
+<td>Q₈ / 二面体群</td>
+<td>伪实类</td>
+</tr>
+<tr>
+<td>n=3</td>
+<td>SU(3)</td>
+<td>复（FS=0）</td>
+<td><strong>S₃</strong></td>
+<td><strong>非阿贝尔（量子维 2,3）</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>依据</strong>：表示论层已在子课题②严格化（引理 A–D：FS 三分法、规范群分类、张量积分解、色单态群论根源）【定理】。离散模拟为<strong>结构对应</strong>【框架】——S₃≠SU(3)，诚实标注。</p>
+<hr />
+<h2>3. 定理 A3（湮灭-再生 → 规范算符 A_v / B_p）【推导 + 数值】</h2>
+<p><strong>命题</strong>：框架"湮灭-再生"事件在量子双格点实现中对应两个基本算符（Kitaev 模型）：</p>
+<table>
+<thead>
+<tr>
+<th>框架事件</th>
+<th>量子双算符</th>
+<th>数学定义</th>
+<th>物理含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>相遇处配对对称性</strong></td>
+<td>A_v（顶点算符）</td>
+<td>A_v = (1/|G|)Σ_h A_v^h，起点边左乘 h、终点边右乘 h⁻¹</td>
+<td><strong>规范变换生成元</strong>（局域配对对称）</td>
+</tr>
+<tr>
+<td><strong>湮灭-再生环流守恒</strong></td>
+<td>B_p（面算符）</td>
+<td>B_p = δ(∏_{e∈∂p} g_e = e)（环绕积=单位元）</td>
+<td><strong>磁通量闭合</strong>（通量管）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>数值验证【本次完成】</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>验证项</th>
+<th>Z₂（16 态）</th>
+<th>Z₃（81 态）</th>
+<th>S₃（216 态）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A_v 投影性 A_v²=A_v</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>B_p 投影性 B_p²=B_p</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[A_v, B_p] = 0</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[A_v, A_v'] = 0</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>基态维数（单面球面）=1</td>
+<td>✓（tr=1.000）</td>
+<td>✓（tr=1.000）</td>
+<td>✓（唯一性）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键机制</strong>：A_v 的"起点左乘 h / 终点右乘 h⁻¹"约定使环绕积 <strong>P' = h·P·h⁻¹</strong>（共轭保持单位元判定）⟹ [A_v,B_p]=0 恒成立【推导，本次确认】；非阿贝尔情形下此混合约定同时保证 [A_v,A_v']=0（共享边作用相消）。</p>
+<hr />
+<h2>4. 定理 A4（通量管 = 禁闭弦 → 面积律）【推导】</h2>
+<p><strong>命题</strong>：B_p 面算符网络 = 框架的通量管（色电场压缩）⟹ 禁闭弦；在已知严格区域面积律成立：</p>
+<ol>
+<li><strong>2D Yang-Mills【定理，Migdal-Makeenko】</strong>：⟨W(C)⟩ = e^{−g²C₂(R)A/2}，σ₂D = g²C₂(R)/2——2D 中通量管是严格对象（对接 YM推进报告）；</li>
+<li><strong>格点强耦合【定理，Wilson】</strong>：⟨W(C)⟩ = (β/2N)^{A/a²}，σa² = −ln(β/2N)（β&lt;2N 严格禁闭）；</li>
+<li><strong>框架通量管 σ(β) 模型【推导，N3】</strong>：FTSM 修正中耦合区（β=1.75 偏差 +259%→−12.8%）、通量管宽度 w∝1/√σ 预言。</li>
+</ol>
+<p><strong>意义</strong>：B_p 网络在已知严格区域给出面积律——"通量管⟹禁闭"在 2D/强耦合有严格支撑，4D 弱耦合（B6）为千禧年开放问题。</p>
+<hr />
+<h2>5. 定理 A5（主定理：规范对称性涌现）【定理引用】</h2>
+<p><strong>命题【引用，Kitaev 2003】</strong>：量子双 D(G) 的代数结构精确实现格点 G-规范理论——哈密顿量 H = −Σ_v A_v − Σ_p B_p 的局域对称性 = 规范对称性，且 A_v、B_p 两两对易（本次数值确认）。</p>
+<p><strong>推论【框架】</strong>：若框架事件流（公理 1 + 配对阶数 A2 + 湮灭-再生 A3）映射到量子双结构，则<strong>规范对称性是涌现的</strong>——不需要外生规范场。这与框架"四力 = 风暴四模态""统一 = 模态分界消失"的叙事完全一致：<strong>规范场是通量场的集体模态</strong>（P3-E 分波分解的离散版本）。</p>
+<p><strong>框架增量 vs 已知结果</strong>：Kitaev 定理证明了"规范理论可从离散代数涌现"的存在性；框架的增量为<strong>机制解释</strong>（为什么是这种离散结构——配对阶数选群、事件流选代数）与<strong>统一图像</strong>（规范=模态、禁闭=通量管自束缚）。</p>
+<hr />
+<h2>6. 定理 A6（为什么 n=3）【框架启发·开放】</h2>
+<p><strong>问题</strong>：为何强相互作用恰好对应 n=3（复表示/非阿贝尔）而非 n=1/2？</p>
+<p><strong>候选（框架启发，非定理）</strong>：
+1. <strong>Clifford 内空间 4 分量【框架】</strong>：4 = 时间双向×手性双向（§4.10 定理 4）——内空间维数 4 的因子结构 2×2 与配对阶数 n 的关系待阐明；
+2. <strong>数轴分类【原文 935–956】</strong>：1→引力、2→电磁、3→弱、6=2×3→强（夸克同时带电荷 2 与色荷 3）；
+3. <strong>费马可解性【框架启发】</strong>：n=3 立方无解（禁闭的代数根源）——子课题②已标注为启发式非定理（H1）。</p>
+<p><strong>状态</strong>：【开放】——A6 是规范侧"为什么恰好这个群"的开放注记，对标 §4.10 定理 4（"为什么是 4"）的规范侧版本，但其严格化比引力侧更难（无 Tammes 式唯一性定理可用）。</p>
+<hr />
+<h2>7. 数值验证附录</h2>
+<pre><code class="language-text">Z₂ 单面（16 态）: A_v²=A_v ✓  B_p²=B_p ✓  [A_v,B_p]=0 ✓  [A_v,A_v']=0 ✓  基态 tr=1.000 ✓
+Z₃ 单面（81 态）: A_v²=A_v ✓  B_p²=B_p ✓  [A_v,B_p]=0 ✓  [A_v,A_v']=0 ✓  基态 tr=1.000 ✓
+S₃ 单面（216 态）: A_v^h 保持 B_p=1 子空间 ✓  A_v|ψ₀&gt;=|ψ₀&gt; ✓  B_p|ψ₀&gt;=|ψ₀&gt; ✓  基态唯一 ✓
+D(S₃): 8 任意子（量子维 {1,1,2,2,2,2,3,3}）, D²=36=|S₃|² ✓
+  融合维数恒等式: τ⊗τ=A₁⊕A₂⊕τ ⟹ 2×2=1+1+2=4 ✓（非阿贝尔）
+</code></pre>
+<p>数值脚本：<code>_stageA_verify.py</code>（保留可复现）。</p>
+<hr />
+<h2>8. 诚实标注与下一步</h2>
+<p><strong>严格性分级</strong>：
+- 【定理】A2（表示论层，子课题②）、A4 面积律（2D/强耦合）、A5（Kitaev）；
+- 【推导+数值】A3（本次验证）；
+- 【框架→结构】A1、A4 的 FTSM 部分；
+- 【开放】A6、B6（4D 弱耦合面积律/质量隙 = 千禧年）。</p>
+<p><strong>诚实缺口</strong>：
+1. A1 的"事件流三操作 ↔ Hopf 三结构"映射未完全严格化（阶段 B 任务）；
+2. S₃/Q₈/Z_n 是离散模拟非真实规范群（连续极限 B6 开放）；
+3. "框架哈密顿量"的具体构造未完成——A5 目前是"模板存在 + 机制对应"，非"框架推出"。</p>
+<p><strong>与论文 §5 的整合点</strong>：定理 A2（配对阶数引理链）+ A3（算符对应）+ A5（涌现声明）可作为 §5.2"配对阶数引理链"的规范侧定理包，与 §4.10 packing 定理包对称。</p>
+<p><strong>下一步（阶段 B）</strong>：构造 2+1D 量子双型框架哈密顿量（B5），证明涌现规范对称性——模板严格（Kitaev），框架映射待构造。</p>
+
+<div class="footer">阶段 A：框架规范结构 = 量子双代数（定理包 A1–A6） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 阶段A_框架规范结构量子双代数.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

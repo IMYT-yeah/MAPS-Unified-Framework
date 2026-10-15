@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>讨论纪要：人造微观反应腔 —— 「直接生成电子而非热量」</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>讨论纪要：人造微观反应腔 —— 「直接生成电子而非热量」</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>2026-09-24 ｜ 核验脚本 <code>_disc_microreactor.py</code>（MR-1…MR-8，<strong>8 项 0 失败</strong>）
+起因：用户提出直觉 —— 人类能造芯片，也应能掌握微观制造技术，造出「人造微观反应腔」；
+让汽油分子进入一个个腔体、与 O₂ 反应，<strong>直接生成电子而非热量</strong>，能量利用效率应该很高。</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>「绕过卡诺」是真的，「不放热」是假的，「能量密度突破」是记错了轴。</strong></p>
+<p>你的直觉<strong>命中了标准物理里的成熟技术：燃料电池</strong> —— 它的理论上界由 <code>η = ΔG/ΔH</code> 给出
+（<strong>确实不受卡诺限制</strong>），但实际收益是<strong>效率 ×1.5–2</strong>；而第 55/56 轮讨论的
+<strong>存储密度</strong>（<code>f = Q/c²</code>）由化学键决定，<strong>换转换方式一点都改不了</strong>。</p>
+<hr />
+<h2>一、把你的设想拆成四段，逐段判定</h2>
+<table>
+<thead>
+<tr>
+<th>你的设想</th>
+<th>对应标准物理</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>人造微观反应腔（一个个「腔体」）</td>
+<td><strong>催化活性位点 / 三相界面（TPB）</strong>：催化剂–电解质–气体的交界；纳米结构电极、单原子催化剂</td>
+<td>✅ <strong>是活跃研究方向</strong>，但它是<strong>化学选择性</strong>问题，<strong>不是几何精度问题</strong>（见 §三）</td>
+</tr>
+<tr>
+<td>燃料分子进腔与 O₂ 反应</td>
+<td>阳极氧化 + 阴极还原</td>
+<td>✅ <strong>就是燃料电池</strong>（H₂/O₂ 型已是商品）</td>
+</tr>
+<tr>
+<td><strong>直接生成电子而非热量</strong></td>
+<td>不经热机的电化学转换</td>
+<td>✅ <strong>真物理</strong>：电化学把化学能直接转为电功，<strong>不受 <code>1−T_c/T_h</code> 约束</strong></td>
+</tr>
+<tr>
+<td>……但希望「<strong>不</strong>放热」</td>
+<td><code>ΔG = ΔH − TΔS</code></td>
+<td>❌ <strong>做不到</strong>：<code>TΔS</code> 必然是热（辛烷 3.2%、甲醇 3.3%、甲烷 8.1%、氢 <strong>17.0%</strong>）</td>
+</tr>
+<tr>
+<td>「能量利用效率很高」</td>
+<td>η 0.30（汽油机）→ 0.55（SOFC）</td>
+<td>✅ 但只有 <strong>1.83 倍</strong>，<strong>不是数量级</strong></td>
+</tr>
+<tr>
+<td>（隐含）能量密度大幅提升</td>
+<td>与存储密度无关</td>
+<td>❌ <strong>记错了轴</strong>（§二）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、⭐ 最要紧的一条：<strong>效率</strong>与<strong>存储密度</strong>是两个轴</h2>
+<p>第 56 轮刚好把这两件事分开了。你这次说的是<strong>轴 B</strong>，不是轴 A：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>轴 A 存储密度</th>
+<th>轴 B 转换效率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>由什么决定</td>
+<td><strong>化学键</strong>（燃料本身）</td>
+<td><strong>转换器</strong>（发动机 / 燃料电池）</td>
+</tr>
+<tr>
+<td>汽油的数值</td>
+<td>ΔH = <strong>47.3 MJ/kg</strong> = 13 140 Wh/kg</td>
+<td>汽油机 0.25–0.35 ｜ SOFC 0.50–0.60</td>
+</tr>
+<tr>
+<td>换转换方式能改吗</td>
+<td><strong>完全不能</strong></td>
+<td>能（这就是你直觉的价值所在）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>燃料侧有效能量密度</strong>（脚本 MR-7）：</p>
+<table>
+<thead>
+<tr>
+<th>路径</th>
+<th>η</th>
+<th>有效能量密度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>汽油 + 汽油机</td>
+<td>0.30</td>
+<td><strong>3 942 Wh/kg</strong></td>
+</tr>
+<tr>
+<td>汽油 + SOFC</td>
+<td>0.55</td>
+<td><strong>7 226 Wh/kg</strong>（×1.83）</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 但这是<strong>燃料侧</strong>。<strong>系统级</strong>加上堆体 / 氧气处理 / 高温绝热后，优势被吃掉大半 ——
+对照氢燃料电池车：<em>含 700 bar 储罐</em>的系统密度仅 <strong>1 500–2 000 Wh/kg</strong>，
+比汽油（12 000 Wh/kg 燃料）<strong>差得远</strong>。⟹ <strong>效率高 ≠ 更轻</strong>。</p>
+<hr />
+<h2>三、⚠️ 「芯片」类比为什么不成立</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>芯片（光刻）</th>
+<th>反应腔（催化）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>靠什么取胜</td>
+<td><strong>几何精度</strong>（3 nm 线宽）</td>
+<td><strong>化学特异性</strong>（每个位点专一地抓分子、撕<strong>指定</strong>键、传质子、导电子）</td>
+</tr>
+<tr>
+<td>关键工具</td>
+<td>光刻 / 刻蚀 / 沉积</td>
+<td><strong>自组装、原子层沉积、配体设计、酶模拟</strong></td>
+</tr>
+<tr>
+<td>尺度法则</td>
+<td>越小越好（集成度）</td>
+<td><strong>不是越小越好</strong>：太小 ⟹ 传质受限、水管理困难</td>
+</tr>
+<tr>
+<td>瓶颈</td>
+<td>分辨率</td>
+<td><strong>离子传导 + 三相界面长度 + 催化剂毒化</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>芯片的成就是「几何的胜利」，反应腔要的是「选择性的胜利」</strong> ——
+后者是<strong>化学</strong>问题，光刻帮不上忙。你设想里的"腔体"如果真的只是把几何做小，
+并不会提升效率；提升来自<strong>催化剂活性与选择性</strong>。</p>
+<hr />
+<h2>四、⚠️ 汽油燃料电池的真实障碍（脚本 MR-6）</h2>
+<table>
+<thead>
+<tr>
+<th>燃料</th>
+<th>电子数/分子</th>
+<th>要断的键</th>
+<th>现实状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H₂</td>
+<td><strong>2</strong> e⁻</td>
+<td>H–H（1 个）</td>
+<td><strong>商用成熟</strong>（PEMFC）</td>
+</tr>
+<tr>
+<td>CH₃OH</td>
+<td><strong>6</strong> e⁻</td>
+<td>C–H×3、C–O、O–H</td>
+<td>DMFC 20–30%（甲醇渗透 + 催化剂中毒）</td>
+</tr>
+<tr>
+<td>CH₄</td>
+<td><strong>8</strong> e⁻</td>
+<td>C–H×4</td>
+<td>需高温（SOFC 或先重整制氢）</td>
+</tr>
+<tr>
+<td><strong>C₈H₁₈</strong></td>
+<td><strong>50</strong> e⁻</td>
+<td>C–H×18、<strong>C–C×7</strong></td>
+<td><strong>无商用直接燃料电池</strong>；只有 SOFC 在 <strong>700–1000 °C</strong> 能做</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 瓶颈是<strong>多步串联反应</strong>（50 个电子要分 50 步，任何一步慢都是瓶颈）+ <strong>C–C 断裂</strong>。
+<strong>这不是"腔体做得更精细"能解决的</strong> —— 它是<strong>反应路径</strong>问题（活化能 / 过电位 / 串联步骤）。</p>
+<hr />
+<h2>五、一个漂亮的反直觉（脚本 MR-1 / MR-3）</h2>
+<table>
+<thead>
+<tr>
+<th>燃料</th>
+<th>ΔH (kJ/mol)</th>
+<th>ΔG (kJ/mol)</th>
+<th><strong>η_max = ΔG/ΔH</strong></th>
+<th>TΔS/ΔH</th>
+<th>n</th>
+<th><strong>V_theory</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H₂ + ½O₂</td>
+<td>−285.8</td>
+<td>−237.1</td>
+<td><strong>0.830</strong></td>
+<td>17.0%</td>
+<td>2</td>
+<td>1.229 V</td>
+</tr>
+<tr>
+<td>CH₄ + 2O₂</td>
+<td>−890.4</td>
+<td>−817.9</td>
+<td><strong>0.919</strong></td>
+<td>8.1%</td>
+<td>8</td>
+<td>1.060 V</td>
+</tr>
+<tr>
+<td>CH₃OH + 1.5O₂</td>
+<td>−726.8</td>
+<td>−702.7</td>
+<td><strong>0.967</strong></td>
+<td>3.3%</td>
+<td>6</td>
+<td>1.214 V</td>
+</tr>
+<tr>
+<td>C₈H₁₈ + 12.5O₂</td>
+<td>−5470.6</td>
+<td>−5296.3</td>
+<td><strong>0.968</strong></td>
+<td>3.2%</td>
+<td>50</td>
+<td>1.098 V</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两个反直觉</strong>：
+1. <strong>碳氢燃料的理论电化学效率（92–97%）比氢（83%）更高</strong> —— 因为熵项 <code>TΔS</code> 更小
+   （气体分子数减少得少）。而<strong>实际</strong>恰好相反（氢 PEMFC 最成熟）⟹ 差在<strong>动力学</strong>，不在热力学。
+2. <strong>每电子的理论电压全部落在 1.0–1.2 V</strong> —— 因为所有碳氢氧反应的化学本质都是
+   C–O / H–O 成键。所以"直接生成电子"= <strong>1.1 V 级电动势</strong>，不是高电压。
+   （实际工作电压只有 0.5–0.9 V。）</p>
+<hr />
+<h2>六、框架侧：比第 56 轮<strong>更远</strong>（脚本 MR-8）</h2>
+<p>按陷阱 41 的三步审查：</p>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 内容存量</td>
+<td>「电化学 / 催化 / 电极 / 电解质 / 燃料电池 / 反应路径 / 活化能 / 过电位 / 势能面 / 离子传导 / 化学选择性 / 反应速率」<strong>各 0 处</strong> ⟹ <strong>0</strong></td>
+</tr>
+<tr>
+<td>② 尺度</td>
+<td>核心是<strong>界面化学选择性</strong>（~0.3 nm 的活性位点构型）</td>
+</tr>
+<tr>
+<td>③ 可判定入口</td>
+<td><strong>没有</strong> —— 而且<strong>比储能更远</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>为什么"更远"</strong>：第 56 轮证明框架<strong>没有势函数</strong>（4 个哈密顿量、"势能/结合能/V(r)"各 0 处）。
+⟹ 框架连「<strong>反应路径</strong>」这个概念都没有；而燃料电池<strong>全部</strong>是反应路径问题。</p>
+<p>⟹ 这是 <strong>I-14「单谱量特征」的第二个例证</strong>（第一个 = 储能）。
+⟹ 登记 <strong>N-19（负面）</strong>：用本框架推电化学转换 / 催化剂设计。</p>
+<hr />
+<h2>七、建设性：你的直觉中最有价值的部分是「绕过热机」</h2>
+<table>
+<thead>
+<tr>
+<th>路径</th>
+<th>η</th>
+<th>现状</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>燃料电池</strong>（化学→电）</td>
+<td>0.50–0.60（SOFC）</td>
+<td><strong>已产业化</strong>（固定式发电、重卡、航天）</td>
+</tr>
+<tr>
+<td>热电材料（热→电）</td>
+<td>0.05–0.15</td>
+<td>受 ZT 限制，进展慢</td>
+</tr>
+<tr>
+<td>磁流体发电（MHD）</td>
+<td>0.20–0.30</td>
+<td>高温材料限制</td>
+</tr>
+<tr>
+<td>β 伏打 / 核电池（核→电）</td>
+<td>电效率低但<strong>寿命极长</strong></td>
+<td>航天 / 植入式医疗</td>
+</tr>
+<tr>
+<td>反物质（<code>f = 1</code>）</td>
+<td>1.0</td>
+<td><strong>制造与约束是瓶颈</strong>（正是框架名字所指）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>唯一能立刻拿到 ×1.5–2 的是燃料电池；唯一能拿到量级的是核 / 质能 —— 而那不属于化学。</strong></p>
+<p>⚠️ 另一个要避免的方向：如果你说的"直接生成电子"是指<strong>绕过化学键重组</strong>、
+直接把分子的电子抽出来（电离），那在能量上是<strong>亏的</strong> ——
+化学键能 ~1.5 eV/原子，而电离能 ~10 eV ⟹ <strong>付 10 eV 收 1.5 eV</strong>。</p>
+<hr />
+<h2>诚实边界</h2>
+<p><strong>是引文核对 / 算术（可逐步复核）</strong>：
+- ΔH_f / ΔG_f / S° 全部取标准态（298.15 K）的教科书值，四种燃料的 ΔH、ΔG、η、n、V 逐项算出；
+- 卡诺极限、Landauer、有效能量密度的换算；
+- 框架侧词条计数（12 个词全 0 处）。</p>
+<p><strong>是判定（非严格）</strong>：
+- <strong>实际效率区间</strong>（汽油机 0.25–0.35、PEMFC 0.30–0.50、SOFC 0.50–0.60、DMFC 0.20–0.30）
+  是<strong>文献量级</strong>，随系统与工况浮动很大，<strong>本纪要只当量级用</strong>；
+- 「系统级密度被吃掉大半」是<strong>定性判断</strong>（氢车含罐 1 500–2 000 Wh/kg 是数量级引用）；
+- 「芯片类比不成立」是<strong>论证</strong>，不是定理。</p>
+<p><strong>没做</strong>：
+- <strong>没有</strong>研究任何具体催化剂 / 电池材料（DFT / 实验领域）；
+- <strong>没有</strong>对某个具体装置建模；
+- <strong>没有</strong>动论文（讨论纪要按惯例只进清单，不进正文）。</p>
+<hr />
+<h2>给用户的三句话</h2>
+<ol>
+<li><strong>你的直觉不是错的，它是"提前命中了一个成熟领域"</strong> —— 燃料电池就是"让燃料直接产电子"，
+   而且<strong>真的绕过卡诺</strong>。</li>
+<li><strong>但它的收益是 ×1.8 的效率，不是 ×10⁹ 的密度</strong> —— 而后者才是第 55/56 轮在找的东西。</li>
+<li><strong>如果目标是"能量密度"，那在化学这条路上没有任何余地</strong>：<code>f</code> 由化学键决定
+   （Li–O₂ 已是天花板 3 500 Wh/kg）；要量级突破只能换物理机制（核 / 质能），
+   而那就<strong>离开了电池问题，也离开了本框架</strong>。</li>
+</ol>
+
+<div class="footer">讨论纪要：人造微观反应腔 —— 「直接生成电子而非热量」 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 讨论纪要_人造微观反应腔_绕过卡诺与记错的轴.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

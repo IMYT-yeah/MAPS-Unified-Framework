@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAPS 推演轮次流程（maps-deduction-round）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">0. 开场：先定位，再动笔</div>
+  <h1>MAPS 推演轮次流程（maps-deduction-round）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-05 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<p>name: maps-deduction-round
+description: MAPS 统一框架（正反物质对风暴）「继续推演」轮次的规范化流程。当用户说「继续推演」「接着推」「下一轮」或提到 MAPS/正反物质对风暴/风暴框架/λ=1/黑洞宇宙/衬底置换等本项目术语时使用。包含每轮必做的 9 步、论文补丁的中英同步与锚点规则、环境坑（Windows/bash/PATH/venv）、数值与编码陷阱、以及已判死的路（勿再试）。
+agent_created: true</p>
+<hr />
+<h1>MAPS 推演轮次流程（maps-deduction-round）</h1>
+<blockquote>
+<p>2026-09-20 重建（换机时丢过一次）。原版本由第 1–38 轮累积而成，本版按第 39 轮的状态重写。</p>
+</blockquote>
+<h2>0. 开场：先定位，再动笔</h2>
+<p>工作区根 = 含 <code>outputs/</code> 与 <code>MAPS-Unified-Framework/</code> 的那个目录（<strong>路径会变，用相对自身定位</strong>）。</p>
+<p>按顺序读这三样，30 秒内知道推到哪：</p>
+<ol>
+<li><code>环境交接说明.md</code> —— 找<strong>最新的一轮段</strong>（在「已排除的路」之前）与 §七 的 🎯 优先级；</li>
+<li><code>outputs/工程期望清单.md</code> —— 「待标识候选池」；</li>
+<li>该轮要用的备忘录（<code>outputs/&lt;主题&gt;.md</code>）。</li>
+</ol>
+<p><strong>本轮主题的选取规则</strong>：优先做 🎯 标注项；若该主题上一轮已判死，改做候选池下一项。
+<strong>不要把"数值占卜"当主题</strong>（见 §5 铁律）。</p>
+<h2>1. 九步流程（每轮都走完）</h2>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>产出</th>
+<th>要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td><code>outputs/_&lt;topic&gt;.py</code></td>
+<td>核验脚本。检查项编号（如 CF-1…CF-9），每项打 <code>[OK]/[XX]</code>，末尾<strong>必须</strong>打印「通过 N 项，失败 M 项」。<strong>先看汇总行</strong>（本项目踩过 3 次"数值看着对、期望值写错"）</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>跑通</td>
+<td><code>M == 0</code> 才算过。失败就改，不许跳过</td>
+</tr>
+<tr>
+<td>S3</td>
+<td><code>outputs/&lt;中文标题&gt;.md</code></td>
+<td>备忘录。固定含：一句话结论 / 判据与数值表 / <strong>诚实边界</strong>（哪些是推导、哪些是判定、哪些没做）/ 判决 / 下一步</td>
+</tr>
+<tr>
+<td>S4</td>
+<td><code>outputs/_patch_&lt;topic&gt;.py</code>（可分段 a/b/c）</td>
+<td>论文补丁，<strong>中英同步</strong>。锚点<strong>必须恰好命中一次</strong>，否则拒绝改动并报错。改前备份到 <code>MAPS-Unified-Framework/paper/history/&lt;论文名&gt;_备份_YYYY-MM-DD第N轮前.md</code></td>
+</tr>
+<tr>
+<td>S5</td>
+<td>更新 <code>outputs/工程期望清单.md</code></td>
+<td><strong>每轮必做</strong>（第 36 轮定）。先找<strong>增量</strong>；无增量则从候选池取<strong>存量</strong>。评级 ★/★★/★★★，类型 工程/难题/<strong>负面</strong>；「诚判」列必须写"框架没给什么"</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>⭐ <code>python _md2html_generic.py --stale</code></td>
+<td>生成/补齐 html 快照（需 <code>markdown</code> 包）。<strong>改了 CSS/模板 → 必须用 <code>--all</code> 全量重建</strong>（<code>--stale</code> 只看 mtime，模板变更发现不了）<strong>⚠️ 该脚本在「工作区根目录」（与 <code>outputs/</code>、<code>MAPS-Unified-Framework/</code> 同级），不在 <code>outputs/</code> 里</strong> —— 必须在根目录调用；它写 <code>outputs/*.html</code> 并自动同步副本到 <code>docs/html/</code>。<strong>⚠️ 不要手搓转换器</strong>：第 88 轮我 <code>ls outputs/*.py</code> 没找到它（它在根目录）就手写了一个，样式与项目不一致（项目模板复用 <code>_md2html_v21.py</code> 的 CSS ＋ 离线 LaTeX 转换器）。报 <code>切片失效，缺少 X</code> ⟹ <code>_md2html_v21.py</code> 的行号被改过（见下方「HTML 快照排错」）</td>
+</tr>
+<tr>
+<td>S7</td>
+<td>更新 <code>环境交接说明.md</code> + <code>.workbuddy/memory/YYYY-MM-DD.md</code></td>
+<td>交接说明：新增「第 N 轮」段 + 更新 🎯 优先级 + 必要时加「已排除的路」。记忆：追加（<strong>只追加，不覆盖</strong>）</td>
+</tr>
+<tr>
+<td>S8</td>
+<td>同步仓库镜像</td>
+<td><strong>人工 <code>cp</code></strong>，<strong>绝不要跑 <code>_rebuild_repo.py</code></strong>（见 §4）</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>S2 之前不要写论文</strong>：本项目多次出现"备忘录结论稳定、但论文锚点或数值需要回头改"。</p>
+<h2>2. 判决口径（第 37 轮建立，逐轮沿用）</h2>
+<ul>
+<li>每条结论标<strong>四类判定</strong>：<strong>真预言</strong>（先算后验未观测）/ <strong>postdiction</strong>（答案已知后才导出）/
+  <strong>半拟合</strong>（能标是配的）/ <strong>失败</strong>（主动承认）。</li>
+<li>跟踪<strong>复用率 = 现象数 / 参数数</strong>（现 2.0，过约束 2 倍）。新增现象若需新增参数，必须显式写明。</li>
+<li><strong>别再包装 postdiction 为预言</strong>。第 39 轮起：<strong>「与 X 一致（一致性构造）」与「推出 X」必须分开写</strong>。</li>
+</ul>
+<h2>3. 环境（Windows，每次开工先做）</h2>
+<pre><code class="language-bash"># ① bash 的 PATH 常年是坏的 —— 每条命令前加这句（本轮又踩 2 次）
+export PATH=&quot;/usr/bin:/bin:$PATH&quot;
+
+# ② git 不在 PATH，用全路径
+C:/Users/&lt;你&gt;/.workbuddy/binaries/PortableGit/versions/1.2.0/cmd/git.exe
+
+# ③ 托管 python 无三方包；用隔离 venv（勿装全局）
+&quot;/c/Users/&lt;你&gt;/.workbuddy/binaries/python/envs/default/Scripts/python.exe&quot;
+# 该 venv 需要：numpy（已有）、markdown（md→html 必需，换机后记得 pip install markdown）
+</code></pre>
+<ul>
+<li><strong>PowerShell 工具无 stdout</strong> ⟹ 一律用 Bash 工具（记得先修 PATH）。</li>
+<li><code>pip install</code> 也要带 PATH，否则管道里 <code>tail</code> 不存在、输出被吞（会误判"没装上"）。</li>
+<li>中文路径：<code>git -c core.quotepath=false status</code>。</li>
+</ul>
+<h2>4. 仓库镜像（重要：别删 .git）</h2>
+<ul>
+<li><code>MAPS-Unified-Framework/</code> 是<strong>从 <code>outputs/</code> 重建</strong>的 GitHub-ready 仓库；<code>outputs/</code> 是素材镜像。</li>
+<li>❌ <strong>不要跑 <code>_rebuild_repo.py</code></strong>：它会 <code>shutil.rmtree(DST)</code> —— <strong>连 <code>.git</code> 一起删</strong>，
+  而仓库常处于「N 文件已暂存未提交」状态（git 身份可能还没设）。</li>
+<li>✅ <strong>改完用人工定向同步</strong>（本轮做法）：
+  <code>outputs/&lt;新备忘录&gt;.md            → MAPS-Unified-Framework/notes/推演专题/
+  outputs/工程期望清单.md           → notes/推演专题/
+  outputs/论文*_v2.9.md            → paper/zh/ ；En 版 → paper/en/
+  outputs/_&lt;topic&gt;.py、_patch_*.py → verification/
+  （html 由 _md2html_generic.py 自动写进 docs/html/）</code></li>
+</ul>
+<h2>5. 铁律与已判死的路（<strong>勿再试</strong>）</h2>
+<h3>5.0 边界速查（第 55–76 轮已判定的「框架能/不能」）</h3>
+<ul>
+<li><strong>储能 = 不覆盖</strong>（S-13）：框架的 [能量/质量] 量只有 <code>f = Q/c² = O(1)</code>，化学储能 ~10⁻¹⁰。</li>
+<li><strong>框架的「差」只有三类</strong>（I-14）：谱内差（<code>Δ = 2J</code>）／参数差（<code>E0(λ)</code> = 相图）／<strong>无极小弦势</strong>（σ_m ≥ 0 ⟹ 恒单调 ⟹ <strong>无势阱</strong>）
+  ⟹ 边界含 <strong>化学键 / 相变潜热 / 电离能</strong>（N-21）。⚠️ <strong>有相变 ≠ 有潜热</strong>。</li>
+<li><strong>机制 = 位置的量子化缺口</strong>（I-16）：没有一层同时有「位置 ＋ 能量 ＋ 位置是 <strong>q-数</strong>」
+  （衬底：有位置无能量｜弦网：无位置有能量｜场论：都有但 <strong>c-数</strong>）。判据 =「<strong>能否与另一构型做量子态之差</strong>」。</li>
+<li>⚠️ <strong>C-8</strong>：有<strong>场空间</strong>势 <code>V(Φ)</code>（§6.4）；无<strong>构型空间</strong>径向势 <code>V(r)</code>。</li>
+<li>⚠️ <strong>第五力已彻底关死</strong>（61/62/72）：工程出口 = 0、四力位无空位、<strong>I-17 结项</strong>（耦合是 Φ 的<strong>第 4 个纯输入</strong>、零约束；
+  补 KK 读法后毫米档<strong>已被 40–350 μm 桌面实验排除</strong>、普朗克档<strong>不可观测</strong>）。
+  ⚠️ <strong>第 120 轮修定（C-83/84、I-26）</strong>：以 KK radion 值 <strong><code>α_Y = 1/3</code></strong>（BD ω=0）重判 —— <strong>47.1 μm 档存活</strong>（余量 2–3×）、
+  193.8 μm 档排除（4–20×）、<strong>窗口 <code>λ ≲ 65–90 μm</code></strong>、<strong>×3 判据</strong>（40–60 μm 段即可判定）；2025–26 新数据<strong>无一命中</strong>该带。
+  ⚠️ <strong>第 121 轮（实验线 ×3）</strong>：判据精确化 —— <strong>×3 = 到达边缘</strong>、<strong>×3.2 = 四链干净排除</strong>、<strong>×6.4 = 2× 裕度</strong>（<strong>C-85</strong>）；
+  候选装置 = <strong>Du et al. 2022（CQG 39, 105008）32 重对称吸引子设计</strong>（<strong>40–800 μm</strong>、投影 <strong>2.0×10⁻¹⁷ N·m</strong>、<strong>×10 @ λ≈300 μm</strong> —— ⚠️ 设计≠结果、×10 非 47 μm、<strong>40–60 μm 段投影未公布 = I-27</strong>）＋ <strong>Cal Poly Humboldt「50 μm 以下」（在建）</strong>；材料包（<strong>未送出</strong>）。</li>
+<li>⛔ <strong>「动力学·耦合层」的内部推导 = 判否</strong>（第 123 轮 <strong>N-43</strong>）：三条结构性障碍（<strong>I-16</strong> 位置量子化缺口／<strong>I-20</strong> 两个 <code>ρ</code> 不接／<strong>I-21</strong> 非交换 = 外加）＋ <strong>15 例终止态台账</strong>（无一「推导成功」）。✅ <strong>条件构造可做</strong>（三样板：度规 B3／Φ 第五力／A2 动能 —— <strong>框架全部对外产出出自此档</strong>）；⚠️ <strong>失效条件 = 新增公理级输入</strong>（量化 Φ 等）。</li>
+<li>⚠️ <strong><code>ρ_Λ = E_c⁴</code> 的定量识别 = 已放弃</strong>（第 95 轮 / <strong>C-54</strong>；候选池 #2 结项）：<strong>保住 meV 量级／放弃定量识别</strong>（差 <strong>23.76 倍</strong>；二选一：配住 Ω_Λ 则 <code>E_c → 2.25 meV</code>；β 敏感度 <code>dlnΩ_Λ/dβ = 465</code>；<code>4!</code>/<code>e^π</code>/<code>π⁴/4</code>/<code>8π</code> 全不够）。⚠️ 判决 2026-09-17 做出、<strong>25 天（跨 90+ 轮）未进论文</strong>（「23.76」「二选一」论文 0 处）—— 第 95 轮补录（§8.1×2 ＋ §8.4，中英同步）。<strong>不得</strong>以「框架给出暗能量密度/比例」引用 §8.4；引「meV 量级」须同时写本判决。</li>
+<li>⚠️ <strong>η 能标不可独立导出 = 判否</strong>（第 95 轮 / <strong>N-40</strong>；候选池 #1 结项）：<strong>一维简并族</strong> —— 对<strong>任意</strong> <code>E*</code> 都存在 <code>(ε₀*, β*)</code> 使两锚点（1 meV / E<em>）同时精确成立（<code>β*(E*) = ln(1/η)/ln(E*/1meV)</code>；实测 E</em> = 0.246/0.969/5/100 TeV 均给 ε(E*) = η 至 1e-15）⟹ <strong>能标不被约束</strong>、「ε(1 TeV) ≈ η」<strong>不携带能标信息</strong>。引用必须写明 <strong>1 TeV 是输入</strong>。</li>
+<li>⚠️ <strong>PPN 优越系 = 不覆盖</strong>（第 93 轮 / <strong>N-38</strong>；候选池 #5 结项）：§4.5b「其余全 0」是<strong>静态扇区</strong>结论 —— <code>ξ/α₁/α₂/α₃/ζ</code> 系是<strong>运动型参数</strong>，静态 ansatz 对它们是<strong>盲区</strong>（「自动 GR 值」把「不出现」误报为「= 0」）；「= 0」实由 <strong>C-2</strong>（衬底绝对性不泄漏到 1PN）承担，而 <strong>C-2 未演示</strong>（「各向同性＋50:50 ⟹ 抹掉」<strong>不成立</strong>：各向同性介质仍定义优越系；<code>n^μ</code> ~ aether <code>u^μ</code>）。判别力 <strong>0</strong>（1PN 与 GR 同值）。登记 <strong>I-22</strong>。<strong>别再拿「PPN 全 0」当已得结果</strong>；引用须带 C-2。</li>
+<li>⚠️ <strong>void-CPT-κ = 悬空</strong>（第 94 轮 / <strong>N-39</strong>）：机制（镜像支引力投影）早于 <strong>2026-09-16/17</strong> 被<strong>硬否证</strong>（读法 A 低 5.31 倍／读法 B 高 3.82 倍）——<strong>不得</strong>把它计为可检验预言；四类判定须走<strong>机制轴 × 观测轴</strong>两轴（见技能陷阱 89）。</li>
+<li>⚠️ <strong>不覆盖宇宙学判别</strong>（73 / <strong>N-29</strong>）：9 条输出<strong>可判别 = 0</strong>；因<strong>包含关系</strong>（<code>ΛCDM = 框架在 ν=0 的特例</code>）。</li>
+<li>⭐ <strong>宇宙学动力学 = 「不该有」而非「还没推导」</strong>（75 / <strong>I-20</strong>）：等分账输入<strong>只有同时刻 <code>H</code></strong> ⟹ <code>Ω_tot ≡ 1</code>；
+  硬写面上守恒 ⟹ <strong><code>w = −1/3</code></strong>（<strong>22.4σ</strong>）= <strong>曲率标度</strong> <code>ρ ∝ a⁻²</code> ⟹ 它的 <code>ρ</code> <strong>只能是约束</strong>；
+  ⭐ <strong>两个 <code>ρ</code> 不接</strong>（<code>J^μ</code> 守恒但<strong>不带 <code>p</code></strong>）⟹ <strong>缺同一个 <code>ρ</code></strong>（<strong>分层</strong>）。</li>
+<li>⭐ <strong>§7 = 非交换化是「外加」的，判别力 = 0</strong>（76 / <strong>I-21</strong>）：框架<strong>自有代数没有一层提供非交换</strong>
+  （衬底<strong>交换</strong>｜<strong>弦网完全交换</strong>（顶点与面共享 2 条边）｜<code>(−1)^N</code> 是<strong>阿贝尔相位</strong>）；
+  唯一非交换的 <strong>Clifford 投影</strong>是 §5.2 <strong>记号</strong>。<strong>§7.2 是条件命题</strong>（<code>S = −2√2</code> 用 2 qubit 即可复现，
+  <strong>零框架元素</strong> ⟹ <strong>Tsirelson</strong>）；§7.4 <strong>自认</strong>与标准 QM 重合 ⟹ 判别力 0。⭐ <strong>与 I-16 同构</strong>。
+  ⭐ 唯一正面：枚举 16 个局域策略 ⟹ max CHSH = 2 ⟹ §7.1 可升级为 <strong>Fine 定理（1982）的推论</strong>（<strong>解释力，非判别力</strong>）。</li>
+<li>❌ <strong>弦网耦合 → <code>α</code> 无路径</strong>（77 / <strong>N-33 / N-34</strong>）：<code>g</code> 在框架里<strong>处处相消</strong>（扫 <code>g</code> 跨 18 个数量级 <code>J/K</code> 恒 <strong>3.000000</strong>）
+  ⟹ 「<code>g</code> 的精确值」<strong>没有对象</strong>；<code>n_G = d_min(G)</code> 是<strong>群论整数</strong>，而 <code>α</code> 是 <strong>@E 量</strong>（论文「跑动」正文 0 处）；
+  §5.8 <strong>自认连续极限仍开放</strong> ⟹ <strong>连续规范场尚未涌现 ⟹ <code>α</code> 连定义域都没有</strong>；从 <code>n_G</code> 到 <code>α</code> 需 <strong>4 个换算因子，具备的 = 0</strong>。
+  ⚠️ 「3:2:1」是 <strong><code>n_G</code> 之比</strong>，按字面读作耦合常数比 = 强/电磁 3 vs 观测 <strong>15.10</strong> ⟹ <strong>差 5.03 倍 ≈ 100σ</strong>（<strong>C-24</strong>）。
+  ⚠️ <strong>C-25</strong>：英文稿曾<strong>完全没有</strong> v2.9 A3 的内容（中英不同步）—— 第 77 轮已补齐。</li>
+<li><strong>出口</strong>：❌ 工程 = 0、★★★ 清零；✅ 观测只剩 <strong>EMRI</strong>（LISA ~10–15 年，三前提全在框架外）。</li>
+<li><strong>公开就绪度</strong>（63）：独有+可测+有数 = <strong>1</strong>；★★★ = 0；「参数表」<strong>0 处</strong> ⟹ 审稿人七击 4 条致命。<strong>负面边界不怕公开</strong>。</li>
+<li><strong>开口</strong>：✅ I-16 / I-17 / I-18 / I-19 / I-20（75）/ <strong>I-21（76）</strong> / 候选池 9、3、36。⚠️ 第 73 轮「候选池已清空」是<strong>过度声明</strong>（<strong>C-18</strong>）
+  ⟹ 实测<strong>真实待办 21 条、现剩 18 条</strong>（明细 <code>outputs/全量待办回溯_我的过度声明更正与真实待办总账.md</code>）；
+  ⚠️ <strong>C-19</strong>：清单 ☐ 标记<strong>双向失真</strong> ⟹ <strong>不得作待办依据</strong>。</li>
+</ul>
+<p><strong>方法铁律</strong>
+<strong>五类失败，五种抓法</strong>（第 60 轮建立；记忆里只留指针）
+- <strong>冗余</strong>（方程数 &lt; 未知量）→ 可识别性检查｜<strong>缺失</strong>（4 个哈密顿量、0 个 <code>V(r)</code>）→ 结构清点
+- <strong>分层</strong>（缺把两层接起来的算符）→ 「同一层里有没有这两个量」｜<strong>数性错配</strong> → 「q-数还是 c-数」｜
+  <strong>量纲混淆</strong> → 「这个量<strong>有量纲</strong>吗」
+⟹ 瓶颈不在「算得不够多」，而在「<strong>每次接新现象都缺一个把量纲/层次/口径对齐的机制</strong>」。</p>
+<p><strong>方法铁律（续，第 65–78 轮）</strong>
+- <strong>19</strong> 判别「确定 vs 随机」比<strong>时间序列与守恒量</strong>，不比快照（铁律见陷阱 55）。
+- <strong>20</strong> 拓扑计数用 <strong>Morse 谱</strong>；离散绕数须<strong>曲率修正</strong>，且只对<strong>单位模</strong>场（陷阱 57/58）。
+- <strong>21</strong> 新增演化方程前跑<strong>0 处检索</strong>，并显式标「<strong>新增假设</strong>」（陷阱 59）。
+- <strong>22</strong> 「边界」命题先问 <strong>q-数还是 c-数</strong>；报边界必须同时报<strong>失效条件</strong>（陷阱 60）。
+- <strong>23</strong> <strong>内部一致性检验常比重算便宜</strong>（先用文档里的两个互相约束的数互查）。
+- <strong>24</strong> 「跨章节同名量」：<strong>反推自变量的适用域</strong>（陷阱 62）。
+- <strong>25</strong> 判据用的「<strong>度量</strong>」先用<strong>第二个尺寸</strong>验非退化（陷阱 63）。
+- <strong>26</strong> 「有量纲 / 无尺度」是<strong>两类量</strong>，不可混用。
+- <strong>27</strong> 报「N 个独立模式」前先算<strong>秩</strong>；口径缺失时报<strong>区间</strong>（陷阱 64）。
+- <strong>28</strong> <strong>符号撞车先检索</strong>：新符号先全文查，撞车须加「符号约定」。
+- <strong>29</strong> 「某方程还缺」前先问<strong>缺的是方程还是对象</strong>（逐个问该量「约束」还是「守恒」）。
+- <strong>30</strong> <strong>恒等式的数值检测</strong>：缩放「链条里<strong>成对出现</strong>的公共自变量」（不是缩放它们本身）。
+- <strong>31</strong> ⚠️ <strong>更正必须扫「同一处的派生量」</strong>（第 78 轮 C-26）：判据问句 = 「<strong>我改了 A，还有哪些 B 是从 A 算出来的？</strong>」；
+  同族新形态另有「<strong>改了工具没改产物</strong>」（C-27）。</p>
+<ul>
+<li><strong>拒绝数值占卜</strong>：本项目已明确拒绝过 <code>4! = 24</code>、<code>e^π</code>、<code>1/log(1/δ) = 2/3</code>、
+  <code>9/7 ≈ e^{1/4}</code> 等。数值接近只可<strong>登记为"无机制"</strong>，不得作证据、不得写进正文。</li>
+<li><strong>随机采样会低估覆盖半径</strong>（最坏点落在零测度集上）：求覆盖半径必须用候选极值点/解析值。</li>
+<li><strong>报偏差必须附该 N 的噪声基线</strong>，否则数字无法解读（绝对判据在 N ≲ 1600 时不可用）。</li>
+<li><strong>改动后变好但动了两个变量时，必须做 2×2 对照再归因</strong>（第 26 轮教训：错误归因过一次）。</li>
+<li><strong>来源不同的量不能互换</strong>：如「保留因子 1−1/3」≠「稳态占据 2/3」。</li>
+<li><strong>口径依赖要显式写</strong>：如「压缩因子的因子 2」在体内是 2 键/面元、2×2 块是 3 键/面元。</li>
+<li><strong>⚠️ 陈年待办先核查再动手</strong>（第 0 批，2026-09-28）：<code>环境交接说明</code> / 清单里的「待办」
+  <strong>可能已由后续轮次落地而没勾掉</strong> —— 实测：第 16 轮登记的 3 条收口待办，
+  在随后 40 轮间<strong>已做完 2 条半</strong>（①「因果补丁边界」已废弃、③「ξ-稳健性」已降调、
+  ②「λ 统一」基本完成但<strong>漏了 <code>λ_micro</code></strong>）。
+  ⟹ <strong>凡跨 10 轮以上的待办，先做脚本化引文取证</strong>（全文检索 + 明确判据），再决定改不改。
+  ⚠️ 教训：跳过核查直接重做，会<strong>白改三处、并漏掉唯一真正没改的那一处</strong>。
+  📌 判据写法示例（第 0 批 <code>_audit_01_02.py</code>）：每条待办给一个<strong>可判定的验收条件</strong> ——
+  如「① 该措辞全文仅剩否定用法」「② 该符号作为 X 义 = 0 处（排除合法语境）」
+  「③ 该性质出现处均已写『降调』」。</li>
+<li><strong>「同轴性」判据</strong>（第 56 轮建立，处理"这个目标框架能不能做"）：任何<strong>容量 / 密度 / 效率</strong>类
+  目标（储能容量、信息容量、转换效率…）先<strong>形式化</strong>，再逐条检验：
+  <strong>(a) 五条结构条件</strong> —— ① 双因子（分子 ΔE 与分母 M 各自可算）② <strong>两态之差</strong>（★最常失败的一条：
+  量必须是"束缚态 vs 解离态"之差，不是某个绝对能标）③ 记账单元对偶 ④ 可释放性 ⑤ 可逆性；
+  <strong>(b) 一个无量纲锚</strong> —— 如储能 <code>f ≡ Q/c² = ΔE_bind/(m_unit·c²)</code>（<strong>可释放质量份额</strong>），
+  它能一眼分开"储能"与"质能等价"（化学 f ~ 10⁻¹⁰、裂变 ~10⁻³、质能 1）。
+  ⟹ 这把"该不该做 / 走哪条路"的讨论变成<strong>可判定操作</strong>（第 56 轮用它一轮内给出结论）。
+  ⚠️ 与<strong>陷阱 41</strong>（开工<strong>前</strong>的三步审查：查内容存量 / 查尺度 / 找可判定入口）配对使用：
+  41 判「值不值得开工」，本条判「开工后合不合格」。
+  ⚠️ 检查 ② 的<strong>具体手法</strong>：把框架的<strong>全部哈密顿量列出来</strong>，逐个问「有没有带 V(r)」——
+  第 56 轮正是这样发现「4 个哈密顿量、0 个势函数」的（全文"势能/结合能/相互作用势/V(r)"各 0 处）。</li>
+</ul>
+<p><strong>已判死的路（别再走）</strong>
+1. 用<strong>表观视界</strong>做能账 ⟹ 恒等式，对 λ 零预言力。
+2. 直接取 <code>R·H = c</code> 当表观视界 ⟹ 循环。
+3. <strong>Kodama 动力学表面引力</strong> <code>κ = −cH(1−3w)/4</code> ⟹ 217σ，已否证。
+4. tick 的<strong>串行</strong>归一化（每 tick 全局一次对换）⟹ 三条独立判据排除。
+5. <strong>全局统一相位</strong>（一 tick 内所有线同侧）⟹ 动力学被钉住；相位必须<strong>每线独立</strong>。
+6. <strong>从衬底动力学推「观测者读数分辨率」</strong> ⟹ 第 40 轮三难排除：不变的读数熵密度 ≈ 0.44
+   纳特/格点（偏大 1.75 倍）/ 群高度可迁时次广延（面积律不成立）/ 时间平均 <code>τ = t_P/(δ²e²)</code>
+   一个方程两个未知量、零预言力。需要的是<strong>观测者的分辨率 δ 或积分时间 τ</strong>，不是衬底。
+   可证伪判据：典型轨道大小 <code>⟨|O|⟩ = 1.557^N</code>（tick 群在 N = 16 上给 ≈ 60，差约 20 倍）。
+7. <strong>在衬底里找压缩因子 5.545（= 8 ln2）的机制</strong> ⟹ 第 39 轮四路 no-go：
+   无整数枚举（块级最近 m=3 偏 −8.98%）、最保守几何读法仍超 ln16 = 2.7726 倍、
+   不受观测约束（Hawking 温度只含观测端）、动力学零熵产生。
+   它是「比特计的槽位数 ÷ 纳特计的熵」⟹ <strong>伪问题</strong>；真问题是<strong>观测者读数分辨率</strong>（B5 公设）。
+8. <strong>用任何单体输运量（扩散系数 D 等）反推 h、或区分 tick 随机性来源</strong> ⟹ 第 43 轮：
+   D 是 <strong>1 个实数</strong>，相位自由度是 <strong>L² 个比特</strong> ⟹ <strong>欠定</strong>（不是难测）。
+9. <strong>用周期性判别 tick 随机性来源</strong> ⟹ 第 44 轮：位移不按驱动周期重复
+   （τ=256 处 C = −0.3269，而严格周期应是 <strong>C(T) ≈ +1</strong>）。
+10. <strong>两点关联函数</strong> ⟹ 第 44 轮：空间关联只差 <strong>0.14σ</strong>（且关联量 ≠ 0，判否是实质的）。
+11. <strong>从 §4.9 涡动力学定观测者周期 τ</strong> ⟹ 第 45 轮：N1 只是<strong>量子化条件</strong>；
+    三个候选各带一个新未知量（R / m / ω）⟹ <strong>公设上移 = 无穷回归</strong>。
+12. <strong>用群阶 <code>|G|</code> 代替真实轨道来估 H/N</strong> ⟹ 第 47 轮：两者<strong>无单调关系</strong>
+    （(2,4,4) 的 ln|G|/N = 0.8162 &gt; ln2，若轨道接近 |G| 则 H/N &lt; 0，不可能）
+    ⟹ <code>|G|</code> 只能当<strong>上界</strong>（<code>|O| ≤ |G|</code>），<strong>不能反过来</strong>由 |G| 推 H/N。
+13. <strong>用群阶 <code>|G|</code> 判断「某格点能不能算轨道」</strong> ⟹ 第 48 轮：决定成本的是<strong>轨道大小</strong>
+    （实测 10³·⁴ – 10⁶·⁸），不是 <code>|G|</code>（(2,4,4) 的 |G| = 2.2×10¹¹ 却被误判"不可算"）。
+    GAP 的 <code>Stabilizer(G,c,OnSets)</code> 直接给 <code>|G|/|Stab|</code>，<strong>完全不遍历轨道</strong> ⟹ 与第 12 条同源的误判。
+14. <strong>孤立地看 (2,2,L) 细长格点上的任何 H/N 定量</strong> ⟹ 第 48 轮：那是<strong>退化角落</strong>。
+    L = 2 的方向<strong>没有相位自由度</strong>（长度 2 的环只有一种完美匹配 ⟹ σ_j = 恒等）
+    ⟹ <strong>≥2 个</strong> L=2 方向时 H/N ∈ [0.4335, 0.5307]，<strong>≤1 个</strong>时 ∈ [0.1802, 0.2834]（两组完全分离）。
+    ⚠️ 第 40 轮立、第 46 轮"补强"的「不变读数偏大 1.75 倍 ⟹ 面积律不成立」就栽在这上面（<strong>R-1</strong>）。
+15. <strong>用「扫参数」定位 0.25 的机制</strong> ⟹ 第 50 轮排除。三个方向都扫过了 ——
+    扫 <strong>N</strong>（第 49 轮）、扫<strong>占据数层 k</strong>（第 50 轮）、扫<strong>格点形状</strong>（第 48 轮）——
+    凡命中 0.25 都只是 <code>H/N(参数)</code> 曲线<strong>穿过</strong> 0.25，且跨点位置<strong>随任一参数移动</strong>
+    （k_c/N 从 0.377 降到 0.289）⟹ <strong>换一个参数重复的是同一件事</strong>。
+    ⟹ 不要再换参数试；要么找到<strong>机制</strong>（钉住 N / k / 形状），要么承认<strong>不存在定量联系</strong>。
+16. <strong>找「H/N = 0.25」的等式跨点</strong> ⟹ 第 51 轮排除（<strong>目标错了</strong>，不是没找到）。
+    第 40 轮已证明「观测者的读数<strong>不能</strong>是 tick 不变量」⟹ 观测者用<strong>瞬时</strong>读数，
+    而 tick 不变读数是它的一个函数 ⟹ <code>H/N</code>（不变读数）<strong>≤</strong> <code>0.25</code>（观测者读数），<strong>不等式</strong>。
+    ⟹ 0.2834（N=32）是<strong>违反</strong>自洽性、0.1839（N=64）是<strong>满足</strong>自洽性；<strong>不是</strong>「0.25 被跨过」。
+    ⟹ 第 46–50 轮的等式路线<strong>判死</strong>（N-13 / C-3）。宏观余量 ~10⁵⁰（太阳质量 BH：N ≈ 4.2×10⁷⁷、
+    H/N ≈ 5.4×10⁻⁵²）⟹ 天体物理黑洞<strong>全部自洽</strong>，N_c ≈ 41.8 只是普朗克尺度的下界。
+17. <strong>试图单独定出 B5 拆分里的 a（面元/单元）或 b（纳特/单元）</strong> ⟹ 第 52 轮排除。
+    观测只给一个数 <code>σ = S/A = 0.25 纳特/l_P²</code> ⟹ 只约束 <strong>b/a</strong>；
+    (a,b) = (4,1) / (2,0.5) / (8,2) / (1,0.25) / (16,4) <strong>给出完全相同的观测量</strong>
+    ⟹ 拆分<strong>不可观测</strong>。⟹ 一般教训：<strong>只有当观测量的个数 ≥ 待定参数的个数时才可识别</strong>；
+    一个方程两个未知量的拆分（与第 45 轮 B5 上移是同一个病）<strong>没有任何判别力</strong>。
+18. <strong>把 <code>ε₀ = ε(M_Pl)</code> 搬到其他能标用</strong> ⟹ 第 53 轮排除（= <strong>N-14</strong>）。
+    S-E5 的 <code>ε ~ 10⁻²⁰</code> 就是这么来的；按 <code>ε(E) = ε₀(M_Pl/E)^β</code>，FQH 能标下应为 <strong>0.04–77</strong>
+    （差 18–21 个数量级）。而 §8.1 自己写着 <code>ε(1 meV) ~ 1</code> ⟹ 论文内部两处冲突。
+    ⟹ 凡<strong>能标依赖量</strong>（ε、α、λ_c…）必须带 <strong>(@E)</strong> 标注；<strong>跨能标引用 = 无意义</strong>。
+19. <strong>用「自旋/对称性类型」做跨系统等同</strong> ⟹ 第 54 轮排除（= <strong>N-15</strong>）。
+    S-E5 的「FQH 引力子模 = 框架弦网模态」依据只有「自旋 2」，而框架自己论证
+    「<strong>自旋 2 是任何二阶无迹对称张量涨落模态的几何必然</strong>」⟹ 该特征<strong>不判别</strong>。
+    另两条硬障碍（同一判据的加强版）：<strong>弦网无手性</strong>（实哈密顿量；而手性是实测量）、
+    <strong>能量差 10³⁰</strong>（弦网 <code>J = n_G·E_P·g</code> 是普朗克标度 vs FQH meV）。
+    ⟹ 规矩：<strong>做跨系统等同时先问「这个特征排除了什么」</strong> —— 排除不了的就不是依据。
+20. <strong>把框架接向一个「工程上更实际」的新领域</strong> ⟹ 第 55 轮排除两条（= <strong>N-16 / N-17</strong>）。
+    (a) <strong>用本框架推化学储能（电池材料 / 结构设计）</strong>：框架对电池/储能/电化学/化学键<strong>零内容</strong>，
+        尺度差 ≥10 个数量级。⟹ 化学储能的天花板 = <strong>化学键能 ~ 数 eV/原子</strong>
+        （Li–O₂ 理论 3500 Wh/kg；量级突破只能来自核/质能，而那不属于化学）。
+    (b) <strong>把「跨支 ER 通道」当作能量/物质通路</strong>：框架自己有<strong>负压</strong>但<strong>无负能量密度</strong>
+        （<code>P ≤ ρc²</code>、<code>ρ ≥ 0</code>）；可穿越虫洞需<strong>违反 ANEC</strong>；即使违反，量子不等式 <code>ΔE·Δt ≲ ℏ</code>
+        把预算锁在 <code>ℏ/Δt</code>（1 s 内 ≤ 1.06×10⁻³⁴ J，比室温热能小 14 个数量级）⟹ 只能载<strong>信息</strong>。
+    ⟹ <strong>教训（与第 36/51/54 条同族）</strong>：<strong>目标更实际 ≠ 框架能做</strong>；换一个「接地气」的目标
+       不会自动产生接口。<strong>接新领域前先做三步审查（见陷阱 41）</strong>。</p>
+<p><strong>已判死（近 14 轮，第 62–76 轮 —— 负面 N-2x 与更正 C-1x）</strong>
+- <strong>N-28</strong> Φ 的耦合强度当框架能给出的量（第 72 轮：耦合是 Φ 的<strong>第 4 个纯输入</strong>、零约束；补 KK 读法后毫米档<strong>已被 40–350 μm 桌面实验排除</strong>）
+- <strong>N-29</strong> 在框架与 ΛCDM 之间找<strong>判别点</strong>（第 73 轮：实为<strong>包含关系</strong> <code>ΛCDM ⊂ 框架</code>，可判别 <strong>0/9</strong>）
+- <strong>N-30</strong> 把「等分账的 <code>ρ</code> ＋ 能量守恒」当可用路径（第 75 轮：<code>w = −1/3</code>，<strong>22.4σ</strong>；<code>ρ ∝ a⁻²</code> 是曲率标度）
+- <strong>N-31</strong> 把 §7.2 的「非交换化 ⇒ 量子关联」当框架的<strong>推导</strong>（第 76 轮：<strong>条件命题</strong>，前提含结论；<code>S = −2√2</code> 只需 2 个 qubit）
+- <strong>N-32</strong> 把 <code>D = ℏ/(3m)</code> vs Nelson <code>ℏ/(2m)</code> 当<strong>判别点</strong>（第 76 轮：前者是<strong>恒等式</strong>；1.5 倍是数字巧合）
+- <strong>N-23</strong> 「第五种力」当框架预言｜<strong>N-24</strong> 用空间快照判别确定性｜<strong>N-25</strong> 「χ = 2」当物质–反物质不对称来源｜<strong>N-26</strong> 「钉扎项」当位置算符｜<strong>N-27</strong> 「粗粒化」当「截断」
+- <strong>N-22</strong> 「平坦性 <code>Ω_K = 0</code>」当<strong>判别性</strong>预言（与平 ΛCDM <strong>同值</strong>）｜<strong>N-21</strong> 框架推化学键 / 相变潜热 / 电离能（公共需求 = <strong>势阱型构型差</strong>）
+- <strong>C-15</strong> <code>λ</code> 三义、<code>g</code> 两义｜<strong>C-16</strong> §8.4 的 <code>ε</code>（漂移指数）当 §8.1 的 <code>ε</code>｜<strong>C-17</strong> 「哈勃球 = 史瓦西半径」当机制（<code>G</code>/<code>H₀</code> 全消掉的<strong>恒等式</strong>）
+- <strong>C-18</strong> 「候选池可判定入口已清空」的过度声明（⟹§七 是当期优先级，不是台账）｜<strong>C-19</strong> 清单 ☐ 标记双向失真
+- <strong>C-20</strong> 等分账面积口径未写明（须取 <code>πR²/l_P²</code>，取 <code>4πR²</code> <strong>差 4 倍</strong>）｜<strong>C-21</strong> <code>ρ</code> 五义、<code>w</code> 两义无约定
+- <strong>C-22</strong> 候选池 3 的全部锚点词<strong>论文里 0 处</strong>（真实出处是第 18/21 轮备忘录）｜<strong>C-23</strong> 「<code>(−1)^N_exchange</code>（交换符号）」记号歧义（组态权重 vs 费米子算符；框架<strong>无 Fock 空间</strong>）
+- <strong>C-13</strong> 用 (2,2,4) 的块方差做判据（最小算例退化）｜<strong>C-12</strong> §8.1 <code>ε_A</code> 与 A2 的 <code>δ</code> 当同一个 ε｜<strong>C-6</strong> F2 降标 @ R_H 当独立成果
+- <strong>N-33</strong> 「<code>g</code> 的精确值」当可求的量（第 77 轮：两种读法都判否 —— 弦网 <code>g</code> <strong>处处相消</strong>／钉扎 <code>g</code> <strong>零约束</strong>）
+- <strong>N-34</strong> 「<code>n_G = 3:2:1</code> → <code>α_s/α_EM</code>」当可达映射（第 77 轮：数字差 5.03 倍｜群论整数 vs @E｜无连续极限｜4 个换算因子全缺）
+- <strong>C-24</strong> 「耦合强度谱系预言 3:2:1」措辞把群论整数比与耦合常数比混在一起（第 77 轮）
+- <strong>C-25</strong> ⭐ 中英不同步：英文稿曾完全没有 v2.9 A3 的内容（第 77 轮顺带查出并<strong>已补齐</strong>）</p>
+<p><strong>第 78–87 轮增量（前 77 轮见上）</strong>
+- <strong>N-35</strong> 把「消掉 <code>8π/3</code>」当可达目标（第 81 轮：<strong>没有对象</strong> —— 它是「微观事件率密度 / 引力约束密度」之比，框架从未要求二者相等；与第 77 轮「<code>g</code> 的精确值没有对象」<strong>同构</strong>）｜<strong>C-32</strong> 该处的 <code>N</code> 两义（差 π）
+- <strong>N-36</strong> 把 <code>h = ln3 + L²·ln2</code> 里的 <code>L²</code> 当「框架推出面积律」（第 81 轮：它是 <code>h</code> 的<strong>定义式</strong> ⟹ <strong>定义 ≠ 发现</strong>）
+- <strong>N-37</strong> 把「Ricci 流 → 基本粒子」当框架可覆盖（第 82 轮：Ricci 流只证 <strong><code>n = 3</code></strong>；<code>n ≥ 5</code> 属 h-cobordism／Smale；<strong><code>n = 4</code> 光滑版仍未解</strong> —— 而衬底正是 4 维）⟹ 登记为<strong>不覆盖</strong>
+- ⚠️ <strong>关联长度是「二分」</strong>（第 81 轮 H4）：<code>C∥(d) = (−1)^d</code> 逐位精确、<code>ξ⊥ = 0</code>、<code>N_eff = L²</code>（线数）⟹ <strong>与 <code>h</code> 的 <code>L²</code> 同源，不是新量</strong>
+- ⭐ <strong>衬底几何的裁决等级 =【引理 1（设定）＋几何枚举下唯一的自洽解】</strong>（第 85 轮）—— 第 84 轮曾误写成「<strong>对等二读法任选</strong>」，<strong>已撤回</strong>：
+  第 27 轮<strong>自承</strong>那一步是「<strong>唯一依赖的外来步骤</strong>」，第 28 轮 FC-7(a) <strong>专门审查后判定其支撑不成立</strong>。
+  判据：<strong>「外来步骤没打通」≠「几种读法都行」</strong>（前者是缺口，后者是自由）。
+- ⚠️ <strong>金刚石不成立的硬理由 = 共面性</strong>（第 83 轮 <strong>C-33</strong>：撤回第 82 轮把「<strong>第 27 轮初稿</strong>里的金刚石」当<strong>定案</strong>所做的补证）
+  ｜⚠️ <strong>4 vs 6 不冲突</strong>：<strong>信息层 4</strong>（<code>k·q = 16</code>）vs <strong>几何层 6</strong>（配位数）—— 两个不同的层，不是矛盾。
+- ⚠️ <strong>C-37（第 85 轮）</strong>：<strong>审计面 = 论文 ＋ 备忘录族 ＋ 清单</strong> —— 只读论文会漏掉<strong>只记在备忘录里</strong>的 gap（第 85 轮真的因此写错论文）。
+- ⭐⭐ <strong>C-39 / C-40 / C-41</strong> ＝ <strong>数值口径三连</strong>（明细见 §6 陷阱 78、79）：<strong>主控变量 = 退化方向数</strong>｜<strong>h_min 必须分组拟合</strong>｜<strong>宏观外推必须写口径</strong>。
+- <strong>C-26 / C-34 / C-35</strong>：中英不同步 与 符号撞车（明细见 §6 陷阱 70 起）。
+- ⛔ <strong><code>ℏ</code> 的独立身份 = 不可辨识</strong>（第 111 轮 <strong>N-41</strong>）：框架自有关系只有 <code>c = l_P/t_P</code> 与 <code>l_P² = Gℏ/c³</code> 两条，
+  <code>c</code> 另有实测值 ⟹ <code>{l_P, G, ℏ}</code> <strong>3 未知 / 1 关系 ⟹ 自由度 2</strong>；且全文 <code>l_P</code> 唯一数值（附录 <code>1.62×10⁻³⁵ m</code>）
+  <strong>就是</strong> <code>√(Gℏ/c³)</code> ⟹ <strong>不得</strong>说「<code>ℏ</code> 不是基本常数」或「<code>ℏ</code> 是导出量」（准确说法：框架只固定<strong>组合</strong> <code>Gℏ/c³</code>）。
+  ⭐ 定量事实：<strong>λ = 1 链里 <code>ℏ</code> 逐项抵消</strong>（<code>N</code> 的分母 × <code>k_BT</code> 的分子）⟹ <code>ρ = 3H₀²/(8πG)</code> 不含 <code>ℏ</code>。
+- ⛔ <strong><code>M²/A = c⁴/(16πG²)</code> 不是「普朗克常数」</strong>（第 111 轮 <strong>C-77</strong>）：量纲 <strong>kg²/m² ≠ ℏ 的 kg·m²/s</strong>、
+  表达式 <strong><code>ℏ</code> 指数 0</strong>、且它是 <strong>GR 代数恒等式</strong>（由 <code>A = 4πr_h²</code>、<code>r_h = 2GM/c²</code> 得，<strong>对任意 M 成立</strong>）
+  ⟹ 由它「推 <code>r_h</code>」是<strong>循环</strong>，「<code>α = 1</code> 双重来源」应<strong>降为 1 条</strong>。
+- ⛔ <strong>EMRI 的 <code>κ = 0.30</code> 不是标定量</strong>（第 112 轮 <strong>C-78</strong>）：<code>stormetric/emri.py</code> 里它是 <strong><code>coupling</code> 的默认形参</strong>
+  （docstring 自标 "Phenomenological coupling"；<code>metric</code> 注明「kept for interface symmetry」）⟹ <strong>进动律不经过度规</strong>。
+  ⭐ <strong>可升级</strong>：度规自己的值是 <strong><code>κ_rel(e)</code></strong>（e→0 给 <strong>1/3</strong>，升到 <strong>0.4116</strong>@e=0.96）⟹ <strong>参数 −1</strong>。
+  ⚠️ 且代码把 <code>δ</code> 当<strong>绝对</strong>超额用，1PN 相同 ⟹ <strong>绝对必为 O(x_p²)</strong>、只有<strong>相对</strong>才 ∝ <code>x_p</code>（<strong>口径错位</strong>）。
+- ⛔ <strong>三处 <code>1/3</code> 不是「同源」</strong>（第 112 轮 <strong>N-42</strong>）：<code>Γ</code> 的 <code>s²</code> 系数／2PN <code>g_rr</code> 分叉／<code>κ_rel(e→0)</code>
+  —— 三条链<strong>输入互斥</strong> ⟹ 只登记为<strong>无机制的一致性</strong>。</p>
+<p><strong>「对外接口」核完清单（第 61–76 轮）</strong>
+工程（61：出口 = 0）／新力（62、72：四力位无空位 ＋ 耦合给不出）／宇宙学判别（73：0/9）／
+凝聚态（53–55：无势阱）／<strong>量子基础（76：非交换化是外加的，判别力 = 0）</strong> ⟹ <strong>观测侧只剩 EMRI</strong>。
+⭐ 结构上可归结为<strong>同一条</strong>：「能做<strong>测试粒子在外源场中</strong>（c-数背景），不能做<strong>两个可比质量物体的排布</strong>（需 q-数位置）」。</p>
+<h2>6. 编码与数值陷阱（都踩过）</h2>
+<ol>
+<li><strong><code>%</code> 格式符</strong>：中文串里的 <code>%</code>（尤其后跟全角逗号）会被当格式符 ⟹ 字面 <code>%</code> 写 <code>%%</code>。
+   更稳的做法：<strong>改用 <code>.format()</code> 或 f-string</strong>。</li>
+<li><strong>中文正文引号一律用「」/『』</strong>：补丁脚本里中文串内写 ASCII <code>"</code> 会 <code>SyntaxError</code>，
+   而且<strong>报错行常常不是出问题的行</strong>（报在下一行，提示 "Perhaps you forgot a comma?"）。
+   第 43 轮<strong>同一坑踩了 3 次</strong> ⟹ 写完必做自查：扫描「前后都是中文字符的 ASCII 引号」：
+   <code>python
+   import io, re
+   for i, s in enumerate(io.open(p, encoding="utf-8").read().split("\n"), 1):
+       for m in re.finditer('"', s):
+           a, b = s[m.start()-1], s[m.start()+1]
+           if "\u4e00" &lt;= a &lt;= "\u9fff" and "\u4e00" &lt;= b &lt;= "\u9fff":
+               print(i, s[:100]); break</code></li>
+<li><strong>对数空间</strong>：<code>1 − p</code> 远低于双精度（如 1.66e-25）时 <code>exp(...)</code> 会塌缩成 1.0 ⟹ 全程用 ln 算。</li>
+<li><strong>环面配对必须绕回</strong>：<code>coords = [(offs+t) % L]</code> 再按 2 步配对。初版 <code>range(offs, L, 2)</code>
+   在 <code>L = 2</code> 时<strong>一个配对都没有 ⟹ 映射退化成恒等</strong>，而"像集大小不变"这类双射检查<strong>照样通过</strong>
+   ⟹ <strong>必须加哨兵检查：映射 ≠ 恒等</strong>（数一数有多少构型被改变）。</li>
+<li><strong>格点编解码函数必须显式传 <code>Lx</code></strong>：别读全局 L（踩过 2 次 IndexError）。</li>
+<li><strong>格点模型的有效自由度远小于格点数</strong>（配对/键共享强关联）⟹ 统计判据要用多种子平均或实测散布定容差；<strong>每个配置至少 3–5 个种子</strong>。</li>
+<li><strong>bit / nat 必须对账</strong>：同一处 ln2 的写法在论文里已出现<strong>至少四代残留</strong>（第 25 轮改 12 处，
+   第 39 轮又查出 3 处）。<strong>凡改单位，全文搜「比特 / 纳特 / bit / nat / ln2」对账，不能只改主段落。</strong></li>
+<li><strong>群阶 / 轨道 BFS 会跑飞</strong>：4×4×4 有 <strong>513 个生成元</strong>，直接跑群阶 BFS 会被 bash 的
+   2 分钟超时 <strong>SIGTERM 且看不到任何输出</strong>。规范：<strong>先算规模再跑</strong> —— 构型数 <code>2**N</code>
+   （2^32 = 43 亿）、生成元数 <code>Σ_轴 2^(线数)</code>；构型数 &gt; ~10⁷ 或生成元 &gt; ~10⁵ 就
+   <strong>不要穷举</strong>，改成从单个构型做轨道 BFS 或随机乘积采样；重脚本用 <code>timeout 600 &lt;cmd&gt;</code>。</li>
+<li><strong><code>np.random.RandomState.randint(0, 1 &lt;&lt; N)</code> 在 N ≥ 32 会 int32 溢出</strong> ⟹ 用
+   <code>random.getrandbits(N)</code>。</li>
+<li><strong>装大包（sympy 等）会超时被 SIGTERM</strong>（sympy 装了 7 分 39 秒）⟹ <strong>装包一律
+    <code>run_in_background</code></strong>，别在前台等（前台 2 分钟被杀且看不到输出）。</li>
+<li><strong>补丁脚本正文里不要写 <code>\|</code></strong>：会触发 <code>SyntaxWarning: invalid escape sequence</code>
+    并且<strong>反斜杠被原样写进论文</strong>（在反引号 <code>\|G\|</code> 里会显示成字面反斜杠）。
+    markdown 表格外直接写 <code>|G|</code>；写完 <code>grep -c '\\|'</code> 自查。</li>
+<li><strong>大组合数一律用对数</strong>：<code>float(3 * 2&lt;strong&gt;(L&lt;/strong&gt;2))</code> 在 L = 64 就会 <code>OverflowError</code>
+    （int 太大转不了 float）⟹ 写成 <code>log2(选择数) = log2(3) + L²</code>，不要算原值。</li>
+<li><strong>⚠️ 不要从 N ≤ 16 外推</strong>（第 41 轮的教训）：第 40 轮在小格点上看到「tick 群很小
+    （|G| = 8 / 128）」，第 41 轮 N = 64 就变成 <strong>2.79×10³⁷</strong>。凡是"只穷举到 N ≤ 16"的
+    结论，<strong>默认标注为待外推</strong>，除非能给出随 N 的严格界。</li>
+<li><strong>别让"快速指针"文件烂掉</strong>：<code>环境交接说明.md</code> 头部把 <code>outputs/本轮推演总结_*.md</code>
+    当作"想快速知道推到哪了"的入口，但它<strong>曾过期 26 轮</strong>（停在 09-17 / 第 16 轮）。
+    ⟹ 每轮收尾时若指针落后 <strong>&gt; 5 轮</strong>，就续写/新建一份覆盖最近 N 轮的总结，并更新指针。
+    （2026-09-21 已补 <code>本轮推演总结_2026-09-21.md</code>，覆盖第 18–42 轮，含"被自己推翻的"表。）</li>
+<li><strong>⚠️ 非自平均的量不能引用单一种子值</strong>（第 43 轮的教训，也是复核第 26 轮的依据）：
+    测输运量时<strong>必做多（≥20）种子统计并报相对散布</strong>。经验判据：<strong>相对散布 &gt; 20% ⟹ 非自平均</strong>，
+    单值无意义（第 43 轮：<code>global</code> 相位 20 种子散布 <strong>65%</strong>，范围 [0.364, 3.444]；
+    而 <code>indep</code> 只有 <strong>3%</strong>）。第 26 轮引用的「29.7% / 42.5%（两个种子）」就是这类噪声。</li>
+<li><strong>测"输运"要用最终位移，不要用时间平均</strong>（第 43 轮踩过）：
+    <code>Σ_{i} r_i²/n</code> 是<strong>时间平均</strong>（对无偏随机游走 ≈ n/2），不是 ⟨r²⟩/n。
+    正确统计量 = <strong>最终位移 r_n²</strong> 的多种子平均。第一版脚本用错口径，数值全错（1.59 vs 1.0）。</li>
+<li><strong>相位/局域随机性的"空间结构"要用完整格点检验</strong>（第 43 轮）：
+    <strong>单标记轨迹看不出「每线独立」与「全局共享」的差别</strong>（实测两者均 0.9933，逐位相同 ——
+    标记只见到自己那条线的 φ）。差别<strong>只在多诸元关联里</strong> ⟹ 谈相位共享必须跑全格点。</li>
+<li><strong>⚠️ 别把"相邻相关"当成"周期性"</strong>（第 44 轮归因错误）：测自相关找周期时，
+    <strong>峰常常落在 τ = 1</strong>（生成器的相邻输出相关，如低位 LCG），而不是 τ = 周期。
+    正确判据：<strong>严格周期的标志是 <code>C(T) ≈ +1</code>（序列原样重复）</strong>，不是"出现一个峰"。</li>
+<li><strong>⚠️ 数值模拟里的"真随机"只能是伪随机</strong>（第 44 轮的方法硬限制）：
+    除 <code>os.urandom</code> 外，<code>random.Random(seed)</code>（MT19937）<strong>也是确定性的</strong>。
+    比较"H1 真随机 vs H2 确定性"时，实际只能比较<strong>不同质量的确定性生成器</strong> ⟹
+    报告时<strong>必须写明这个限制</strong>，否则结论会被误读。
+    三档对照的规范写法：<code>sys</code>=os.urandom / <code>indep</code>=MT19937 / <code>lcg</code>=LCG。</li>
+<li><strong>⚠️ 区分「量子化条件」与「数值」</strong>（第 45 轮）：论文里常说"某某必须累积整数倍 4π"、
+    "必须锁定轴"——这类命题只给<strong>约束</strong>，<strong>不给数值</strong>。要得到 τ、R、ω 之类，
+    必须另外有<strong>尺度</strong>（半径/质量/频率）；论文没给就<strong>不要默认它存在</strong>，
+    直接判"该量未被确定"并列出缺哪个尺度。</li>
+<li><strong>轨道 BFS 用「生成元闭包」，不要遍历整个 |G|</strong>（第 46 轮的提速关键）：
+    轨道 = 从起点用<strong>生成元</strong>做闭包（生成元数通常 ≪ |G|）。第 46 轮若遍历 |G|，
+    N=24（|G|=648）会慢到不可行；改用生成元闭包后 2.7×10⁶ 构型只用 ~2 分钟。</li>
+<li><strong>⚠️ 检验「不变量是否完备」的严格判据</strong>（第 46 轮）：
+    不变量在轨道上不变 ⟹ <strong>轨道细分等值集</strong> ⟹ <strong>轨道数 == 等值集数 ⟺ 完备</strong>。
+    第 46 轮用这条判据否证了第 41 轮的 (Z₂)³ 不变量：N=8 完备（<strong>偶然</strong>，每类仅 1 点），
+    N=16 就破缺（253 vs 155）、N=24 加剧（6224 vs 1050）⟹ <strong>不变量公式只能作上界</strong>。
+    ⟹ 教训：<strong>在小格点上"验证通过"的不变量，很可能只是退化情形</strong>，务必在两个以上尺度检验。</li>
+<li><strong>⚠️ 警惕「公设上移」的无穷回归</strong>（第 45 轮，B5 的教训）：
+    把一个公设 X 换成"由方程 E 联系的量 Y"，若 E 是<strong>一个方程两个未知量</strong>，
+    则<strong>未知量个数不变</strong> ⟹ 只是上移一层、换了名字 ⟹ 可以无限上移。
+    判据：每上移一层就问"<strong>这层的未知量有没有独立约束？</strong>"没有 ⟹ <strong>判否并建议停在最底层</strong>
+    （选那个<strong>直接出现在可观测量里</strong>的量，语义最干净）。
+    B5 的链条：<code>δ → τ（τ = t_P/(δ²e²)）→ R 或 m → …</code>，本轮建议<strong>停在 δ</strong>。</li>
+<li><strong>⚠️ 算轨道前先算 <code>|G|</code> 摸规模</strong>（第 47 轮的核心方法学收获）：
+    第 46 轮的流程（穷举 C(N,N/2) + 生成元闭包 BFS）在 N=32 上撞墙 —— 第一版
+    在 (2,4,4) 上<strong>11 分钟无输出、被迫杀掉</strong>（C(32,16) = 6.01×10⁸）。
+    规范三步：① <code>sympy</code> 算 <code>|G|</code> ⟶ ② 判可行性（本轮上限 4×10⁵）⟶
+    ③ <strong>随机采样构型 + 单构型轨道 BFS + 低/高 16 位分块查表</strong>。
+    ⟹ 这样流程只依赖 <code>|G|</code>，<strong>不依赖 C(N,N/2)</strong>。
+    ⚠️ 但 <code>|G|</code> 极大时（2.2×10¹¹）仍不可行 ⟹ 必须上 <strong>GAP</strong>（见「工具」）。</li>
+<li><strong>⚠️ 格点「形状」是独立变量，禁止只写 N</strong>（第 47 轮）：
+    固定 N=32，只改形状，<code>|G|</code> 从 <strong>2.048×10³</strong>（细长 (2,2,8)）跳到 <strong>2.2015×10¹¹</strong>（立体 (2,4,4)）
+    ⟹ <strong>差 8 个数量级</strong>。⟹ 凡报告轨道 / H/N 的定量，<strong>必须同时写明格点形状</strong>；
+    凡在 (a,a,L) 系列上得到的结论，<strong>默认标注「细长格点、待外推」</strong>。</li>
+<li><strong><code>\|</code> 转义坑（RNA 级复发）</strong>：Python <strong>非 raw</strong> 字符串里的 <code>\|</code> 会
+    ① 触发 <code>SyntaxWarning: invalid escape sequence</code>，② <strong>把反斜杠写进 md</strong>。
+    md 里 <code>\|</code> <strong>只在表格行内合法</strong>（行首 <code>|</code>），<strong>正文/引用块里会渲染成字面反斜杠</strong>。
+    ⟹ 两条规矩：脚本正文串一律 <code>r"""</code> 或直接用「」；每轮收尾跑一次
+    <strong>「非表格行的 <code>\|</code> 清理」</strong>（判据：<code>'\\|' in line and not line.lstrip().startswith('|')</code>）。</li>
+<li><strong>⚠️⚠️ σ_j（每线生成元）不是「全体 +2 的纯平移」</strong>（第 48 轮查出，影响第 41/46/47 三轮；
+    第 50 轮修正了本条的表述）：
+    <code>✓ 正确：σ_j = 相位1匹配 ∘ 相位0匹配（&lt;strong&gt;用两个匹配复合算，不要手写公式&lt;/strong&gt;）
+    ✓ 等价：coords[i] → coords[(i + 2) % L]  (i 偶) ；coords[i] → coords[(i - 2) % L]  (i 奇)
+    ✗ 错误：coords[i] → coords[(i + 2) % L]  （全体 —— 这是「纯平移」，&lt;strong&gt;不在 tick 群里&lt;/strong&gt;）</code>
+    ⚠️ <strong>第 50 轮实测澄清</strong>：在长度 6 的环上
+    <code>m0∘m1 = (0 4 2)(1 3 5)</code>、<code>m1∘m0 = (0 2 4)(1 5 3)</code> —— <strong>两者互为逆</strong>，且
+    <code>⟨M_a, m0∘m1⟩ = ⟨M_a, m1∘m0⟩</code>（<strong>都等于真 tick 群</strong>，用真 tick 集逐元素验证过）。
+    ⟹ <strong>复合顺序无关紧要</strong>（第 48 轮曾把"偶位+2、奇位−2"当成唯一正确写法，是不必要的严格）；
+    <strong>唯一要避开的是"纯平移"</strong>。<code>_tickgroup.gens_correct</code> 用两个匹配复合 ⟹ 不会再踩。
+    <strong>L ≤ 4 时两者逐元素相同</strong>（L=4：都退化成 <code>(0 2)(1 3)</code>）⟹ <strong>只在 L ≥ 4 的格点上验证是抓不到的</strong>。
+    后果（L ≥ 6）：两群<strong>阶相同但群不同</strong>（单线长 6 上只共有 2 个元素，|并| = 10）；
+    8 个随机真 tick 里<strong>只有 3 个</strong>落在旧群里。
+    ⟹ <strong>教训（与陷阱 22 同源）：化简/等价性验证必须覆盖「每一种线长」，不能只在最小格点上做。</strong>
+    自检最便宜的一步：<strong>随机抽几个真 tick，检查它们是否都属于化简群</strong>（<code>Group.contains</code>）。</li>
+<li><strong>⚠️ 等价性验证不能只比「阶」</strong>（第 48 轮）：<code>|G₁| == |G₂|</code> <strong>不代表</strong> <code>G₁ == G₂</code> ——
+    (2,2,6) 上万错的两群都是 648 阶却完全不同。判据要用
+    ① 生成元双向包含（<code>is_subgroup</code> / <code>contains</code>）② 或小群直接<strong>穷举元素集比较</strong>。</li>
+<li><strong>补丁用「行号 + 断言」比用「长锚点」更稳</strong>（第 48 轮）：改动多、锚点长时容易因
+    小的措辞差异全盘失败；改成「行号定位 + 断言该行含指定子串」后，本轮 23 项里
+    19 项一次过、4 项因行号估偏被<strong>断言挡住</strong>（而不是改错），修正行号后 4 项全过。</li>
+<li><strong>每轮收尾扫一次论文的「拼接/断行」缺陷</strong>（第 48 轮查出两处积压）：
+    症状 = ① 两轮块被粘在<strong>同一行</strong>（前一轮末行 + <code>&gt; **【v2.9 补充（第 N 轮…</code>）；
+    ② 一句话被拆成「行尾断掉」+「很远处的残片（以 <code>，</code> 或 <code>,</code> 开头）」。
+    自检：
+    <code>python
+    L = io.open(path, encoding="utf-8").read().split("\n")
+    for i, s in enumerate(L, 1):
+        if s.strip().startswith(("，", ",")): print("残片", i, s[:80])
+        if "【v2.9 补充" in s and not s.lstrip().startswith(("&gt; **【", "&gt; 【")): print("粘连", i)</code>
+    ⟹ 发现就修（补全断句、删残片、拆分粘连）。<strong>残片那一行正好可以当新块的插入位</strong>。</li>
+<li><strong>⚠️ 预判必须在「已知全部依赖」之后写</strong>（第 49 轮 PB 的教训）：
+    第 48 轮写下「(6,6,6) 应与 (4,4,4) 同为 ≈0.1839」时，<strong>还不知道 H/N 主要由 N 决定</strong>
+    ⟹ 该预判的<strong>设定本身就是错的</strong>（同类 ≠ 同值），不是 GAP 失败、也不是算力问题。
+    ⟹ 规矩：写下可证伪预判前，先问「<strong>这个量还依赖什么？我是不是已经扫过？</strong>」；
+    本轮就是先补扫了 (2,4,L) 才发现 N 才是主控量。</li>
+<li><strong>⚠️ 后台跑长脚本时 <code>| tail</code> 会吞掉全部进度</strong>（第 49 轮踩了两次）：
+    <code>python x.py 2&gt;&amp;1 | tail -30</code> 或 <code>&gt; log</code> 都会因<strong>输出缓冲</strong>导致进度完全不可见
+    （跑了 26 分钟还一行都没有）。⟹ 用 <code>python -u</code>，并且<strong>不要</strong>在后台命令里接 <code>| tail</code>；
+    要看某个后台任务算到哪一步，可以去找它<strong>当前打开的临时文件</strong>（本轮靠 <code>tempfile.mkstemp</code>
+    留下的 <code>.g</code> 脚本反推出"正在算 N=216"）。</li>
+<li><strong>⚠️ 插入新小节时，千万不要把作为锚点的那个小节标题替换掉</strong>（第 49 轮踩过）：
+    写 <code>sub_once(P, "### 1.1 第 N 轮新增", NEW_SECTION, ...)</code> 会把原标题<strong>吃掉</strong>，
+    原小节的内容随即变成"无标题段落"（而且编号会重复）。
+    ⟹ 正确写法：<code>sub_once(P, ANCHOR, NEW_SECTION + ANCHOR, tag)</code> —— <strong>保留锚点</strong>。
+    ⟹ 自查：改完 <code>grep '^### 1\.' 文件</code> 看编号是否连续、有无重复。</li>
+<li><strong>清单小节顺延时，重命名要按行号降序做</strong>（第 49 轮）：
+    "1.1→1.2、1.2→1.3…" 这种链式重命名<strong>必须从大到小</strong>改，否则会连环覆盖
+    （先改 1.1→1.2 就会把原来的 1.2 撞掉）。最稳的做法是直接按<strong>行号 + 内容断言</strong>改。
+    ⚠️ <strong>「讨论纪要」小节不参与轮次顺延</strong>（第 51 轮踩过）：用 <code>re.match(r"### 1\.(\d+)")</code> 批量
+    顺延时会把 <code>### 1.1 讨论纪要（…）</code> 也加一 ⟹ <strong>编号出现两个 1.2</strong>。
+    ⟹ 顺延时<strong>先排除标题里不含「第 N 轮」的小节</strong>；改完必做 <code>grep '^### 1\.'</code> 看是否连续、有无重复。
+    ⚠️ 另有<strong>顺序陷阱</strong>：若 A 替换的新文本里<strong>包含</strong> B 的锚点，则必须<strong>先做 B 再做 A</strong>
+    （第 50 轮：先"清残片"再"补全断行"，否则补全后的文本让残片锚点命中两次）。
+    ⚠️ <strong>补丁脚本重跑会重复插入</strong>（第 51 轮踩过）：<code>sub_once(ANCHOR, ANCHOR + NEW)</code> 在第二次运行时
+    <code>ANCHOR</code> 仍命中 1 次 ⟹ 再插一遍（本轮被推翻表多了两行 "| 17 |"）。
+    ⟹ 补丁失败后重跑，先核验已生效项；或给 NEW 里加一个唯一标记，跑前先检查该标记是否已存在。</li>
+<li><strong>⚠️⚠️ H/N 的平均口径必须写死：一律「构型等权」，不是「轨道等权」</strong>（第 50 轮 R-2）：
+    第 40 轮 <code>part_entropy</code> 的<strong>权威定义</strong>是
+    <code>H = ln M − Σ_o (|O_o|/M)·ln|O_o|          M = 该层构型总数
+    ⟹ H/N ≈ ln2 − ⟨ln|O|⟩_cfg/N              （|O| 越大权重越大）</code>
+    而第 46/48 轮的 Python 全层脚本曾写成 <code>avg = Σ_o ln|O_o| / #轨道</code>（轨道等权）——
+    <strong>两者差得很大</strong>：N = 8 / 16 / 24 上差 <strong>0.0520 / 0.0318 / 0.0176</strong>。
+    第 48 轮因此把 (2,2,6) 从 0.4330「更正」到 0.4510，而<strong>正确值是 0.4334</strong>
+    （真正的生成元错误只值 <strong>0.0004</strong>）⟹ 那次更正报的 0.0176 <strong>全部来自口径</strong>（<strong>R-2</strong>）。
+    ✅ <strong>GAP 的随机构型采样天然是构型等权</strong>（随机抽 c → 算 |O(c)| → 平均 ln|O|）⟹ 第 47/48/49 轮
+    的全部 GAP 结果<strong>不受影响</strong>；Python 全层遍历必须写成 <code>Σ|O|·ln|O| / Σ|O|</code>。
+    ⟹ <strong>口径铁律</strong>：凡算 H/N，先在脚本里写明用的是哪种平均；发现旧值不一致时，
+    <strong>先查口径、再查代码</strong>。</li>
+<li><strong>⚠️⚠️ 检查判据的「方向」：是等式还是不等式？</strong>（第 51 轮，本轮最大的收获）：
+    两个量 X（衬底算出来的）与 Y（公设给的）之间，可能只有<strong>不等式</strong>（信息论/包含关系），
+    而<strong>不是等式</strong>。若按 <code>X = Y</code> 去找"它在哪里成立"，就会造出「<strong>跨点</strong>」这种<strong>伪现象</strong>，
+    并沿着它白跑好几轮。
+    实例：第 46–50 轮一直在找「H/N = 0.25 的跨点」。但第 40 轮已证明
+    「观测者的读数不能是 tick 不变量」⟹ 观测者用瞬时读数，不变读数是它的函数 ⟹
+    <strong><code>H/N ≤ 0.25</code></strong>（不等号来自"函数的信息量 ≤ 原变量"）。
+    ⟹ 正确读法：0.2834 是<strong>违反</strong>自洽性，0.1839 是<strong>满足</strong>；不是"0.25 被跨过"。
+    ⟹ <strong>规矩</strong>：写下 <code>X = Y</code> 之前，先问「<strong>X 与 Y 之间是不是只有单调性 / 包含关系？</strong>」
+    （例：B5 的 <code>S = A/(4l_P²)</code> 只含 A 与 l_P ⟹ 对 N / k / 形状<strong>零约束</strong> ⟹ 也不存在 X=Y。）
+    ⟹ 另一个常见形式：把<strong>输入</strong>（由公设算出的数，如"每格点 0.25 纳特"）
+    误当成<strong>目标</strong>（待命中的数）。
+36b. <strong>⚠️ 可识别性检查：观测量的个数 ≥ 待定参数的个数？</strong>（第 52 轮，与第 45 轮同源）：
+    一个由<strong>乘积/比值</strong>进入观测的量，其<strong>因子是不可识别的</strong>。例：B5 的 0.25 纳特/l_P²
+    被 Hawking 温度钉住（取 1 bit 偏 +44.27%），但它等于 <code>b/a</code>（b = 纳特/单元、a = 面元/单元），
+    (a,b) = (4,1)/(2,0.5)/(8,2)/… 的观测量<strong>完全相同</strong> ⟹ <strong>a = 4 没有机制、也无从检验</strong>。
+    ⟹ 规矩：凡把一个观测量<strong>拆成几个因子</strong>来"解释"时，先问「<strong>有没有第二个观测量能分开口子？</strong>」
+    没有 ⟹ <strong>只登记为因式分解，不得当作机制</strong>。
+    ⟹ 这条与第 23 条「公设上移 = 无穷回归」是<strong>同一个病</strong>：都是"未知量个数 &gt; 方程个数"。</li>
+<li><strong>⚠️ 诊断顺序：先证生成元，再查口径</strong>（第 50 轮）：
+    遇到"同一格点两个值不一致"，第一反应容易是生成元错了。正确的第一步是
+    用<strong>定义级基准</strong>（把<strong>全部真 tick</strong> 枚举出来生成群）验证化简生成元是否等于它 ——
+    第 50 轮这样查出"σ 的两个复合顺序<strong>都等于真群</strong>"⟹ 排除生成元，差异才落到口径上。
+    判据写法：<code>enum_group(reduced) == enum_group(full_tick)</code>（小群可直接枚举元素集）。
+    ⚠️ <strong>别只比群阶</strong>（第 48 轮教训）：阶相同不代表群相同。</li>
+<li><strong>⚠️⚠️ 能标依赖量不得跨能标引用</strong>（第 53 轮；与「bit/nat 对账」「口径写死」同类的<strong>第三种口径病</strong>）：
+    同一个符号在不同能标取<strong>不同值</strong>，而论文里常被当成同一个数用。
+    实例：<code>ε(E) = ε₀(M_Pl/E)^β</code>，在 <strong>M_Pl 是 7.7×10⁻²⁰、在 1 meV 是 ~1、
+    在 FQH 能标（0.1–15 meV）是 0.04–77</strong> —— 而 S-E5 直接引用了 10⁻²⁰（<strong>N-14</strong>）。
+    ⟹ 规矩：引用任何带能标依赖的数之前，先问「<strong>这个数是在哪个能标算的？我要用的能标是多少？</strong>」</li>
+<li><strong>⚠️⚠️ 判别「恒等式」与「推导」：做代数消元</strong>（第 53 轮，最便宜的自检，<strong>每轮都值得做一次</strong>）：
+    若某个标着【推导】的结论可以化成<strong>中间参数被消掉</strong>的形式，那它是恒等式、<strong>零内容</strong>。
+    实例：<code>E_c = M_Pl·ε₀^{1/β}</code> 代入 <code>ε₀ = ε(1TeV)/(M_Pl/1TeV)^β</code> ⟹ <code>E_c = 1TeV·ε(1TeV)^{1/β}</code>
+    —— <strong>M_Pl 完全消掉</strong>，≡ <strong>1.000000 meV</strong>（论文记 1.0181 = 数值残差）
+    ⟹「E_c 与暗能量能标同量级」只是<strong>锚点 2 的重述</strong> = <strong>循环</strong>（<strong>C-4</strong>）。
+    ⟹ 判据：<strong>把结论里的中间参数代回去，看它是否与其他锚点恒等</strong>；恒等 ⟹ 标【恒等式】，不标【推导】。
+    ⟹ 它与第 23 条（公设上移）、第 36b 条（不可识别）是<strong>同一个病的三种表现</strong>：<strong>方程数 &lt; 未知量数</strong>。</li>
+<li><strong>⚠️⚠️ 「跨系统等同」的三步自检</strong>（第 53 + 54 轮，审查 S-E5 时成形；<strong>最便宜也最有效</strong>）：
+    当论文说「A（框架里的东西）= B（实验里的东西）」时，依次问：<ol>
+<li><strong>数字是在哪个能标/口径算的？</strong>（第 53 轮：<code>ε ~ 10⁻²⁰</code> 是 ε(M_Pl)，被搬到 meV ⟹ 差 18–21 个数量级）</li>
+<li><strong>这两个东西的共同特征排除了什么？</strong>（第 54 轮：「自旋 2」被框架自己论证为<strong>任何</strong>二阶张量模态
+   的几何必然 ⟹ 排除不了任何东西 ⟹ 不是依据）</li>
+<li><strong>它们的量纲/尺度怎么对上？需要几个换算因子？</strong>（第 54 轮：<code>l_P→l_B</code> + <code>E_P→E_C</code> 两个，
+   且量级差 10³⁰ ⟹ 要么 postdiction、要么未知量 &gt; 方程）
+⟹ 三步都便宜（引文核对 + 算术，不需要重跑数值），但<strong>常能直接把「可检验预言」的招牌摘下来</strong>。
+⚠️ 可与第 38 条（能标）、第 36b 条（可识别性）、第 39 条（恒等式判别）合起来当<strong>常规收尾自查</strong>跑一遍。</li>
+</ol>
+</li>
+<li>
+<p><strong>⚠️⚠️ 接一个新领域/新目标前的「三步可行性审查」</strong>（第 55 轮成形；<strong>成本一小时，能省几个月</strong>）：
+    当有人提出「用本框架去推 X」（X = 电池、超导、某个工程问题）时，<strong>先别开工</strong>，依次问：</p>
+<ol>
+<li><strong>内容存量</strong>：框架里关于 X 的词条有几处？（第 55 轮：电池/储能/电化学/化学键 <strong>各 0 处</strong>；
+   第 53 轮超导：论文正文 1 处。⟹ 存量 0–1 ⟹ 不存在「从框架推 X」的路径）</li>
+<li><strong>尺度对得上吗</strong>：框架的核心量（l_P、E_P、普朗克格点）与 X 的特征量差几个数量级？
+   （第 55 轮：弦网 J ~ E_P vs FQH meV ⟹ 10³⁰；第 54 轮同一个数）</li>
+<li><strong>有没有可判定的入口</strong>：能不能把 X 换成一个<strong>框架内可判定</strong>的问题？
+   （正例：第 55 轮把「造电池」换成「框架能否定义与储能容量同轴的量」；
+    第 54 轮把「给 Γ_flux」换成「框架有没有衰减率实例」）
+⟹ 三步都只是<strong>引文检索 + 算术</strong>，不需要跑数值。若 1/2 判否且 3 找不到 ⟹ <strong>直接写「框架不覆盖」</strong>，
+   并把 X 的特征上限算出来交给用户（第 55 轮交付了「化学储能天花板 ~3500 Wh/kg」这份数据）。
+⚠️ 与陷阱 36（等式/不等式）、36b（可识别性）、40（跨系统等同）同族：<strong>都是「先审查再投入」</strong>。</li>
+</ol>
+</li>
+<li>
+<p><strong>⚠️ 能标自洽性检查必须用「自洽导出」的常数</strong>（第 56 轮踩坑，两个）：
+    (a) <strong>l_P / m_P 各取独立 CODATA 值 ⟹ 检查假失败</strong>。第 56 轮写 <code>lP = 1.616255e-35</code>、
+        <code>mP = 2.176434e-8</code>，再用 <code>E_of_R(lP) == E_P</code> 做自洽检查 —— 两者相对差 <strong>1.5×10⁻⁵</strong>
+        （因为 <code>√(ℏG/c³) = 1.61628e-35</code>），在 <code>1e-9</code> 容差下报 <strong>[XX]</strong>，<strong>而代码是对的</strong>。
+        ⟹ 规矩：<strong>凡"自洽性检查"（<code>R = l_P ⟹ E_P</code> 这类），常数一律自洽导出</strong>：
+        <code>lP = √(ℏG/c³)</code>、<code>mP = √(ℏc/G)</code>、<code>EP_J = mP·c²</code>。
+    (b) <strong>黑洞热力学的 <code>S/k_B</code> 口径</strong>：论文里的 <code>S = 1.0494×10⁷⁷</code> 是 <strong>S/k_B（无量纲）</strong>。
+        算 <code>T·S</code>（要焦耳）<strong>必须再乘 k_B</strong>，否则 <code>TS/(Mc²)</code> 给 <strong>5</strong> 而不是 <strong>0.5</strong> ——
+        差 10 倍，且<strong>恰好不显眼</strong>（看着像"物理"而非口径）。⟹ 与陷阱 35（构型等权）、
+        陷阱 38（能标标注）<strong>同族：第四种口径病 —— 「S 还是 S/k_B」</strong>。
+    ⟹ 两条合起来：<strong>报 [XX] 之前先查口径与常数，再怀疑物理</strong>（第 56 轮两次 [XX] 都是期望/口径错，
+       模型本身 0 失败）。</p>
+</li>
+<li>
+<p><strong>⚠️ 轨道数/覆盖率的口径：全构型空间 2^N ≠ 单个 k 层</strong>（第 57 轮）：
+    tick 是<strong>置换</strong> ⟹ <strong>占据数 k 守恒</strong> ⟹ 每个 k 层（C(N,k)）是<strong>封闭子空间</strong>。
+    所以「N 个格点上有多少条轨道」<strong>必须写明是全空间还是某一层</strong>：</p>
+<ul>
+<li><strong>全空间 2^N</strong>：2×2×2 → <strong>46 条</strong>、2×2×4 → <strong>1357 条</strong>（= 第 40 轮的「构型空间」口径）</li>
+<li><strong>单层 k = N/2（C(N,k)）</strong>：2×2×2 → <strong>14 条</strong>、2×2×4 → <strong>253 条</strong>
+⟹ 第 57 轮第一次算时用了<strong>单层</strong>口径、与第 40 轮的 46/1357 对不上，<strong>一度以为是实现错了</strong>；
+  补算全空间后<strong>逐项一致</strong> ⟹ 判明是<strong>口径差异，不是错误</strong>。
+⟹ 与陷阱 35（构型等权 vs 轨道等权）、陷阱 38（能标）、陷阱 42(b)（S 还是 S/k_B）
+  <strong>同族：第五种口径病 —— 「全空间还是单层」</strong>。
+自检：报轨道数 / 覆盖率时<strong>必须同时给出</strong> (a) 格点形状 (b) 是全空间还是哪一层 (c) M 的值。
+⚠️ 「一条轨迹能访问多少」的<strong>物理</strong>口径是<strong>单层</strong>（观测者只能在同一 k 层内比较）；
+  而「轨道数」作<strong>数学</strong>量通常指<strong>全空间</strong> —— 两者别混。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>print("...</code> 漏写闭合 <code>")</code></strong>（第 57 轮踩过一次）：报错是
+    <code>SyntaxError: unterminated string literal (detected at line N)</code>，<strong>报错行正确</strong>。
+    症状是<strong>上一行末尾少了 <code>")</code></strong>（不是引号内容问题）—— 与陷阱 2（中文串里的 ASCII 引号）<strong>不同</strong>：
+    那条报 "Perhaps you forgot a comma?"，这条报 "unterminated string literal"。
+    ⟹ 见到 unterminated ⟹ <strong>先看该行与上一行是否配对</strong>，别急着找引号内容。</p>
+</li>
+<li>
+<p><strong>⚠️ 符号撞车：同一字母两个含义</strong>（第 0 批，2026-09-28）：
+    论文里 <strong><code>ε</code> 有两个互不相干的含义</strong> —— ① <strong>泄漏概率</strong> <code>ε(E)</code>（<strong>能标依赖</strong>，45 处）；
+    ② <strong>Levi-Civita 全反对称张量</strong> <code>ε_ijk</code> / <code>ε^ij</code>（<strong>与能标无关</strong>，8 处，§5.2 的表示论记号）。
+    而 <code>λ</code> 也有撞车（宇宙学密度比 vs §5 弦网耦合常数）——<strong>但 λ 有声明（§8.6「符号约定（重要）」）、
+    ε 没有</strong>。
+    ⟹ <strong>规范三条</strong>：① 引入新符号前<strong>先全文检索该字母</strong>，看是否已被占用；
+      ② 撞车必须在<strong>首次密集使用处</strong>加「符号约定（重要）」块（参照 §8.6 对 λ 的做法）；
+      ③ <strong>能标依赖量一律紧跟 <code>(@E)</code></strong> —— 这是第 38 条（跨能标引用）的<strong>执行细则</strong>。
+    ⚠️ 与陷阱 35（构型等权）、38（能标）、42b（S 还是 S/k_B）、43（全空间还是单层）
+      <strong>同族：第六种口径病 —— 「同一字母两个含义」</strong>。</p>
+</li>
+<li>
+<p><strong>⚠️ 自动化口径扫描会给"误报"</strong>（第 0 批，2026-09-28）：
+    <code>_gap_orbit_48.py</code> 里的 <code>sum(log(s) for s in sizes)/len(sizes)</code> <strong>看上去</strong>是「轨道等权」，
+    但 <code>sizes</code> 来自<strong>随机采样</strong>的构型 ⟹ 每个构型等权 ⟹ <strong>它其实就是构型等权</strong>（正确）。
+    ⟹ 判据必须加一步：<strong>先看 <code>sizes</code> 从哪来</strong> ——
+      · <strong>全层枚举</strong> ⟹ <code>Σln|O|/#轨道</code> 是<strong>错的</strong>（轨道等权，<code>_fix_run_48.py</code> 就是这处）；
+      · <strong>随机采样</strong> ⟹ <code>Σln|O(c)|/S</code> <strong>天然正确</strong>（构型等权）。
+    ⟹ 处理方式：给<strong>两类</strong>都加注释（前者标「不可引用」、后者标「看似等权实为正确，<strong>请勿「修正」</strong>」），
+      而不是只改错的那一类 —— <strong>防未来的误用与误修</strong>。</p>
+</li>
+<li>
+<p><strong>⚠️ 引文清点会命中「讨论该词的元文本」</strong>（第 60 轮）：
+    论文里<strong>写「X 共 0 处」这句话本身</strong>，就把 X 从 0 处变成了 1 处 —— 第 56 轮块自己列举了
+    「势能 / 结合能 / <strong>解离</strong> / 化学键 / 内能 / 自由能」，于是第 60 轮清点时「解离」「束缚能」
+    显示 <strong>2 处</strong>（中英各 2），而<strong>实质使用是 0</strong>。
+    ⟹ <strong>清点必须先排除已登记的轮次块</strong>（判据：<code>&gt;</code> 起始的连续引用块）：
+    <code>python
+    def block_ranges(lines, marker):
+        rng, i = [], 0
+        while i &lt; len(lines):
+            if lines[i].lstrip().startswith("&gt;") and marker in lines[i]:
+                j = i
+                while j + 1 &lt; len(lines) and lines[j + 1].lstrip().startswith("&gt;"):
+                    j += 1
+                rng.append((i + 1, j + 1)); i = j + 1
+            else:
+                i += 1
+        return rng</code>
+    ⚠️ <strong>中英 marker 不同</strong>：ZH = <code>v2.9 补充（第</code>；EN = <code>**【v2.9</code>（含 supplement / correction /
+    addendum 多个变体）⟹ 写死单一 marker 会<strong>漏排除</strong>（第 60 轮第一次就是这样，EN 报 0 段）。
+    ⟹ 自检问句：<strong>「这个 0 处，是不是被我上一次的检索结果打破了？」</strong>
+    ⚠️ 与陷阱 30（收尾扫拼接/断行）、陷阱 46（自动扫描会误报）同族：
+      <strong>自动检索的判据要防「自指」与「误报」两件事</strong>。
+    ✅ <strong>最省的执行细则（第 62 轮实测，强烈推荐）</strong>：<strong>底本一律读 <code>paper/history/*_备份_&lt;轮&gt;前.md</code></strong>
+      （= 补丁前的备份），并在脚本里<strong>并列打印「补丁前 / 补丁后」两列</strong> ——
+      第 62 轮就这样一眼看出污染：「第五力」补丁前 <strong>0 处</strong> → 补丁后 <strong>9 处</strong>，
+      而多出来的全部是<strong>本轮自己写进去的</strong>（§5.5 注 + 第 62 轮块）。</p>
+</li>
+<li>
+<p><strong>⚠️「解析谱 vs 数值」对账前，两边都要先做同一种归并</strong>（第 60 轮踩过）：
+    2+1D toric code 的解析谱 <code>E(a,b) = 2(a+b) − (N_v+N_p)</code> 里，<strong>(a,b) = (4,0) 与 (0,4) 都给 E = 0</strong>
+    ⟹ 解析侧不归并就与 <code>np.unique(np.linalg.eigvalsh(H))</code> 的长度/简并对不上，<strong>报 [XX]</strong>
+    （一度以为是实现错了，差点改代码）。修法：
+    <code>python
+    agg = {}
+    for E, deg, a, b in rows:
+        agg[round(E, 6)] = agg.get(round(E, 6), 0) + deg
+    ana = sorted(agg.items())</code>
+    ⟹ 通则：<strong>数值侧 <code>np.unique</code> 天然归并，解析侧常常没有</strong> —— 写断言前先问「两边同一口径了吗」（= 陷阱 35 的近亲）。</p>
+</li>
+<li>
+<p><strong>⚠️「这些差算不算两态之差」的判据 —— 三类差</strong>（第 60 轮建立，<strong>处理"框架没有 X"这类主张</strong>）：
+    当有人说「框架没有 X」时，<strong>先问「X 是哪一类差」</strong>：</p>
+<ul>
+<li><strong>谱内差</strong>：同一格点、<strong>同一参数</strong>下两个本征值之差（能隙 <code>Δ</code>、<code>Δ±2</code>）⟹ 差的是<strong>内部构型</strong>；</li>
+<li><strong>参数差</strong>：同一系统在两个<strong>外参数</strong>下（<code>E0(λ)</code>、<code>m(κ)</code>）⟹ 那是<strong>相图</strong>，不是两个态；</li>
+<li><strong>构型差</strong>：同一组分、<strong>两个空间排布</strong>之间的能量差 ⟹ <strong>化学键 / 相变潜热 / 电离能要的是这一种</strong>。
+⚠️ <strong>两个便宜的判定入口</strong>：
+  ① <strong>「势有极小吗？」</strong> —— 束缚态 ⟺ 势阱；<strong>单调势（如禁闭弦势 <code>σ_m ≥ 0</code>）⟹ 无束缚态</strong>
+     （这是<strong>结构上不可能</strong>，不是「还没算出来」）；
+  ② <strong>「同一层里有没有位置和能量这两样？」</strong> —— 第 60 轮正是这样发现
+     <strong>衬底有位置无能量（只给 H/N）、弦网有能量无位置（态是通量）</strong> ⟹ 这是「<strong>分层</strong>」这一失败形态。
+⟹ 与陷阱 36（等式/不等式）、36b（可识别性）、41（三步审查）同族：<strong>先审查「问对了没有」再投入</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>⚠️「某理论独有 / 可判别」的判据</strong>（第 61 轮建立；<strong>核它极便宜，却常能摘掉大招牌</strong>）：
+    当论文/清单里出现「<strong>框架独有</strong>」「<strong>框架特有签名</strong>」「<strong>可判别预言</strong>」这类标签时，<strong>别默认接受</strong> ——
+    判据一句话：<strong>「它给出的数值 / 标度律，能不能与其他理论区分？」</strong></p>
+<ul>
+<li>✅ <strong>真独有</strong>：给了<strong>具体的标度律</strong>（第 61 轮：EMRI 的 <code>δ ∝ x_p</code> —— 其他修改引力给不同标度）；</li>
+<li>❌ <strong>假独有</strong>：<strong>与标准理论同值</strong>（第 61 轮：<code>Ω_K = 0</code> —— 标准平 ΛCDM 给的也是 0）。
+⚠️ 必须分开两个词：<strong>解释力</strong>（从公理解出而非假设）≠ <strong>判别力</strong>（能与其他理论分开）。
+最省的检索判据：<strong>两个术语「同行共现」的次数</strong> ——
+第 61 轮：「Ω_K」与「ΛCDM」<strong>同行共现 0 次</strong> ⟹ 区分性<strong>从未被论证</strong>（不是「论证不足」）：
+```python
+co = [i for i, s in enumerate(lines, 1) if "Ω_K" in s and "ΛCDM" in s]</li>
+</ul>
+<h1>co == [] ⟹ 该「独有」主张从未被论证</h1>
+<p>```
+⚠️ 与陷阱 36（等式/不等式）、36b（可识别性）、40（跨系统等同）、41（三步审查）<strong>同族</strong>：
+  <strong>都是「先审查这个主张问对了没有，再投入」</strong>。</p>
+</li>
+<li>
+<p><strong>⚠️「检测显著性 σ」与「参数精度 σ」是两个不同的数</strong>（第 61 轮）：</p>
+<ul>
+<li><strong>检测显著性</strong>：由 <code>ΔlnL</code> 给 ⟹ 等效 <strong>√(2ΔlnL) σ</strong>（第 61 轮：√(2×357) = 26.7 ⟹ 论文记 27σ ✓）</li>
+<li><strong>参数精度</strong>：由 <code>δ/σ_δ</code> 给（信噪比）
+若似然<strong>高斯</strong>，两者<strong>必须</strong>满足 <code>ΔlnL = (δ/σ)²/2</code> ⟹ 可互推
+（第 61 轮实测 <strong>v1.27 自洽：由 8.3×10⁻⁴ 推 290，报 288，Δ = 0.8%</strong>）。
+⚠️ <strong>有强简并时两者可以差几百倍</strong>（似然非高斯）：第 61 轮 v1.35 的 σ_δ = 1.63×10⁻⁶ 与 ΔlnL = 357
+⟹ <strong>σ 口径差 459 倍</strong>；由 ΔlnL 反推的<strong>有效宽度</strong> <code>σ_eff = δ/√(2ΔlnL) = 7.49×10⁻⁴</code> 才是可用值。
+⟹ 规矩三条：① <strong>报显著性用 ΔlnL</strong>（它已含简并）；② <strong>报精度必须写明是「局部曲率」还是「有效宽度」</strong>；
+  ③ <strong>两者不可并列引用</strong>（读者会取大的那个）。
+⟹ 自检脚本（30 秒）：把每个 <code>(σ_δ, ΔlnL)</code> 对代进 <code>ΔlnL ≟ (δ/σ)²/2</code>，比值 ≫ 1 就是口径混用。
+⚠️ 与陷阱 35 / 38 / 42b / 43 / 45 同族：<strong>第七种口径病 —— 「同一个 σ 有几种定义」</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>⚠️ 单位制混用：<code>ℏc</code> 的「J·m 版」与「eV·m 版」差 1.602×10⁻¹⁹</strong>（第 62 轮踩过）：</p>
+<ul>
+<li><code>ℏc = 3.1615×10⁻²⁶ &lt;strong&gt;J·m&lt;/strong&gt;</code> ＝ <code>1.97327×10⁻⁷ &lt;strong&gt;eV·m&lt;/strong&gt;</code>（比值 = eV→J 的换算因子 <strong>1.602×10⁻¹⁹</strong>）；</li>
+<li>第 62 轮算力程时<strong>分子用了 J·m 版、分母用了 eV 版的质量</strong> ⟹ 结果差 <strong>1.602×10⁻¹⁹ 倍</strong>
+  （<code>2.105×10⁻⁵⁴ m</code> vs 正确的 <code>1.314×10⁻³⁵ m</code>，即 0.81 l_P）。
+⟹ 规矩：<strong>凡 <code>ℏc</code> / 质量 / 能量三者同现的公式，先把单位制写死在一行注释里</strong> ——
+  例如 <code># 全用 eV 制：ℏc = 1.97327e-7 eV·m</code>；<strong>不要在同一个式子里换单位制</strong>。
+⟹ 自检：把算出的长度与「已知尺度」比一下（第 62 轮若与 l_P 比就会立刻发现差 10¹⁹）。
+⟹ 与陷阱 35 / 38 / 42b / 43 / 45 / 51 同族：<strong>第八种口径病 —— 「单位制混用」</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>⚠️ 组合量的独立分量数要用 <code>C(D,k)</code>，不要手写谓词</strong>（第 62 轮踩过）：
+    完全反对称张量 <code>ε_{i₁…i_k}</code> 在 D 维空间的独立分量数 = <strong><code>math.comb(D, k)</code></strong>
+    （指标必须互异 ⟹ 每个 k-组合给 1 个分量）。
+    ❌ 不要写 <code>1 if k == D else 0</code> —— 那在 <strong>D=4、k=3</strong> 时给 0，而正确答案是 <strong>C(4,3) = 4</strong>。
+    ✅ 第 62 轮的关键判断（<code>ε_ijkl ≡ 0</code> 于 3D，因为 <strong>C(3,4) = 0</strong>）正来自这个公式。
+    ⟹ 通则：<strong>凡"某阶反对称张量在 D 维有几个分量"的问题，一律用组合数，并列出 2×2 的对照表</strong>。</p>
+</li>
+<li>
+<p><strong>⚠️ 决定「公开 / 投稿」之前，先跑一次「公开就绪度核查」</strong>（第 63 轮建立；<strong>成本半小时</strong>）：
+    自研理论往外推之前，先算这五项（<strong>都可复算</strong>）：</p>
+<ol>
+<li><strong>「本框架独有 + 可测 + 已有数字」的预言有几个？</strong> —— 这是审稿人问的第一个问题
+   （第 63 轮：§9 的 14 组里只有 <strong>1</strong> 个，即 EMRI）；</li>
+<li><strong>★★★（已有具体实验/装置可达）的可用数？</strong>（第 63 轮：<strong>0</strong>）；</li>
+<li><strong>最近 N 轮的产出类型</strong>（正面 / 负面 / 合流）—— <strong>趋势比单轮重要</strong>
+   （第 63 轮：55–62 共 8 轮，<strong>正面 = 0</strong>）；</li>
+<li><strong>有没有「参数表」？</strong> —— 审稿人必问，且这是<strong>最容易被打的一处</strong>
+   （第 63 轮：「参数表」<strong>0 处</strong>，而论文 L42 还在批评标准模型「含 19–26 个自由参数」）；</li>
+<li><strong>论文自己的定位声明？</strong> —— 会<strong>被直接引用为拒稿理由</strong>
+   （第 63 轮：摘要写「启发式统一框架（<strong>参考架构，非已确立物理</strong>）」）。
+⟹ 然后写一张「<strong>审稿人 N 击</strong>」表：每条附<strong>论文位置</strong>与<strong>严重度</strong>
+  （判据：这条是不是「<strong>改一改就能答</strong>」？不是 ⟹ 致命）。
+⚠️ <strong>两个结论通常是</strong>：
+  · <strong>公开加速的是「错误被发现」，不是「结论被验证」</strong> —— 后者取决于<strong>实验时间表</strong>
+    （第 63 轮：唯一的判别性预言等 <strong>LISA ~10–15 年</strong>），<strong>不是人力问题</strong>；
+  · <strong>成本不对称</strong>：<strong>公开是一次性、不可撤回的</strong>（arXiv 留下记录）；<strong>自推是可递增的</strong>。
+⟹ <strong>最省的替代方案（强烈建议先做）</strong>：<strong>私下找 1–2 个懂行的人看关键章节</strong>
+  （第 63 轮建议只看三处：<code>§4.5b</code> 的 PPN/EMRI、<code>§9</code> 的预言表、<code>§8.1</code> 的 ε 与能标）——
+  <strong>比公开快、无记录成本</strong>，且懂行的人一小时能指出的东西常比公开等一个月还多。
+⭐ <strong>一条可推广的判据</strong>：<strong>负面边界声明不怕公开</strong>（"本框架不覆盖 X"这类结论
+  <strong>没有争议空间</strong>，公开反而有价值）；<strong>正面主张才需要 ① ② 两项指标站得住</strong>。</li>
+</ol>
+</li>
+<li>
+<p><strong>⚠️ 判别「确定 vs 随机」要比时间序列与守恒量，不要比快照</strong>（第 65 轮建立；<strong>可跨项目复用</strong>）：
+    用户问「某个界面/数据看起来就是随机的，它真的是随机的吗」时，<strong>不要去看图</strong>，去算两档判据：</p>
+<ul>
+<li><strong>单帧 / 局部侧</strong>（把画面粗粒化后能读到的量）：单点密度、两点关联、<strong>块密度方差</strong> ——
+  第 65 轮实测 tick 与 i.i.d. 白噪声<strong>四条全部不可分</strong>；</li>
+<li><strong>时间 / 守恒量侧</strong>：<strong>守恒量</strong>（第 65 轮：k 极差 0 vs 104）、<strong>可逆性</strong>、
+  <strong>结构化重排</strong>（每条线上的守恒量必不变）、<strong>混合时间</strong>、<strong>混合时间的尺寸标度</strong>（τ ∝ L² vs τ = 1）
+  —— <strong>五条全部可分</strong>。
+⟹ <strong>原理</strong>：<strong>快照只是系综的一个样本，而系综分布在两种情形下可以完全相同</strong>；
+  能被分开的东西必然住在<strong>路径</strong>里。
+⚠️ 一条便宜的杀手判据：<strong>找「结构性恒等」而不是「数值差异」</strong> ——
+  第 65 轮的「轴对齐线级重排」对 tick 恒为 <strong>1.0000</strong>（定义直接蕴含），对白噪声只有概率巧合（0.18）。
+⚠️ <strong>陷阱：连「逐位变化率」都可能不可分</strong> —— 第 65 轮我预测 <code>Δ_tick = 0.25</code>（差 2 倍），
+  <strong>实测 0.503 ≈ 0.500</strong>。错因：<strong>每个位置都必然被改写为伙伴的旧值，而伙伴永远 ≠ 自己</strong>。
+  ⟹ <strong>算「变化率」前先问：这个变化是「必然」还是「概率」？</strong>
+⚠️ 与第 44 轮同源但<strong>不是</strong>同一条：第 44 轮比的是两种随机源（差 0.14σ），本条比的是
+  「有结构 vs 无结构」；<strong>空间关联这个入口两轮都判否</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong>⚠️ 跨模块对照前先对齐「索引约定」，别用集合相等当判据</strong>（第 65 轮踩过）：
+    把自写实现与项目权威模块对照时，我先试了「生成元集合相等」→ 失败；再试「群闭包集合相等」→
+    <strong>两个群阶相同（128）但集合不同</strong>。真因是<strong>索引约定</strong>不同：
+    <code>_tickgroup</code> 用 <strong>Fortran 序</strong> <code>i = z·Lx·Ly + y·Lx + x</code>，我的 numpy 用 <strong>C 序</strong>（<code>reshape(dims)</code>）
+    ⟹ <strong>轴标号差一个反序</strong>。换算坐标后<strong>逐位一致</strong>。
+    ✅ 正解（也是更好的判据）：<strong>别比群，比结构性质</strong> ——
+      ① 双射（<code>len(set(g)) == N</code>）② <strong>对合</strong>（<code>np.array_equal(g[g], arange(N))</code>）
+      ③ <strong>轴不混淆</strong>（交换只在同一条线内发生，垂直坐标不变）
+      ④ 与权威模块<strong>换算坐标后</strong>逐位一致。
+    ⟹ 教训与<strong>陷阱 28</strong>（等价性不能只比阶）同族：<strong>「相等」的判据要先问「在什么坐标系/口径下相等」</strong>。</p>
+</li>
+<li>
+<p><strong>⚠️ 拓扑计数：用 Morse 谱，不要用「单位化向量场的绕数」</strong>（第 66 轮踩过，各改两轮）：
+    任务形态：「<strong>验证某个拓扑不变量</strong>」（如 χ(S²) = 2 ⟹ 涡心数）。
+    (a) <strong>网格必须避开退化点</strong>：<strong>经纬网格的极点会让 1-ring 退化</strong> ——
+        顶点 (1, j) 的三个「上一行」邻居 <code>(i-1,j-1)/(i-1,j)/(i-1,j+1)</code> <strong>全映射到同一个北极点</strong>
+        ⟹ 环上同一点出现 3 次 ⟹ 绕数全错（实测 Σ = <strong>−8</strong> 而非 2）。
+        ✅ 换 <strong>icosphere</strong>（细分 3 次 = 642 顶点 / 1280 面，1-ring 度数 {5:12, 6:630}）后立刻正常。
+    (b) <strong>「单位化 ∇f 的绕数」≠「临界点指数」</strong>：单位化会把 <code>|∇f|</code> 小的<strong>非零点</strong>
+        放大成「方向绕一圈」的<strong>伪涡心</strong> —— 实测 <code>f = p_x</code>（真临界点只有 ±x̂）报 <strong>6 个 +1</strong>，
+        多出的 4 个落在 <code>|∇f| ≈ 0.156</code> 处。<strong>它们不是零点。</strong>
+    ✅ <strong>正解</strong>：数 <strong>max / min / saddle</strong> ⟹ <code>Σ = #max − #saddle + #min = χ</code>（Morse 定理）。
+        判据：全邻居更低 ⟹ max；全更高 ⟹ min；否则数 1-ring 上的<strong>符号变化 ≥ 4</strong> ⟹ saddle。
+        <strong>三档解析标定</strong>（f = p_x/p_y/p_z，真值各 +2）<strong>一次全对</strong>。
+    ⚠️ <strong>判据只在「平滑层」上成立</strong>：逐点独立的随机场给 Σ = +9 ≠ 2（「处处都是极值」）。
+        这恰好是「<strong>孤子化</strong>」（从噪声粗粒化出平滑结构）那一步的内容 —— <strong>别拿未粗粒化的场去判</strong>。
+    📌 <strong>反面对照（χ = 0 的曲面）更便宜</strong>：直接找<strong>处处非零的场</strong>（T² 上 v = ∂/∂u，模恒 1.0）
+        ⟹ 「能否全部湮灭」由 <strong>χ</strong> 决定，<strong>与随机性无关</strong>。
+    ⟹ 与<strong>陷阱 28</strong>（等价性不能只比阶）、<strong>陷阱 56</strong>（跨模块对照先对齐索引约定）同族：
+      <strong>「相等/计数」的判据要先问「在什么网格、什么口径下算的」。</strong></p>
+</li>
+<li>
+<p><strong>⚠️ 离散绕数必须做曲率修正；且判据要连「适用条件」一起写</strong>（第 67 轮踩过）：
+    <strong>任务形态</strong>：在<strong>离散网格</strong>上验证某个拓扑不变量（如 <code>Σ 指数 = χ</code>）。
+    <strong>坑</strong>：球面上「切向量场沿 1-ring 的<strong>裸</strong>绕数和」<strong>恒为 3χ，不是 χ</strong>。
+    多出的 2χ 恰是<strong>离散曲率项</strong>（Gauss–Bonnet：<code>Σ_i K_i = 2πχ</code>）：
+    <code>裸 Σ w_i = χ + (2/2π)·ΣK_i = χ + 2χ = 3χ
+    ✅ 修正式：Σ_i ( w_i − 2K_i/(2π) ) = χ        （icosphere 上精确到 1e-15）</code>
+    K_i = 离散高斯曲率（球面过剩角）= <code>2π − Σ(顶点处各面内角)</code>。
+    ⚠️ <strong>适用条件</strong>：「平滑 <strong>且</strong> 零点<strong>不落在格点上</strong>」
+    —— 反例：<code>∇p_z</code> 的零点恰在南北极顶点上 ⟹ 修正给 <strong>−2</strong>；<code>x̂×p</code> ⟹ 给 <strong>0</strong>。
+    ⟹ <strong>判据必须连条件一起写</strong>，否则是<strong>选择性标定</strong>（先挑能对的算例 = 自我欺骗）。
+    ⚠️ 与<strong>陷阱 57</strong>（拓扑计数用 Morse 谱）是<strong>同一族的两个坑</strong>：
+      <strong>「离散绕数」本身不是拓扑不变量，除非修正</strong>；而「单位化 ∇f 的绕数」连修正都救不了
+      （因为 <strong>∇f 的模长在非零点可任意小</strong>，单位化把「模长小」放大成「方向乱转」）。
+      ✅ 反过来：对<strong>本来就是单位模</strong>的场（切向量场、相位场），绕数<strong>是</strong>合法定义 ✓
+    📌 <strong>守恒的强度要写准</strong>：实测「逐步严格相同 = <strong>0/40</strong>」—— 涡心跳跃落在<strong>棱</strong>上时，
+      离散绕数读单步 ±1（偶 ±2）抖动，<strong>下一步复原</strong>（不是漂移）。
+      且「严格逐步相同」与「涡心数下降」在 40 seed 下<strong>互斥</strong>（同时成立 0/40）—— 这是数学事实。
+    ⟹ 与<strong>陷阱 28</strong>、<strong>陷阱 56</strong> 同族：<strong>「相等/计数」的判据要先问「在什么网格、什么口径、什么条件下算的」。</strong>
+    ⚠️ <strong>补充（第 67 轮的否证）</strong>：有人会想「那 ∇f 也扣掉曲率不就行了？」——
+      <strong>不行</strong>（实测 <code>_morse_vs_winding_67.py</code>，MW-1）：<code>∇f</code> 的曲率修正绕数只有 <strong>11/12</strong> 命中，
+      1 个失败，且<strong>失败与「零点到最近顶点的角距」无关</strong>（失败者 3.60°，通过者里有 0.77°/1.44°/1.95°）。
+      ⟹ <strong>判据按对象分流</strong>：真·单位模的场（|v| ≡ 1）可用曲率修正绕数；
+      <strong>模长可任意小的场（∇f）必须用 Morse 谱</strong>。机理：∇f 在零点附近 |∇f| → 0，
+      单位化把「模长小」放大成「方向疯狂转弯」，尺度与 1-ring 可比 ⟹ 局部近似失效。
+    📌 方法论：<strong>两条路径各有一个「离散化的偶发失效」</strong>（∇f 1/12；切向量场逐步严格守恒 0/40）
+      —— 这是<strong>离散拓扑计数的共同代价</strong>，报数时要把这个不确定度一起报。</p>
+</li>
+<li>
+<p><strong>⚠️ 给框架「新增一个演化方程」前，先跑一次 0 处检索</strong>（第 67 轮）：
+    框架/项目里<strong>没有</strong>的东西，很容易在"做模拟"的过程中被<strong>默认成已有的</strong>。
+    <strong>做法</strong>：先把候选的动力学词列出来，逐个 <code>grep -c</code>：
+    本轮判据词 = 图热流 / Dirichlet 能量 / 调和映照 / Laplace–Beltrami / 平行移动 / 联络 /
+    时间演化 / 演化方程 / 梯度流 / 亚稳 —— <strong>实测各 0 处</strong> ⟹ 结论是
+    <strong>「框架唯一的动力学是 §8.6.7 的 tick 置换；四个哈密顿量全是静态的」</strong>。
+    ⟹ 由此定性质：新增物<strong>必须显式标注为「新增假设」</strong>，可声称的只有<strong>相容性</strong>
+      （本轮：tick 是置换 ⟹ 保拓扑荷，而新动力学也严格保）。
+    ⟹ 与<strong>陷阱 41</strong>（接新领域前三步审查）、<strong>陷阱 50</strong>（"某理论独有"的判据）同族：
+      <strong>先审查"这东西本来有没有"，再投入。</strong></p>
+</li>
+<li>
+<p><strong>⚠️「边界」命题要先问「哪类数」—— q-数还是 c-数</strong>（第 68 轮建立；<strong>可跨项目复用</strong>）：
+    <strong>触发</strong>：框架里出现一个「<strong>看起来打破了某条边界</strong>」的东西。
+    实例（第 68 轮）：要证「框架没有位置依赖的能量」时，立刻撞上 §6.1 的<strong>钉扎项</strong> <code>gΦψ̄ψ</code>
+    ⟹ <code>m_eff(x) = m + gΦ(x)</code> ⟹ <strong>框架确实有位置依赖的能量</strong>。
+    ⟹ <strong>判据必须升级</strong>：不是「有没有这个量」，而是「<strong>这个量是哪类数</strong>」——
+    · <strong>c-数背景</strong>（外源给定）⟹ 给的是<strong>单粒子在给定背景中的势能</strong>，
+      <strong>不能与另一个构型做量子态之差</strong> ⟹ <strong>不构成反例</strong>；
+    · <strong>q-数算符</strong> ⟹ 才可能做「两态之差」。
+    ✅ 一句话判据：<strong>「这个量能与另一个构型做差吗？」</strong> 不能 ⟹ 它只是<strong>背景</strong>，不是<strong>自由度</strong>。
+    📌 第 68 轮据此把命题从「没有位置」改成「<strong>位置与能量不在同一个「数」的层面上</strong>」——
+      结论更强，而且<strong>两个反例反而成了支持</strong>（它们证明「确实有位置依赖能量，但只是背景」）。
+    ⚠️ 附带：要报「边界成立」时必须同时报<strong>边界失效的条件</strong>
+      （第 68 轮：<strong>把 Φ 量子化即失效</strong> ——「引力量子化之日，就是这条边界消失之时」）。
+    ⟹ 与<strong>陷阱 49</strong>（三类差）、<strong>陷阱 41</strong>（三步审查）同族：<strong>先审查「问对了没有」再投入。</strong></p>
+</li>
+<li>
+<p><strong>⚠️ 内部一致性检验常比重算便宜</strong>（第 68 轮建立）：
+    <strong>触发</strong>：文档/论文里某句给了<strong>两个互相约束的数</strong>。
+    <strong>做法</strong>：<strong>先用它们互查</strong>（计数、代数、量纲），再决定要不要跑代码。
+    📌 实例（第 68 轮 C-10）：第 40 轮块同时写「点对<strong>恰有 8 条轨道</strong>」与「<code>|O₂| = (N/4)²</code>」。
+      N=8 的无序点对只有 <code>C(8,2) = 28</code> 个，而 <strong>8 × 4 = 32 ≠ 28</strong>；<strong>7 × 4 = 28 ✓</strong>
+      ⟹ <strong>两数不能同时为真</strong>，且<strong>一行代码都不用跑</strong>就能判。
+      （随后数值验证：实测 <strong>7 / 9 / 10</strong>；<code>|O₂| = (N/4)²</code> <strong>是对的</strong>。）
+    ⚠️ <strong>附带的小坑（组合对的口径）</strong>：算<strong>无序对</strong>的轨道时，BFS 里<strong>必须规范化</strong>
+      <code>nc = (min(a, b), max(a, b))</code> —— 否则像集可能落回「有序」的表示，
+      集合查找失配 ⟹ 数值与「有序对」<strong>完全相同</strong>（我第一次就栽在这里：7/9/11 而非 7/9/10）。
+      与<strong>陷阱 35 / 43 / 56</strong>（口径）、<strong>陷阱 22</strong>（不变量完备性）同族：
+      <strong>「计数」的判据要先问「在什么表示、什么口径下数的」。</strong>
+    ⟹ 与<strong>陷阱 39</strong>（恒等式判别）、<strong>陷阱 22</strong>（轨道数 == 等值集数 ⟺ 完备）精神一致：
+      <strong>先做代数/计数自洽性检查，再上重武器。</strong></p>
+</li>
+<li>
+<p><strong>⚠️「跨章节同名量」的检出法：反推自变量的适用域</strong>（第 69 轮建立；<strong>可跨项目复用</strong>）：
+    <strong>触发</strong>：同一个符号在文档不同位置出现、<strong>值差很多</strong>，或被当作同一个量引用。
+    <strong>做法（1 分钟）</strong>：把 A 处的值<strong>代进 B 处的公式</strong>，解出它的<strong>自变量</strong>，
+    看结果是否<strong>超出该公式的适用域</strong>。超出 ⟹ <strong>两者不是同一个量</strong>，先别改数值。
+    📌 实例（第 69 轮 C-12）：§4.2 的「ε ~ 10⁻⁵⁰」被按 §8.1 的 <code>ε(E) = ε₀(M_Pl/E)^β</code> 核对，
+      报「差 40 个数量级」。反推：ε = 10⁻⁵⁰ ⟹ <strong>E = 2.05×10⁶⁹ GeV</strong>，
+      <strong>超普朗克能标约 49 个数量级</strong> ⟹ 该公式<strong>根本不适用</strong> ⟹ 两者不同
+      （一个是能标依赖的泄漏率、一个是湮灭–再生的截面失配参数）。
+      ⟹ 第 0 批的「40 个数量级」是<strong>假警报</strong>；对它的更正就是本轮 <strong>C-12</strong>。
+    ⚠️ <strong>伴随的第二个坑（归一化退化）</strong>：在<strong>最小算例</strong>上，多个归一化可能<strong>给出同一个数</strong> ——
+      第 69 轮：L=2 时 <code>Δ/(2L)</code>、<code>Δ/4</code>、<code>|E0|/(N_v+N_p)</code> <strong>全部 = 1.000000</strong>（因 <code>2L = 4 = N_v+N_p</code>）
+      ⟹ <strong>光看最小算例无法还原口径</strong>，必须用<strong>第二个尺寸</strong>（L ≥ 3）区分。与<strong>陷阱 22</strong>同族。
+    ⭐ <strong>通则（三样必须同时报）</strong>：报一个量时必须给出 ——
+      ① <strong>归一化</strong>（如 H = −JΣA_v − JΣB_p 里的 J 是什么，有无 1/2、1/4 因子）；
+      ② <strong>边界条件</strong>（<strong>开 / 周期</strong> —— 第 69 轮证明它才是「2J vs 4J」的真正来源，不是维度）；
+      ③ <strong>适用域</strong>（哪个能标 / 哪个尺寸）。
+    📌 第 69 轮的能隙案例<strong>三样全缺</strong>（只写「Δ=1」），所以<strong>无法被还原</strong> —— 这是「不可复现」的典型。</p>
+</li>
+<li>
+<p><strong>⚠️ 判据所用的「度量」必须先用第二个尺寸验证</strong>（第 70 轮 C-13；<strong>可跨项目复用</strong>）：
+    <strong>触发</strong>：为某个目标（平滑度、结构度、有序度、团簇度…）<strong>自选一个度量</strong>时。
+    <strong>坑</strong>：<strong>最小算例上，某些度量会退化成不变量</strong> —— 第 70 轮选「块密度方差 B」测
+      「同一 tick 轨道内平滑度能变化多少」，在 <strong>(2,2,4)</strong>（z 线长 4）上实测极差<strong>恒为 0</strong>，
+      一度被读成「<strong>块方差是 tick 不变量</strong>」（一个看起来很像结论的伪结论）。
+      真因：该格点的相位 1 匹配 <code>(1 2)(3 0)</code> <strong>恰好把「被 z 配对切开的两块」整体互换</strong>
+      ⟹ 块 0 密度 d₀ ↦ 1 − d₀ ⟹ 方差 <code>(d₀ − 0.5)²</code> 恒不变。
+      ✅ 换 <strong>z 线长 ≥ 6</strong>（(2,2,6)）后极差立刻是 <strong>0.25</strong>（另一度量 S 给 0.591）。
+    ⚠️ 与<strong>陷阱 22 / 62</strong>（最小算例退化）<strong>同族但方向相反</strong>：
+      22/62 是「算例太小 ⟹ <strong>口径还原不出</strong>」；本条是「算例太小 ⟹ <strong>度量本身失效</strong>」。
+    ✅ <strong>规范三条</strong>：
+      ① <strong>每个度量都要跑第二个尺寸</strong>（至少两个 L），并<strong>并列报两列的极差 / 散布</strong>；
+      ② <strong>先跑「已知答案」的正对照</strong>（第 70 轮 CG-3 用不变量 k 做正对照，CG-4b 用它验非退化）；
+      ③ 若两个尺寸结论相反 ⟹ <strong>默认小尺寸退化</strong>，以大尺寸为准。
+    📌 <strong>顺带一条好习惯</strong>：一旦发现度量可疑，<strong>立刻换第二个独立度量交叉验证</strong>
+      （块方差 B ＋ 相邻对同值比例 S），<strong>两者同向</strong>才下结论。</p>
+</li>
+<li>
+<p><strong>⚠️「N 个独立模式」要先算秩；口径未写明时下界是区间</strong>（第 71 轮 C-14；<strong>可跨项目复用</strong>）：
+    <strong>触发</strong>：文档说「<strong>N 个</strong>独立模式 / 通道 / 自由度」，并据此推出一个<strong>下界</strong>
+    （Nyquist、采样、编码、自由度计数…）时。
+    <strong>坑（一个极容易被忽略的数学事实）</strong>：<strong>4 个向量在 3D 里必然线性相关</strong> ——
+      正四面体的 4 个单位方向满足 <code>Σ n_a = 0</code>（数值 <code>[0,0,0]</code>，精确）⟹ <strong>秩只有 3</strong>。
+      第 71 轮实测：若模式取<strong>线性</strong>泛函 <code>n_a·p</code>，<code>k×4</code> 采样矩阵的秩在 k ≥ 4 时仍是 <strong>3</strong>；
+      「随机 4 泛函」（与框架无关）同样给 3；只有<strong>非线性</strong>模式（<code>|n_a·p|</code>、高斯核）才给 <strong>4</strong>。
+    ⟹ <strong>「4 模式需 ≥ 4 采样点」这一步依赖「模式如何定义」，而原文未写明</strong> ⟹
+      <strong>下界从单值变成区间</strong>（相干块 <strong>3 – 4 l_P²</strong> ⟹ 尺度 <strong>√3 – 2 l_P</strong>）。
+    ✅ <strong>规范三条</strong>：
+      ① <strong>凡「N 个独立 X」的断言，先构造一个采样 / 求值矩阵并算秩</strong>（几行代码）；
+      ② <strong>算完后换 2–3 种模式定义重算</strong> —— 若秩随定义变，说明<strong>口径缺失</strong>；
+      ③ <strong>口径缺失时，结论报「区间」</strong>，并把口径缺口<strong>登记为一条更正</strong>（不要替文档选一个）。
+    ⚠️ <strong>但不要直接判「错」</strong>：框架里的「4 个方向模式」更可能指「4 个方向上的<strong>连接状态</strong>」
+      （非线性 / 离散量）⟹ 那样确实可以 4 维。<strong>缺的是口径，不是结论。</strong>
+    ⟹ 与<strong>陷阱 45 / 51</strong>（符号与 σ 的口径）同族，但<strong>新形态</strong>：
+      那两条是「同一个符号两个含义 / 同一个 σ 几种定义」，本条是「<strong>口径根本没写，导致下界是区间</strong>」。</p>
+</li>
+<li>
+<p><strong>⚠️「轮次块」不全是 <code>&gt;</code> 引用块 —— 清点掩码会漏</strong>（第 72 轮发现；<strong>陷阱 47 / 20 的执行细则之三</strong>）：
+    <strong>触发</strong>：做「某词 <strong>0 处</strong>」这类论证时，必须先把<strong>论文自己登记的轮次文本</strong>排掉。
+    <strong>坑</strong>：只按「<code>&gt;</code> 起始的连续引用块」排除<strong>会漏两类</strong> ——
+      ① <strong>无 <code>&gt;</code> 前缀的块</strong>：直接以 <code>&lt;strong&gt;【v2.9 补充（第 N 轮…</code> 开头的</strong>正文段<strong>
+         （实测第 42/43/44/45/55 轮块都有这种形态）；
+      ② <strong>正文里的轮次注</strong>：写作 <code>&lt;strong&gt;（第 N 轮加注）&lt;/strong&gt;</code>，且<strong>跨多个自然段</strong> ——
+         第 62 轮在 §5.5 的加注就是 <strong>805–808 ＋ 810–820</strong> 两段，<strong>第二段不带任何标记</strong>
+         （首行是 <code>⚠️ &lt;strong&gt;关键判据…</code>），</strong>空行就把它切开了</strong>。
+    <strong>症状</strong>：第 72 轮首次清点时「第五力」在正文里还剩 <strong>3 处</strong>，全部来自该注的第二段。
+    ✅ <strong>规范做法（第 72 轮实现；⚠️ 第 80 轮改为「模式化」）</strong> —— 与旧的 <code>&gt;</code> 块掩码<strong>取并集</strong>：
+    <code>python
+    # ⚠️ 第 80 轮的更正：&lt;strong&gt;不要枚举块的名字，要匹配块的模式&lt;/strong&gt; ——
+    #   枚举版（v2\.9 补充（第|v2\.9 更正（第|…）在「v2.9 分层注（第 80 轮…）」上&lt;strong&gt;漏了&lt;/strong&gt;。
+    PAT = re.compile(r"(v2\.9\s*[^\n（|]{0,16}（第\s*\d+\s*轮|【第\s*\d+\s*轮"
+                     r"|第\s*\d+\s*轮加注|第\s*\d+\s*轮口径注|第\s*\d+\s*轮补注)")
+    in_note = False
+    for i, s in enumerate(lines):
+        if s.lstrip().startswith("|"): m[i] = False; continue   # 表格行永不标记（保守）
+        if s[:1] == "#": in_note = False                        # 下一个标题终止
+        if PAT.search(s): in_note = True
+        m[i] = in_note</code>
+    📌 <strong>第四次命中（第 80 轮）</strong>：新增块的标题写成「<strong>v2.9 分层注（第 80 轮…）</strong>」与
+      「<strong>v2.9 登记（第 80 轮…）</strong>」—— <strong>不在枚举白名单里</strong> ⟹ 掩码漏 ⟹ 该轮 SH-5 从
+      「区分说明 0 处」变成 2 处、<strong>7 项变 6 项翻红</strong>。改成上面的模式化判据后复跑通过。
+      ⟹ <strong>一般教训：块的名字会</strong>变**（补充／更正／加注／口径注／登记／分层注／补注…），
+      判据要匹配<strong>模式</strong>。（<strong>「补丁后必须复跑核验」已连续四轮救场：72/75/76/80</strong>。）
+    ⚠️ <strong>两个方向要分别拿捏</strong>：<strong>标记要宽</strong>（宁可多排，也不要让「自己刚写的字」把 0 处变成 N 处）；
+      但<strong>表格行永远算正文</strong>（少排 ⟹ 「0 处」的论证更<strong>强</strong>，不会误报）。
+    ✅ <strong>必做的自检（本轮一句话就抓到问题）</strong>：<strong>补丁完成后再跑一次核验脚本</strong> ——
+      仍 <strong>N 项 0 失败</strong> ⟹ 掩码真的挡住了自指；某项翻红 ⟹ 先看它命中的是不是<strong>本轮自己写的行</strong>
+      （第 72 轮正是这样抓出两处：新写的 §6.1 注与 §8.6 补注各命中了 PC-2 的判据）。
+    ⟹ <strong>「排除元文本」共有三个漏口</strong>：<code>&gt;</code> 块（陷阱 47）、补丁前后（陷阱 20）、
+      <strong>无 <code>&gt;</code> 前缀与跨段注（本条）</strong>。三条一起用才不会自欺。
+    📌 <strong>第三次命中（第 76 轮）</strong>：新写的 §7.4 块里含「<strong>Fock / 二次量子化 / … 各 0 处</strong>」，
+      让 QM-9 立刻翻红（用的是 <code>cnt_all</code> 全文计数）⟹ 改成 <code>cnt_body</code> 后复跑通过。
+      <strong>「补丁后必须复跑核验」已连续三轮救场（第 72 / 75 / 76 轮）。</strong></p>
+</li>
+<li>
+<p><strong>⚠️⚠️「下一步优先级」≠「全量待办清单」—— 收尾必须回核批次状态</strong>（第 74 轮，<strong>用户当场纠正</strong>）：
+    <strong>触发</strong>：每轮收尾更新 <code>环境交接说明</code> §七 与写「下一步」建议时。
+    <strong>坑（本次实测）</strong>：第 73 轮我在 §七 写下「<strong>候选池里有明确可判定入口的项已清空</strong>」——
+      实际含义只有「<strong>候选池 36 已结项</strong>」。用户立刻反驳「<strong>我记得有很多分支都还没做</strong>」。
+      做全量回溯（从<strong>四个来源</strong>取证 ＋ 资产核查）后，<strong>真实待办 = 21 条</strong>：
+      · <strong><code>未完成研究工作流_按依赖排序.md</code> 的第 3 / 4 批 6 项全部仍是 ☐</strong>（而我只做了第 0/1 批 ＋ 2.1）；
+      · 候选池 <strong>#1–#9</strong> 九项实质未做（含 §8.6.3 自认仍缺的「加速度方程＋连续性方程」）；
+      · <code>交接说明 §七</code> <strong>老编号里 5 条未做</strong>（消 <code>8π/3</code> / 载流子两类型 / 第 26 轮建议 ①②④）；
+      · 论文 §10.2 #11 的 <strong><code>g → α_s/α_EM</code> 映射</strong>（⚠️ 与 I-17 不是同一件事）；
+      · <strong>Lean 资产仍未拷回</strong>（<code>verification/lean/</code> 只有 README.md）。
+    📌 <strong>同一族的第五次命中（第 80 轮，</strong>方向相反<strong>）</strong>：第 74 轮是「<strong>已做的没标 ✅</strong>」（清单 ☐ 失真），
+      第 80 轮碰上另一头 —— <strong>H5（§4.10「六处 4」复查）早在第 29 轮就做完了</strong>（备忘录 ＋ 论文分级注 ＋
+      第 39 轮修正标注错位），而台账 <code>全量待办总账</code> 的 H5 行仍写「低（成本）」⟹ <strong>C-31</strong>。
+      ⟹ <strong>规范（两向对账）</strong>：收尾除「回核批次状态」，还要<strong>拿"已完成清单"反向扫一遍台账</strong> ——
+      <code>grep</code> 台账里每条待办的<strong>关键名词</strong>，看它在 <code>outputs/*.md</code> 里是否<strong>已有对应的完成备忘录</strong>。
+      <strong>只增不销的待办表会越积越假</strong>（这是 C-19 族的第 <strong>11</strong> 条）。
+    <strong>根因</strong>：<strong>§七 是「当期优先级」，不是台账</strong> —— 只用它判断进度，会<strong>系统性地漏掉整批任务</strong>。
+    ✅ <strong>规范（本轮起照做）</strong>：每轮收尾的检查表固定加两条 ——
+      ① 回 <code>outputs/未完成研究工作流_按依赖排序.md</code> <strong>核一遍每一批的状态</strong>（不只核最新那一批）；
+      ② 写完「下一步」后<strong>自问「这句话是否把『我做了一条』说成了『这一类已清空』」</strong>。
+    ⚠️ <strong>顺带查出（</strong>C-19<strong>）：清单候选池的 ☐ 标记</strong>双向失真** —— 29 条无 ✅/❌ 标记的条目里
+      <strong>10 条已过期</strong>（<strong>已做仍标 ☐ 的 4 条</strong> ＋ <strong>已判否/暂缓仍标 ☐ 的 6 条</strong>）。
+      ⟹ <strong>铁律 17 要升级为「双向核查」</strong>：既查「待办是否已做」，也查「已判否的是否还在待办表里」。
+    ⟹ 与<strong>陷阱 17（陈年待办先核查）</strong>、<strong>陷阱 41（三步审查）</strong>同族，但方向不同：
+      那条查「登记过的做完没有」，本条查「<strong>没登记进 §七 的还有多少</strong>」。</p>
+</li>
+<li>
+<p><strong>⚠️⚠️ 判断「某方程还缺」之前，先问「缺的是</strong>方程<strong>还是</strong>对象<strong>」</strong>（第 75 轮建立；<strong>可跨项目复用</strong>）：
+    <strong>触发</strong>：文档/论文自己写着「方程 X 仍缺」「还未推导出 Y」时。
+    <strong>做法（一轮内可判）</strong>：把该方程需要的量的<strong>全部身份</strong>列出来，逐个问 ——
+      <strong>它在框架里是「约束」（恒成立、无自由）还是「守恒」（带时间演化）？</strong>
+      若<strong>没有任何一个量</strong>能同时满足两者 ⟹ <strong>缺的不是方程，是对象</strong>（第 4 种失败形态：<strong>分层</strong>）。
+    📌 <strong>实例（第 75 轮）</strong>：§8.6.3 自认「加速度方程与连续性方程仍缺」，而 §2.2 <strong>已有</strong>守恒流 <code>∇·J = 0</code>。
+      逐项核对后发现<strong>两个 <code>ρ</code> 不接</strong>：
+      · §2.2 的 <code>J^μ</code> <strong>守恒</strong>，但它是<strong>事件计数</strong>测度（<code>W[Σ] = ∫J·dΣ</code>），<strong>不带状态方程 <code>p</code></strong>
+        ⟹ 写不出 <code>ρ̇ + 3H(ρ+p/c²) = 0</code>；
+      · §8.6.3 的等分账 <code>ρ = 3H²/8πG</code> <strong>带 <code>p</code></strong>（它本身就是从 <code>N·k_BT</code> 来的），
+        但<strong>硬写守恒必然给出 <code>w = −1/3</code></strong>（<code>E ∝ 1/H</code>、<code>V ∝ H⁻³</code> ⟹ <code>w = −ℏG/(3l_P²c³) ≡ −1/3</code>，
+        <code>ℏ</code>、<code>G</code>、<code>c</code>、<code>H₀</code> 全消掉）—— 而 <code>w = −1/3</code> <strong>正是曲率标度</strong> <code>ρ ∝ a⁻²</code>，
+        与观测（<code>w = −1.028 ± 0.031</code>）差 <strong>22.4σ</strong>。
+      ⟹ <strong>等分账的 <code>ρ</code> 只能是「约束」，不能是「守恒流体」</strong>；<strong>缺的是「同一个 <code>ρ</code>」</strong>。
+    ✅ <strong>两个附带的好习惯</strong>：
+      ① <strong>先查「接口有没有被写过」</strong>（判据 = 两个符号<strong>同行共现次数</strong>）——
+         第 75 轮实测「<code>J^μ</code>/微变权」与「<code>3H²/8πG</code>」<strong>同行共现 0 次</strong> ⟹ 接口从未被写；
+      ② <strong>把「反证」和「预言」分开写</strong>：第 75 轮的 <code>w = −1/3</code> 是<strong>反证</strong>
+         （「<strong>若</strong>要写守恒，<strong>就</strong>必然…」），<strong>不是</strong>「框架预言 <code>w = −1/3</code>」。
+         ⚠️ 这一类加法<strong>必须显式声明为「额外假设」</strong>，否则读者会误读成框架的结论。
+    ⚠️ <strong>反向价值</strong>：这条也能<strong>加强</strong>框架 —— 第 75 轮同时查明等分账的输入<strong>只有同时刻的 <code>H</code></strong>
+      ⟹ <code>Ω_tot(t) ≡ 1</code> 是<strong>「恒为 0」而非「今天恰好为 0」</strong>（比单向陈述更强的表述）。
+    ⟹ 与<strong>陷阱 41</strong>（三步审查）、<strong>陷阱 62</strong>（反推自变量适用域）、<strong>陷阱 49</strong>（三类差）同族：
+      <strong>都是「先审查『这个缺口是哪种缺口』，再投入」。</strong></p>
+</li>
+<li>
+<p><strong>⚠️ 清单补丁的</strong>操作顺序<strong>：顺延与插入必须分开、且插入用</strong>顺延后<strong>的锚点</strong>（第 75 轮踩过）：
+    <code>_patch_list_*.py</code> 里同时做「小节顺延（1.2→1.3…）」与「插入新 1.2 节」时，
+    若<strong>先顺延后插入</strong>，插入用的锚点（如 <code>### 1.3 第 73 轮新增</code>）<strong>已被顺延改成 1.4</strong> ⟹
+    <code>sub_once</code> <strong>命中 0 次、拒绝执行</strong>，而脚本<strong>其余项照做</strong> ⟹ 结果<strong>小节编号出现空洞</strong>（1.2 缺失）。
+    ✅ <strong>规范三条</strong>：① 顺延与插入<strong>分成两次脚本调用</strong>（或先插占位）；② 插入的锚点取<strong>顺延后</strong>的编号；
+      ③ 收尾<strong>必做连续性检查</strong> <code>[int(re.match(r"^### 1\.(\d+) ", s).group(1)) …] == range(1, n+1)</code>
+      —— 第 75 轮正是靠这一步当场抓到并补插。
+    ⟹ 与<strong>陷阱 33/34</strong>（插入新小节时别吃掉锚点、链式重命名要降序）<strong>同一族</strong>。</p>
+</li>
+<li>
+<p><strong>⚠️ 恒等式的</strong>数值<strong>检测手法：扰动「成对出现的那个公共自变量」</strong>（第 76 轮建立；陷阱 39 的执行细则）：
+    <strong>触发</strong>：某结论标着【推导】，你怀疑它其实是<strong>恒等式</strong>（零内容）—— 但代数消元不够直观时。
+    <strong>做法（3 行代码）</strong>：找一个<strong>理论上不该影响结果</strong>的参数 X，<strong>缩放它</strong>，看结论是否不变。
+    ✅ <strong>关键</strong>：X 必须选「<strong>在代换链条里成对出现的那一对的公共自变量</strong>」——
+      第 76 轮：链条 <code>p_rev = m/m_P</code> ⟹ <code>λ_C = l_P/p_rev</code> ⟹ <code>D = c·λ_C/3</code> 里，
+      <code>l_P</code> 与 <code>m_P</code> 只以<strong>乘积</strong> <code>l_P·m_P ≡ ℏ/c</code> 出现，而它们的<strong>公共自变量 = G</strong>
+      （<code>l_P ∝ √G</code>、<code>m_P ∝ 1/√G</code>）⟹ <strong>缩放 G 时 D 完全不变</strong>（实测三次相对差 0）
+      ⟹ 证明 <code>l_P</code>、<code>m_P</code> 被消掉 ⟹ <code>D = ℏ/(3m)</code> 只是 <code>λ_C = ℏ/(mc)</code> 的重述。
+    ❌ <strong>我第一版踩的坑</strong>：<strong>同时缩放 <code>l_P</code> 与 <code>m_P</code></strong> ⟹ <code>l_P·m_P</code> 变成 <code>f²·ℏ/c</code> ⟹ D 变了
+      ⟹ <strong>假 [XX]</strong>（看起来"参数没被消掉"，其实是扰动方式不对）。
+    📌 <strong>判据三条</strong>：① 先写清楚链条里每个量的<strong>代换关系</strong>；② 找出<strong>只以乘积/比值出现</strong>的那一对；
+      ③ 缩放<strong>那一对的公共自变量</strong>（不是缩放它们本身）。
+    ⚠️ 与<strong>陷阱 39</strong>（把中间参数代回去看是否消掉）<strong>同一目的、不同手法</strong>：39 是<strong>代数</strong>消元（精确、但要求能写成闭式），
+      本条是<strong>数值</strong>扰动（粗糙、但链条长/含超越函数时更省事）。<strong>两条都做一遍最稳。</strong></p>
+</li>
+<li>
+<p><strong>⚠️⚠️ 更正必须扫「同一处的派生量」，不能只改直接面对的那几个数</strong>（第 78 轮 C-26；<strong>新形态</strong>）：
+    <strong>触发</strong>：你做了一次数值/口径更正，改掉了某段里的<strong>几个数</strong>。
+    <strong>坑（实测）</strong>：第 50 轮更正了 (2,2,6) 的<strong>轨道数 6224 → 6334</strong> 与 <strong>H/N 0.4330 → 0.4334</strong>，
+      <strong>却漏改了同一份记录里的「不完备度 5.93」</strong> —— 而 5.93 正是 <code>6224 / 1050</code> 算出来的
+      ⟹ <strong>同一段文字里两个数来自不同的群</strong>（第 78 轮才查出）。
+    ✅ <strong>规范三条</strong>：① 更正时<strong>列出这段里所有该量的派生量</strong>（比值、差值、对数、百分比…）并逐个核对；
+      ② 若原值标了删除线/留痕，<strong>新值旁边写明"由哪个改正后的数算出"</strong>；
+      ③ 收尾<strong>扫一遍该段的全部数字</strong>（<code>grep</code> 旧值），确认没有孤立的旧数残留。
+    ⚠️ <strong>与 C-15 / C-16 / C-21 / C-23 同族但形态不同</strong>：那几条是<strong>符号/口径撞车</strong>（同名字母两义），
+      本条是「<strong>一次更正的作用域没扫全</strong>」⟹ 前者的解法是「加符号约定」，本条是「<strong>扫派生量</strong>」。
+    📌 <strong>第 78 轮同时命中一条老的</strong>（<strong>C-27</strong>）：第 48 轮改了<strong>工具</strong>（<code>gens_buggy</code>/<code>gens_correct</code>），
+      但第 46 轮的<strong>产物没回溯更正</strong> ⟹ 「<strong>改了工具没改产物</strong>」也是同一个病。
+      ⟹ 判据问句：<strong>「我改了 A，还有哪些 B 是从 A 算出来的？」</strong></p>
+</li>
+<li>
+<p><strong>⚠️⚠️ 批量文本替换的</strong>判据要分层<strong>：双引号可放宽，单引号必须严格；且写文件前先跑 dry run</strong>（第 79 轮，<strong>本轮真的改坏了文件</strong>）：
+    <strong>任务形态</strong>：把「中文里的 ASCII 引号」批量换成「」/『』（排版清理）。
+    <strong>坑 1（判据太窄 ⟹ 配对错位）</strong>：判据若用「引号<strong>两侧均为 CJK</strong>」，则 <code>"配对阶数" n=3</code> 的
+      <strong>闭引号右侧是空格</strong>、不计入 ⟹ 该行只剩 1 个候选 ⟹ <strong>奇数 ⟹ 错位</strong>（首次 dry run 只改了开引号）。
+      ✅ 正解：<strong>按行处理</strong> —— 若该行是中文行（CJK 字符 ≥ 10）且 ASCII 引号数为<strong>偶数</strong>，则把该行<strong>全部</strong>引号按序配对。
+      📌 实测：论文 105 个含 <code>"</code> 的行<strong>引号数全为偶数</strong>，零奇数行 ⟹ 该方案安全。
+    <strong>坑 2（判据太宽 ⟹ 误伤数学记号）</strong> ⚠️ <strong>本轮真的改坏了</strong>：单引号若用「两侧<strong>非</strong>字母数字」，
+      则 <code>F1'''</code> → <code>F1'『』</code>、<code>β'=βb^{2−d}</code> → <code>β『=βb</code> —— 因为<strong>希腊字母 <code>β</code> 与相邻撇号都不是 ASCII 字母数字</strong>。
+      ✅ 正解：<strong>单引号一律用严格判据</strong>（两边均 CJK，或右边是中文标点），并<strong>先把待改清单打印出来人工过一遍</strong>。
+      📌 论文里 <code>n'</code>（同号配对阶数）、<code>M'</code>/<code>g'</code>、<code>'t Hooft</code>、<code>F1'</code>/<code>F1''</code>/<code>F1'''</code>、<code>β'</code>、<code>V'(Φ)</code>、<code>Gel'fand</code>、
+      <code>A_v'</code>、<code>v'</code>、<code>B4'</code>、<code>6'</code> <strong>全是记号，不能动</strong>（实测 51 个单引号里只有 4 个是中文引号）。
+    <strong>规范三条</strong>：① <strong>先 dry run</strong>（只打印 "改前 → 改后" 对照与统计，不写文件）；② <strong>改完立即复核</strong>（数量、行数、残留）；
+      ③ <strong>出事后精确回滚</strong>（只还原被误改的行，不要从整档备份恢复 —— 那会丢掉同轮其它已生效的改动）。
+    ⚠️ 与<strong>陷阱 46</strong>（自动扫描会给误报）、<strong>陷阱 47/65</strong>（自指）同族，但<strong>后果不同</strong>：那几条只是<strong>误读</strong>，
+      本条会<strong>真的破坏文件</strong> ⟹ <strong>凡是"批量改写"任务，dry run 不是可选项</strong>。</p>
+</li>
+<li>
+<p><strong>⚠️⚠️ 「修复型检查项」必须写成「取证（补丁前）＋ 确认（补丁后）」两段</strong>（第 80 轮，<strong>同一个脚本里两次翻红，第二次是判据自己过期</strong>）：
+    <strong>触发</strong>：某个检查项的作用是<strong>证明某处有毛病</strong>（如「台账把已完成的待办仍标未做」），
+      而<strong>同一轮里你会把它修好</strong>。
+    <strong>坑（实测）</strong>：SH-7 原判据 = <code>"✅" not in 台账H5行</code>（用来证明「标记过期」）。
+      补丁把该行改成含 ✅ 之后，<strong>同一个判据立刻翻红</strong>（6 项 1 失败）——
+      <strong>不是文件错了，是判据过期了</strong>：它检查的状态<strong>已经被我改掉了</strong>。
+    ✅ <strong>规范</strong>：这类检查<strong>一律拆成两段</strong>，且<strong>都用底本/当前稿分别判</strong>：
+      <code>python
+      pre_row  = grep(底本备份, "&lt;strong&gt;H5&lt;/strong&gt;")          # 补丁前
+      curr_row = grep(当前稿,   "&lt;strong&gt;H5&lt;/strong&gt;")
+      chk(tag, ("✅" not in pre_row) and ("✅" in curr_row),
+          "补丁前：标记过期（取证）／补丁后：已修复（确认）")</code>
+    📌 <strong>一般化（本条的真正价值）</strong>：<strong>判据和文件一样会过期</strong>。凡「检查某个 Bad 状态」的项，
+      若本轮会把它变好，就必须<strong>两段式</strong>；否则「改好了反而翻红」会浪费一整轮排查。
+    ⚠️ <strong>与陷阱 46/47（自动扫描误报）、陷阱 65（掩码漏）同族但层次不同</strong>：
+      那几条是<strong>判据看错了对象</strong>（把新写的字当旧文本），本条是<strong>判据看对了对象、但对象已被修好</strong>。
+    📌 <strong>第四种形态（第 83 轮）</strong>：<strong>判据对「中间态」误报</strong> —— 清单脚本「顺延编号后、插入新节前」
+      必然缺 1.2（这是<strong>预期中间态</strong>），而检查按<strong>最终态</strong>判 ⟹ 假 <code>[XX]</code>。
+      ✅ 中间态检查一律 <code>strict=False</code>（打印 <code>[INFO]</code>、不计入失败）。
+    📌 <strong>第六次命中（第 85 轮，三条同时）</strong>：AU-1/AU-3/AU-4 的判据是「这些内容在论文里 <strong>0 处</strong>」，
+      而<strong>本轮补丁正是把它们补录进论文</strong> ⟹ <strong>三条同时翻红</strong>（6 → 3 项）。
+      ✅ 改为两段式（<code>PRE.count(...)==0</code> 取证 ＋ <code>Z.count(...)&gt;=1</code> 确认）后复跑 6 项 0 失败。
+      <strong>累计</strong>：第 80 轮（SH-5 掩码／SH-7 判据过期）、第 83 轮（中间态）、<strong>第 85 轮（三条）</strong>。
+    ⭐ <strong>第 80 轮一天内三次翻红的完整账</strong>：① SH-5（掩码漏「v2.9 分层注」⟹ 陷阱 65 第四次命中）；
+      ② SH-7（判据自己过期 ⟹ 本条）；③ 两者都靠「<strong>补丁后必须复跑核验</strong>」抓到。</p>
+</li>
+<li>
+<p><strong>⚠️⚠️ 条件式补丁必须</strong>报「未命中」** —— <code>if anchor in t:</code> 会<strong>静默失败</strong>（第 80 轮真实发生，第 81 轮才发现）：
+    <strong>触发</strong>：脚本里为了稳健写成 <code>if anchor in t: t = t.replace(...)</code> 这种<strong>条件式</strong>插入。
+    <strong>坑（实测）</strong>：第 80 轮我写 <code>anchor = "（4.3 的「77 处」是&lt;strong&gt;行计数&lt;/strong&gt;"</code>，而文件里的实际文本是
+      「（4.3 的「<strong>77</strong>」是行计数」—— <strong>锚点差几个字</strong> ⟹ <code>anchor in t</code> 为 <strong>False</strong> ⟹
+      <strong>整段 C-31 从未被插入，而且没有任何报错</strong>（对比 <code>sub_once</code> 会打印「命中 0 次」）。
+      直到第 81 轮往清单里加 C-32 时，才发现「总账行里居然没有 C-31」。
+    ✅ <strong>规范（三条）</strong>：
+      ① <strong>一律用 <code>sub_once</code> 式的显式检查</strong>（<code>n = t.count(old)</code>；<code>n != 1</code> 就<strong>打印并计 BAD</strong>），
+         <strong>不要用 <code>if old in t:</code></strong>；
+      ② 若确实需要「可选的」插入，<strong>也必须打印一行 <code>[SKIP] &lt;tag&gt; 锚点未命中</code></strong>，绝不静默；
+      ③ 收尾<strong>反向核对</strong>：把本轮「声称已改」的每一项，用 <code>grep</code> 在文件里<strong>再查一遍</strong>。
+    📌 <strong>一般化</strong>：<strong>「没报错」≠「做成了」</strong> —— 自动化补丁里，<strong>沉默是最大的失败模式</strong>。
+      与陷阱 47（只改一处）、陷阱 70（漏改派生量）同族，但更隐蔽：那两条是<strong>改了但不够</strong>，
+      本条是<strong>根本没改</strong>。
+    ⭐ <strong>第 81 轮同时踩到一个「定位错位」</strong>：<code>t.find("C-31")</code> 命中的是<strong>别处的同名条目</strong>（1.x 节里的表格行），
+      于是 C-32 被插进了错误位置 ⟹ 靠「插入上下文打印 + 表格首尾管道检查」抓到并<strong>精确回滚</strong>。
+      ⟹ <strong>用 <code>str.find</code>/<code>index</code> 定位时，先打印上下文再改</strong>；<strong>改完跑一次结构完整性检查</strong>（本处 = 表格行首尾管道数）。</p>
+</li>
+<li>
+<p><strong>⚠️⚠️ 锚点必须取「</strong>整行<strong>」</strong> —— 行首前缀会让 <code>replace</code> 把新块插进<strong>行的中间</strong>（第 82 轮真实发生）：
+    ⚠️ <strong>同族子坑（第 87 轮补实测）</strong>：<strong>插入块内部不得有空行</strong>。轮次块的判据是
+      「<code>&gt;</code> 起始的<strong>连续</strong>引用块」（见铁律 18），块里夹一个空行就会<strong>把块切成两三段</strong>
+      ⟹ 后半段<strong>不再被识别为轮次块</strong> ⟹ 后续「某词 0 处」这类清点会把<strong>我自己写的元文本算进去</strong>（自指污染）。
+      ✅ <strong>自检（插入后必做，一条命令）</strong>：取「块首标记行」到「块末标记行」的区间，
+      <strong>断言区间内每行都以 <code>&gt;</code> 开头</strong>；并<strong>删掉区间内的空行</strong>（表格行之间也不要空行，
+      markdown 里 <code>&gt;   | …</code> 连续写照样渲染成表）。
+    <strong>触发</strong>：往一个<strong>本来就有一整行长文本</strong>的段落后面插新块。
+    <strong>坑（实测）</strong>：我写 <code>old = "&lt;strong&gt;(g) 6-正则二分图同样非平面&lt;/strong&gt;"</code>（<strong>只是行的前缀</strong>），
+      然后 <code>t.replace(old, old + "\n" + BLOCK)</code> —— 结果是
+      <strong><code>(g)</code> 行的后半段被甩到新块的后面</strong>，新块插在了<strong>行的中间</strong> ⟹ <code>(g′)</code> 被<strong>拆成两半</strong>
+      （标题在前、表格在后，中间夹着 <code>(g)</code> 的残段）。
+      ⚠️ 更糟的是：这个错误<strong>不会报错</strong>（<code>count(old) == 1</code> 成立，脚本打印「已插入」）。
+    ✅ <strong>规范</strong>：锚点<strong>逐字取整行</strong>：
+      <code>python
+      LINES = t.split("\n")
+      cand = [ln for ln in LINES if ln.startswith("**(g) 6-正则二分图")]
+      assert len(cand) == 1, len(cand)          # 唯一性先断言
+      old = cand[0]                              # ← &lt;strong&gt;整行&lt;/strong&gt;
+      t2 = t.replace(old, old + "\n" + BLOCK, 1)</code>
+    📌 <strong>连带第二条（移动文本块时）</strong>：<strong>「块边界」的定义必须与写入时的结构一致</strong> ——
+      我第一次的补救用「从标记行到<strong>第一个空行</strong>」定义块，而块本身<strong>含空行</strong>（多段落 + 表格）
+      ⟹ <strong>只搬走了第一段</strong>，反而更乱。
+      ✅ <strong>最稳的补救 = 从备份整体恢复、改正锚点后重做</strong>（不要试图原地修补已错位的多段块）。
+    ⚠️ <strong>与陷阱 73（条件式插入静默失败）同族</strong>：两条都是「<strong>脚本报成功、文件却错</strong>」。
+      ⟹ <strong>收尾必做结构性核对</strong>：本处 = <strong>打印锚点前后各 6 行</strong>看段落边界是否完整 + <strong>表格行首尾管道检查</strong>。</p>
+</li>
+<li>
+<p><strong>⚠️⚠️ 检索到某个词 ≠ 那个词描述的是「现行」状态</strong>（第 83 轮 <strong>C-33</strong>，<strong>本轮真的写错并公开给用户</strong>）：
+    <strong>触发</strong>：你要基于「<strong>框架的现状是 X</strong>」做一步新工作（补证 / 对照 / 登记）。
+    <strong>坑（实测）</strong>：第 82 轮我在底本里检出「金刚石」<strong>5 处</strong>，就当作「框架在用金刚石」，
+      并据此加了一整段「<strong>(g′) 4-正则（金刚石）二分图非平面</strong>」，还把它写成<strong>该轮唯一正面产出</strong>。
+      实际上：<strong>5 处里 4 处带撤回标记</strong> —— §8.6.8 的<strong>标题</strong>就是
+      「衬底格点几何：外空间 6 方向 ⟹ <strong>简单立方</strong>（T-6 裁决，<strong>第 30 轮</strong>）」，
+      该小节<strong>第一段</strong>就是【v2.9 裁决：<strong>撤回</strong>本小节初稿的「金刚石」】，
+      (i) 段写「<strong>金刚石结构与 §4.9 引理 1 不相容</strong>，简单立方通过」。
+      第 27 轮那个「金刚石」是<strong>初稿</strong>，<strong>第 30 轮 T-6 裁决已撤回</strong>。
+      ⚠️ 而且 <strong>(g) 算的 6-正则正是简单立方 = 现行几何</strong> ⟹ <strong>(g) 早已覆盖它</strong> ⟹ 那一档<strong>没有对象</strong>。
+    ✅ <strong>规范（三条）</strong>：
+      ① <strong>先读该词所在小节的标题</strong> —— 标题往往直接写死了定案（本处连轮次都写了）；
+      ② <strong>反向检索撤回标记</strong>：<code>撤回</code> / <code>作废</code> / <code>withdrawn</code> / <code>incompatible</code> / <code>不成立</code> / <code>已解除</code>
+         —— 与目标词<strong>同行或同段</strong>出现就要停下来读全文；
+      ③ <strong>两列法</strong>（陷阱 20/22）：把目标词在<strong>底本</strong>里的每一处上下文都打印出来<strong>逐条分类</strong>
+         （「现行陈述」vs「撤回/作废提及」vs「并列对照」），<strong>不要只数个数</strong>。
+    📌 <strong>判据问句</strong>：<strong>「我引用的这个词，有没有『撤回』标记？它所在小节的标题写的是什么定案？」</strong>
+    ⚠️ <strong>与陷阱 46/47/65 同族、层次不同</strong>：那几条是「把<strong>新写的字</strong>当旧文本」（自指）；
+      本条是「把<strong>旧的废稿</strong>当现状」（<strong>检索方向相反，失败方式相同</strong>）——
+      共同病根 = <strong>只做了一次关键词检索就下结论</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐ 「审计轮」的规范动作：撤回链的</strong>依据等级<strong>审计（第 84 轮建立 —— 用户要求「先不要推进，彻底检查已有内容的冲突和验证」）</strong>：
+    <strong>触发</strong>：用户说「别推进了 / 先检查 / 有没有前后矛盾 / 会不会有对的结论被后来算错」，
+      或你自己怀疑某条<strong>后期更正</strong>可能推翻了一个<strong>本来正确</strong>的结论。
+    <strong>做法 = 审计六问</strong>（对每一条「撤回 / 更正 / 判否」依次问）：
+      ① <strong>结论反转</strong>？ 同一命题在不同轮次有相反陈述吗？
+      ② ⭐ <strong>依据等级</strong>？ 推翻它用的东西是【<strong>定理</strong>】还是【<strong>设定</strong>】/【<strong>结构论证</strong>】？
+         （<strong>第 84 轮新增，也最重要</strong>：此前只问「依据是否现役」，没问「依据有多硬」。）
+         📌 <strong>判据</strong>：<strong>用【设定】推翻【设定】不是推导，是换一个设定</strong> ⟹ 这类判决只能标【判定 / 读法选择】，
+           <strong>不得</strong>写成【定理】或「某步不成立」。实例：§8.6.8 (i) 声称 T-6 有「三条独立依据」，
+           三条<strong>无一是定理</strong>（论证 4 =【结构论证】、引理 1 =【本框架设定】），唯一严格的定理（LST/Borsuk）
+           给的是 <code>k ≥ 4</code>、<strong>不是配位数 6</strong>。
+      ③ <strong>依据现役</strong>？ 依据<strong>本身</strong>后来被更正/撤回了吗？（<strong>C-33 的教训</strong>：第 82 轮用「已撤回的金刚石」做前提。）
+      ④ <strong>派生量扫全</strong>？ 同处的比值/差值/百分比改了吗？（<strong>C-26 的教训</strong>：改了 6224→6334 却漏改 5.93。）
+      ⑤ <strong>下游同步</strong>？ 引用这条结论的地方改了吗？（<strong>C-35 的教训</strong>：§4.8 正文仍写「q=4（唯一）」而第 32 轮已撤回。）
+      ⑥ <strong>术语撞车</strong>？ 同一符号/词在不同章节含义不同吗？（C-15 <code>λ</code>／C-16 <code>ε</code>／C-21 <code>ρ</code>／C-32 <code>N</code>／<strong>C-34「卷曲」</strong>。）
+    ✅ <strong>产出规范</strong>：审计轮<strong>也可以产出"确认没错"</strong> —— 第 84 轮的主要安心结果是
+      <strong>「4（信息方向）vs 6（几何邻居）不是硬冲突」</strong>（第 31–32 轮已处理）。
+      ⚠️ <strong>这一步极重要</strong>：若把它误判为冲突并「更正」，就会<strong>制造一个新的 C-33</strong>。
+      ⟹ <strong>审计的产出不一定是「发现了错」，也可能是「确认了没错」，而后者常更重要</strong>
+        （它挡住的是<strong>我可能做出的又一次错误更正</strong>）。
+    📌 <strong>扫描面（脚本化）</strong>：① 论文里含「撤回/已解除/作废/降为/已排除/不成立」的<strong>全部行</strong>（第 84 轮 = 39 行）；
+      ② 清单总账的 <strong>C-xx / N-xx 全编号</strong>；③ <strong>10 组关键量的多处一致性</strong>（看是否带「更正前/后」并列）。
+    ⚠️ <strong>第 84 轮踩到的实现坑</strong>：把<strong>正则模式</strong>当<strong>字面子串</strong>用（<code>all_hits(r"0\.4334")</code> 永远匹配不到）
+      ⟹ <strong>静默返回 0 处</strong>，看起来像"论文里没有这个数"。✅ 子串匹配就直接给字面串，别带转义反斜杠。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 审计面必须包含「</strong>备忘录族<strong>」，不能只读论文</strong>（第 85 轮 <strong>C-37</strong>，<strong>真的因此写错了论文</strong>）：
+    <strong>触发</strong>：做「审计轮」（陷阱 76 的六问），或任何「这条结论的依据是什么」的追溯。
+    <strong>坑（实测）</strong>：第 84 轮我<strong>只读论文</strong>审 T-6，得出两条<strong>过苛</strong>结论 ——
+      ① 说「(i) 段把<strong>对接</strong>说成<strong>判别</strong>」（其实第 31 轮 RC-5 是<strong>精确枚举</strong>，数学，形式有效）；
+      ② 说「<strong>两条读法对等</strong>」并<strong>恢复了第 27 轮读法的地位</strong>（其实第 27 轮<strong>自承</strong>那一步是
+         「<strong>本轮结论唯一依赖的外来步骤</strong>」，第 28 轮 FC-7(a) <strong>专门审查后判定其支撑不成立</strong>）。
+      ⚠️ 这两条<strong>已写进论文</strong>（中英同步）⟹ 不追加一轮就更正，论文里会留下<strong>一处错误的「恢复」</strong>。
+    <strong>为什么漏</strong>：论文里<strong>根本没有</strong>这些记录 —— 实测 <code>外来步骤</code> <strong>0 处</strong>、<code>FC-7</code> <strong>0 处</strong>、<code>UQ-5</code> <strong>0 处</strong>
+      （第 27 轮自承的 gap、第 28 轮 FC-7a、第 38 轮 UQ-5 <strong>都只写在备忘录里</strong>）。
+    ✅ <strong>规范三条</strong>：
+      ① <strong>审计面 = 论文 ＋ 备忘录族（<code>outputs/*.md</code>）＋ 清单</strong> —— 缺一不可；
+      ② 凡「这条结论的依据」，<strong>先在备忘录里 grep 它的轮次编号与方案编号</strong>（<code>FC-7</code>/<code>RC-5</code>/<code>UQ-5</code> 之类）；
+      ③ 特别检查<strong>论文声称的「N 条独立依据」</strong>：论文往往只写 3 条，备忘录里可能 4–5 条
+         （含<strong>一致性检查</strong>，后者<strong>不是独立依据</strong>，不应计入）。
+    📌 <strong>判据问句</strong>：<strong>「这条结论的 gap，是不是只记在备忘录的诚实边界表里？」</strong>
+    ⚠️ <strong>漏的方向是系统性的</strong>：gap 类信息<strong>倾向只写在备忘录的诚实边界表</strong>（论文正文写"结论"、
+      备忘录写"边界"）⟹ 只读论文会<strong>系统性地把「有 gap 的结论」看成「没 gap 的结论」</strong>。
+    ⭐ <strong>讽刺之处值得记住</strong>：第 84 轮<strong>正是为防「把正确的撤回说成错的」而做的</strong>，
+      结果<strong>它自己犯了反向的同类错误</strong>。⟹ <strong>审计也要审计自己</strong>：审计结论<strong>准备写进论文</strong>前，
+      <strong>先按本条再核一遍备忘录</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 数值类结论</strong>必须带「口径三件套」<strong>；审计「结论是否被后期写错」要</strong>按同一量的全部算例排表**（第 86 轮 <strong>C-39 / C-40</strong>，<strong>本轮真的抓到一处「后期把早期对的结论写反」</strong>）：
+    <strong>触发（两种）</strong>：
+      (a) 你要在论文里写一个数值结论（或引用一个算例的数值）；
+      (b) 你要审计「某个结论有没有被后期的一轮写错」。</p>
+<p><strong>坑（实测，(b) 的那种）</strong>：论文 §4.8 的<strong>第 78 轮块</strong>写
+  「H/N ≈ 0.433 ≫ 0.25 ⟹ <strong>面积律在能算的格点上不成立</strong>」——
+  而 <code>0.433</code> 只来自 <strong>(2,2,L) 系列</strong>，该族含 <strong>2 个长度为 2 的「退化方向」</strong>；
+  <strong>无退化</strong>的算例 <strong>(4,4,4) = 0.1839</strong>、<strong>(6,6,6) = 0.0779</strong> 是<strong>第 48 / 49 轮就已算出</strong>的，
+  <strong>都 &lt; 0.25（面积律成立）</strong>，且第 51 轮论文里早写着「(4,4,4) 的 0.1839 是<strong>满足</strong>」。
+  ⟹ <strong>后期的一轮把早期正确的结论写反了</strong>（而且是写成了更“负面”的那个方向）。</p>
+<p>✅ <strong>规范（数值类结论的「口径三件套」）</strong>：报任何数值前，先问三件事 ——
+  ① <strong>哪个算例 / 哪个族</strong>？（本处：(2,2,L) 家族 ⟹ <strong>有 L=2 退化方向</strong>）
+  ② <strong>该族是不是有系统性伪影</strong>？（本处的伪影机制 = <strong>线长为 2 的环上两种完美匹配重合 ⟹ σ_j = 恒等</strong>，
+     该方向不贡献群元素 ⟹ 轨道更小 ⟹ H/N 更大；<strong>只有 L = 2 如此</strong>，L = 4/6/8 逐项验证不重合）
+  ③ <strong>物理上对应哪一族</strong>？（本处：真实宇宙格点尺寸 ≫ 2 ⟹ 对应<strong>无退化</strong>那一组）</p>
+<p>✅ <strong>规范（审计做法）</strong>：<strong>把同一量的「全部算例」排成一张表</strong>（本轮 15 个），再按可疑变量分组。
+  本轮一列表就看出来：<strong>按「退化方向数」二分，两组完全分离</strong>（≥2：0.4334–0.5307；≤1：0.0779–0.2834，空隙 (0.2834, 0.4334)）
+  ⟹ <strong>主控变量是「退化方向数」（数值伪影），不是 N</strong>。
+  ⚠️ 只读「最后一条结论句」会<strong>完全看不到</strong>这件事 —— 而第 78 轮正是这么写的。</p>
+<p>📌 <strong>判据问句（两条）</strong>：
+  · 「<strong>我报的这个数，属于哪个族？那个族有系统性伪影吗？物理上对应它吗？</strong>」
+  · 「<strong>这个量的全部算例排出来是什么样？</strong>」（<strong>列表 ＞ 读结论句</strong>）</p>
+<p>⚠️ <strong>附带知识（可复用）</strong>：<strong>「归纳出的判据」要补机制</strong> —— 第 48 轮把判别量记作「长度为 2 的方向数」
+  并注明「是 8 个算例上<strong>归纳</strong>出来的」；本轮补上了组合机制（L=2 ⟹ σ_j = 恒等），
+  从此它不再是归纳，而是<strong>可逐项验证的事实</strong>。</p>
+<p>⚠️ <strong>同族新形态（C-40）</strong>：<strong>「两组分离」≠「阈值在两组之间」</strong> ——
+  第 48 轮写「两组完全分离、<strong>0.25 落在空隙里</strong>」，而空隙是 (0.2834, 0.4334)、<strong>0.25 &lt; 0.2834</strong>
+  ⟹ 0.25 其实在<strong>组内</strong>（跨点 N ∈ (32, 48)，第 49 轮已给出）。
+  ⟹ <strong>报「落在空隙里」之前，先把两个组的上下界与阈值三者排大小。</strong></p>
+<p>⚠️ <strong>同块内部一致性检查（最便宜的一招）</strong>：第 78 轮的<strong>结论句</strong>与<strong>同一块的诚实边界</strong>
+  （「只算了 (2,2,L) …… 结论<strong>不外推</strong>」）<strong>自相矛盾</strong> —— 这类矛盾<strong>不用跨块比对</strong>就能发现。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 拟合标度律前</strong>先按「主控变量」分组<strong>；</strong>混合族的幂指数不得外推**（第 87 轮 <strong>C-41</strong>，直接兑现第 86 轮的审计发现）：
+    <strong>触发</strong>：要在若干算例上拟合 <code>Y = C·N^p</code>（或任何幂律/标度律），并打算用它<strong>外推</strong>。</p>
+<p><strong>坑（实测）</strong>：论文 §4.8 第 50 轮的 <code>h_min</code> 标度律 <code>C = 3.01、p = −0.6762</code>（<strong>9 个 GAP 点</strong>、N ∈ [32,216]）
+  把<strong>两族混在一起</strong>拟合了；而第 86 轮已证「<strong>退化方向数</strong>」是主控变量。本轮重做：</p>
+<table>
+<thead>
+<tr>
+<th>组</th>
+<th>点数</th>
+<th>拟合</th>
+<th>最大残差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A（退化方向 ≥ 2）</td>
+<td>4</td>
+<td><code>0.2265·N^{+0.2051}</code></td>
+<td>0.6%</td>
+</tr>
+<tr>
+<td>B（≤ 1，<strong>物理对应</strong>）</td>
+<td>8</td>
+<td><code>3.0887·N^{−0.6836}</code></td>
+<td>2.2%</td>
+</tr>
+<tr>
+<td><strong>混合</strong>（全部 N ≥ 32，12 点）</td>
+<td>12</td>
+<td><code>11.1033·N^{−0.9326}</code></td>
+<td><strong>56.7%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⭐⭐ <strong>两组指数符号相反</strong>（A 的 p = <strong>+0.205 &gt; 0</strong>，H/N 随 N <strong>上升</strong>；B 的 p = <strong>−0.684 &lt; 0</strong>）
+  ⟹ <strong>混拟合＝把一条上升曲线与一条下降曲线拼起来</strong>，得到的 p <strong>既不是 A 的也不是 B 的</strong>。</p>
+<p>✅ <strong>规范（拟合四件套）</strong>：
+  ① <strong>先分组</strong>：找出主控变量（本处 = <strong>退化方向数</strong>），按它分组<strong>分别拟合</strong>；
+  ② <strong>同窗口</strong>：各组用<strong>同一 N 窗口</strong>（本处 N ≥ 32）—— 否则残差没有可比性（组 A 全窗口残差 7.9%，因为 N ≤ 24 段有<strong>浅谷</strong>）；
+  ③ ⭐ <strong>留一外推检验</strong>（<strong>最便宜的判据</strong>）：只训练 <strong>N ≤ 96</strong>、预测 <strong>N = 216</strong>（组 B：<strong>+1.7%</strong>；混合：<strong>−12.6%</strong>）
+     ⟹ <strong>组 B 好约 7 倍</strong> ⟹ 这是<strong>可判定的</strong>，不是口味问题；
+  ④ ⭐ <strong>样本外新点</strong>：另算一个<strong>不参与拟合</strong>的点（本处 <strong>(4,4,6) N=96 = 0.1333</strong>，组 B 预测 0.1364，<strong>−2.3%</strong> ✓）
+     ⟹ 比样本内残差更有力。</p>
+<p>📌 <strong>判据问句（三条）</strong>：
+  · 「<strong>这些点属于同一族吗？主控变量是什么？</strong>」
+  · 「<strong>离群的那些点，是不是有系统性伪影？</strong>」（本处 = <strong>L=2 退化方向</strong>）
+  · 「<strong>这个幂指数外推出去，换一组点会不会差很多？</strong>」（本处：<strong>同一条链的两种混合方式相差 19 个数量级</strong>）
+⚠️ <strong>报幂律的最小配置</strong>：<strong>公式 ＋ 点数 ＋ N 窗口 ＋ 最大残差 ＋ 分组判据</strong>。缺任一项都会让下游无法复核。</p>
+<p>⚠️ <strong>附带教训（第 87 轮踩到）</strong>：<strong>「未记录用了哪些点」的拟合无法复核</strong> ——
+  第 50 轮只写「9 个点」，没写是哪 9 个 ⟹ 我只能用「全部 N ≥ 32」重做。
+  ⟹ <strong>凡是会进入论文的拟合，必须把点集写进脚本输出</strong>（或明确列出格点表）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「改函数」要问「谁在内部调它」—— 只修直接调用点 = 假修复</strong>（第 87 轮<strong>实测翻车两次</strong>）：
+    <strong>触发</strong>：你发现某个老函数有 bug（或某个老模块有已知坑），而新脚本复用了它。</p>
+<p><strong>坑（实测，本轮真的跑挂）</strong>：大格点 <code>(4,4,8)</code> 的 GAP 输出里 <code>|G|</code> 有 <strong>108 位十进制</strong>，而 GAP 对<strong>超长整数会自动折行</strong>
+  （第 49 轮查出、第 87 轮首次真触发）⟹ 逐行解析 <code>int(ln.split()[1])</code> 抛 <code>IndexError</code>。
+  第 87 轮<strong>确实</strong>写了一个折行安全的 <code>orbit_via_gap_safe</code>，<strong>并且用它跑探针成功了</strong>（<code>|G|</code> 108 位、<code>|Stab|</code> 正常打印）——
+  <strong>但采样那一步挂了</strong>：<code>hn_stats()</code> 是<strong>复用第 48 轮</strong>的老函数，它<strong>自己内部去调</strong>老版 <code>orbit_via_gap</code>
+  ⟹ 修复<strong>根本没被走到</strong>，采样阶段原样踩回同一个坑。</p>
+<p>✅ <strong>规范（三问，缺一不可）</strong>：
+  ① <strong>谁在内部调它？</strong> 用 <code>grep -n "&lt;函数名&gt;\s*("</code> 把<strong>定义处、直接调用处、间接（被别的函数内）调用处</strong>三类都列出来；
+  ② <strong>修复是打在「调用点」还是「被调函数」上？</strong> —— <strong>优先改被调函数本体</strong>，或<strong>重绑全局名</strong>：
+     <code>globals()["orbit_via_gap"] = orbit_via_gap_safe</code>（Python 函数体对全局名的查找是<strong>运行时</strong>的，
+     所以老函数 <code>hn_stats</code> 会拿到重绑后的版本）；
+  ③ <strong>改完必须跑「真实入口」，不能只跑「探针」</strong> —— 本轮探针过了、采样没过，正是因为两者走的不是同一条路径。</p>
+<p>📌 <strong>判据问句</strong>：「<strong>我这次修复，覆盖了所有会执行到这段代码的路径吗？</strong>」
+  —— 尤其当「老函数 + 新脚本」混用时；<strong>复用别人的函数 = 连带继承它的 bug</strong>。</p>
+<p>⚠️ <strong>同族形态（可一并自查）</strong>：<code>_gap.py</code> 里其实早有<strong>规范版</strong> <code>orbit_sizes_via_gap</code>
+  （它还额外调了 <code>SetPrintFormattingStatus("*stdout*", false)</code> <strong>从源头关掉折行</strong>）——
+  <strong>手搓内联版就把这个保险漏掉了</strong>。⟹ 判据：「<strong>这个能力是不是现成模块里已经有了？</strong>」
+  （与「先查现成模块，别重写」同一条，见下方「工具」节。）</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「外推误差更小」不是判别性检验 —— 样本外点必须「足够远」</strong>（第 87 轮补 <strong>C-42</strong>，<strong>实测把一个自己刚写下的判据推翻</strong>）：
+    <strong>触发</strong>：你用「留一外推 / 样本外新点」去比较<strong>两个模型</strong>（两条标度律、两种口径、两组点集）谁更好。</p>
+<p><strong>坑（实测）</strong>：第 87 轮把判据写成「<strong>组 B 的外推误差 &lt; 混合的外推误差</strong>」——
+  在 <strong>N = 216</strong> 上成立（组 B <strong>+1.7%</strong> vs 混合 <strong>−12.6%</strong>），于是当成「可判定的改进」。
+  <strong>本轮把同一判据挪到 N = 128</strong>（同一训练窗口 N ≤ 96）⟹ <strong>结论翻转</strong>：
+  组 B 预测 <strong>0.1116</strong>（误差 −1.2%），<strong>混合预测 0.1093（误差 +0.9%，反而更准）</strong>。
+  ⟹ <strong>「谁的外推误差小」根本不是判据</strong>，它只是在<strong>距离训练窗足够远</strong>的点上碰巧成立。
+  ⚠️ 更隐蔽的是：<strong>那个点自己的偏差看起来还挺小</strong>（−1.2%）—— 只看「误差百分比」<strong>完全看不出来它判不了</strong>。</p>
+<p>✅ <strong>正确判据（可计算，一句话）</strong>：
+  设两模型在样本外点 N 上的预测之差为 <code>Δ</code>、该点的<strong>测量误差</strong>为 <code>σ_meas</code>
+  ⟹ <strong>只有当 <code>Δ / σ_meas ≥ 2</code> 时，该点才有判别力</strong>；否则该点<strong>什么也判不了</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>目标点</th>
+<th>距训练窗末端</th>
+<th><code>Δ</code></th>
+<th><code>σ_meas</code></th>
+<th>判别力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N = 128</td>
+<td>1.33×</td>
+<td>0.0023</td>
+<td>0.0021</td>
+<td><strong>1.09σ ⟹ 不可分</strong></td>
+</tr>
+<tr>
+<td>N = 216</td>
+<td>2.25×</td>
+<td>0.0142</td>
+<td>0.0037</td>
+<td><strong>3.83σ ⟹ 可分</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>判别力 ∝ 样本外点到训练窗口末端的距离</strong> —— 选点前先估一句「这个距离够不够」。</p>
+<p>📌 <strong>判据问句（两条）</strong>：
+  · 「<strong>这两个模型在这个点上的预测，差得比这个点的误差大吗？</strong>」（<code>Δ/σ ≥ 2</code>？）
+  · 「<strong>这个样本外点离训练窗末端有多远？</strong>」（&lt; 1.5× 基本别指望能分开）</p>
+<p>⚠️ <strong>报数的最小配置（在第 79 条「公式＋点数＋窗＋残差＋分组判据」之上再加两项）</strong>：
+  <strong>该点到训练窗的距离</strong> ＋ <strong><code>Δ/σ_meas</code></strong>。缺这两项，审稿人无法判断这个点是否有判别力。</p>
+<p>⚠️ <strong>一句话总结</strong>：<strong>「验证了模型自身的预测」≠「判定模型优于竞争对手」</strong> ——
+  前者只要预测落在 2σ 内即可，<strong>门槛低得多</strong>；写结论时<strong>不许把前者写成后者</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「同一命题跨章节一致性」审计：七类判据陷阱</strong>（第 88 轮 <strong>C-43</strong>；<strong>一轮之内我在同一类错误上连犯六次</strong>）：
+    <strong>触发</strong>：做「同一命题在不同章节表述是否一致」的审计（用户说「检查有没有前后矛盾」时的高频形态）。
+    <strong>做法（三段，缺一不可）</strong>：
+      ① <strong>命题台账</strong>：给每条命题建「出现点台账」 = (行号, <strong>正文 or 轮次块</strong>, 该行里该量的值, 上下文片段)
+         —— 矛盾就藏在这个<strong>二维表</strong>里（数值 × 位置）；
+      ② <strong>反转方向做全量检测</strong>：从<strong>全文带更正标记的行</strong>里抽「<strong>左侧旧值</strong>」，再查旧值是否<strong>裸留在正文</strong>；
+      ③ <strong>标签一致性</strong>：<code>框架独有 / 硬预测 / 可检验 / 完成度</code> 这类<strong>标签</strong>是否都带得起（陷阱 50 的全量版）。</p>
+<p>⚠️ <strong>六类判据陷阱（全部实测、全部产生过假 FAIL）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>陷阱</th>
+<th>实测</th>
+<th>正确判据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><strong>裸数字串不是「值」的判据</strong></td>
+<td>用裸串 <code>148</code> 查「旧值是否裸留」⟹ 命中 <code>3.138–3.148</code>（<strong>区间写法</strong>）的尾三位</td>
+<td>要求 <strong>≥ 4 字符</strong> ＋（含小数点／4 位以上整数／科学计数），<strong>排除年份</strong></td>
+</tr>
+<tr>
+<td>②</td>
+<td><strong>数字子串判据会误命中</strong></td>
+<td><code>0.04</code> ⊂ <code>0.0493</code>；<code>1.00</code> ⊂ <code>α=1</code></td>
+<td>加<strong>非数字边界</strong> <code>(?&lt;![0-9.])…(?![0-9])</code>，或先证明它是<strong>独立记号</strong></td>
+</tr>
+<tr>
+<td>③</td>
+<td>⭐ <strong><code>X → Y</code> 不一定是更正，也可能是「序列／递进」</strong></td>
+<td><code>0.4679 → 0.4335 → 0.4334 → 0.4617</code> 是 <strong>N=8→16→24→32 的曲线</strong>；<code>0.4335 → 0.4334</code> 是 <strong>N=16 vs N=24</strong>（原文写「N=16 → 24 几乎饱和」）</td>
+<td>抽「更正对」前先问：<strong>两侧是同一命题的两个时间版本，还是同一曲线上的两点？</strong> 前者才叫更正</td>
+</tr>
+<tr>
+<td>④</td>
+<td>⭐ <strong>表格行会被拆成多行</strong></td>
+<td>§9 的 <code>S-C1</code> / <code>S-E1</code> 行，<code>⚠️ 第 61 轮加注</code> 写在<strong>续行</strong>上 ⟹ 我第一遍误判为「§9 表未同步」</td>
+<td>判据取<strong>行 ＋ 续行</strong>（<code>" ｜ ".join(L[i-1:i+2])</code>）</td>
+</tr>
+<tr>
+<td>⑤</td>
+<td><strong>同名条目定位错位</strong>（陷阱 73 的新形态）</td>
+<td><code>[…if "S-C1" in s][0]</code> 取到的是<strong>轮次块里的 S-C1</strong>，不是 §9 表格行</td>
+<td>锚定<strong>结构前缀</strong>（<code>s.startswith("\| &lt;strong&gt;S-C1&lt;/strong&gt; \|")</code>），并打印「另有 N 处同名在块里」</td>
+</tr>
+<tr>
+<td>⑥</td>
+<td><strong>判据太粗会撞上别的小节号</strong></td>
+<td>用 <code>"§10" in s</code> 判「§1 是否引用 §10.1」⟹ 被 §1 里的 <strong>§10.2</strong> 命中</td>
+<td>交叉引用判据<strong>精确到小节号</strong>（<code>§10.1</code> ≠ <code>§10</code>）</td>
+</tr>
+<tr>
+<td>⑦</td>
+<td>⭐ <strong>「按行号区间取内容」的判据会被同一轮的补丁移位</strong></td>
+<td>核验脚本写 <code>1945 &lt;= k &lt;= 1959</code> 取 §10.2 的 13 条，而<strong>本轮补丁往 §10.1 插了 6 行</strong> ⟹ 区间只剩 <strong>6</strong> 条 ⟹ 假 FAIL</td>
+<td><strong>结构定位</strong>：从标题行扫到<strong>下一个同级标题</strong>（<code>def section(lines, head, level)</code>），<strong>永不按行号区间取内容</strong></td>
+</tr>
+</tbody>
+</table>
+<p>📌 <strong>一句话通则</strong>：<strong>「检索到一个数字」≠「那个数字在那个位置表示那个量」</strong> ——
+  一致性审计里，<strong>每个判据都要先证明「我把它当什么用」</strong>（区间？序列？更正？同名？小节？）。</p>
+<p>⚠️ <strong>审计的第二种产出（同样重要）</strong>：<strong>「确认了没错」</strong> ——
+  本轮 <strong>11 个已知被更正的数值全部带标记、未同步残留 = 0</strong>。
+  它挡住的是<strong>我可能做出的又一次错误「更正」</strong>（陷阱 76 已述，本轮再次兑现）。
+  ⟹ 报审计结果时，<strong>「通过」与「发现」要并列写，不许只写后者</strong>。</p>
+<p>⭐ <strong>真正翻出问题的那一格是「定性自评」</strong>（<strong>C-43</strong>）：<strong>「完成度 ~90%」是全文唯一的定量自评，
+  也是全文唯一没有度量的数</strong>，且与同章 §10.2 的 13 条开放问题（5 条未闭合）、
+  上章 §9 表 25 行里的 5 行「❌/张力/待推导/判别中」、§1 的「非已确立物理」（相距 1895 行、
+  只指向 §10.2 不指向 §10.1）<strong>三处不相容</strong>。
+  ⟹ <strong>判据形态</strong>：<strong>「数值层查干净了，就去查定性层」</strong> ——
+  <strong>口径缺失（C-20/C-28/C-41 族）不只发生在数字上，也发生在「百分比式的自评」上</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 溯源审计：「某轮有没有备忘录」不是个能一句话回答的问题</strong>（第 89 轮 <strong>C-44</strong>；<strong>同一问题四种判据四个答案</strong>）：
+    <strong>触发</strong>：做「备忘录 → 论文」的反向核对，或任何需要<strong>按轮次</strong>检索备忘录族的操作。</p>
+<p>⚠️ <strong>实测（本轮）</strong>：问「39–88 里哪几轮没有备忘录」——
+  | 判据 | 「无备忘录」的轮次数 | 清单 |
+  |---|---|---|
+  | 全文任意位置（最宽） | <strong>2</strong> | 64, 79 |
+  | 头部前 6 行（<strong>含标题</strong>） | <strong>3</strong> | 59, 64, 79 |
+  | 头 1–10 行（<strong>跳过标题</strong>） | <strong>4</strong> | 59, 64, 79, 83 |
+  | 专用声明式（最严） | <strong>16</strong> | 59,60,61,62,63,64,65,66,67,70,71,72,73,75,79,83 |
+  ⟹ <strong>判据一变，结论就变</strong> —— 因为<strong>轮次标识至少有 6 种写法</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>形</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td><code>&gt; 第 67 轮备忘录 ｜ 日期 ｜ …</code></td>
+</tr>
+<tr>
+<td>B</td>
+<td><code>&gt; &lt;strong&gt;日期&lt;/strong&gt;：…（第 43 轮）</code></td>
+</tr>
+<tr>
+<td>C</td>
+<td><code>&lt;strong&gt;轮次&lt;/strong&gt;：第 60 轮（工作流第 1 批 1.1）</code></td>
+</tr>
+<tr>
+<td>D</td>
+<td><code>&gt; &lt;strong&gt;第 68 轮&lt;/strong&gt;（日期）。核验脚本 …</code></td>
+</tr>
+<tr>
+<td>E</td>
+<td><code>&gt; 第 65 轮讨论纪要 ｜ 日期 ｜ …</code></td>
+</tr>
+<tr>
+<td>F</td>
+<td><code>&gt; 第 78 轮 ｜ 工作流 &lt;strong&gt;3.1&lt;/strong&gt; ｜ 核验脚本 …</code></td>
+</tr>
+</tbody>
+</table>
+<p>✅ <strong>规范（三条，缺一不可）</strong>：
+  ① <strong>报结论必须同时报判据</strong>：「<strong>窗口多宽 / 跳不跳标题 / 认哪些格式</strong>」—— 否则不可复核；
+  ② <strong>跳过 H1 标题行</strong>：标题里的轮次是「<strong>提到</strong>」而不是「<strong>是</strong>」。
+     ⭐ 三例实测（第 10 类陷阱）：<code>h能否被可观测量定出…且第 26 轮一处数值需修正</code> ⟹ 旧判据归给<strong>第 26 轮</strong>（正确 <strong>43</strong>）；
+     <code>…第 83 轮已撤回</code> ⟹ 归给 <strong>83</strong>（正确 <strong>82</strong>）；<code>审计面的漏洞：第 84 轮两处…</code> ⟹ 归给 <strong>84</strong>（正确 <strong>85</strong>）。
+  ③ <strong>「备忘录」要排除索引类文档</strong>：<code>工程期望清单</code> / <code>环境交接说明</code> / <code>未完成研究工作流</code> / <code>本轮推演总结</code>
+     <strong>不是备忘录</strong> —— 本轮把它们算进去，导致第 79 轮被误判为「并入其他轮备忘录」。</p>
+<p>⚠️ <strong>第 8 / 9 类判据陷阱（与 82 的七类合起来共十二类）</strong>：
+  <strong>⑧ 行号 / 条目号不是「值」</strong> —— <code>L1918</code>、<code>_refs_67.md</code> 的 <code>1278 / 1280 / 1300 / 1303 / 1344</code> 被当成
+    「物理值」去论文里找 ⟹ 当然 0 处 ⟹ 整段输出被噪声占满。<strong>判据：值必须是 A 档（含小数点 / 科学计数）
+    或带「非数字边界」且不在 <code>a / b / c</code> 编号串里的 B 档。</strong>
+  <strong>⑨ 检测窗口大小会改变结论</strong> —— 同一判据取前 300 / 600 / 1500 / 全文 ⟹ 命中 <strong>47 / 47 / 47 / 49</strong>。
+  <strong>⑪ ⭐⭐ 本轮自己的文档会污染检索</strong>（<strong>自指污染</strong>，第 89 轮实测）——
+    本轮写的审计备忘录里<strong>引用了四个待查脚本名</strong>，于是「第 64 / 79 轮有没有备忘录」的答案
+    <strong>被我自己刚写的文件改掉了</strong>。
+    ✅ <strong>判据：审计必须在「不含本轮产物」的语料上跑</strong> —— 显式排除<strong>本轮自己的备忘录</strong> ＋
+    对本轮<strong>将要修改</strong>的每一份文件<strong>改用补丁前备份</strong>（本轮为此换了 2 份：第 59 / 第 82 轮的备忘录）。
+  <strong>⑫ ⭐ 代码前缀也会被子串误命中</strong>（第 88 轮的「数字子串」发生在<strong>代码层</strong>的版本）——
+    <code>re.findall(r"C-(\d+)")</code> 会把 <strong><code>RC-1…RC-9，9 项 0 失败</code></strong> 里的 <strong><code>C-9</code></strong> 当成更正编号 ⟹
+    造出一个<strong>幽灵缺口 C-9</strong>（并让 V-5c 连错三次）。
+    ✅ <strong>判据：代码要加「前面不是字母」</strong>（<code>(?&lt;![A-Za-z])C-(\d+)</code>）；⚠️ 同理 <code>N-</code> / <code>R-</code> 也会与 <code>RC-</code> / <code>MR-</code> 撞。
+  📌 <strong>⑫ 的连带教训（台账计数）</strong>：报「共 N 条」前要先定<strong>属于哪一族</strong> ——
+    清单的 <strong>44 个连续编号</strong>里，<strong>C-1 的处置列是「修正」而非「撤回 / 更正」</strong>
+    ⟹ 撤回/更正族 = <strong>44 − 1 = 43</strong>，与声明一致。<strong>「编号总数」≠「某族条目数」</strong>。</p>
+<p>⚠️ <strong>实际缺口的处置原则（本轮定）</strong>：<strong>不伪造历史</strong> ——
+  第 64 轮（宇宙模拟器，<code>_universe_sim_64.py</code>）与第 79 轮（<code>_hmin_quote_79.py</code> / <code>_clean_quotes_79.py</code>）
+  <strong>确实没有备忘录</strong>；<strong>不要事后补写一份「像当时写的」</strong> —— 那会让「第 N 轮的产物」与「当时实际算的」脱钩。
+  ✅ 正确做法：<strong>登记缺口 ＋ 写明取证位置（论文块 / 清单行）＋ 补 ID（若备忘录存在只是没标）</strong>，
+  并把「<strong>新备忘录头部必须带轮次 ID</strong>」（统一形 D：<code>&gt; &lt;strong&gt;第 N 轮&lt;/strong&gt; ｜ 日期 ｜ 核验脚本</code>）定为规范。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「预测表」必须逐行带四类判定；且「表里的行数」≠「独立出口数」</strong>（第 90 轮 <strong>C-45</strong>）：
+    <strong>触发</strong>：写/审「可检验预言」表，或引用「框架有几条可检验预言」这类数字。</p>
+<p>⚠️ <strong>实测（本轮）</strong>：论文 §9 表 <strong>23 行</strong>，而<strong>第 37 轮定的四类判定（真预言 / postdiction / 半拟合 / 失败）
+  在全文的覆盖率只有 13%</strong>（含「预言」的 60 行里仅 8 行标了）。逐行补标后：
+  <strong>真预言 11 ｜ 推导/数值 3 ｜ 未定量 2 ｜ 失败 2 ｜ postdiction 2 ｜ 半拟合 1 ｜ 真预言（不可测）1 ｜
+  解释性（判别力 0）1</strong>。</p>
+<p>⭐⭐ <strong>最关键的一条（此前</strong>任何地方都没写过<strong>）</strong>：
+  <strong>「真预言」11 条里，EMRI 系（S-E1–S-E4）四项同源</strong> —— 全都来自 <code>δ = 0.30·x_p</code> <strong>一个关系</strong>
+  ⟹ <strong>按「独立出口」计 = 1 条</strong>（与第 61 轮「观测出口 = 1 条」一致）。
+  ⟹ 📌 <strong>规范：报「出口数 / 预言数」之前，先问「这些行是不是同一个关系的不同侧面？」</strong> ——
+    <strong>表格的行数是排版单位，不是成果单位</strong>。⚠️ 这是本项目<strong>反复出现的同一个病</strong>的新形态：
+    把「行数」当「条数」（与 C-19「清单标记失真」、C-18「§七 不是台账」同族）。</p>
+<p>⚠️ <strong>两条必要补充档</strong>（四类之外，实测必须有，否则半数行无处可放）：
+  · <strong>未定量</strong>：「理论可算、数值待推导」「只写定性预言」⟹ <strong>没有可算的数</strong> ⟹ 无法检验；
+  · <strong>推导 / 数值</strong>：「2+1D 格点严格结果」「钳制物态微观推导」⟹ 是<strong>模型结果</strong>，不是对自然的预言。</p>
+<p>🐞 <strong>表格结构检查（两处真破损，本轮修）</strong>：
+  ① <strong>表格单元里的裸竖线</strong>：§9 第 9 行写了 <code>|G|²</code> ⟹ 被 markdown 当成列分隔符 ⟹ <strong>拆成 6 列</strong>。
+     ⚠️ 陷阱 11 只说了「表格<strong>外</strong>直接写 <code>|G|</code>」；<strong>表格内必须写 <code>\|G\|</code></strong>。
+  ② <strong>残行</strong>：S-C1 行<strong>跨三行</strong>（2 / 2 / 3 列）⟹ 渲染成三个残行。<strong>表格行必须一行结束</strong>。
+  ✅ <strong>自检</strong>：对区间内<strong>每个</strong>表格行算列数，<strong>全部必须相等</strong>。</p>
+<p>⚠️ ⭐ <strong>第 13 类判据陷阱：转义后的 <code>\|</code> 仍会被「按 <code>|</code> split」的列计数器计入</strong> ——
+  修完 <code>\|G\|²</code> 后，我用 <code>s.strip("|").split("|")</code> 再数一次，仍然得 6 列 ⟹ <strong>假 FAIL</strong>（修好了却报没修好）。
+  ✅ <strong>正确判据</strong>：<strong>按未转义的竖线分割</strong> —— <code>re.split(r"(?&lt;!\\)\|", s)</code>。</p>
+<p>⚠️ ⭐ <strong>第 14 类：规则表的关键词会撞上「同形词不同义」</strong> ——
+  初筛把第 10 行的「<strong>弦张力</strong>」（string tension，一个物理量）当成「与观测<strong>存在张力</strong>」⟹ 误判为「失败」。
+  ⟹ 与第 88 轮「<code>0.04</code> ⊂ <code>0.0493</code>」（子串）<strong>同族但机制不同</strong>（<strong>同词两义</strong>）。
+  📌 <strong>规范：规则表要显式列出「不要命中的词」</strong>（本处必须排除 <code>弦张力</code>）；<strong>初筛结果一律人工过一遍</strong>。</p>
+<p>📌 <strong>规范（第 90 轮起）</strong>：<strong>§9 表此后每行必须带四类判定</strong>；<strong>每行的判定必须引一条已登记的轮次作依据</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 把判定从「表」推到「正文」：正文级承诺句的分类与「表 vs 正文」冲突检测</strong>（第 91 轮 <strong>C-46</strong>）：
+    <strong>触发</strong>：做完「表格四类判定」之后（第 90 轮），把口径推到<strong>正文里的承诺句</strong>。</p>
+<p>✅ <strong>四步做法（可直接复用）</strong>：
+  ① <strong>二分</strong>：全部含「预言」的行按 <strong>正文 / 轮次块</strong> 切开（用模式化掩码，陷阱 65）。
+     实测：<strong>73 行 → 正文 30 / 块 43</strong>。
+  ② <strong>剔三类噪声</strong>：<strong>表行</strong>（已在第 90 轮覆盖）、<strong>索引行</strong>（目录/开放问题表）、<strong>变更记录行</strong>（<code>v1.xx 变更</code>）。
+     ⟹ 得<strong>正文级实质承诺句</strong>。实测 <strong>21 行</strong>。
+  ③ <strong>逐行判定</strong>（依据一律引已登记轮次），得：
+     <strong>真预言 2 ｜ postdiction 3 ｜ 半拟合 2 ｜ 失败 3 ｜ 推导 / 数值 5 ｜ 未定量·开放 1 ｜ 解释性 1 ｜ 混合 1（摘要）</strong>。
+  ④ ⭐⭐ <strong>冲突检测（本轮最有价值的一步）</strong>：<strong>同一命题在「表」里已判「失败」，而「正文」里仍称「预言」且邻域无任何限定</strong>
+     ⟹ <strong>横向不一致</strong>。实测 <strong>1 处</strong>：<strong>§5.3 的「第四代预言」vs §9 第 5 行的「与 LHC 未发现存在张力」</strong>。</p>
+<p>⚠️ <strong>冲突必须中英双查</strong>：本轮 ZH 与 EN <strong>对称地</strong>如此（EN 亦写 <code>Fourth-generation prediction</code>）
+  ⟹ 若只查中文，会得出「英文同步」的<strong>错误结论</strong>。<strong>修的时候也要两边各改一处</strong>。</p>
+<p>⚠️ <strong>摘要是最容易被漏的高可见位置</strong>：摘要里列出<strong>约 12 项</strong>预言，<strong>此前只有 1 项带判定</strong>
+  ⟹ 读者最先看到的那一段，判定覆盖率最低。<strong>规范：摘要在列完预言后必须给一个指向判定台账的指针。</strong></p>
+<p>📌 <strong>判据问句（三条）</strong>：
+  · 「<strong>这个承诺句在表里是什么判定？正文里的说法和它一致吗？</strong>」
+  · 「<strong>这段话是承诺（可被检验），还是惯例性地用了一次『预言』这个词？</strong>」（<strong>索引行/变更记录行不是承诺</strong>）
+  · 「<strong>最先被读的部分（摘要、§1）判定覆盖率是多少？</strong>」</p>
+<p>⚠️ <strong>与第 88 轮 C-43 同族</strong>：C-43 是「同一定性自评在三张表里不一致」，本轮是「同一命题在表与正文里不一致」
+  —— <strong>都是「同一命题、多处表述」的检查</strong>，只是这次的<strong>两个位置</strong>换成了「表格 vs 正文」。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「备忘录 vs 论文块」的判决归属：只有</strong>内容<strong>判据成立</strong>（第 92 轮 <strong>C-47</strong>；<strong>十五类判据陷阱</strong>）：
+    <strong>触发</strong>：做「备忘录 → 论文」的<strong>冲突</strong>检查（注意：第 89 轮查的是「有没有<strong>遗漏</strong>」，本轮查「表述是否<strong>冲突/错位</strong>」）。</p>
+<p>⚠️ <strong>两个检测器实测都失败</strong>（先把它俩否掉，能省一整轮）：
+  <strong>① 数值近邻（同前缀异尾数）</strong> —— 找「<code>0.4330</code> vs <code>0.4334</code>」这样的候选，得 <strong>29 对，全部是假警报</strong>：
+    它们是 <strong>(2,2,L) 族里 N=8/16/24 三个不同格点</strong>的合法值，两边都出现是<strong>正常的</strong>。
+    加「标签共现」（±60 字符内的 <code>(N,N,N)</code> / <code>N=</code>）过滤后<strong>仍有 56 对</strong>（表格行同时含 (2,2,2)/(2,2,4)/(2,2,6)）。
+    ⟹ <strong>数值本身不携带身份</strong>（与铁律 18「引文清点命中元文本」同一家族，这是第 <strong>15</strong> 类陷阱）。
+  <strong>② 标题字面重合度（bigram）</strong> —— 把第 88 轮判成 <strong>0%</strong>：块标题「C-43：这个 ~90% 的度量是什么？」
+    vs 备忘录「横向一致性审计_成熟度自评与三张表不相容」—— <strong>同一件事换了措辞</strong>。
+    ⟹ <strong>换措辞就认不出的，一律不算冲突。</strong></p>
+<p>✅ <strong>成立的判据（内容判据）</strong>：
+  ① <strong>配对</strong>：论文的 <code>【v2.9…（第 N 轮…】</code> 块 × 备忘录头部的轮次 ID。实测 <strong>42 对</strong>（用短声明式，见陷阱 83）。
+  ② <strong>判决方向对照</strong>：定义否定词表
+     <code>判否 / 不成立 / 不可判定 / 无路径 / 已被排除 / 零预言力 / 零内容 / 结项 / 撤回 / 作废 / 降调 / 不覆盖 / 不可识别 / 没有对象 / 无机制 / 失败</code>，
+     取备忘录的「一句话结论 / 判决 / 净增量 / 收口」区 vs 论文块全文，<strong>看否定词有没有出现在块里</strong>。
+     实测：<strong>备忘录有否定词的轮次里，38/42（90%）论文块里也有</strong> ⟹ <strong><code>MA-2</code> 这一列是「通过」</strong>。
+  ③ ⭐ <strong>只有 4 轮不满足，逐条落地后 3 条是用词层面、1 条是真错位</strong>（见下）。
+  ④ <strong>真问题的判据不是「词没出现」，而是「概念在块里缺席」</strong>：
+     第 55 轮的块内「<strong>储能 / 电池 / 化学 / 判否 / 不覆盖 / 零内容</strong>」<strong>各 0 处</strong>，
+     而该轮的核心判否（框架对化学储能零内容、三条路径全部判否）<strong>只作为下一轮块的首句背景</strong>出现。</p>
+<p>⚠️ ⭐ <strong>新形态：不是「缺块」，而是「块的主题取错了」</strong> ——
+  第 55 轮的块标题是「跨支通道的用途限于信息」，而该轮<strong>备忘录的主题</strong>是「战略审查：电池能量密度能否由框架支撑」
+  ⟹ 一轮产出<strong>多条</strong>时，块的主题取成了<strong>三条分支里的一条</strong>，主产物的判决<strong>在论文里没有归属</strong>。
+  ✅ <strong>处置</strong>：<strong>在块首加「归属注」</strong>（写明两个产物 ＋ 缺口的量化证据 ＋ 必须同时引的下一轮块与清单条目），
+    <strong>不删改原块</strong>。⚠️ <strong>修之前先查中英</strong>（本轮 ZH/EN 对称缺失，两边各加一处）。</p>
+<p>📌 <strong>规范（第 92 轮起）</strong>：
+  · <strong>每轮块的主题必须等于该轮备忘录的主题</strong>；<strong>一轮产出多条时，主题取自其中的主产物</strong>；
+  · ⭐ <strong>报「冲突数」时，必须同时报「检测器」</strong> —— 否则「29 对」「56 对」这种数字会把人吓住而其实全是噪声。</p>
+</li>
+<li>
+<p><strong>⚠️⚠️ 流程级：审计闭环自检 —— 防「一整天都在循环毫无推进」</strong>（第 92 轮后新增）：
+    <strong>每轮开工前登记「任务来源」</strong>：<strong>外部待办</strong>（候选池 / I 项 / A 项 / 工作流遗留 / 交付物）还是<strong>内部</strong>（上一轮的诚实边界 / 「还没查过的维度」/ 遗留缺口）。
+    ⚠️ <strong>连续 ≥3 轮内部</strong> ⟹ 强制两件事：① 显式对照外部待办清单；② 若本轮理由只是「上一轮留下的缺口」⟹ <strong>默认改做外部待办</strong>。
+    📌 <strong>实测（第 88–92）</strong>：连续 <strong>5 轮任务来源 100% 内部</strong>，且发生在<strong>用户已明确说「检查告一段落，继续推进」</strong>（第 87 轮）之后 ——
+    <strong>用户示意退出审计，链条仍靠自身缺口再生了 5 轮</strong>。机制：每轮补丁<strong>插入新文本 ⟹ 新文本＝新的被审计面</strong> ⟹ 闭环可再生。
+    边际递减签名：第 88 轮已报「数值层 0 残留」；末轮「一条发现」需<strong>两个失败的检测器</strong>才挖到（第 92 轮）。
+    ⚠️ <strong>审计改变不了第 63 轮的三项天花板</strong>（工程出口 0 ／ ★★★ 0 ／ 独有+可测+有数 = 1）——
+    <strong>只有「结题成交付物」或「判掉可判定题」才算推进</strong>；审计仅在服务于这两者时才有价值。</p>
+</li>
+<li>
+<p><strong>小坑：<code>str.format()</code> 里的 LaTeX 花括号会被当成替换字段</strong>（第 93 轮实测）：
+    <code>"…g₀₀ = −e^{−2x} … {}".format(v)</code> 直接 <code>KeyError: '−2x'</code>（<code>{−2x}</code> 被 <code>.format</code> 解析为关键字字段）。
+    ✅ 修法：改 <code>exp(−2x)</code> 记法，或把花括号转义为 <code>{{ }}</code>。<strong>凡在 <code>.format()</code> 串里写公式，先自查 <code>{</code>。</strong></p>
+</li>
+<li>
+<p><strong>⭐⭐ 「真预言」判定需要两根轴：机制轴 × 观测轴</strong>（第 94 轮 <strong>C-51</strong>；<strong>「悬空」档</strong>）：
+    <strong>触发</strong>：给预言/承诺句定四类判定，或引用「框架有几条真预言」。
+    ⚠️ <strong>实测（第 94 轮）</strong>：第 90/91 轮把 void-CPT-κ 判为「<strong>真预言</strong>」，理由只有观测轴（「未观测／分析方案已给出」）——而其<strong>机制轴</strong>早已崩：
+    唯一机制（镜像支投影）在 <strong>2026-09-16/17</strong> 被<strong>硬否证</strong>（读法 A 低 5.31 倍／读法 B 高 3.82 倍），§8.3 自写「<strong>仅在该机制被重建后才成立</strong>」；
+    清单 <strong>S-8</strong>、第 84 轮审计也都按「悬空/未解决」处理——<strong>四条下游全部未同步</strong>（§9 表、§8.4、摘要、两张判定台账）。
+    ✅ <strong>两轴判据</strong>：<strong>机制轴（依据现役？）× 观测轴（未观测？）</strong> ⟹ <strong>现役×未观测 = 真预言</strong>｜<strong>已否证×未观测 = 悬空（机制未重建）</strong>｜<strong>已否证×已观测 = 失败</strong>。
+    📌 <strong>判据问句</strong>：<strong>「这条预言的推导依据（机制），后来被撤过吗？」</strong> —— 查三处：① §8.x 的【v2.9 修正】类标记；② 清单 S-8 / N-xx；③ 回溯/审计录里的「悬空／待重建」。
+    ⚠️ <strong>连带</strong>：判定表改动必须扫<strong>汇总行与派生句</strong>（11 → 10；trap 70）；<strong>「悬空」是新档</strong>（四类 ＋ 未定量 ＋ 推导/数值之外的第七档）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 判决的下游同步是三维的；池表清点必须脚本化</strong>（第 95 轮 <strong>C-54 / C-55 / N-40</strong>；<strong>「判决做了、论文没收到」</strong>）：
+    <strong>触发</strong>：你在备忘录里做出一个<strong>判决级</strong>结论（判否 / 放弃 / 二选一 / 降级），或做「候选池还剩什么」的回顾。</p>
+<p>⚠️ <strong>实测（第 95 轮）</strong>：OM 判决（2026-09-17）「<strong>保住 meV 量级／放弃 <code>ρ_Λ = E_c⁴</code> 定量识别</strong>」——
+  核心词（「23.76」「二选一」）在论文里 <strong>0 处</strong>；而 §8.4 至今把 <code>ρ_Λ ~ (E_c)⁴</code> 标【推导】、
+  §8.1 的「O(1) 系数待定」未收回 ⟹ <strong>判决做出 25 天（跨 90+ 轮），论文从未收到</strong>。
+  ⚠️ 它与 C-51（判定该降级却没降）<strong>方向相反、病根相同</strong>：<strong>判决与文档不同步</strong>。</p>
+<p>✅ <strong>规范（判决三维）</strong>：一个判决必须同步<strong>三处</strong>，缺一维 = <strong>静默过期</strong>：
+  ① <strong>判定标签</strong>（四类判定 / 悬空 / 放弃）—— C-51 的维度；
+  ② <strong>论文正文标注</strong>（【推导】→「量级陈述」、加判决注）—— <strong>C-54 的维度（本轮新登记）</strong>；
+  ③ <strong>编号 / 台账</strong>（清单条目结项、总账计数、交接说明）—— C-53 / C-55 的维度。
+  📌 <strong>判据问句</strong>：「<strong>我这个判决，25 天后还有人能从论文里读到它吗？</strong>」</p>
+<p>✅ <strong>规范（池表清点脚本化）</strong>：报「候选池还剩什么」<strong>必须用脚本清点未结项条目</strong>，不靠回忆 ——
+  第 95 轮实测：<strong>四条未结项（#1/#2/#4/#6），而第 93/94 轮回顾只报三条（漏 #6）</strong>（C-18 族第 N 次）。</p>
+<p>⭐ <strong>同轮方法学（#1 的「一维简并族」）</strong>：要证「某能标不可导出」，<strong>构造一族解</strong>比争论措辞便宜 ——
+  对<strong>任意</strong> <code>E*</code> 解出 <code>(ε₀*, β*)</code> 使<strong>全部</strong>约束同时成立 ⟹ 该能标是<strong>自由参数</strong>（零预言力）。
+  比「原文说它是配的」强得多：<strong>可复算、可判定的否定</strong>（实测 0.246–100 TeV 全可行，至 1e-15）。</p>
+</li>
+<li>
+<p><strong>⭐⭐ 资产恢复：五路取证 → 分级重建</strong>（第 96 轮 <strong>A1 Lean 资产恢复</strong>）：
+    <strong>触发</strong>：某资产（源码 / 工程 / 数据）随换机或误删丢失，需要「恢复」。</p>
+<p>✅ <strong>先做五路取证</strong>（<strong>全部为负才允许说「只能重建」</strong>）：
+  ① <strong><code>.git/objects</code> 对象池</strong> —— ⭐ <strong>最容易漏的一路</strong>：无 commit 的仓库里，
+     <strong><code>git add</code> 过的 blob 仍是 dangling objects</strong>（对象池 ≠ 空！）。
+     扫法：直接 zlib 解压 <code>.git/objects/??/*</code> + <strong>源码级判据</strong>（<code>import Mathlib</code> / <code>:= by</code> / <code>noncomputable section</code>）；
+     ⚠️ <strong>不要用宽词判据</strong>（「theorem」「lean」会命中所有<strong>讨论该资产的中文文档</strong> —— 实测 48 命中→严格判据后 3 命中）；
+  ② git 历史（<code>git log --all</code> / <code>git fsck</code> 的 dangling 列表）；③ git remote（<code>config</code> 里有无远端）；
+  ④ 全盘文件系统搜索（文件名 + 内容特征）；⑤ 原机器（<code>find</code> 关键路径是否可达）。
+  ⚠️ <strong>实测教训</strong>：09-16 的初评「确认不可恢复」<strong>只扫了 <code>outputs/</code> 镜像</strong> ——
+     对象池 / git / 全盘三路都是本轮（96）第一次扫；且<strong>顺带发现丢失清单漏登记 4 份报告</strong>（C-56）。
+     ⟹ <strong>「不可恢复」这类结论，必须写明「扫过哪几路」</strong>。</p>
+<p>✅ <strong>再分级重建</strong>（<strong>禁止把「重建」写成「恢复」</strong>）：
+  · <strong>A 级【完整重建】</strong>：有完整记录（日志 / 恢复规格）→ 写完整证明 / 实现；
+  · <strong>B 级【重建·待编译确认】</strong>：有名称 + 结论、无证明细节 → 尽力版 + 标注；
+  · <strong>C 级【陈述级重建】</strong>：只有结论目标 → 锚点声明（<code>sorry</code>）+ 标「<strong>重设计</strong>（原名未入日志）」；
+  · <strong>D 级【设计登记】</strong>：未形式化 → 注释登记。
+  📌 <strong>引用规范</strong>：<strong>不同层级不得混报</strong>（状态行写成「含证 21 ／ sorry 2 ／ 待重写 23 ／ 登记 5」）。
+  ⚠️ <strong>「未经编译的重建」≠「已恢复」</strong>：状态表须显式写验证状态（本轮：工具链环境中）。
+  ⭐ <strong>重建时内建历史修正</strong>：把旧日志记录过的<strong>每一个坑</strong>以注释写入源码（供首次 build 对照）——
+    这是「日志 → 源码」的信息传递，成本≈0、回报大。
+  ⭐ <strong>重建的机器核验优先走「可快速验证的子集」</strong>：A3/A4 等族实为初等代数，
+     若 mathlib 装不上，可先拆出 core-only 子集验证（本轮因忠实原单文件结构未拆，记为可选优化）。</p>
+<p>⭐⭐ <strong>A2 追加（第 98 轮，<code>python/maps</code> 包恢复）—— 三条可复用增量</strong>：
+  ⑤ ⚠️ <strong>「提到包」≠「是包」</strong>：对象池里命中的往往<strong>不是</strong>源码，而是<strong>讨论/组装它的脚本</strong> ——
+     第 98 轮唯一"命中"是 <code>_repo_assemble.py</code>，它含 <code>lam_c = 1.3e26</code>，但那是它 <code>patch_maps()</code>
+     的<strong>替换文本</strong>。⟹ <strong>判据必须收紧到「定义」（<code>^def t1..t5</code>）</strong>，并把元文本对象
+     （含 <code>patch_maps</code> / <code>MAPS_SRC</code> / 组装器名）<strong>单独计数、不算命中</strong>。（铁律 18 的又一次命中。）
+  ⑥ ⭐ <strong>原件消失 ≠ 信息消失：找「补丁器」</strong>。<code>_repo_assemble.py::patch_maps()</code> <strong>逐字保留了
+     原代码被替换的原文</strong> ⟹ 它把 T5 行／F1 注释／[PPN] 段从 C 级抬到 <strong>A 级逐字</strong>。
+     📌 <strong>凡"某资产被脚本处理过"，先读那个脚本</strong>（替换对 = 原文 ＋ 新文，两份都拿到了）。
+  ⑦ ⭐⭐ <strong>规格缺一个参数时，去「运行时输出」反推</strong>：第 98 轮的 F5 指数 <code>alpha</code> <strong>任何文档都没写</strong>，
+     但差异审计记着<strong>实际运行值</strong> <code>P(1e-35 m) = 1.616</code> ⟹ <code>1.616^alpha = 1.616</code> ⟹ <strong>alpha = 1</strong>；
+     且规格的判据「<code>L ≥ l_P</code> 才是概率」⟺ <code>P ≤ 1</code> ⟺ <strong>恰好也要求 alpha = 1</strong>。
+     ⟹ <strong>两条独立一致 ⟹ 记【已恢复】而不是猜的</strong>。比在文档里翻措辞便宜得多。
+  ⑧ ⚠️ <strong>「整文件重写」不会自动备份</strong>：<code>sub_once</code> 式补丁自带备份，
+     但<strong>直接 Write 覆盖</strong>的路径<strong>不会</strong> ⟹ 第 98 轮改 <code>python/README.md</code> 时违反铁律 9，
+     只能事后<strong>逐字补录</strong>底本（标「事后补录」）。<strong>规矩：先 <code>cp</code>，再 <code>Write</code>。</strong></p>
+</li>
+<li>
+<p><strong>⭐⭐ Lean/mathlib 环境的「复现三件套」＋ 瞬时锁</strong>（第 97 轮 <strong>A1 环境层</strong>；<strong>可跨项目复用</strong>）：
+    <strong>触发</strong>：在新机器上把<strong>旧的</strong> Lean 工程（或任何依赖 git 库的旧构建）跑起来。</p>
+<p><strong>① git 全局面具</strong>（lake 内部所有 fetch 走镜像）：
+<code>git config --global url."https://ghfast.top/https://github.com/".insteadOf "https://github.com/"
+git config --global core.longpaths true     # Windows 长路径（mathlib 深层目录）</code></p>
+<p><strong>② 钉修订，不要取 master</strong> —— ⚠️ <strong>依赖库的 master 会移动</strong>：mathlib master
+已从 <code>v4.34.0-rc2</code>（2026-09 时代）移到 <code>v4.35.0-rc3</code>（2026-10）⟹ 与旧工具链<strong>不兼容</strong>。
+做法：日志里若留有短 SHA（如「HEAD eda2e61d06 = master」），<strong>解析为完整 SHA 后写进 lakefile</strong>：
+<code>require mathlib from git "…" @ "&lt;40 位 SHA&gt;"</code>。
+短 SHA → 完整 SHA 的解析手法（<strong>代理不支持 api.github.com / HTML 提交页时</strong>）：
+<strong>blobless ＋ depth 窗口 fetch ＋ <code>git rev-parse</code></strong>（800 个 commit 窗口 ≈ 1 分钟）。</p>
+<p><strong>③ cache 服务器</strong>：<code>lake exe cache get</code> 经 <code>https://cache.mathlib.org/…</code>（<strong>内容寻址</strong> <code>/f/{hash}.ltar</code>；
+<code>/c/{commit}</code> 是 CI <strong>上传</strong>路径，不是下载入口）。全量 = <strong>451MB / 8892 文件</strong>（第 97 轮实测与原记录逐字一致）。
+⚠️ <strong>解压是瓶颈</strong>：第 97 轮<strong>实测全量 4h58m</strong>（8892 个 .ltar ≈ <strong>30 个/分钟 ≈ 0.5 个/秒</strong>），
+而目标盘裸写小文件可达 <strong>617 个/秒</strong> ⟹ <strong>瓶颈在 leantar 的每文件开销，不在磁盘</strong>。
+⚠️⭐ <strong>别用别的进程并发读同一批 <code>.ltar</code></strong>（我本轮为统计库名用 16 线程扫了 8892 个文件头）
+⟹ 立刻触发 <code>拒绝访问（os error 5）</code>，<code>cache get</code> 报 <code>6694 decompression(s) failed</code>、<code>exit=1</code>。
+<strong>要统计就等解压结束再扫。</strong>（产物仍达全量，但退出码不可信 ⟹ <strong>不要拿退出码当验收判据</strong>）
+⭐ <strong>下次直接并行解压</strong>（可省约 4 小时）：<code>leantar</code> 自带批接口 ——
+<code>leantar -x -j - --jobs &lt;N&gt;</code>，stdin 读 JSON <code>[{file, base?, hash?}]</code>（<code>base</code> = 解包根，可 per-file 覆盖 <code>-C</code>；
+<code>--jobs</code> <strong>默认 = num CPUs</strong>，而 <code>lake exe cache get</code> 走的是<strong>单线程</strong>路径）。
+各包的 <code>base</code> 由其内部路径首段决定（<code>Mathlib</code>→<code>.lake/packages/mathlib</code>、<code>Batteries</code>→<code>batteries</code>、
+<code>Aesop</code>→<code>aesop</code> …）。
+<code>leantar.exe</code> / <code>clang.exe</code> <strong>随工具链捆绑</strong>（无需另装）。
+<strong>④ post_update 钩子</strong>：mathlib lakefile 内置，update 后自动 <code>cache get</code>（前提：lake 版本 == 根工程
+<code>lean-toolchain</code> 版本）。<strong>cache get 必须在根工程跑</strong>（子目录跑 ⟹ 嵌套克隆 ＋ 需 cc 的构建）。</p>
+<p>⚠️ <strong>瞬时锁（重跑即愈）</strong>：构建期 <code>.olean</code> 写入报 <code>failed to write …: 13 Permission denied</code>
+（或读 <code>olean.private</code> 失败）= Windows 文件锁（AV / 索引器），<strong>直接重跑</strong>；
+第 97 轮实测：cache exe 首次构建 2 个模块失败 ⟹ 重跑一次全过（含残留 <code>.olean.tmp.*</code> 清理）。</p>
+<p>📌 <strong>判据</strong>：凡「复现旧环境」任务，<strong>先报出「钉在哪个修订 ＋ 工具链版本 ＋ cache 服务器」三项</strong>，
+缺一项就会在半途失败。实测耗时参考：mathlib clone pack <strong>505MB</strong>（ghfast 0.3–0.9 MB/s）＋ 依赖 ~9 包
+＋ cache 451MB；<strong>总 wall-clock ≈ 1–1.5 h（不含解压）</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「N jobs 全绿」≠「N 个定理通过」</strong>（第 97 轮 <strong>C-57</strong>；<strong>构建规模 ≠ 内容量</strong>）：
+    <code>lake build StormPoC</code> 报 <strong><code>Build completed successfully (8909 jobs)</code></strong> 与 09-09 原记录<strong>逐字一致</strong>，
+    但实测这 8909 个 job 里 <strong>8908 个是依赖</strong>（mathlib 全量 ＋ batteries/aesop/Qq/Cli/proofwidgets/
+    importGraph/plausible/LeanSearchClient），<strong>StormPoC 自身只占 1 个 job</strong>。
+    ⟹ 该数<strong>只证明「依赖建得起 ＋ 本文件能过」</strong>，与「8 族 52 定理」<strong>量纲不同，不得并列引用</strong>。
+    📌 <strong>判据</strong>：凡引用「N jobs / N 个编译单元 / N 行全绿」这类<strong>构建规模数</strong>时，
+    <strong>先拆「依赖 vs 自身」</strong>，再决定能不能当内容证据（与铁律 39「表行数 ≠ 独立出口数」同族）。</p>
+</li>
+<li>
+<p><strong>⭐⭐ 「日志记了修正」≠「重建时执行了修正」</strong>（第 97 轮 <strong>C-57</strong>；<strong>注释不算落地</strong>）：
+    首次 <code>lake build</code> <strong>7 处报错</strong>，其中 <strong>3 处</strong>（<code>λ</code> 是 Lean 保留字 ⟹ 参数改名）<strong>09-09 日志早已记录</strong> ——
+    第 96 轮重建时<strong>只把这条修正抄进了源码注释，没有改代码</strong>（注释赫然写着「λ 是保留字 ⟹ 改名 l」，
+    而三处签名里仍是 <code>λ</code>）。后续两轮迭代又暴露 2 处 ⟹ <strong>共修 9 处、四次构建 7→4→2→0</strong>。
+    ⚠️ 附带：<strong><code>hλ</code> 也不是合法标识符</strong>（词法把 <code>λ</code> 单独切成 token），一并改名。
+    ⚠️ 另：7 处里 <strong>5 处是语法/记号</strong>（<code>n !</code> 阶乘<strong>不许有空格</strong> ×2、<code>λ</code> 保留字 ×3），
+    第 96 轮 README 把它们预估为「按报错微调若干 <strong>API 名</strong>」是<strong>错的</strong> —— <strong>API 名过时只是其中一小类</strong>。
+    📌 <strong>规范</strong>：凡「历史已记录的修正」，重建时<strong>必须在源码里落一行</strong>，注释不算；
+    <strong>「预估报错类型」要留出「语法/记号」这一档</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 物理 toy 模拟的三个"看起来像物理"的实现坑</strong>（第 98 轮 A2 重建 T2 时<strong>连踩三个</strong>）：
+    <strong>触发</strong>：写一个"玩具级"MC 验证某条统计/热化结论（玻尔兹曼、弛豫、分布收敛…）。</p>
+<p>⚠️ <strong>坑 1：1D 等质量弹性碰撞 = 交换速度 = 置换 ⟹ 分布严格不变、永不弛豫。</strong>
+  我第一版就是这样写的（"随机配对 + 交换速度"），跑几万步毫无变化。
+  ⟹ <strong>要热化必须真的交换动量</strong>：3D 里"相对速度绕随机法向镜面反射"
+  （<code>g2 = g − 2(g·n)n</code>，<code>v1' = V + g2/2</code>、<code>v2' = V − g2/2</code>，<code>V = (v1+v2)/2</code>）。
+  📌 <strong>判据问句</strong>：<strong>"我这个更新是不是某个不变量下的置换？"</strong> 是 ⟹ 什么都不会发生。</p>
+<p>⚠️ <strong>坑 2：随机配对 + numpy fancy indexing 非原子 ⟹ 能量系统性流失。</strong>
+  <code>i, j = rng.integers(0,n,n), rng.integers(0,n,n)</code> 有放回 ⟹ 同一索引在一批里被写多次，
+  <strong>后写覆盖前写</strong> ⟹ <code>&lt;v²&gt;</code> 从 1.014 掉到 0.060（<strong>看起来像"能量在流失"，其实是实现</strong>）。
+  ✅ <strong>正解：置换配对</strong>（<code>pm = rng.permutation(n); i, j = pm[0::2], pm[1::2]</code>，两批索引<strong>不相交</strong>）。
+  📌 <strong>自检</strong>：每跑一步就打 <code>E/E0</code>，<strong>必须恒为 1.000000</strong>；不恒为 1 ⟹ 先修实现，别解释物理。</p>
+<p>⚠️⭐⭐ <strong>坑 3：统计矩不能混用</strong> —— 我把 Maxwell 速率分布的<strong>均值</strong> <code>2√(2/π) = 1.5958</code>
+  当成了<strong>偏度</strong>（真值 <code>2√2(4−π)/π^{3/2} = 0.4360</code>），于是把一个<strong>已经收敛</strong>的分布判成"没收敛"，
+  又白查了两轮。
+  ✅ <strong>定案手法（最便宜）</strong>：<strong>从"精确已知的初态"出发做不动点测试</strong> ——
+  取 <code>v ~ N(0, I₃)</code>（严格 Maxwell），跑几万步，偏度<strong>必须</strong>停在 0.436 附近。
+  它一停 ⟹ 动力学没问题，是<strong>我的期望值写错了</strong>。
+  📌 <strong>判据问句</strong>：<strong>"我写的这个解析值，是分布的哪一阶矩？"</strong>（均值/方差/偏度/峰度各有公式，别记串。）</p>
+<p>⟹ 三条合起来一句话：<strong>"数值看起来像物理"是最危险的错觉</strong> ——
+  先打<strong>守恒量</strong>（坑 2）、先问<strong>是不是置换</strong>（坑 1）、先核<strong>解析期望</strong>（坑 3），三步都便宜。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「清点轮」的固定套路与四个坑</strong>（第 99 轮 <strong>C-59 / I-23</strong>；<strong>用户问「还有什么可以算/推」时用</strong>）：
+    <strong>触发</strong>：用户问「还有什么可以计算和推演的」／「还有哪些没做」／任何<strong>盘点</strong>性质的请求。
+    <strong>⚠️ 千万不要只读一个台账就回答</strong> —— 第 99 轮实测：<strong>四源交叉</strong>才查出问题（见坑 1、2）。</p>
+<p><strong>四源</strong>（缺一个就会系统性漏批）：
+  S1 清单的「全量待办总账」行（组 I–VI）｜S2 <code>未完成研究工作流_按依赖排序.md</code>（分批 ☐）
+  ｜S3 论文 <strong>§10.2</strong> 的 13 条开放问题｜S4 <strong>资产侧</strong>（A1/A2 ／ 各备忘录登记的 O-n ／ 候选池）。</p>
+<p>⚠️ <strong>坑 1：台账行的 ✅ 标记会大面积过期</strong>。第 99 轮实测<strong>缺 13 处</strong>（<code>3.1/3.2/4.3/C1–C4/H1–H5/P1</code>，
+  全部已在第 43–95 轮结项）⟹ <strong>只读台账会误得「还有 13 条待办」</strong>。
+  ✅ <strong>做法</strong>：脚本里建一张<strong>结项台账</strong>（编号 → 轮次），逐条比对「有结项记录但无 ✅」= 过期（<strong>C-59</strong>；C-19 族第 13 次）。
+  📌 <strong>规范</strong>：台账行<strong>每轮必须与 1.x 段对账</strong>。</p>
+<p>⚠️⭐⭐ <strong>坑 2：有些整块内容「已登记、未入体系」</strong>。第 99 轮查出<strong>并轨线</strong>
+  （<code>python/maps</code> 的 P1–P5／F1–F5／SPB 模型／分支 A‑B／<strong>O1–O5</strong>）在四个台账里<strong>命中 0 处</strong>（<strong>I-23</strong>）
+  ⟹ <strong>形式化完整、代码化完整、从未排进待办</strong>。
+  ✅ <strong>做法</strong>：对每个「大块内容」算<strong>特征短语 × 四个台账</strong>的命中矩阵（并做<strong>两段式</strong>：补丁前必须全 0）。
+  📌 <strong>判据问句</strong>：<strong>"这块内容在哪个台账里出现过？"</strong> 全都 0 ⟹ 它没进流水线。</p>
+<p>⚠️ <strong>坑 3：解析器会把「注」当条目</strong>（= 铁律 18 的又一次命中）。第 99 轮我在台账行末写的修补注里
+  <strong>列出了</strong> <code>3.1／3.2／C1–C4…</code> 这些编号 ⟹ 解析器把注当成 <strong>5 条新条目</strong>、误报「补丁后仍过期 5 处」。
+  ✅ <strong>做法</strong>：解析前先 <code>re.sub</code> <strong>剥掉本轮自己写进去的注</strong>（<code>⚠️ &lt;strong&gt;【第 N 轮注】…&lt;/strong&gt;</code>）。</p>
+<p>⚠️ <strong>坑 4：两段式的「补丁前」底本必须是备份</strong>。第 99 轮第一版对「交接说明」误用了<strong>当前文件</strong>，
+  报出「补丁前命中 2 处」的<strong>假取证</strong>；改用 <code>*_备份_&lt;日期&gt;第N轮前.md</code> 后 = <code>{0,0,0,0}</code> ✓。</p>
+<p><strong>产出</strong>：一张三类表 —— <strong>甲｜环境已就绪 ＋ 纯本地 ＋ 判据硬</strong>（优先做这个）／
+  <strong>乙｜已登记、带判据、从未推演</strong>（备忘录里的 O-n 类）／<strong>丙｜依赖外部前提</strong>（等装置/等审稿）；
+  外加一张 <strong>⛔ 已判死对照表</strong>（避免重复撞墙）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ Lean/mathlib 证明的 7 条工程坑 ＋ 1 条流程事故</strong>（第 100 轮 <strong>A1 补完</strong>；<strong>写 Lean 前必读</strong>）：
+    <strong>触发</strong>：补写/修写 Lean 证明，尤其含 <code>field_simp</code> / 除法 / 大量变量时。</p>
+<p>⚠️⭐ <strong>坑 1：<code>λ</code> 与 <code>hλ</code> 都不是合法标识符</strong>。Lean 词法把 <code>λ</code> 切成独立 token ⟹
+  <code>(λ : ℝ)</code> 与 <code>hλ : ...</code> <strong>都编译不过</strong>。用 <code>lam</code> / <code>hlam</code>。
+  <strong>该坑已出现 3 次（第 97 / 98 / 100 轮）</strong> —— 每次都是「我知道，但还是写了」。</p>
+<p>⚠️⭐ <strong>坑 2：<code>field_simp; ring</code> 在 ≥8 个变量上指数爆炸</strong>。第 100 轮实测：
+  一条 10 变量的恒等式（<code>lc_lambda_eq_2alphabeta</code>）<strong>单条编译 &gt; 13 分钟不收敛</strong>（内存涨到 3 GB）。
+  ✅ <strong>正解：拆成 2–3 步小引理</strong>（先把几何因子的消去单独做成一条，主定理只处理剩下的 2–3 个变量）。
+  📌 <strong>判据问句</strong>：<strong>"这条 <code>field_simp</code> 要处理几个变量？≥6 就先拆。"</strong></p>
+<p>⚠️ <strong>坑 3：<code>field_simp</code> 会顺带约掉两侧的公因子</strong>。第 100 轮它把 <code>ℏ</code> 约掉了 ⟹
+  继续按原式推导时「找不到符号」。<strong>先用 <code>#check</code>/打印核对化简后的假设</strong>。</p>
+<p>⚠️ <strong>坑 4：<code>eq_div_iff</code> vs <code>div_eq_iff</code> 方向</strong>：
+  <code>a = b / c</code> 用 <code>eq_div_iff h</code>；<strong><code>a / c = b</code> 用 <code>div_eq_iff h</code></strong>。第 100 轮<strong>两次用错</strong>。</p>
+<p>⚠️ <strong>坑 5：<code>field_simp</code> 常常已经把目标关掉</strong> ⟹ 紧跟的 <code>ring</code> 报 <code>No goals to be solved</code>。
+  ✅ <strong>稳妥写法：<code>field_simp; try ring</code></strong>（<code>try</code> 会吞掉 "no goals"）。全局替换一次即可。</p>
+<p>⚠️ <strong>坑 6：<code>linarith</code> 不处理含除法的原子</strong>（<code>x / R = y</code>）⟹ 报 <code>linarith failed</code>。
+  ✅ 先 <code>field_simp at h</code>（清分母）再 <code>linarith</code>；或 <code>rw [div_eq_iff hR] at h</code>。</p>
+<p>⚠️ <strong>坑 7：检查脚本自己也会误报</strong> —— 第 100 轮 <code>LF-16</code>（查代码里有无非法 <code>λ</code>）
+  第一版只按行首判定注释，把 <strong>doc 注释（<code>/-- … -/</code>）的续行</strong>当成代码 ⟹ 误报 5 处。
+  ✅ <strong>用状态机跳过注释块</strong>。</p>
+<p>⚠️⭐⭐ <strong>流程事故（第 100 轮实际发生，已恢复）</strong>：我写了
+  <code>io.open(f, "w").write(io.open(f).read())</code> 当作「无害的零操作写回」——
+  <strong><code>"w"</code> 模式先截断文件</strong>，读回来就是空的 ⟹ <strong>把 <code>MEMORY.md</code> 清空</strong>。
+  ✅ 靠<strong>当轮备份</strong>（<code>MEMORY_备份_&lt;日期&gt;第N轮前.md</code>）完整恢复（这正是<strong>铁律 9</strong> 的兑现）。
+  📌 <strong>教训（永久有效）</strong>：
+  ① <strong>永远不要把同一个文件同时作为写目标和读源</strong>；
+  ② <strong>「零操作写回」根本不该存在</strong> —— 想「确认写成功」就重新 <code>open(...,"r").read()</code>；
+  ③ <strong>任何就地改写的脚本，第一件事就是备份</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「判据分辨率」必须先量化，再谈「漂移」</strong>（第 101 轮 <strong>甲-2 <code>λ_c(∞)</code></strong>；<strong>C-61/62/63</strong>；<strong>做有限尺寸标定前必读</strong>）：
+    <strong>触发</strong>：任何「用 N 个尺寸的数据外推一个临界点/极限值」的任务（λ_c、κ_c、h_c、β_c、指数 ν……）。</p>
+<p>⚠️ <strong>本轮实测的失败模式</strong>（拿 2 个尺寸就能骗过自己）：
+  · 2 尺寸（2×2×2、3×2×2）峰位 0.230 / ~0.20 ⟹ 「<strong>无漂移</strong>，λ_c(∞) ∈ [0.21, 0.23]」—— 看起来完美。
+  · 补第 3、4 个尺寸（3×3×2、<strong>3×3×3 = 真 L=3</strong>）⟹ 峰位 0.2826 / <strong>0.3075</strong>，<strong>单调升且不收敛</strong>。
+  · 1/L̄ 外推给 <strong>0.436</strong> —— <strong>比全部数据点都大</strong>，而 λ=0.40 时 ⟨A_c⟩ 已降到 0.24（明显在无序侧）。</p>
+<p>✅ <strong>六条固定检查（每条都便宜）</strong>：
+  ① ⭐⭐ <strong>先量化判据自身的系统不确定度，再谈漂移</strong>。
+      本例：χ 峰的<strong>网格差随尺寸增大</strong>（step 0.05 vs 0.0125/0.02 ⟹ 0.008 / 0.018 / <strong>0.025</strong>），
+      而尺寸漂移只有 ~0.03 ⟹ <strong>同量级 ⟹ 不可分离 ⟹ 判「方法学不足、未定位」（不给数）</strong>。
+      📌 问句：<strong>「换个网格/换个判据，我的数是变多少？这个变化量和我要测的效应谁大？」</strong>
+  ② ⭐⭐ <strong>外推值必须落在数据范围内</strong>。0.436 &gt; max(数据)=0.40 ⟹ <strong>自证荒谬</strong>，别报告。
+  ③ ⭐ <strong>N 个点要先问是不是「独立的标度点」</strong>。本轮的 2×2×2 与 3×2×2 <strong>最短边都是 2</strong> ⟹
+      标度变量（最短边）几乎不变 ⟹ 它们<strong>不是两个点</strong>。📌 用 <code>V^{1/3}</code> 或<strong>最短边</strong>当标度变量时，
+      <strong>要检查它在各尺寸上是否真的不同</strong>。
+  ④ ⭐ <strong>比较前先问「是不是同一个轴」</strong>。3D Ising 的 <code>β_c</code> 是<strong>耦合倒数</strong>，规范侧的 <code>λ</code> 是 <strong>X 场强度</strong>；
+      对偶映射连的是 <code>β</code>↔<strong>plaquette 耦合 K</strong>。本模型 <strong>K=1 固定、扫的是 <code>λ=h</code></strong> ⟹
+      <strong>「差 3.7% ⟹ 对偶自洽」是轴混淆</strong>（<strong>C-62</strong>）。
+      📌 问句：<strong>「我这两个数，是同一个哈密顿量项的系数吗？」</strong>
+  ⑤ ⚠️ <strong>算法可能让质量指标恒等失效</strong> —— 两个实例：
+      · <strong>1-site DMRG 的 discarded weight ≡ 0</strong>（1-site 更新<strong>不增长 bond</strong>，<code>min(aL·2,aR) ≤ χ</code>）
+        ⟹ <strong><code>dw = 0</code> 是恒等式，不是质量指标</strong>；χ 够不够<strong>只能</strong>靠 χ=8 vs 16 vs 32 的能量/序参量差。
+      · <strong>Binder 累积量在本模型恒等失效</strong>：<code>A_c</code> 是 6 个 Pauli-Z 之积 ⟹ <code>A_c² = I</code> ⟹
+        ⟨A²⟩≡1、⟨A⁴⟩≡1 ⟹ <strong>Binder ≡ 2/3（0 信息）</strong>。
+      📌 问句：<strong>「这个指标在这个算法/这个模型下会不会恒为常数？」</strong>
+  ⑥ ⭐⭐ <strong>相变定位前先问「我用的是序参量吗」</strong>。χ = −d⟨A⟩/dλ 的峰<strong>不是</strong>普适的相变判据；
+      本轮它给不出收敛值（与论文已有的 2D 诊断「<code>m(h_c)</code> 外推 → 0.93 ≠ 0 ⟹ ⟨X⟩ 非序参量」<strong>同族</strong>）。
+      本轮唯一较强判据 = <strong>⟨A_c⟩ 的跨尺寸交叉点</strong>（集中 0.32–0.34），<strong>且它不需要数值微分</strong>。</p>
+<p>⭐ <strong>附带两条工程经验</strong>：
+  · <strong>性能优化要先测再改</strong>：本轮先以为瓶颈在「环境重算」（O(n²)），改成增量后才发现
+    <strong>真正的瓶颈是局部有效 H 的构建</strong>（单 sweep 2.10 s 里环境只占 0.04 s）。<strong>先 profile，再动手。</strong>
+  · <strong>BLAS 化张量网络收缩</strong>（<code>tensordot</code>/<code>matmul</code> + <code>reshape</code>/<code>transpose</code> 替代大中间张量的 <code>einsum</code>）
+    在本轮给出 <strong>1.8–18×</strong> 提速；<strong>但注意把两个 bond 分开写</strong> —— 边界位点的 <code>aL=1 ≠ ar=χ</code>，
+    合并写会在 <code>c=0</code> 处 reshape 崩溃（本轮踩过）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「选判据前先查它在极限处是否退化」＋「先找守恒量降维」</strong>（第 102 轮 <strong>甲-3 toric code 相变点</strong>；<strong>C-64/65/66</strong>）：
+    <strong>触发</strong>：任何「用数值定位一个相变点/临界值」的任务；以及任何「全空间太大算不动」的格点模型。</p>
+<p>⚠️ <strong>坑 1：判据在极限处退化 ⟹ 它是恒等式，不是判据</strong>（本轮<strong>第二次</strong>踩，甲-2 是第一次）。
+  甲-3 我选了「<strong>能隙 Δ = E1−E0 的极小点</strong>」作判据 —— 而 <strong>h = 0 时 toric code 基态 4 重简并</strong>
+  ⟹ Δ(0) = 0 ⟹ 极小点<strong>必然</strong>落在扫描区间的下边界（实测全部 h = 0.20，零信息）。
+  📌 <strong>问句：「极限处（h→0 或 h→∞）这个量会退化成常数吗？会 ⟹ 换。」</strong>
+  （甲-2 的同族：<strong>1-site DMRG 的 discarded weight ≡ 0</strong>，因为 1-site 更新不增长 bond。）</p>
+<p>⚠️ <strong>坑 2：先找守恒量/好量子数，维数能降几个数量级</strong>（本轮<strong>最大收获</strong>）。
+  <code>H = −J Σ_v A_v − K Σ_p B_p − h Σ_ℓ X_ℓ</code>：<code>A_v = Π_{e∋v} X_e</code> 是 X 型 ⟹
+  <strong><code>[A_v, Σ_ℓ X_ℓ] = 0</code></strong>（且与 ΣB_p 净对易）⟹ <strong>A_v 是好量子数</strong> ⟹ 在 <strong>A_v = +1 扇区</strong>工作，
+  维数从 <strong>2^(2L²) 降到 2^(n−V+1)</strong>：
+    · 3×3：2.6e5 → <strong>1024</strong>； 3×4：1.7e7 → <strong>8192</strong>； <strong>4×4：4.3e9 → 131072（3.3e4×）</strong>
+  ⟹ <strong>当年做不到的 4×4 一轮就能扫完</strong>（31 个 h 点 204 s）。
+  📌 <strong>动手前先问：「这个模型有什么对易的算符/守恒律？能不能固定它？」</strong>
+  ⚠️ 实现要点：扇区 = <strong>GF(2) 零空间</strong>；基必须用<strong>完整 RREF</strong> 构造
+  （只做行阶梯、然后逐个自由列 XOR，会<strong>互相污染其他 pivot 列</strong> —— 本轮踩过，靠 <code>assert</code> 自检兜住）。
+  ⭐ 换到「让约束对角」的那组基（本项目：<strong>X 基</strong>），则<strong>该类型算符的任意矩都是对角的</strong> ⟹
+    <strong>Binder 累积量零额外成本</strong>（不需要高阶算符内积）。</p>
+<p>⚠️ <strong>坑 3：算符恒等式往往直接判掉一条"物理推论"</strong>。
+  <code>[A_v, ΣX_ℓ] = 0</code> ⟹ A_v 守恒 ⟹ <strong>J 项在扇区内退化为常数 <code>−J·V</code></strong> ⟹ <strong>相变完全不依赖 J</strong>。
+  <strong>机器精度验证</strong>：J = 1 vs 3，E0 恰平移 <code>(J−1)V</code>（3×3 差 18、3×4 差 24），<strong>m 与能隙不变（Δm ~ 1e-12）</strong>。
+  ⟹ 论文那条「J/K = 3 ⟹ h_c = K/J」的「⟹」<strong>没有推导</strong>。
+  📌 <strong>问句：「我论文里这个结论，依赖的那个耦合，真的进入物理条件吗？」</strong>
+  （同族：<strong>C-62</strong> 的「轴混淆」、<strong>铁律 47④</strong>「先问是不是同一个量/同一个轴」。）</p>
+<p>⚠️ <strong>坑 4：先核实文献值的</strong>模型<strong>，再比较</strong>（本项目反复出问题）。
+  甲-3 用 WebSearch 核实后得到：文献模型 <code>H ≡ −Σ_v A_v − Σ_p B_p − h Σ_ℓ X_ℓ</code>（<strong>环面</strong>）
+  <strong>与框架逐项一致</strong>；<code>h_x^c ≈ 0.328</code>（<code>h_z = 0</code>，<strong>X 场就是 0.328</strong>）；<strong><code>0.34</code> 属自对偶线 <code>h_z = h_x</code></strong>；
+  <strong>X↔Z 加对偶格是严格对偶 ⟹ 两纯场版本同值</strong>。
+  ⟹ 论文原有的「X 场 0.32 ／ σ^z 场 0.328」<strong>是错的</strong>（而当年脚本的文档本来就写对了）。
+  ⚠️ <strong>另一条</strong>：两个约定（0.5 系数 vs <code>J_A=J_B=1</code>）<strong>差一个未给的换算因子</strong>，
+    跨约定并列比较<strong>不成立</strong>（<strong>C-66</strong>）。
+  📌 <strong>问句：「文献那个数，是在哪个哈密顿量、哪个约定下算的？和我的是同一个吗？」</strong></p>
+<p>⚠️ <strong>坑 5：诚实的收尾 —— 若判据分歧 &gt; 待判别效应，就说「不能判别」</strong>。
+  甲-3：Binder 交叉 <strong>0.31±0.02</strong> vs 保真度磁化率 <strong>0.3683</strong> ⟹ <strong>跨度 0.31–0.377</strong>；
+  而文献 <strong>0.328474</strong> 与框架 <strong>1/3 = 0.3333</strong> <strong>都落在这个跨度内</strong>（只差 1.5%）。
+  ⟹ <strong>本轮既不能确认也不能否证</strong>。⚠️ 另：含 L=2 的 7 组配对给 0.35–0.47（L=2 太小），<strong>不可用</strong>。
+  📌 <strong>规范</strong>：报告里必须写「跨度」，而不是挑一个判据当结论。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「数值验证」的三个判据问句 ＋ 「各向同性的阶」用表示论判</strong>（第 103 轮 <strong>甲-4 麦克斯韦谱</strong>；<strong>C-67</strong>）：
+    <strong>触发</strong>：论文/清单/备忘录里出现「<strong>数值验证 X</strong>」「<strong>X 已被数值验证</strong>」这类标签，或你要做一个「验证」。
+    <strong>⚠️ 本轮实测：论文 §5.8 的「数值验证 C」是两处独立的空转</strong>（存在了 <strong>10 轮以上</strong>，且在 §5.8 里有两处不同的数）。</p>
+<p>⚠️ <strong>判据 1：被"验证"的量，是不是</strong>被直接赋值<strong>的？</strong> —— 最便宜的一问。
+  第 103 轮实测：<code>_u1_spin2.py</code> L70 写 <code>omega = k  # ω=|k| 无质量光子</code>，
+  L72 再打印「验证: ω/k = …≈ 1 ⟹ 线性色散 ✓」。<strong>验证的是 <code>x/x = 1</code></strong>。
+  📌 <strong>做法</strong>：<code>grep</code> 该量在<strong>脚本里</strong>的赋值 ⟹ 若右侧就是它要被比对的另一侧 ⟹ <strong>恒等式</strong>。
+  ⭐ 这与<strong>铁律 39（恒等式 vs 推导）</strong>是同一件事，但形态更隐蔽：<strong>它藏在"验证"这个词名下</strong>。</p>
+<p>⚠️ <strong>判据 2：那个数是不是</strong>长波/小参数展开的前几项<strong>？</strong>
+  第 103 轮实测：<code>0.9999</code> = <code>2 sin(k/2)/k</code> 在 k=0.05 处的值 = <code>1 − k²/24 = 0.9998958</code> <strong>的四舍五入</strong>
+  （脚本只打印 4 位小数 ⟹ 读者无法看出它来自泰勒）。
+  📌 <strong>做法</strong>：把那个数减去 <code>1</code>，看余量是否 = <code>(小参数)²×(有理数)</code>。
+  ⚠️ 附带：该脚本还把「<strong>分量约定</strong>」（<code>w_k</code> 里的 <code>k</code>）与「<strong>沿方向约定</strong>」（<code>k_abs = √3·k</code>）<strong>混用</strong> ⟹
+    <strong>两个约定混用会让"比值"连物理意义都没有</strong>（严格应为 <code>sinc(k/(2√3)) = 1 − k²/72</code>）。</p>
+<p>⚠️ <strong>判据 3：这个推导链里，本项目的</strong>特有元素<strong>出现了几次？</strong>（<strong>这项最重要</strong>）
+  第 103 轮逐项清点：色散公式只用「离散 Laplace 算子的定义 ＋ 高斯积分 ＋ <code>sin x ≈ x</code>」——
+  <strong>框架特有元素 0 个</strong>。看似相关的（Z₂ ⊂ U(1) 嵌入、Villain 紧致化、配对阶数 n=1、衬底立方几何）
+  <strong>都不进入推导</strong>。⟹ 「长波 ω=|k|」<strong>不是框架的预言</strong>，而是<strong>任何</strong>格点规范理论的共同性质。
+  📌 <strong>写法</strong>：列一张「<strong>实际用到的输入</strong>」表 ＋ 一张「<strong>看似相关、实际不进入</strong>」表。
+  ⭐ <strong>正面对手</strong>：若清点发现某条推导<strong>确实</strong>依赖框架元素，那条才是可声称的。</p>
+<p>⭐⭐ <strong>附带方法（本轮真正的正面产出）：把"数值验证"换成"带误差界的定理"</strong>
+  · 第 103 轮把「长波 ω→|k|（数值 0.9999）」换成
+    <code>0 ≤ 1 − ω(k)/|k| ≤ 1 − √(1 − k²/12) ≤ k²/12</code>（立方格点，<code>|k| ≤ √12</code>，<strong>最坏方向 [100]</strong>）。
+  · 证明只用 <code>|sin y| ≤ |y|</code>、<code>sin y ≥ y − y³/6</code>、<code>Σk_i⁴ ≤ k⁴</code>（交叉项非负）、<code>1 − √(1−ε) ≤ ε</code>。
+  · ⚠️⚠️ <strong>我第一版把不等式方向搞反了</strong>：<code>Σk_i⁴</code> 的<strong>最大</strong>在 [100]、<strong>最小</strong>在 [111]，
+    而它出现在 <code>ω²</code> 的<strong>负项</strong>里 ⟹ 偏差最大在 <strong>[100]</strong>（我原以为在 [111]）。
+    <strong>数值扫描立刻报"达界的 149.5%"</strong> ⟹ 界不成立。📌 <strong>先想清楚"哪端最坏"，再写界。</strong></p>
+<p>⭐⭐ <strong>表示论：判断「某个对称性在</strong>第几阶<strong>能保证各向同性」</strong>
+  <strong>手法</strong>（几行代码，可复用）：取该对称群 <code>G</code>（本项目 = 立方群 <code>O_h</code>，48 元 = 6 置换 × 8 符号翻转），
+  构造它在「k 的 n 次型空间」上的表示 <code>R_n</code>，求投影算子 <code>P = (1/|G|)Σ_g R_n(g)</code> 的<strong>秩</strong>。
+  · <code>n = 2</code>（<code>Sym²(T₁)</code>，6 维）：<strong>秩 = 1</strong> ⟹ 任何 <code>G</code> 不变的二次作用量必为 <code>M_ij = c·δ_ij</code>
+    ⟹ <strong>「光速各向同性」是定理，只需立方对称（不需要连续旋转）</strong> —— 这正好是格点能给的<strong>全部</strong>对称性；
+  · <code>n = 4</code>（<code>Sym⁴(T₁)</code>，15 维）：<strong>秩 = 2</strong>（不变量 <code>(k²)²</code> 与 <code>Σk_i⁴</code>）⟹ <strong>四阶修正必然各向异性</strong>
+    （实测 [100] 系数 <strong>1/12</strong> vs [111] <strong>1/36</strong>，差 3 倍）；
+  · <code>n = 全阶</code>：各向同性<strong>只能靠连续极限</strong>（世界级）。
+  ⟹ 📌 <strong>一句话判据：「某个对称性保证各向同性，只保证到第几阶？」</strong> —— <strong>秩 &gt; 1 的那一阶就开始各向异性</strong>。
+  ⚠️ 实现坑：<code>Sym⁴</code> 的 15 维基要写 <code>[(a, b, 4-a-b) for a in range(5) for b in range(5-a)]</code>
+    （<strong>我第一次写成 <code>range(5-a-b)</code> 得到 35 个 ⟹ IndexError</strong>）；<strong>加 <code>assert len == 15</code> 兜住</strong>。</p>
+<p>📌 <strong>另一个便宜的判据：「全谱」还是「长波」？</strong>
+  第 103 轮：格点上 <code>ω(π,π,π)/|k| = 2/π = 0.6366</code>（差 36%），且 <code>ω</code> 是 BZ <strong>周期函数</strong>
+  ⟹ 「ω=|k|」<strong>只能是长波极限</strong>。凡看到「某色散关系 = 某连续形式」的断言，先查<strong>BZ 边界</strong>。</p>
+<p>⚠️ <strong>同族记账（第 4 次命中）</strong>：<strong>C-4</strong>（<code>E_c ≡ 1 meV</code> 恒等式）／<strong>N-36</strong>（<code>L²</code> 是 <code>h</code> 的定义式）／
+  <strong>N-32</strong>（<code>D = ℏ/(3m)</code> 恒等式）／<strong>本轮 C-67</strong>。四次的共同病根 = <strong>把一个定义／展开式当成了发现</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「定性论证」严格化的三步套路（形式化 → 代数 → 穷举）＋ 三个判据坑</strong>（第 104 轮 <strong>甲-5</strong>；<strong>C-68/69/70/71</strong>）：
+    <strong>触发</strong>：文档/论文里有一条<strong>自承是"定性论证"</strong>或"启发式"的结论，要把它严格化
+      （本项目实例：N2 的「2 平面拍频不稳定」= §10.2#7 的剩余严格化）。</p>
+<p>✅ <strong>三步套路（可复用）</strong>：
+  <strong>① 形式化 —— 把物理词换成可判定的数学条件。</strong> 关键是<strong>把"锁定/确定/有序"这类词换成"本征态"</strong>：
+    第 104 轮把「涡锁定平面 <span class="math">i</span>」定义为「涡态 <span class="math">ψ</span> 是 <span class="math">J<sub>i</sub></span> 的<strong>本征态</strong>且本征值 <span class="math">ne 0</span>」。
+  <strong>② 代数 —— 找一条三行能走完的链。</strong> 第 104 轮：设 <span class="math">[A,B] = iC ne 0</span>，若 <span class="math">ψ</span> 同时是两个荷的本征态
+    （<span class="math">Aψ = aψ</span>、<span class="math">Bψ = bψ</span>），则
+    <code>① iCψ = [A,B]ψ = 0 ⟹ Cψ = 0</code>；<code>② iAψ = [B,C]ψ = −b·Cψ = 0 ⟹ a = 0</code>，与 <span class="math">a ne 0</span> <strong>矛盾</strong>。
+    📌 <strong>问句：「我要证的不可能，能不能写成两个不对易算符的"同时本征态"？」</strong>（对易子往往直接给矛盾。）
+  <strong>③ 穷举 —— 代数给结论，穷举给"没有例外"。</strong> 第 104 轮扫 <span class="math">j = 0,<span class="frac"><span class="num">1</span><span class="den">2</span></span>,…,5</span>（9 个不可约表示）
+    <strong>并加可约表示</strong>（<span class="math">0⊕<span class="frac"><span class="num">1</span><span class="den">2</span></span>⊕1⊕<span class="frac"><span class="num">3</span><span class="den">2</span></span></span>）⟹ 结论<strong>不依赖不可约性</strong>。
+    📌 <strong>必做的一步：带上「可约表示」</strong> —— 否则读者会问「你凭什么只查不可约的」。</p>
+<p>⚠️ <strong>判据坑 1：把「期望值非零」当「有确定值」</strong>（第 104 轮反例）。
+  取 <span class="math">H = ω<sub>1</sub>J<sub>1</sub> + ω<sub>2</sub>J<sub>2</sub></span> 的<strong>本征态</strong>，它给 <span class="math">langle J<sub>1</sub>rangle = 0.447</span>、<span class="math">langle J<sub>2</sub>rangle = 0.894</span>
+  —— <strong>两个都非零</strong>，但它对 <span class="math">J<sub>1</sub></span>、<span class="math">J<sub>2</sub></span> <strong>都不是本征态</strong>。
+  ⟹ 若判据取「期望值非零」，会<strong>误判「两个都能锁定」</strong>。<strong>「有确定值」必须是本征态。</strong>
+  📌 <strong>问句：「我这个量是"有确定值"，还是只是"平均值非零"？」</strong></p>
+<p>⚠️ <strong>判据坑 2：论文引用的「数值」可能（a）无脚本、（b）自承启发式却没带限定</strong>（<strong>C-69</strong>）。
+  第 104 轮实测：论文 §4.9 的「稳定性 0.00/1.00/0.30/0.05」——
+  · 产生它的脚本 <code>_now_numeric.py</code> <strong>已丢失</strong>（<code>outputs/</code> 里没有）；
+  · 原始备忘录<strong>自承</strong>「稳定性评分为<strong>启发式</strong>（缺严格动力学证明）」，而论文把它写成与别的结论<strong>并列</strong>的数值。
+  ⟹ <strong>比 C-67（数值验证是恒等式）更重</strong>：C-67 至少脚本可查，<strong>C-69 连脚本都没有</strong>。
+  📌 <strong>检查清单（三问）</strong>：① 脚本还在吗？② 原文档给它什么限定？③ <strong>论文带了这个限定吗？</strong>
+  ⚠️ 处置<strong>不要删数</strong>（历史留痕）—— <strong>就地加限定 ＋ 用严格结果替代</strong>。</p>
+<p>⚠️ <strong>判据坑 3：同一个符号的"两种自洽读法"</strong>（<strong>C-68</strong>）。
+  第 104 轮的「4π 整数倍」有两种都自洽的读法：<strong>A</strong>（<span class="math">ϕ</span> 单值 ⟹ 绕数取<strong>偶数</strong>、最小涡荷 2）、
+  <strong>B</strong>（序参量为旋量 <span class="math">e<sup>iϕ/2</sup></span> ⟹ 绕数任意、最小涡荷 1）—— <strong>下游量差 2 倍</strong>，而原文未写明。
+  📌 <strong>发现手法</strong>：把该条件<strong>分别代入两种解释</strong>，看<strong>下游的可观测量是否不同</strong>；不同 ⟹ 口径缺口。
+  📌 同族：<strong>C-20</strong>（面积口径）／<strong>C-28</strong>（拟合口径）／<strong>C-41</strong>（外推口径）—— 这是第 <strong>4</strong> 次。</p>
+<p>⭐⭐ <strong>附带：分级标签</strong>（<strong>C-70</strong>）。第 104 轮发现英文稿<strong>同一处两个口径</strong>（§1【Derivation】vs §4.9【Framework assumption】），
+  根源是<strong>四项（N1–N4）严格性各不相同，却用一个【本框架设定】标签覆盖</strong>。
+  ⟹ <strong>规范：一个"命题链"里各项若严格性不同，必须逐项标注</strong>（设定／定理／定义／原文＋经典机制）。
+  📌 <strong>检查手法</strong>：把该链各项的严格性<strong>列成表</strong>，与论文的<strong>标签</strong>对照。</p>
+<p>⚠️⚠️ <strong>两个实现坑（都是"检查器/补丁自己出错"）</strong>：
+  · <strong>检查器的区间右端过宽</strong>（第 104 轮 V-16/V-17）：用 <code>s[i0 : i1+40]</code> 取"块"的区间 ⟹
+    <strong>把块后的空行算成块内空行</strong> ⟹ <strong>假 FAIL</strong>（块内其实 0 空行）。
+    ✅ 改成 <code>s[i0 : s.index("\n", i1)]</code>（<strong>卡在行尾</strong>）。同族：第 100 轮 LF-16（把 doc 注释续行当代码）。
+  · ⭐ <strong>表格/清单的"块"会被后续轮次切开</strong>（第 104 轮 <strong>C-71</strong>）：第 103 轮把新条目插在
+    <code>| &lt;strong&gt;C-66&lt;/strong&gt; |</code> <strong>之前</strong>，而 C-66 属<strong>上一轮</strong>的连续块（C-64/C-65/C-66）⟹ <strong>切开</strong>。
+    ✅ <strong>规范：新条目一律插在该轮"上一个条目之后"或该轮的独立分组里，不得插进别轮的连续块中间</strong>；
+      收尾必做<strong>编号连续性 / 分块完整性检查</strong>（<code>seq[i:i+8] == [...]</code>）。</p>
+<p>📌 <strong>两段式的第 7 次救场</strong>：NP-13a（取证「英文稿两个口径」）在<strong>补丁后翻红</strong> ——
+  因为<strong>本轮补丁正是去修它</strong>。改成「补丁前取证（读备份）＋ 补丁后确认（读当前稿）」后通过。
+  ⟹ <strong>「修复型检查项一律两段式」＋「补丁后必须复跑核验」</strong>（陷阱 72）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「判定轮」的标准做法：先量纲、再定标，然后三档判定</strong>（第 105 轮 <strong>乙类并轨</strong>；<strong>C-72/73</strong>）：
+    <strong>触发</strong>：用户给一个<strong>已经登记但从未推进</strong>的块（本项目实例：I-23 的「并轨线 O1–O5」），
+      或你面对一批「开放问题」需要处置。<strong>这一轮不产新物理，只产判定</strong> —— 别硬凑内容。</p>
+<p>⚠️⭐ <strong>第 1 步（最便宜、命中率最高）：把每个「率/上界/密度」做量纲检验。</strong>
+  第 105 轮实测：备忘录两处都写「净产生率上界 <code>R_net ~ (E_c)⁴/ħ</code>」——
+  <strong>量纲指数 = (3, 6, −7)</strong>，而「能量密度率」= <strong>(1, −1, −3)</strong> ⟹ <strong>它不是任何率</strong>。
+  自然补全只有两个：<code>(E_c)⁵/(ℏ⁴c³)</code> 或 <code>ρ·E_c/ħ</code> ⟹ 原文<strong>缺 (ℏc)³ 与一个时间尺度</strong>。
+  📌 <strong>做法（10 行代码）</strong>：<code>DIM = {"E": (1,2,-2), "ħ": (1,2,-1), "c": (0,1,-1), "密度率": (1,-1,-3)}</code>，
+    用指数向量加减小乘，把候选式与目标量纲<strong>逐项比</strong>。<strong>别用感觉判断量纲。</strong>
+  ⭐ <strong>红利</strong>：这一步常直接判掉一条判据 —— 因为<strong>量纲不成立 ⟹ 任何定标都任意</strong>。</p>
+<p>⚠️⭐ <strong>第 2 步：把「定标歧义」量化成倍数。</strong>
+  补全后出现的自由时间尺度，<strong>把每个自然选择都算出来并报倍数</strong>。
+  第 105 轮：<code>τ_ℏ = ℏ/E_c</code> = 6.4651×10⁻¹³ s vs <code>τ_H = 1/H₀</code> = 4.5782×10¹⁷ s ⟹ <strong>差 7.08×10²⁹ 倍</strong>。
+  ⟹ 同一句「上界」里可以有 <strong>29 个数量级</strong>的歧义；于是<strong>「活」与「死」两个结论都成立</strong>
+    （慢读法给「不可测」、快读法给「真空活不过 1e-12 s」）⟹ <strong>判据不成立</strong>。
+  📌 <strong>口径必须成对报</strong>（本例还有第二重歧义：<code>ρ_Λ</code> 的框架值 vs 观测值差 23.76 倍，<strong>C-54</strong>）
+    ⟹ <strong>两个不确定相乘时，「单报一个数」= 口径不全。</strong></p>
+<p>⭐ <strong>第 3 步：三档判定（+ 两条出路）</strong>。把每条开放问题归到：
+  · <strong>可判定</strong>（本轮唯一一条：O2 —— 给出定量后判「分支 B 悬空、A 保留」）；
+  · <strong>构造可行但验证不可行</strong>（O1：截断两端各含一个未定量 —— 新增参数 <code>n</code> 与框架未定义的 <code>|Φ|_over</code>；
+    <strong>自由参数 +2 ⟹ 不可识别</strong>）⟹ <strong>不推荐做</strong>；
+  · <strong>不可判定 / 缺层</strong>（O3「同源」= 记法选择，参数 4 &gt; 锚 1；O4 缺「势阱型构型差」= <strong>N-21 同族第 2 次</strong>）；
+  · <strong>撞已判死区</strong>（O5：跨支通道用途<strong>限「信息」</strong>，第 55 轮）。
+  ⟹ <strong>收口方式</strong>：若 ≥4/5 是后三档，<strong>就不要并入正式稿</strong> —— 第 105 轮据此把 I-23 收口为
+    「<strong>已判定：不进论文</strong>」。⚠️ <strong>「已登记、未推演」的正确归宿常常是「判定后判否」，不是「补进去」。</strong></p>
+<p>⚠️⭐⭐ <strong>第 4 步：核验的「假阳性」不要直接压掉 —— 先问它命中了什么</strong>（本轮最大教训，<strong>C-73</strong>）。
+  写核验时我检索「并轨内容是否混入论文」：<code>SPB</code>／<code>分支 A/B</code>／<code>分支 B</code> 全 <strong>0 处</strong> ✓，
+  但<strong>判据串选得太裸</strong>（裸 <code>O1</code>／<code>O2</code>）⟹ <strong>命中</strong>。若直接收紧判据了事，就会<strong>错过真问题</strong>。
+  <strong>追查后</strong>：论文里 <code>O1–O4</code> 有<strong>两套并存编号</strong> —— <strong>§4.9</strong> 是<strong>观测者-信息命题链</strong>
+  （O1 观测者结构／O2 可访问信息／O3 均匀先验／O4 信息容量），<strong>§9</strong> 是<strong>宇宙学输出对照表</strong>
+  （O1 <code>Ω_K=0</code>／O2 <code>ρ=3H²/8πG</code>／O3 <code>M=c³/(2GH₀)</code>／O4 <code>T=ℏH₀/2π</code>），
+  另有并轨备忘录的<strong>第三套</strong> O1–O5 ⟹ <strong>同一符号体系内部</strong>撞车（<strong>首次</strong>）。
+  📌 <strong>规范（两条都要）</strong>：① 检索「某词 0 处」时判据串<strong>必须足够特异</strong>（用 <code>O1｜</code>／<code>SPB</code> 而非 <code>O1</code>）；
+    ② <strong>假阳性要追查到「它命中的到底是什么」</strong> —— 本次正是这么抓出 C-73 的。
+  📌 <strong>顺带的处置范式</strong>：符号撞车<strong>不删编号</strong>，而是①加<strong>语境前缀</strong>规范（「§4.9-O1」／「宇宙学-O1」／
+    「并轨-O1」）＋②在每套编号处加<strong>一处口径注</strong>（中英同步）。
+  ⚠️ 同族：符号撞车已 <strong>6 次</strong>（<strong>C-15</strong> <code>λ</code>/<code>g</code>｜<strong>C-20</strong> 面积｜<strong>C-21</strong> <code>ρ</code>/<code>w</code>｜<strong>C-32</strong> <code>N</code>｜
+    <strong>C-68</strong> 「4π」｜<strong>C-73</strong> <code>O</code>+序号）⟹ <strong>每轮开工前扫一遍新引入的编号/字母。</strong></p>
+<p>⚠️ <strong>第 5 步：补丁自身的结构自检</strong>（<strong>C-71 同族第 3 次</strong>）。第 105 轮我又把新条目 <strong>C-73</strong>
+  插到了 <strong>C-72 之前</strong> ⟹ 序号非升序（<strong>组内必须升序</strong>）。<strong>我的 <code>assert</code> 当时写得太宽容</strong>
+  （用 <code>or</code> 允许两种顺序）⟹ 没拦住，靠打印出来才看见。
+  ✅ <strong>正解</strong>：<code>nums == sorted(nums)</code> <strong>严格断言</strong>；且<strong>新条目一律插在「本轮上一条之后」</strong>。</p>
+<p>⭐ <strong>一句话</strong>：判定轮的价值 = <strong>把「待办」变成「判定」，并把判否写下来</strong> ——
+  「不进论文」也是一个<strong>结论</strong>，而且常常是<strong>更诚实</strong>的那个。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「对外材料」的写法（交付物轮）</strong>（第 106 轮 <strong>丙类</strong>：私审准备包 ＋ EMRI 材料包）：
+    <strong>触发</strong>：要写一份<strong>给别人看</strong>的东西（送审材料、给实验组的提案、给同行的求助信），
+      而不是论文/备忘录。<strong>这一轮的性质是「翻译」—— 把你的自我认知翻译成外人能快速用的形式。</strong></p>
+<p>⚠️⭐ <strong>第 1 条（最重要）：把缺陷写在结果前面。</strong>
+  第 106 轮的 EMRI 材料包把<strong>三条最不利的事实</strong>放在 §二（<strong>在结果之前</strong>）：
+  ① <strong>度规不是新的</strong> —— <code>g_μν = diag(−e^{−2x}, e^{2x}, r²e^{2x}, r²sin²θe^{2x})</code> <strong>就是</strong>
+     <strong>Yilmaz–Rosen exponential metric</strong>（Papapetrou 1954／Yilmaz 1958／Rosen 1962）；
+  ② <code>δ = 0.30·x_p</code> 是<strong>测地线 RK4 三点数值标定</strong>，不是解析推导；
+  ③ 三个前提<strong>全在框架之外</strong>（LISA 发射／事件率／波形模型）。
+  📌 <strong>为什么必须前置</strong>：专家的时间极贵。<strong>若你把它藏在中间，他会以为你在夸大，然后停止阅读</strong>
+    —— 而<strong>前置</strong>反而建立了可信度（"这人知道自己有什么"）。
+  ⚠️ 反差：写论文时我们习惯「结论先行」；<strong>对外材料要「边界先行」。</strong></p>
+<p>⚠️⭐ <strong>第 2 条：先列「我已经知道的边界」，并请他别在这上面花时间。</strong>
+  第 106 轮的私审包开头有「<strong>已知边界 8 条 —— 请不要在这上面花时间</strong>」表
+  （独有可测预言 = 1／★★★ = 0／近 8 轮正面 = 0／<strong>参数表 0 处</strong>／工程出口 = 0／四项同源 = 1／判别力 = 0／
+  审计 73＋40 条），并列出「我已经做过的自查工具」（格式自查／引文清点／两段式取证／符号一致性扫描）。
+  📌 <strong>双重收益</strong>：① 省对方时间；② <strong>把「你能发现的问题」提前占掉</strong> ⟹ 对方只能给出<strong>新</strong>的东西。
+  ⚠️ 附带：<strong>要承认锚定效应</strong> —— 我明确写了「这张表可能让你从『哪里有问题』开始看，
+    若你愿意请先独立看那三处，再回来看表」。<strong>这一句很难写，但它决定对方是否认真读。</strong></p>
+<p>⚠️⭐ <strong>第 3 条：只挑 3 处送审，不要发全文。</strong>
+  第 63 轮定的规格 = 「给 1–2 个懂行的人<strong>只看三处</strong>」（§4.5b／§9／§8.1），<strong>~1–2 小时</strong>。
+  📌 <strong>理由（已在材料里写明）</strong>：全文 400+ 页会让人放弃。
+  ⭐ <strong>并且给出「20 分钟版」</strong>（只留 3 问：最可能搞错的三处）⟹ 降低启动成本。
+  📌 <strong>问句</strong>：<strong>「如果要对方只回一句，我最需要哪一句？」</strong> —— 那 1–3 问就是核心。</p>
+<p>⚠️⭐ <strong>第 4 条：问题必须可回答，且要写「我想要什么答案」。</strong>
+  反面（无用）：「你觉得这个理论怎么样？」「有没有前途？」
+  正面（第 106 轮的 9 个 Q）：<strong>「静态 ansatz 下的『PPN 其余全 0』在运动情形下是否仍成立？」</strong>
+    「KK 标量模是否必然带来长程标量力？约束量级 <code>α ≲ ?</code>」「<code>E_c = 1TeV·ε(1TeV)^{1/β}</code> 是恒等式吗？」
+  📌 <strong>每条都附三件</strong>：<strong>论文位置 ＋ 我自己的疑虑 ＋ 想要什么答案</strong>。
+  ⭐ <strong>并显式说「泛评对我无用」</strong>（例：「如果你只回一句『这方向没前途』——<strong>对我不构成新信息</strong>」）
+    —— 这句话有风险，但它把对话从「评价」拉到「技术」。</p>
+<p>⚠️⭐ <strong>第 5 条：计数上的诚实要主动写，并邀请反驳。</strong>
+  第 106 轮在材料里写：<strong>「S-E1–E4 四项全部来自同一个关系 ⟹ 按独立可检验预言计是 1 条，不是 4 条」</strong>，
+  并加一句「<strong>若你认为 3PN 与 2PN 应算独立，请告诉我</strong>」。
+  📌 <strong>理由</strong>：四个数看起来比一个数好看，但<strong>专家会立刻看穿</strong>；主动说出来 ⟹ 换回可信度。
+  ⚠️ 同族：<strong>「表行数 ≠ 独立出口数」</strong>（铁律 39）、<strong>「8909 jobs ≠ 8909 定理」</strong>（铁律 43）。</p>
+<p>⚠️⭐⭐ <strong>第 6 条：换参数后必须重做自洽性检验</strong>（第 106 轮 <strong>C-74</strong>，<strong>备料时才发现的</strong>）。
+  写材料时要<strong>把数字重新算一遍</strong> —— 因为<strong>别人会算</strong>。
+  第 106 轮实测：EMRI 的 <code>σ_δ</code> 与 <code>ΔlnL</code> <strong>在变化率上也不自洽</strong> —— 2 yr → 4 yr 时
+  <code>σ_δ</code> 比 <strong>2.212</strong>（合理，减半），而 <code>ΔlnL</code> 比 <strong>1.109</strong>（只增 11%）；若 <code>ΔlnL ∝ 1/σ²</code>，
+  4 yr 应给 <strong>1748</strong>，实际 <strong>396.2</strong> ⟹ <strong>差 4.41 倍</strong>。绝对值检验更狠：差 <strong>2.11×10⁵ / 9.29×10⁵ 倍</strong>。
+  📌 <strong>判据问句</strong>：<strong>「我换了个参数表示（σ → ΔlnL），换算因子在两个不同设置下还一样吗？」</strong>
+  🔧 <strong>处置范式</strong>（已写进材料）：<strong>只报能自洽的那一档（2 yr），另一档只说「进一步改善」不给倍数</strong>。</p>
+<p>⭐ <strong>第 7 条：交付物是独立文档，不要硬并入论文。</strong>
+  第 106 轮两份材料<strong>都没进论文</strong>（论文零改动，已用 mtime ＋ 清单/交接声明三重验证）。
+  📌 <strong>理由</strong>：它们是<strong>对外材料</strong>（给陌生人看的），论文是<strong>对内主稿</strong>（给人反复审的）；
+    混淆两者会让论文变脏、让材料失去「就事论事」的语气。
+  ⚠️ <strong>判据</strong>：<strong>「这份东西的读者是谁？他会不会读第二部分？」</strong> —— 不会 ⟹ 独立文档。</p>
+<p>⭐ <strong>第 8 条：材料要给「退出机制」。</strong>
+  第 106 轮在给 LISA 组的四问里加了<strong>不是问题的一问</strong>：
+  「<strong>如果你判断这个预言不值得做（分叉太小／与其他度规无法区分），请直接说 ——
+  我会把它降级为『理论兴趣』并停止调用 LISA 资源。我需要的是早一点知道。</strong>」
+  📌 <strong>理由</strong>：对方最怕的是「被拖进一个长期项目」。<strong>给他一条低成本的退出路径，
+    他反而更愿意回答。<strong>（这条与「不越权」配对：材料里同时写明</strong>「未提交、未联系任何人」</strong>。）</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「数据可追溯性」盘点：五源 ＋ 三边界</strong>（第 107 轮 <strong>元任务</strong>；用户问「往期对话能不能追溯」时用）：
+    <strong>触发</strong>：用户问「之前聊过的东西还在吗」「分支没做完，有记录吗」「最早能追到什么时候」。
+    <strong>⚠️ 不要凭印象回答</strong> —— 第 107 轮实测：<strong>同一台机器上，不同源的起点差了 31 天</strong>。</p>
+<p><strong>五源（按「信息密度」排序，全部要查）</strong>：
+  | 源 | 位置 | 粒度 | 本机实测 |
+  |---|---|---|---|
+  | ① <strong>memory 日志</strong> | <code>&lt;工作区&gt;/.workbuddy/memory/YYYY-MM-DD.md</code> | 逐日（任务/产出/结论/下一步） | <strong>2026-08-20 起</strong> |
+  | ② <strong>对话原文 JSONL</strong> | <code>~/.workbuddy/projects/&lt;cwd 编码&gt;/&lt;sessionId&gt;.jsonl</code> | <strong>逐句 ＋ 工具调用</strong> | <strong>2026-09-20 起</strong>（111.9 MB） |
+  | ③ <strong>file-history</strong> | <code>~/.workbuddy/file-history/&lt;sessionId&gt;/&lt;hash&gt;@vN</code> | 单文件版本 | 最早 <strong>2026-08-24</strong> |
+  | ④ <strong>产出物</strong> | <code>outputs/</code>、<code>notes/</code>、<code>paper/</code> ＋ 台账 | 备忘录/脚本/数据 | 随日志 |
+  | ⑤ <strong>服务端检索</strong> | <code>conversation_search</code> 工具 | 跨会话 | ⚠️ <strong>实测窗口仅约 1 周</strong> |</p>
+<p>⚠️⭐ <strong>边界 1：日志与对话原文的起点可以差很多</strong>（本例 <strong>31 天</strong>）。
+  第 107 轮：日志 8-20 起、对话原文 9-20 起 ⟹ <strong>8-20～9-19 只能追「做了什么」，追不到「怎么想的」</strong>。
+  📌 <strong>做法</strong>：<strong>分别报两条边界</strong>，别只说「能追到 X 号」——<strong>颗粒度不同</strong>。</p>
+<p>⚠️⭐ <strong>边界 2：<code>~/.workbuddy</code> 环境重建会截断对话原文</strong>。
+  判据：<code>device-id</code>／<code>edge-sync-mapping-v4.db</code> 的 mtime ＋ <code>logs/</code> 第一个日期目录
+    ＋ 最早的 session json <code>startedAt</code> —— 四者若同一天 ⟹ 那天就是<strong>环境重建日</strong>。
+  📌 <strong>跨机迁移的痕迹</strong>：日志里残留<strong>旧机绝对路径</strong>（本例 <code>D:/Users/IMYT.YT/…</code>，出现 2 次），
+    而本机<strong>无该盘</strong> ⟹ 那些天的对话原文<strong>不可恢复</strong>。<strong>报这条时要给「去哪找」</strong>：
+    旧机的 <code>~/.workbuddy/projects/</code>（按 cwd 编码分目录）。</p>
+<p>⚠️ <strong>边界 3：服务端检索窗口远小于本地</strong>（本例 ~1 周 vs 本地 13.7 天～45 天）。
+  ⚠️ 且它<strong>可能返回 0 条</strong>（不是「没有」，是「窗口外」）⟹ <strong>不要用它下「不存在」的结论</strong>。</p>
+<p>⭐⭐ <strong>「未完成分支」怎么盘（第 107 轮的做法，可复用）</strong>：
+  ① 对全部日志扫 <strong>15 个标记词</strong>：<code>待办/未完成/尚未/未做/开放问题/下一步/剩余/缺口/TODO/☐/待定/未攻/判否/留给后续/后续工作</code>；
+  ② <strong>按日期分桶</strong> ⟹ 得到「什么时候开的什么分支」的时间轴；
+  ③ <strong>按「对话原文是否覆盖」分两级</strong>：<strong>A 级（双源可核）</strong> vs <strong>B 级（仅日志）</strong>
+     —— 第 107 轮：MAPS 337 条标记（25 天）→ <strong>A 174 / B 163</strong>；
+  ④ <strong>抽样验证 B 级的粒度</strong>（本例日志的「下一步」含具体技术动作与文件名 ⟹ <strong>够用</strong>）；
+  ⑤ <strong>先查已有台账</strong>（总账／交接说明／工作流）—— 第 107 轮实测这三个台账共 571 KB，
+     <strong>已结构化的部分不用重建</strong>，只需「补 A/B 分级标注」。
+  📌 <strong>一句话</strong>：<strong>日志给「分支清单与状态」，对话原文给「当时的推理」</strong> —— 前者几乎从不丢，
+    后者受环境重建/换机影响。<strong>所以「分支没完成」这件事基本都能追。</strong></p>
+<p>⭐ <strong>顺带一条运维建议</strong>（值得主动告诉用户）：<code>~/.workbuddy/projects/&lt;项目&gt;/</code> 下的 JSONL 是
+  <strong>滚动文件</strong>（本机主项目已 111.9 MB）⟹ <strong>建议定期整目录复制</strong>（用户桌面那个 9-20 zip 就是
+  这种做法的实例，⚠️ 但它<strong>只含 <code>memory/</code>，不含对话原文</strong> —— 所以<strong>备份时要连 <code>.workbuddy/projects/</code> 一起打</strong>）。</p>
+<p><strong>产出</strong>：一张<strong>五源矩阵</strong>（源／粒度／最早／最晚／状态）＋ <strong>三条边界线图</strong> ＋
+  <strong>未完成分支的 A/B 分级清单</strong> ＋ <strong>「去哪找」的路径建议</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「历史清单完成度核查」五步法 ＋ 两个判定坑</strong>（第 108 轮；用户问「当时列的待办做完了吗」时用）：
+    <strong>触发</strong>：用户问「以前列的那些待办/候选/开放问题，现在做完没有」；或你要回答「有没有静默掉队的东西」。
+    ⚠️ <strong>别只读台账</strong>（台账会漏 B 期）—— <strong>B 期（无对话原文的那段）只有日志</strong>，必须脚本化抽。</p>
+<p><strong>五步</strong>：
+  ① <strong>抽</strong>：对 B 期每个日志扫 <strong>15–18 个标记词</strong>
+     （<code>待办/未完成/尚未/未做/开放问题/下一步/剩余/缺口/TODO/☐/待定/留给后续/后续工作/未解决/待验证/待严格</code>），
+     再用 <code>(下一步候选|下一步|待办|遗留|剩余|未完成|开放问题|缺口|收尾待办)</code> 收缩到候选行。
+     ⚠️ <strong>切换点</strong>：按 <code>①②③</code> 与 <code>；</code> 切条目（本项目 8-20~9-19 得 <strong>142 行 / 265 条</strong>）。
+  ② <strong>归并成线程</strong>（thread）：不要逐条判 —— 同名候选会连着出现十几天。
+     本项目 265 条归并成 <strong>54 条线程</strong>（A 引力侧 / B 规范侧 / C 论文 / D EMRI / E 开放问题地图 / F 缺陷 / G 缺口）。
+  ③ <strong>三源取证</strong>：S1 源头（B 期日志首次/末次日期）｜S2 后期（切换点之后的日志）｜S3 台账（清单＋交接说明）。
+  ④ <strong>交付物一列</strong>：在 <code>outputs/</code>＋<code>notes/</code> 的文件名里找该线程的<strong>专用词</strong>。
+  ⑤ <strong>五态定判</strong>：<code>✅ 已执行</code>｜<code>✅→⛔</code>（执行后被修正/撤回）｜<code>⏳ 真缺口</code>（无人再提且无交付物）｜<code>⛔ 已判否</code>｜<code>🔁 后续推进</code>。</p>
+<p>⚠️⭐⭐ <strong>坑 1：泛词会污染「交付物」匹配</strong>。
+  第 108 轮初版用<strong>整组关键词</strong>匹配文件名 ⟹ <code>EMRI</code> 让 D1–D5 <strong>全部</strong>变成「有交付物」、
+  <code>饱和</code> 让 <code>k等于N2…HN饱和在0.43</code> 冒充通量饱和的交付物、<code>κ</code>/<code>PPN</code> 同病。
+  ✅ <strong>正解</strong>：每个线程单列一组 <strong><code>file_keys</code> 专用词</strong>（如 D4 用 <code>κ↔Γ</code>、A4 用 <code>临界面积</code>），
+    <strong>命中才算</strong>；且 <strong>必须抽查若干条</strong>（本项目手核 12 条，抓出 6 处误判）。</p>
+<p>⚠️⭐ <strong>坑 2：「行内含『完成』」会跨主题串味</strong>。
+  第 108 轮 A23（普朗克常数身份）只出现 1 次，却被判 ✅ —— 因为<strong>同一段里</strong>别的句子写了「完成」。
+  ✅ <strong>正解</strong>：完成句的判定要在<strong>同一行内</strong>同时命中线程词；且这类「仅 1 次出现」的项<strong>一律手核</strong>。</p>
+<p>⭐ <strong>坑 3（顺带的坏消息，值得主动告诉用户）</strong>：清单里通常<strong>有「下一步」但没有「为什么选它」</strong>。
+  于是后期容易出现<strong>过度解读</strong>（本项目 C-61 的 <code>[0.21,0.23]</code>、B6 自旋 2、A16 金刚石），
+  病根统一 = <strong>把某一轮的工作记录当成定案</strong>。
+  ⟹ 若那批对话原文能找回，<strong>最有价值的就是这种「当时的语境」</strong>，不是结论本身。</p>
+<p><strong>产出</strong>：一张 <strong>54 行的线程表</strong>（<code>编号/线程/B期区间/后期命中/台账命中/交付物数/状态</code>）
+  ＋ <strong><code>⏳ 真缺口</code> 清单</strong>（本项目只有 4 条：A23 普朗克常数身份｜D4 EMRI κ↔Γ｜G4 λ 操作式｜G9 底层四状态）
+  ＋ <strong>「✅→⛔」清单</strong>（每条附更正号，引用时必带）。
+  📌 <strong>回答口径</strong>：先给「在不在」（清单一条没丢），再给「做完没有」（<strong>50/54 有交付物</strong>），最后给真缺口。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「改一个量的名字」与「一次更正的作用域」：两个容易漏的地方</strong>（第 109 轮 <strong>G4</strong>；<strong>C-75</strong>）：
+    <strong>触发</strong>：① 你要<strong>统一/更换某个符号或记号</strong>；② 你做了一次<strong>数值或措辞更正</strong>，准备收工。</p>
+<p>⚠️⭐⭐ <strong>坑 1：换标签 = 换定义方向（涉及倒数/夹角/单位时必须写方向）。</strong>
+  第 109 轮实测：块内历史记法 <code>λ ≡ ρ_micro/ρ_holo =</code> <strong>8π/3 = 8.37758041</strong>，
+  判别表当代记号 <code>Ω_tot = 3/(8π) =</code> <strong>0.11936621</strong> —— <strong>两者互为倒数</strong>（乘积 = 1.000000000000）。
+  ⟹ 只写「改称 <code>Ω_tot</code>」而不写方向，读者会把 <strong>8.38 当成 Ω_tot（差 70 倍）</strong>。
+  📌 <strong>判据问句</strong>：「<strong>新旧定义是不是同一个方向？</strong>」—— 若涉及<strong>倒数 / 夹角 / 单位换算 / 取对数</strong>，
+    <strong>改名必须同时写方向</strong>（分子分母写清）。
+  ⚠️ 这条比「符号撞车」更隐蔽：撞车是<strong>两个量同名</strong>（会被人发现），<strong>本条是一个量换了名字、数值看起来还挺像</strong>
+    （8.38 与 0.119 都不像"错"的数字）。</p>
+<p>⚠️⭐⭐ <strong>坑 2：一次更正要扫三层 —— 「同一轮块 ＋ 同一小节 ＋ 同一量的派生量」。</strong>
+  第 109 轮实测：第 81 轮的修补把 §8.6.5 <strong>判别表的表格行</strong>改成了 <code>Ω_tot = 3/(8π)</code>（全文仅此 1 处 ✓），
+  <strong>而同一轮块的正文仍写 <code>λ ≡ ρ_micro/ρ_holo = 8π/3</code></strong> ⟹ 与本节开头的符号约定
+  （「本节<strong>不使用 λ</strong> 表示密度比」）<strong>直接冲突</strong> —— 两处相距约 100 行，<strong>同一个 §8.6 内</strong>。
+  📌 <strong>同族已第 4 次</strong>：<strong>C-26</strong>（漏改派生量 5.93）／<strong>C-27</strong>（改了工具没改产物）／<strong>C-35</strong>（正文未同步）／<strong>本轮</strong>。
+  ✅ <strong>三层的具体扫法</strong>（每轮收尾各跑一次，都便宜）：
+    · <strong>同一轮块</strong>：<code>grep</code> 该轮的 <code>【v2.9 …（第 N 轮…】</code> 块，逐行看有没有同一量的旧写法；
+    · <strong>同一小节</strong>：<code>grep</code> 该小节（从标题到下一个同级标题）的<strong>全部</strong>同名量；
+    · <strong>派生量</strong>：列出该量在段内的<strong>比值/差值/百分比/对数</strong>，逐个核对（陷阱 70）。
+  📌 <strong>判据问句</strong>：「<strong>我这次改的东西，在同一个块、同一个节、以及由它算出来的数里，还有几处旧写法？</strong>」</p>
+<p>⭐ <strong>坑 3（顺带结论）：符号约定是「追认式」的，会系统性滞后。</strong>
+  第 109 轮查出 <code>λ</code> 的<strong>第四义（力程 / 康普顿波长 <code>λ = ℏc/m</code>）从未登记</strong> ——
+  而 C-15 的三义是<strong>逐轮追加</strong>出来的（第 72 轮才补第三义）。
+  ⟹ <strong>每轮开工前扫一遍「本轮或近期新引入的字母/编号」</strong>（与 C-73 的「符号撞车第 6 次」同一条）。
+  📌 附带：<strong>符号约定的行数计数也会过期</strong>（本项目 <code>λ</code>：26 行 → 44 行 → 本轮实测 <strong>58 行</strong>）
+    ⟹ 引用这类计数<strong>必须现算</strong>。</p>
+<p>⚠️ <strong>实现坑（本轮再次踩）</strong>：<strong>新条目又插到了上一轮条目的前面</strong> ——
+  我把 <strong>C-75</strong> 插在 <code>| &lt;strong&gt;C-74&lt;/strong&gt; |</code> <strong>之前</strong>（违反第 104 轮 C-71 立的规范）。
+  <strong>同一条规范已连续两轮被违反（104 / 109）</strong> ⟹ 说明「靠记性」不行：
+  <strong>结构自检（<code>nums == sorted(nums)</code> 严格断言）必须每轮跑</strong>，它这次当场抓住了。</p>
+</li>
+</ol>
+<p><strong>工具</strong>
+- ⭐ <strong>两个现成模块，直接用，不要重写</strong>（<code>outputs/</code> 下，随仓库一起走）：
+  - ⚠️ <strong>索引约定</strong>：<code>_tickgroup</code> 用 <strong>Fortran 序</strong>（<code>i = z·Lx·Ly + y·Lx + x</code>），
+    numpy 的 <code>reshape(dims)</code> 用 <strong>C 序</strong> ⟹ <strong>轴标号差一个反序</strong>；
+    自写实现要与它对照时<strong>先换算坐标</strong>（第 65 轮踩过：不换算则「群阶相同、集合不同」）。
+  - <code>_tickgroup.py</code> —— tick 群的生成元：<code>gens_correct(dims)</code>（第 48 轮更正版）、
+    <code>gens_buggy(dims)</code>（旧错误版，仅对照）、<code>M_of_axis</code>、<code>sigma_on_line</code>、<code>match_on_line</code>、
+    <code>random_cfgs(N,k,S,seed)</code>。<strong>所有轨道/H/N 计算都用它。</strong>
+  - <code>_gap.py</code> —— GAP 调用助手：<code>gap_available()</code>、<code>gap_run(script)</code>、
+    <code>orbit_sizes_via_gap(gens, cfgs, N)</code>（返回 <code>(|G|, [|O(c)|…])</code>，内部已处理长整数折行）。
+- 置换群阶：用 <strong>sympy</strong> 的 <code>PermutationGroup(...).order()</code>（Schreier–Sims，精确）。
+  ⚠️ <strong>它的 capacity 比直觉大得多</strong>：第 47 轮实测 <code>|G| = 2.2015×10¹¹</code>（N=32，(2,4,4)）
+  仍是<strong>秒级</strong>；再大的算例（6×6×6 的 6.18×10²²²）也能算。
+  ⟹ <strong>群阶几乎永远算得动，轨道才是瓶颈</strong> —— 所以「先算 |G|」永远值得做。
+- 但生成元太多时先<strong>化简</strong>：tick 群 ⟹ <code>G = ⟨M_x,M_y,M_z；所有 σ_j⟩</code>（证明：
+  <code>M_a·T(p) = ∏_{j:p_j=1} σ_j</code>，σ_j = 相位1匹配 ∘ 相位0匹配），把 4×4×4 的 196608 个降到 <strong>51</strong> 个。
+  ⚠️ <strong>σ_j 的正确写法见陷阱 27</strong>（「偶位 +2、奇位 −2」，不是「全体 +2」）。</p>
+<p><strong>GAP（第 48 轮装成，此后为轨道/H/N 的标准工具）</strong>
+- 版本 <strong>4.16.1</strong>，装在 <code>C:\Program Files\GAP-4.16.1\</code>；exe = <code>runtime\opt\gap-4.16.1\gap.exe</code>。
+- 一行出结果：<code>Size(Stabilizer(G, c, OnSets))</code> ⟹ <code>|O(c)| = |G| / |Stab_G(c)|</code>（<strong>不遍历轨道</strong>，
+  所以轨道大到 10¹⁵ 也算得动 —— (4,4,4) 的轨道 10¹²·²–10¹⁵·³，全脚本 ≈76 s）。
+- <strong>调用方式</strong>（三个坑都在这里）：
+  <code>python
+  GAPROOT   = r"C:\Program Files\GAP-4.16.1\runtime\opt\gap-4.16.1"
+  GAPBIN    = r"C:\Program Files\GAP-4.16.1\runtime\bin"
+  env["PATH"] = GAPBIN + os.pathsep + GAPROOT + os.pathsep + env["PATH"]
+  subprocess.run([os.path.join(GAPROOT, "gap.exe"), "-q", "-b"],
+                 stdin=open(script_g, "rb"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)</code>
+  ① 必须把 <code>runtime\bin</code>（<code>cygwin1.dll</code>）与 gap 根目录（<code>libgap.dll</code>）<strong>都</strong>加进 PATH，
+     否则报 <code>No such file or directory</code>；
+  ② <strong>绝不能用 <code>timeout</code> 包一层</strong>（Git Bash 的 execvp 与 Windows 加载器不兼容，必失败）；
+  ③ <code>gap.bat</code> 走 <code>cygstart</code> + mintty ⟹ <strong>无法非交互</strong>，别用。
+- 生成元写成 <code>PermList([...])</code>（1-indexed 像）；集合写成 <code>[i+1, ...]</code>。
+- 校验：<code>Stabilizer(Sym(5),[1,2],OnSets) = 12</code>、<code>Stabilizer(Sym(6),[1,2],OnSets) = 48</code>。
+- ⚠️ <strong>实用上限（第 49 轮实测）：degree ≈ 216</strong> —— (6,6,6) 单次 <code>Stabilizer</code> ≈200 s，
+  ⟹ (8,8,8) N=512 <strong>当前不可行</strong>。更大格点需换不遍历轨道的算法或改用不变量上界。
+- ⚠️ <strong>GAP 对超长整数会折行</strong>（|G| 超过约 78 位）：输出变成
+  <code>ORDER</code> / <code>&lt;数字片段1&gt;</code> / <code>&lt;片段2&gt;</code>… ⟹ 解析时<strong>只按行取 <code>split()[1]</code> 会 IndexError</strong>
+  （第 49 轮因此报 <code>list index out of range</code>，且<strong>一度被误读为"超时"</strong>）。
+  修法：<code>SetPrintFormattingStatus("*stdout*", false);</code> + 解析器<strong>拼接标记之间的数字片段</strong>
+  （已修于 <code>outputs/_gap.py::_parse_markers</code>）。
+  ⟹ 教训：<strong>报错不等于超时，先把原始输出打出来再看</strong>。</p>
+<p><strong>HTML 快照排错（2026-09-21 修）</strong>
+- 症状：预览里<strong>正文被横向排成一条</strong>（每个段落挤成一窄列、中文逐字换行）。
+- 根因：<code>_md2html_v21.py</code> 的 CSS 里 <code>.wrap{...display:flex;...}</code>，而模板的 <code>.wrap</code>
+  直接子元素是 hero + <strong>全部正文块</strong>（没有 <code>.main</code> 包一层）⟹ 它们全成了 flex item。
+- 修法：<code>.wrap{max-width:1160px;margin:0 auto}</code>（去掉 flex）。改完<strong>跑 <code>--all</code> 全量重建</strong>。
+- ⚠️ <code>_md2html_generic.py</code> 用<strong>硬编码行号切片</strong>（<code>_src[250:391]</code>）从 v21 取 CSS + TOC_JS
+  ⟹ <strong>改 v21 时不要增删行</strong>，否则切片失效（有 assert 会报"切片失效"）。
+- <code>.toc</code> / <code>.main</code> 的 CSS 与 TOC_JS 是<strong>死代码</strong>（模板里没有这些容器），无副作用，别删
+  （删了会改行号）。</p>
+<ol start="107">
+<li>
+<p><strong>⭐⭐⭐ 「唯一解」先问是不是除法；「某概念为何恰好是 N」先问对象还在不在</strong>（第 110 轮 <strong>G9-②</strong>；<strong>C-76</strong>）：
+    <strong>触发</strong>：① 论文里出现「<strong>q = 4 是唯一解</strong>」这类<strong>唯一性</strong>断言；② 待办问「某某<strong>为何恰是</strong> N 个 / 几维」。</p>
+<p>⚠️⭐ <strong>坑 1：反解表常常就是恒等式。</strong> 第 110 轮逐项核对：论文那张「以 4 bits/面元为目标反解 q」的表
+  （q=2 → 3.000／3 → 3.585／4 → 4.000／5 → 4.322 bits）<strong>恰等于 <code>2 + log₂q</code></strong>（最大偏差 7.19×10⁻⁵ = 三位小数舍入）
+  ⟹ <code>bits(q) = log₂(4q)</code> 就是「<code>k·q = 16</code>，k = 4」的<strong>换写</strong>。
+  📌 <strong>判据问句</strong>：「<strong>这个表是不是 <code>目标 = k·q</code> 的换写？</strong>」⟹「唯一」<strong>只来自 log 的严格单调性</strong>，不含选择信息。</p>
+<p>⚠️⭐ <strong>坑 2：约束本身可能不唯一。</strong> <code>k·q = 16</code> <strong>单独有 5 组整数解</strong>（(1,16)(2,8)(4,4)(8,2)(16,1)），
+  它只排除<strong>非整除</strong>的 k（如 k = 6）。本链条<strong>唯一</strong>的真唯一性来自 <code>2^k = 16 ⟹ k = 4</code>（<code>2^k</code> 单射），
+  <strong>不经过 q</strong> ⟹ 精确表述：被推出的是「<strong>方向数 = 4</strong>」，不是「<strong>态数 = 4</strong>」。</p>
+<p>⚠️⭐ <strong>坑 3（最重要）：先问「对象还在不在」。</strong> 第 110 轮的结论是<strong>对象消失</strong> —— 「内部四态」是
+  <strong>读法 A 的内部构件</strong>，而读法 A 早在第 32 轮就被裁决淘汰（现行取 <strong>B2</strong>：4 条平面内连接 × 正/负支 ⟹ <code>2⁴ = 16</code>）。
+  ⟹ 问「为何恰是这四个态」等价于问<strong>一个已被淘汰读法的内部构件</strong>。
+  📌 <strong>判据问句</strong>：「<strong>这个问题的主语，在当前读法下还是框架的构件吗？</strong>」—— 若不是，答案是「<strong>对象消失</strong>」，
+    比「判否」更强（判否说「没推出」，对象消失说「<strong>不需要推</strong>」）。
+  📌 <strong>同族</strong>：<strong>C-4</strong>（<code>E_c ≡ 1 meV</code>）／<strong>N-36</strong>（<code>L²</code> 是 <code>h</code> 的定义式）／<strong>N-32</strong>（<code>D = ℏ/(3m)</code>）／<strong>C-67</strong>（直接赋值）
+     —— 「把定义 / 换写当发现」第 <strong>5</strong> 次。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「X 是基本常数 / 是导出量 / 是某某常数」这类身份主张，要跑三个可判定检验</strong>（第 111 轮 <strong>A23</strong>；<strong>C-77 ＋ N-41</strong>）：
+    <strong>触发</strong>：论文或待办出现「<strong>非基本常数</strong>」「<strong>是……的导出量</strong>」「<strong>某某常数</strong>（普朗克常数 / 精细结构常数…）」这类<strong>身份断言</strong>。</p>
+<p>⚠️⭐ <strong>检验 1：量纲 ＋ 指数。</strong> v1.17 把 <code>M²/A = c⁴/(16πG²) ≈ 3.607×10⁵²</code> 称作「<strong>普朗克常数</strong>」——
+  量纲 = <strong>(2, −2, 0) = kg²/m²</strong>，而 <code>ℏ</code> = <strong>(1, 2, −1) = kg·m²/s</strong> ⟹ <strong>不同量纲</strong>；且<strong>表达式里 <code>ℏ</code> 的指数 = 0</strong>。
+  📌 判据问句：「<strong>这个表达式里 <code>X</code> 的指数是多少？</strong>」（是 0 就别说它关于 <code>X</code>）。</p>
+<p>⚠️⭐ <strong>检验 2：是不是恒等式（含不含框架元素）。</strong> <code>M²/A = c⁴/(16πG²)</code> 由 <code>A = 4πr_h²</code>、<code>r_h = 2GM/c²</code>
+  <strong>直接得到、对任意 M 成立</strong>（5 个质量实测最大相对差 2.9×10⁻¹⁶）⟹ <strong>零框架内容</strong> ⟹ 由它「推 <code>r_h</code>」是<strong>循环</strong>。
+  📌 连带：末句「<code>α = 1</code> 双重来源」中<strong>第二条不独立</strong> ⟹ <strong>降为 1 条</strong>（同源误计第 <strong>3</strong> 次：C-6／C-45）。</p>
+<p>⚠️⭐ <strong>检验 3（最有用）：可辨识性计数 —— 数关系、数未知量。</strong> 「<code>ℏ</code> 是导出量」需要<strong>框架给出 <code>l_P</code> 一个
+  不依赖 <code>ℏ</code> 的独立数值</strong> —— 实测：全文 <code>l_P</code> 的<strong>唯一数值</strong>（附录 <code>1.62×10⁻³⁵ m</code>）<strong>就是</strong> <code>√(Gℏ/c³)</code>
+  （自洽复算 1.6163×10⁻³⁵ m）⟹ <strong>无支撑</strong>。计数：框架自有关系 <strong>2</strong> 条（<code>c = l_P/t_P</code>、<code>l_P² = Gℏ/c³</code>），
+  <code>c</code> 另有实测值 ⟹ <code>{l_P, G, ℏ}</code> <strong>3 未知 / 1 关系 ⟹ 自由度 2</strong> ⟹ <strong><code>ℏ</code> 不可辨识</strong>
+  （<code>ℏ</code> 与 <code>G</code> 是同一自由度的两种记账）。
+  📌 <strong>把断言变成可判定问题的固定句</strong>：「<strong>要让它成立，框架必须先给出什么？那个东西在全文出现了几次？</strong>」</p>
+<p>⭐ <strong>正面收获（本轮唯一）</strong>：<strong>λ = 1 链里 <code>ℏ</code> 逐项抵消</strong> —— <code>N = πR²/l_P²</code>（分母含 <code>ℏ</code>）× <code>k_BT = ℏH₀/2π</code>（分子含 <code>ℏ</code>）
+  ⟹ <code>E = R²H₀c³/(2G)</code>、<code>ρ = 3H₀²/(8πG)</code> <strong>不含 <code>ℏ</code></strong>；数值 <code>ℏ → t·ℏ</code>（0.5 / 2 / 10 / 10⁶）并<strong>同步重算</strong> <code>l_P²</code>，
+  <code>ρ</code> <strong>逐位相同</strong>（2.2×10⁻¹⁶）⟹ <strong>核心方程对 <code>ℏ</code> 完全不敏感</strong>。
+  📌 <strong>可复用技巧</strong>：<strong>要判断「某条链是否依赖某个常数」，就把它按比例缩放、并同步重算所有因它而变的量</strong>
+    （比符号推导更快，且天然给出数值容差）。
+  ⚠️ 附带：<strong>「抵消」不等于「无关」</strong> —— 只说明<strong>该链</strong>看不见它；要下全称结论必须<strong>全链清点</strong>
+    （本轮清了 30 行含 <code>ℏ</code> 的文本）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「某量 = 某常数」先问它是</strong>算出来的<strong>还是</strong>填进去的<strong>；再问口径是</strong>相对<strong>还是</strong>绝对****（第 112 轮 <strong>D4</strong>；<strong>C-78 ＋ N-42</strong>）：
+    <strong>触发</strong>：① 待办写「把 A 与 B 精确映射起来（差 x%）」；② 代码或论文里出现「耦合常数」「有效系数」这类<strong>看起来像标定</strong>的数。</p>
+<p>⚠️⭐ <strong>坑 1：先去源码看它是形参还是计算量。</strong> 第 112 轮实测：<code>stormetric/src/stormetric/emri.py</code> 里
+  <code>kappa</code> 是 <strong><code>coupling: float = 0.30</code> 的默认形参</strong>，docstring 自标 <strong>"Phenomenological coupling"</strong>，
+  类文档还注明 <code>metric</code> 参数 <strong>"kept for interface symmetry, the precession law itself is parametrised by κ"</strong>
+  ⟹ <strong>整条进动律不经过度规</strong> ⟹ 「10% 缺口」是<strong>输入 vs 解析系数</strong>的比较，不是两个可推导量之差。
+  📌 <strong>判据问句</strong>：「<strong>这个数是算出来的，还是填进去的？</strong>」（<code>grep '= 0.30'</code> / <code>default=</code> 一秒可判）</p>
+<p>⚠️⭐⭐ <strong>坑 2（最容易漏）：相对 vs 绝对 —— 1PN 相同的两个理论，其「绝对差」必然高一阶。</strong>
+  代码写 <code>δ = κ x_p</code> 并当<strong>绝对</strong>超额用（<code>n_orbits = 1/(κ x_p)</code>），而两度规 1PN 相同 ⟹
+  <strong>绝对</strong>超额必为 <code>O(x_p²)</code>、<strong>只有相对</strong>超额才 ∝ <code>x_p</code>。材料包的 <code>0.57%/1.02%/1.55%</code> 是相对量
+  （三点之比 2.72 ⟹ 随 <code>x_p</code> 变），而代码的 <code>relative_deviation = κ/(6π+κ)</code> 是<strong>常数</strong> ⟹ 两者不相容。
+  📌 <strong>判据问句</strong>：「<strong>这个量随自变量变，还是常数？</strong>」—— 若同一个量在代码里是常数、在备忘录里随参数变，
+    <strong>必有一处口径写错</strong>。（同族 <strong>C-72</strong>（量纲）／<strong>C-75</strong>（倒数方向）／<strong>C-76</strong>（恒等式））</p>
+<p>⭐ <strong>本轮真收获：把唯象参数换成度规导出的函数，参数 −1。</strong> 用框架自己的度规做测地线积分
+  （<strong>GR 侧复现闭式 <code>2π[(1−6M/p)^{−1/2}−1]</code> 作标定</strong>，误差 ≤5×10⁻⁵），得
+  <strong>相对超额系数 <code>κ_rel(e)</code>：0.33332（e→0）／0.34394（0.333）／0.36463（0.6）／0.39045（0.818）／0.41163（0.961）</strong>
+  ⟹ <strong>近圆极限 = 1/3</strong>，且<strong>单调随 <code>e</code> 增大（+23%）</strong> ⟹ 单一 <code>κ = 0.30</code> 在<strong>全部偏心率下偏低 11%–37%</strong>。
+  📌 <strong>可复用套路</strong>：<strong>「唯象参数 → 该参数所在理论的原始几何」</strong> —— 若那个理论自带度规，就去把参数算出来
+    （哪怕只是数值），这常常能<strong>消掉一个自由参数</strong>。</p>
+<p>⚠️ <strong>技术坑（本次连踩，写测地线/进动积分前必读）</strong>：
+  ① 端点开方奇异必须<strong>解析正则化</strong>（写成 <code>W = (r−r_p)(r_a−r)Q(r)</code>，则 <code>dφ/dθ = L√(h/Q)/ρ²</code> 光滑）；
+  ② <strong>双端点都要</strong>正则化（只代换一端 ⟹ 另一端仍是 <code>1/√(1−s)</code> 型 ⟹ <code>quad</code> 报 roundoff 不收敛）；
+  ③ 膨胀参数必须<strong>坐标无关</strong>（用<strong>面积半径</strong>半通径 <code>p = 2R_pR_a/(R_p+R_a)</code>；用坐标标签会有假的「偏心率依赖」）；
+  ④ 提取 2PN 系数是<strong>相减放大</strong>运算（要 ~10⁻¹² 相对精度）⟹ <strong>先用已知闭式标定</strong>，再谈小数第 3 位；
+  ⑤ 浮点不够就换 <code>mpmath</code>（<code>mp.dps = 40</code>）＋ <code>tanh-sinh</code>；⑥ Python 格式化串里的 <code>%</code> 要写成 <code>%%</code>。</p>
+<p>⚠️ <strong>坑 3：三处相同的 <code>1/3</code> 不能叫「同源」。</strong> 本轮同时出现三个精确 <code>1/3</code>：<code>Γ</code> 的 <code>s²</code> 系数、
+  2PN <code>g_rr</code> 分叉 <code>(2−3/2)/(3/2)</code>、<code>κ_rel(e→0)</code> —— 三条链<strong>输入集合两两不相交</strong> ⟹
+  只能登记为<strong>无机制的一致性</strong>（登记 <strong>N-42</strong>）。
+  📌 <strong>判据问句</strong>：「<strong>这两个相同数值，能不能写出它们共用的那一步代数？</strong>」写不出 ⟹ 不许写「同源」。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 解析推演：必须先用【已知闭式】标定；换式必须显式代入变量</strong>（第 113 轮 <strong>I-24</strong>；<strong>把「数值上像 1/3」变成「解析上就是 1/3，且指出它是谁的 1/3」</strong>）：
+    <strong>触发</strong>：① 要把某个<strong>数值</strong>结果升级为<strong>解析</strong>结论；② 要用 sympy 推一条「几何/动力学 → 观测量」的解析链。</p>
+<p>⚠️⭐⭐ <strong>坑 1（本轮真踩了）：换式"看起来写了、其实没生效"。</strong>
+  第 113 轮算 <code>Γ = ω_φ/ω_r</code> 的级数时，变量是 <code>ε = M/r</code>；最后要换成观测变量 <code>y = M/R_areal = ε/√h</code>。
+  第一版把 <code>h</code> 的级数（<strong>以 r 为变量</strong>）直接写进 <code>ε/√h</code> 再对 <code>ε</code> 展开 ⟹ <strong><code>h</code> 被当成与 <code>ε</code> 无关的常数</strong>
+  ⟹ 换式退化成 <code>ε = y</code>（打印出来就是 <code>eps = y</code>）⟹ <code>c₂</code> 输出 <strong>10.5</strong> 而不是 <strong>13.5</strong>。
+  📌 <strong>规范</strong>：换式一律写成「<strong>先用 <code>subs</code> 把 <code>r = 1/ε</code> 显式代进去 → 再对 <code>ε</code> 展开</strong>」；
+    并且<strong>打印换式本身</strong>（<code>eps = y + ...</code>），一眼就能看出它是不是恒等变换。</p>
+<p>⚠️⭐⭐ <strong>坑 2：没有标定，就不知道错的是哪一环。</strong> 本轮的唯一救命稻草是
+  <strong>GR 侧有精确闭式</strong> <code>Γ_GR = (1−6y)^{−1/2}</code>（因为 Schwarzschild 的 <code>ω_φ² = M/r³</code>、<code>ω_r² = M(r−6M)/r⁴</code>）。
+  修好换式后，我的机器给出的系数 <strong><code>3, 27/2, 135/2</code> 与闭式逐项相等</strong> ⟹ 机器与换式<strong>同时</strong>被验证。
+  📌 <strong>规范</strong>：任何解析链<strong>先算一个已知答案的同类子问题</strong>（同族、同阶、同变量约定），再算新问题。
+  ⚠️ 反例警示：若不标定，<code>10.5</code> 与 <code>13.5</code> 都"看起来合理"，而<strong>结论 <code>1/3</code> 却恰好仍对</strong>（差异是共同的）——
+    <strong>结果对不代表过程对</strong>。</p>
+<p>⭐ <strong>本轮产物（可复用套路）</strong>：<strong>「数值上像 X ⇒ 找出 X 是谁的 X」</strong>。
+  方法：把结果写成<strong>级数系数的比</strong>，再看分子分母各是什么物理量 ——
+  <code>κ_rel(e→0) = Δc₂/c₁</code>（<code>c₂</code> = 2PN 系数，<code>c₁</code> = 1PN 斜率）＝ <code>(29/2 − 27/2)/3 = 1/3</code>。
+  再做<strong>单侧替换实验</strong>（只换 <code>f</code>、只换 <code>h</code>）把 <code>Δc₂</code> <strong>严格分解</strong>为 <code>+1.25（g_rr/g_θθ 侧）− 0.25（g_tt 侧）</code>
+  ⟹ 一个「裸的数字」变成了<strong>有来源的机制</strong>。
+  📌 <strong>判据问句</strong>：「<strong>这个数是谁的谁？</strong>」（比值？差？某个系数的组合？）—— 写不出来就还只是数值。</p>
+<p>⚠️ <strong>坑 3：级数计算的规模会爆炸。</strong> 「两点积分 <code>2∫du/√F</code> ＋ 全级数」的完整路线在 sympy 上<strong>多次超时</strong>。
+  📌 对策：① 先做<strong>退化情形</strong>（圆轨道 → 本轮已解析）；② 改用 <strong>L-P 平均法</strong>只取共振项；
+    ③ 或<strong>数值 + 有理重构</strong>（拟合出有理函数再用高精度验证）。<strong>别在一条爆炸的链上耗到超时</strong>。
+  ✅ <strong>第 115 轮（I-25）已解决并写成正式套路</strong> —— 见<strong>陷阱 112</strong>（<code>Fraction</code> 精确递推 ＋ 有理取点 ＋ 精确插值）：
+    同一个两点积分，sympy 版 &gt;600 s 超时两次，换 112 的套路后<strong>一轮内出闭式</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 级数/迭代实现的自检：先打印「最低幂与首项系数」，再谈结果</strong>（第 115 轮 <strong>I-25</strong>）：
+    <strong>触发</strong>：手写任何截断级数（dict{幂: 系数}、多项式截断、不动点迭代）。
+    自造的级数机器<strong>不会自己报错</strong> —— 错法全都表现为「结果看着像对的」。本轮两个真踩到的：</p>
+<p>⚠️⭐ <strong>坑 1：<code>1/A</code> 的幂移位写成 <code>+m</code> 而非 <code>−m</code></strong>（<code>A</code> 的最低幂是 <code>m</code> ⟹ <code>A⁻¹</code> 的最低幂是 <code>−m</code>）。
+  症状：<strong>所有中间量的最低幂整体平移</strong>（<code>β = (SB²+AA²)/(2·SB·AA)</code> 本该 <code>O(1)</code>，实跑到 <code>O(eps⁴)</code>）
+  ⟹ 下游全部「少了一项」，而<strong>某些组合仍可能碰巧给出合理数</strong>。
+  📌 <strong>规范</strong>：级数机器写完，<strong>第一件事是 <code>print</code> 每个中间量的 <code>min(power)</code> 与首项</strong>，逐个核对量级
+    （<code>SB ~ eps¹</code>、<code>AA ~ e·eps¹</code>、<code>β ~ eps⁰</code>、<code>G₀ ~ eps¹</code>、<code>R₀ ~ eps⁻¹</code>、<code>μ²/R₀ ~ eps⁰</code>）。
+  📌 <strong>量级表就是最便宜的判据</strong> —— 它能在<strong>没有任何已知答案</strong>的情况下发现符号错。</p>
+<p>⚠️⭐ <strong>坑 2：不动点迭代漏掉显式的缩放因子</strong>。转折点 <code>u = √h(u)/R</code>（<code>R = 1/(y(1±e))</code>）写成
+  <code>u ← (1±e)·√h(u)</code>（漏了 <code>y</code> 因子）⟹ <code>u</code> 出现 <code>O(1)</code> 常数项（<code>.5</code> 量级），
+  而<strong>所有后续计算照样跑完</strong>、只是答案全错。
+  📌 <strong>规范</strong>：迭代式一律写成「<strong>显式乘上全部因子</strong>」（<code>u ← eps·(1±e)·√h(u)</code>），并<strong>检查首项幂 = 1</strong>。</p>
+<p>⚠️ <strong>坑 3（数值侧）：<code>mpmath</code> 的 <code>dps</code> 不够会让端点开方跑到复平面。</strong>
+  <code>dps = 30</code> 时极端偏心率的测地线积分返回 <strong><code>mpc</code></strong>（<code>findroot</code> 打在端点上，精度不足 ⟹ <code>Q &lt; 0</code> ⟹ <code>sqrt</code> 给虚部），
+  而报错信息是 <code>float() argument must be ... not 'mpc'</code> —— <strong>看不出是精度问题</strong>。
+  📌 <strong>规范</strong>：测地线/开方型积分一律 <strong><code>dps ≥ 40</code></strong>；见到 <code>mpc</code> 先加精度，不要先改公式。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「一条小参数 ＋ 一个要留作符号的参数」的展开：别让 sympy 扛，用精确有理算术按点取 ＋ 精确插值</strong>（第 115 轮 <strong>I-25</strong>；<strong>通用套路</strong>）：
+    <strong>触发</strong>：要展开 <code>F(小参数；符号参数) = Σ c_k(符号参数)·小参数^k</code>，而 <code>c_k</code> 本身是<strong>有理函数</strong>（本轮：<code>F(y; e)</code>、<code>c₂(e) = 1/3 + e²/12</code>）。
+    本轮实测：<strong>sympy 版两次 &gt;600 s 超时</strong>（<code>sp.series</code> 在 <code>P(SB±AA)</code> 这类「多项式代进级数」处产生 <code>deg ~ 56</code> 的巨表达式）；
+    换成下面三步后<strong>一轮内出结果、且全是精确有理数</strong>：</p>
+<p><code>① 级数用 dict{幂: Fraction} 手写（加/乘/逆/开方，各 ~10 行）；
+   开方只在「最低幂为偶 且 首项系数是完全平方有理数」时用 —— 不满足就说明前面错了（本轮借此抓到坑 1）
+② 符号参数取 【有理数】 点（e = 1/3, 1/2, 2/3, 3/4, 4/5, 5/6, 12/13 …），整套算术保持精确
+③ 对「符号参数的幂」（如 E = e²）作最低次精确插值，再用【更多点】验证（7 点全中 ⟹ 形式确定）</code>
+📌 <strong>判据</strong>：插值出的形式<strong>在未参与拟合的点上精确命中</strong>，且<strong>结构上落在预期阶数内</strong>（本轮 <code>S(e) = a₀ + b·e²</code>，无 <code>e⁴</code>）。
+📌 <strong>配套的坑</strong>：
+  - ⚠️ <strong>补丁/检查脚本自己的期望值会过期</strong>：本轮结构类检查连错 3 处（块长手数成 19、<code>gap</code> 期望写成 19/10）。
+    <strong>规范：结构类检查的期望值一律由「扫描得到」（<code>while 行以 '&gt; ' 开头</code>）而不是手数。</strong>（同族 陷阱 72 / 101）
+  - ⚠️ <strong>一次多动作的补丁脚本只能跑一次</strong>（插入型锚点在第二次会命中两次而被拒）；若检查项写错<strong>必须先从备份回滚再重跑</strong>，
+    不要「就地改检查再跑一遍」——那时文件已改过，锚点语义已变（本轮真踩，已用备份回滚）。
+  - ⭐ <strong>副产品</strong>：把「数值表」变成「闭式」时，<strong>顺手核对那张表是怎么来的</strong> —— 本轮由此查出 <strong>C-79</strong>
+    （备忘录的表列用的是原始值，而表头写「外推值」；<strong>同一脚本</strong>打印的外推值才与闭式一致）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 解析式必须与「直接测量」比对，不能与「另一个近似」比对</strong>（第 116 轮 <strong>EMRI 数字重算</strong>；<strong>C-80</strong>）：
+    <strong>触发</strong>：推出一个「宽度 / 精度 / 分辨率」的<strong>解析公式</strong>；或把一个量在<strong>两套口径</strong>之间换算。</p>
+<p>⚠️⭐⭐ <strong>本轮真踩了</strong>：我给 EMRI 的条件宽写了 <code>σ = 1/(√2·ρ·w_GR)</code>，
+  并用「与 Fisher 的 <code>1/√Γ_δδ</code> <strong>相符到 18%</strong>」当作验证就收工了。
+  后来做<strong>直接测量</strong>（对 <code>ΔlnL(δ)</code> 二分求 <code>ΔlnL = 0.5</code> 的<strong>似然半宽</strong>）：<strong>2.54×10⁻⁶</strong>，
+  比我的解析式<strong>大 2.44 倍</strong>。重推后：
+  <code>ΔlnL(Δδ) ≈ 2ρ²·Var(w)·Δδ²   ⟹   σ_cond = 1 / (2ρ√Var(w))     （实测吻合 0.4%）</code>
+  ⭐ <strong>顺带解释掉了那 2 倍</strong>：<code>Γ_δδ ∝ ⟨w²⟩</code>（<strong>二阶矩</strong>），而似然峰值宽度用<strong>方差</strong> <code>Var = ⟨w²⟩ − ⟨w⟩²</code>
+  ⟹ <code>σ_Fisher/σ_似然 = √(Var/⟨w²⟩)</code>（<code>w</code> 线性增长时 ≈ 1/2 ✓）。
+  📌 <strong>规范</strong>：<strong>任何解析公式都要和一个「数值直接测量」对齐</strong>。两个近似互相「印证」<strong>不算证据</strong>
+    （这正是 <strong>C-4／C-67／C-76</strong> 那一族在<strong>解析侧</strong>的版本）。
+  📌 推论：报「宽度」时必须写明<strong>是哪一个</strong>（曲率 <code>1/√Γ</code> ／ 半宽 ／ 边际 ／ 有效）——
+    本轮实测：<code>σ_cond(Fisher)=1.23e-6</code>、<code>σ_cond(似然半宽)=2.54e-6</code>、<code>σ_marginal=8.30e-4</code>、<code>σ_eff=1.05e-3</code>，
+    四个数都在文献里叫过「σ_δ」。</p>
+<p>⭐ <strong>配套判据（本轮的第二个产物）：χ² 型显著性 ≤ <code>√2·ρ</code>。</strong>
+  <code>ΔlnL = ½(δ/σ)²</code> 是<strong>二次外推</strong>（只在小 <code>ΔlnL</code> 有效）；一旦 <code>ΔlnL ~ 10²</code> 就会失控：
+  本轮 4 yr 的旧值 <code>13930</code> <strong>超过 Cauchy–Schwarz 上界 <code>½(ρ+ρ_GR)² = 1132</code> 的 12.3 倍</strong>
+  ⟹ <strong>数学上不可能</strong>，必须改用<strong>精确内积</strong> <code>ΔlnL = ½⟨Δh|Δh⟩</code>。
+  📌 <strong>做法</strong>：既有的 Fisher 机器里加一行 <code>ΔlnL = ½·4∫(Δh)²/S_n dt</code> 就能算，<strong>比二次外推便宜且不会错</strong>。</p>
+<p>⭐ <strong>「两个口径」的识别套路（把「不自洽」翻译成「混用」）</strong>：
+  同一批数据给出两个相差几百倍的「σ」时，<strong>先别判不自洽</strong> —— 问「它们各自放开了哪些参数 / 各自问什么问题」。
+  本轮：<code>1.63×10⁻⁶</code>（<strong>只放开 δ</strong>）vs <code>7.5×10⁻⁴</code>（<strong>边际/有效</strong>）⟹ 比值 ≈ <strong>条件宽 ÷ 有效宽</strong>
+  （实测 413–862）⟹ 两个数<strong>各自都对</strong>，错的是<strong>把它们并列引用</strong>。
+  ⚠️ 附带：<strong>报数时 <code>T</code> 相同但 SNR 不同</strong>也要小心 —— 本轮 MCMC 的 <code>ΔlnL</code> 在 2/4 yr 几乎不变，
+  原因就是它<strong>把噪声按 SNR=20 标定</strong>（<code>ρ²</code> 不随 T 变）⟹ 「比值 ~1」<strong>本来就是对的</strong>。</p>
+<p>⭐ <strong>流程教训</strong>：<strong>多动作补丁发现自己期望值写错时，先从备份回滚，再改脚本重跑</strong> ——
+  不要「就地改检查再跑一遍」（那时文件已改过，锚点语义已变）。本轮真用上了这条（见陷阱 112 配套）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「同一个量的两个数差 2 倍」先问「各自放开了哪些参数」—— 条件 vs 剖面</strong>（第 117 轮 <strong>C-81</strong>；<strong>把「矩之别」证伪</strong>）：
+    <strong>触发</strong>：同一批数据（或同一模型）给出<strong>两个都叫「σ_X」的数</strong>，相差一个 O(1) 因子（本轮 = 2.06）。
+    ⚠️ <strong>本轮实测（第 116 轮的解释被证伪）</strong>：第 116 轮把「<code>2.54×10⁻⁶</code> vs Fisher <code>1.23×10⁻⁶</code>」解释为
+      「<code>Γ_δδ ∝ ⟨w²⟩</code>（<strong>二阶矩</strong>）而似然宽度用<strong>方差</strong> <code>Var</code>」——<strong>不成立</strong>。直接数值验证两个函数：
+      · <strong>φ₀ 固定（条件）</strong> 的似然半宽 = <strong>1.2307×10⁻⁶ = Fisher 值</strong>（两者<strong>本应相等</strong>，差 0.3%）；
+      · <strong><code>max_φ₀</code>（剖面）</strong> 的半宽 = <strong>2.5416×10⁻⁶</strong> vs 公式 <code>1/(2ρ√Var)</code> = 2.5396×10⁻⁶（差 <strong>0.08%</strong>）✓。
+      ⟹ <strong>两个数都对，但回答不同问题</strong>：「φ₀ 已知时 δ 多准」vs「φ₀ 未知（剖面掉）时 δ 多准」。
+      ⭐ <strong>为什么当年「实测吻合」没暴露错误</strong>：线性 <code>ω(t)</code> 下
+        <code>σ_prof/σ_cond = √3/(ρW) ÷ √3/(2ρW) = 2</code>，而 <code>1/(2ρ√Var) ÷ 1/(2ρ√⟨ω²⟩) = √(⟨ω²⟩/Var) = 2</code>
+        —— <strong>两条机制给出同一个 2</strong>（数值巧合）⟹ 只用「数字吻合」判不出机制。
+      📌 <strong>规范</strong>：报任何「宽度/精度」时必须写明<strong>放开了哪些参数</strong>（条件 / 剖面掉谁 / 边际）；
+        发现两个口径差 O(1) 时，<strong>先算「简并膨胀」</strong> <code>√(1−ρ²)</code>（本轮 2.065 ⟹ <code>|ρ(δ,φ₀)| = 0.875</code>，
+        与 a–δ 联测 ≈0.85 一致）——<strong>能用相关系数解释的，不要编新机制</strong>。
+      📌 同族：<strong>C-51（σ 口径病）／C-75（倒数方向）／C-76（恒等式）</strong>；本条是「<strong>同一个 σ 的不同问法</strong>」。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「δ̂ 精确恢复」先查「针状似然 + 格点对齐」</strong>（第 117 轮；<strong>双链共有</strong>）：
+    <strong>触发</strong>：某拟合的「参数恢复演示」报<strong>精确值</strong>（偏离 0.0σ）—— 在你的<strong>自建 toy</strong> 里尤其可疑。
+    ⚠️ <strong>本轮实测</strong>：Kerr 链与 a–δ 链的 δ 似然都是<strong>针状</strong>的 —— <strong>针宽 ~10⁻⁶</strong>（= 条件宽 <code>1/(2ρ√⟨ω²⟩)</code>），
+      而两家的粗网格步长是 <strong>1.75×10⁻⁴ / 6×10⁻⁵</strong>（<strong>大 100 倍</strong>）⟹ <strong>网格整段错过针</strong>。
+      <strong>12 个种子重做</strong>（复刻旧流程）：<code>δ̂</code> <strong>散布整个区间</strong>（<code>[0.0039, 0.058]</code>）、<code>ΔlnL(粗网格)</code> <strong>13–97</strong>（真值 ≈400）、
+      <code>σ_d</code>（±0.008 掩窗二次拟合）<strong>5/12 给 NaN</strong>。旧的「δ̂ = 0.02000 精确恢复」只因
+      <code>−0.01 + 171×(0.07/399) = 0.020000</code> <strong>恰为格点</strong>（a–δ 的 <code>linspace(0.014,0.026,201)</code> 里 0.02 是中点）——
+      <strong>两个 toy 都以「已知真值」布网格</strong>。
+      📌 <strong>规范（三条）</strong>：① 报「精确恢复」必须同时报<strong>网格步长 vs 针宽</strong>的比；
+        ② 自检 = <strong>把真值挪半个格点</strong>（或换种子）重跑 —— 若「精确」消失，就是格点运气；
+        ③ <strong>针状似然的正确做法</strong>：用<strong>解析/连续</strong>方法（内积公式、梯度优化），或<strong>在预测邻域做细网格</strong>
+          （本轮 ±3×10⁻⁶ 恢复到 ≲1.1σ_cond），<strong>不要</strong>用粗网格 + 二次拟合（后者产出伪影 <code>σ_d</code>）。
+      📌 <strong>附带结论（判别口径）</strong>：<code>dt/T_carrier = 23</code>（欠采样）<strong>对积分类量无碍</strong>（<code>n=3×10³</code> vs <code>3×10⁴</code>：
+        <code>ΔlnL</code> 差 1.7%、条件宽差 0.02%）—— 因为 carrier 相位在样本上「<strong>泛化平均</strong>」（⟨sin²⟩ → 1/2），
+        慢进动部分积分稳定 ⟹ <strong>「欠采样」不能一概判死，要看量是「逐点/瞬时」还是「积分/平均」</strong>。
+        而同轮的「梳状」担忧（第 116 轮已排除平滑性）再次证明：<strong>先测量，再叙事</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「某档已被排除」与「某线已被收紧」这两类判决，各有一个必查项</strong>（第 120 轮 <strong>I-17 修定</strong>；<strong>C-83 / C-84</strong>）：
+    <strong>触发</strong>：① 要把某个候选/档位标成「已被实验排除」；② 读到「某领域 2025–26 大幅收紧」并想据它更新某个结论。
+    ⚠️⭐ <strong>坑 1：「α ~ O(1)」不是耦合值。</strong> 第 72 轮把「毫米档（47.1 / 193.8 μm）」整体判为「已被排除」——
+      而排除线 α_max(λ) 在 47 μm 附近是 <strong>~0.66–1.06</strong>：对 <strong>α = 1</strong>（dilaton）勉强算排除，对 <strong>α = 1/3</strong>
+      （KK radion ⇔ BD ω = 0）<strong>不成立</strong>（α = 1/3 比边界低 <strong>2–3 倍</strong> ⟹ <strong>存活</strong>）。
+      📌 <strong>规范</strong>：判「排除」前把该模型的耦合值<strong>钉成具体数</strong>（radion 1/3 ／ RS ~2/3 ／ dilaton 1），
+        <strong>不许用量级记号代替</strong>；报「存活」给<strong>余量倍数</strong>（= α_max/α_model），报「排除」给 α_model/α_max。
+    ⚠️⭐ <strong>坑 2：「全局收紧」≠「你的那条线被收紧」。</strong> 第 118 轮的「第五力 2025–26 大幅收紧」拆开是：
+      · <strong>实测</strong>：微球（α ≲ 10⁶–10⁷ @5–10 μm，<strong>离 α~1 差 6 个数量级</strong>）／HUST 厘米 10⁻⁴／Juno m~10⁻¹⁴ eV／chameleon ~2 量级（<strong>模型不同</strong>）；
+      · <strong>计划</strong>（不得当结果引）：MORRIS／AION-10／VLBAI／Th-229；
+      · <strong>对相关带（40–200 μm）命中 = 0</strong>（仍由 2020 两篇把守，且 39–48 μm 段<strong>互不一致</strong>）。
+      📌 <strong>规范</strong>：外部扫描条目过「三拆」—— <strong>已测／计划</strong>、<strong>参数区</strong>（对得上你的量吗）、<strong>模型类</strong>（是你这个场吗）。
+    ⭐ <strong>配套</strong>：两条实验的 α=1 边界互不一致时（Lee 38.6 μm vs Tan 48 μm），用<strong>两锚点幂律族</strong>（多端点组合）
+      报<strong>区间</strong>而不是单值（本轮 4 组：存活余量 1.97–3.17×、排除余量 4.4–19.4× ⟹ 判决稳健）；
+      并把「<strong>能把该档判定死的实验要求</strong>」算成数字（本轮：40–60 μm 段 <strong>×3</strong> 改进到 ~0.3 级）——
+      <strong>一条可操作的判据比一句「等下一代」有用</strong>。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「×N 改进」类判据的三个必查项 ＋ 「带内有无新数据」的核对工具</strong>（第 121 轮 <strong>实验线 ×3</strong>；<strong>C-85</strong>）：
+    <strong>触发</strong>：① 你要把「再改进 ×N 就能判定」写成可执行判据（或对外请求）；② 你读到外部文献的「改进 ×N」并想引用。</p>
+<p>⚠️⭐ <strong>坑 1：×N 必须分锚线拆开报，并给「三个档」。</strong> 判据基于多条插值链（本轮 = 两锚线 × 四个端点组合）时，
+  「所需改进」在链间不同：本轮 <strong>×1.97–×3.17</strong>。写成单值会把<strong>边缘</strong>当<strong>判定</strong>：
+  <strong>×3 = 到达边缘</strong>（新界 0.218–0.352 恰好跨过目标 1/3）、<strong>×3.2 = 四链干净排除</strong>、<strong>×6.4 = 2× 裕度</strong>
+  （6.4 = 四链最严 6.34 上取整；<strong>×6.3 就不足</strong> —— 这类取整要<strong>验证</strong>，不要手滑）。
+  📌 规范：报 ×N 时给 <strong>区间 ＋ 三档（边缘/干净/裕度）</strong>，并注明覆盖的 λ 段。
+  ⭐ 附带的一个漂亮判据（本轮）：<strong>改进 F = 3 时，<code>α = 1/3</code> 的边界恰好落到旧的 <code>α = 1</code> 锚点上</strong>
+    （48 / 38.6 μm）—— 「边缘」的量级来源是<strong>锚点结构</strong>，不是巧合。</p>
+<p>⚠️⭐ <strong>坑 2：外部数字的自变量 λ 不能搬。</strong> Du 2022 摘要的「×10」是 <strong>λ ≈ 300 μm 处</strong>的数；请求在 47 μm。
+  <strong>引用任何改进因子/灵敏度数字必须连它的 λ 一起引</strong>（与陷阱 116「α ~ O(1) 不是耦合值」同族：
+  那条说「量级记号不能代替具体值」，本条说「单点值不能代替曲线」）。</p>
+<p>⚠️⭐ <strong>坑 3：「结果 / 设计 / 在建 / 计划」四分类，且同一组的不同线不能混引。</strong> 本轮实例：HUST 同时有
+  ① <strong>ISL 设计</strong>（Du 2022，<strong>设计计算</strong>、实验状态未知）与 ② <strong>条纹型洛伦兹实验</strong>（自述「进行中」、<strong>非 ISL</strong>）——
+  引 ② 的「进行中」去支持 ① 就是张冠李戴。📌 外部核对表<strong>每行必带类型列</strong>；「计划」数字<strong>不得当结果</strong>引。</p>
+<p>⭐ <strong>配套工具（本轮的便宜核对法）：「某带有没有新数据」用 INSPIRE 题名扫描 ＋ 摘要扫描</strong>：
+  <code>https://inspirehep.net/api/literature?q=title%20%22X%22&amp;sort=mostrecent&amp;fields=titles,earliest_date,...</code>
+  （换 <code>ab</code> 即摘要扫描）—— 比读综述的引用更直接、可复算。
+  ⚠️ 两个附带教训：① <strong>聚合器新闻源头常追不到</strong>（本轮一条 2026-05 的「0.1 mm 最大测试」，
+    各库均查不到对应论文 ⟹ <strong>追不到就不用</strong>，只在诚实边界里登记）；② INSPIRE 的<strong>作者查询语法易失败</strong>
+    （<code>a Wen-Hai.Tan</code> 返回 0；改用「题名/合作组」检索或逐页核对）。</p>
+</li>
+<li>
+<p><strong>⭐⭐⭐ 「能不能做」类问题的标准做法：三档判定 ＋ 双栏台账 ＋ 失效条件</strong>（第 123 轮 <strong>N-43</strong>；<strong>动力学·耦合层的可行性</strong>）：
+    <strong>触发</strong>：用户问「某某能不能做」—— 尤其针对一个<strong>大而模糊的缺口</strong>（「动力学·耦合层」「统一 XX」）。
+    ⚠️ <strong>不要只答「能」或「不能」</strong> —— 先把问句<strong>拆成三档</strong>，每档独立判定：
+      ① <strong>内部推导</strong>（不新增公理级输入）：判「判否／可行」，依据必须是<strong>结构性障碍</strong>（不是「还没做」）；
+      ② <strong>条件构造</strong>（显式声明输入 ＋ 自洽性过滤）：若可做，给<strong>样板</strong>（谁做过、什么输入、产出什么）；
+      ③ <strong>该不该存在</strong>（本体论）：有时答案是「对象不存在」（I-20 式）。
+    ⭐ <strong>两个台账是产出物</strong>：<strong>终止态台账</strong>（「已试过的都不行」逐条列证人 —— 第 123 轮 15 例：
+      恒等式 6／量纲 1／无对象 2／缺因子 1／外加 1／排除 1／自由 2／填的 1）＋ <strong>输入台账</strong>（「做」的真实成本 = 要声明哪些输入）。
+    ⚠️⭐ <strong>判否必须带「失效条件」</strong>（铁律 22 的执行细则）：写明「什么新输入会让它重开」
+      （第 123 轮：量化 Φ／给 tick 加耗散／新增一层）—— 判否是「<strong>当前公理集下没有路径</strong>」，不是永久判死；两者写混会误导未来的自己。
+    ⚠️ <strong>别忘「可做的那一半」</strong>：第 123 轮的关键发现是 <strong>框架全部对外产出（EMRI／第五力窗口／<code>E_c</code>）都出自「条件构造」档</strong> ——
+      「判否」≠「无事可做」；对外动作照旧。
+    📌 配套自查：<strong>判否依据的严格性等级要标</strong>（I-16 强版依赖设定／I-20 结项级／障碍 C 词条清点类）＋
+      <strong>台账是归纳不是穷举</strong>（「已试过的都不行」≠「证明不行」）。</p>
+</li>
+</ol>
+<h2>7. 论文补丁模板</h2>
+<pre><code class="language-python">import io, os, shutil
+BASE = os.path.dirname(os.path.abspath(__file__))
+ZH = os.path.join(BASE, &quot;论文初稿_正反物质对风暴统一框架_v2.9.md&quot;)
+EN = os.path.join(BASE, &quot;Paper_MatterAntimatterPairStorm_v2.9_EN.md&quot;)
+HIST = os.path.join(os.path.dirname(BASE), &quot;MAPS-Unified-Framework&quot;, &quot;paper&quot;, &quot;history&quot;)
+
+def sub_once(path, old, new, tag):        # 锚点必须恰好命中一次
+    txt = io.open(path, encoding=&quot;utf-8&quot;).read()
+    n = txt.count(old)
+    if n != 1:
+        print(&quot;  [XX] {:&lt;26} 命中 {} 次 —— 拒绝&quot;.format(tag, n)); return
+    io.open(path, &quot;w&quot;, encoding=&quot;utf-8&quot;).write(txt.replace(old, new, 1))
+    print(&quot;  [OK] {:&lt;26} 已改&quot;.format(tag))
+</code></pre>
+<ul>
+<li>论文新块写在 <strong>§4.8 的 v2.9 补充链末尾</strong>（第 31–39 轮都堆在这里），<strong>不要覆盖旧块</strong>——
+  旧块保留但可标"已解除/已裁决"，<strong>历史留痕是本项目刻意的做法</strong>。</li>
+<li>插入新块时：<code>sub_once(path, ANCHOR, ANCHOR + "\n" + "\n".join(BLOCK_LINES), tag)</code>。</li>
+<li>补丁脚本<strong>只能跑一次</strong>（插入型锚点会在第二次命中两次而被拒；被拒时人工核对，别硬改）。</li>
+</ul>
+
+<div class="footer">MAPS 推演轮次流程（maps-deduction-round） · 2026-10-05 · 由 _md2html_generic.py 生成 · 源文件 SKILL_备份_2026-10-05第124轮前.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

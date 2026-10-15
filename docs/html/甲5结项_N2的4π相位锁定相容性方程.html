@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>甲-5 结项：N2 的 4π 相位锁定相容性方程 —— 从启发式评分到 su(2) 定理</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>甲-5 结项：N2 的 4π 相位锁定相容性方程 —— 从启发式评分到 su(2) 定理</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 104 轮</strong> ｜ 2026-10-04 ｜ 核验脚本 <code>_n2phase_104.py</code>（<strong>NP-1 … NP-14，24 项 0 失败</strong>）
+<strong>任务来源</strong>：§10.2#7 的剩余严格化 =「<strong>N2 的 4π 相位锁定相容性方程（深度开放）</strong>」。
+原始登记（<code>outputs/现在平面选择的动力学来源.md</code> §六 遗留 1）：<em>「N2 的『2 平面拍频不稳定』是<strong>定性论证</strong> ——
+需严格动力学（<strong>两套 4π 相位锁定的相容性方程</strong>）」</em>，且 N2 的严格性自评 = 「⚠️ 推导 —— 稳定性评分为<strong>启发式</strong>」。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p><strong>相容性方程写出来了，而且它有解 —— 是「无解」这个解</strong>：
+把「锁定平面 <span class="math">i</span>」形式化为「涡态是平面旋转荷 <span class="math">J<sub>i</sub></span> 的<strong>本征态</strong>且本征值 ≠ 0」后，
+<strong>双平面锁定在 su(2) 代数下不可能</strong>（<span class="math">ψ</span> 同时是 <span class="math">A</span>、<span class="math">B</span> 的本征态 ⟹ 三行推出 <span class="math">a=0</span>，与 <span class="math">ane 0</span> 矛盾）。
+⟹ <strong>N2 的「2 平面冲突」从启发式评分升级为定理</strong>；<strong>方程无自由参数</strong>（甲-5 的判据满足）。</p>
+<p>⚠️ 同时登记三处更正：<strong>「4π」的两种读法论文未写明</strong>（C-68）、<strong>那个启发式评分无脚本可复现</strong>（C-69）、
+<strong>英文稿同一处标了【Derivation】与【Framework assumption】两个口径</strong>（C-70）。</p>
+<hr />
+<h2>二、N1 的「4π」是什么（＋ 论文没写清的地方）</h2>
+<p>论文 N1 原文：「稳态涡需相位累积 <strong>4π 整数倍</strong>【本框架设定】⟹ 必须锁定旋转轴 ⟹ 至少一个平面」。</p>
+<h3>2.1 严格化：4π 不是自由参数，它是 SU(2) 的必然</h3>
+<p>「4π 整数倍」的<strong>精确含义</strong> = <strong>序参量 <span class="math">ψ = e<sup>iϕ/2</sup></span> 是单值的</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>累积</th>
+<th><span class="math">ψ</span> 的变化</th>
+<th>回归？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math">ϕ: 0→ 2π</span></td>
+<td><span class="math">1 → e<sup>iπ</sup> = -1</span></td>
+<td>❌</td>
+</tr>
+<tr>
+<td><span class="math">ϕ: 0→ 4π</span></td>
+<td><span class="math">1 → e<sup>2π i</sup> = +1</span></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p>数值（<span class="math">j=1/2</span>，<span class="math">R(α)=e<sup>-iα J<sub>z</sub></sup></span>）：<span class="math">R(2π) = <span class="bf">-I</span></span>、<span class="math">R(4π) = <span class="bf">+I</span></span>（NP-2，精确到 1e-12）。</p>
+<p>而 <strong>SU(2) 的最低非平凡自旋 = 1/2</strong>（<span class="math">j=0</span> 平凡、<span class="math">jge 1/2</span> 起 <span class="math">2π</span> 给 <span class="math">-1</span>）
+⟹ <strong>「4π」是表示论的必然，零自由参数</strong>（NP-3）。</p>
+<h3>2.2 ⚠️ C-68：两种读法，论文未写明</h3>
+<p>「相位累积 4π 整数倍」有两种<strong>都自洽</strong>的读法：</p>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>假定</th>
+<th>推论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A</strong></td>
+<td><span class="math">ϕ</span> 本身单值</td>
+<td><span class="math">∮ dϕ = 2π w = 4π n</span> ⟹ <strong>绕数 <span class="math">w</span> 必须为偶数</strong>，最小涡 <span class="math">w=2</span></td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td>序参量是旋量 <span class="math">e<sup>iϕ/2</sup></span></td>
+<td><span class="math">∮ d(ϕ/2) = 2π w</span> ⟹ <span class="math">∮ dϕ = 4π w</span> <strong>自动满足</strong>，<span class="math">w</span> 任意，最小涡 <span class="math">w=1</span></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>两种读法下「最小涡」的拓扑荷差 2 倍</strong>，而论文未写明是哪一种。
+📌 这不影响本轮的 N2 结论（两者都只说「相位累积确定」），但<strong>下游任何引用「最小涡荷」的地方都会歧义</strong>。</p>
+<hr />
+<h2>三、N2 的相容性方程（本轮核心）</h2>
+<h3>3.1 定义（可判定的形式化）</h3>
+<blockquote>
+<p><strong>「涡锁定平面 <span class="math">i</span>」<span class="math">iff</span> 涡态 <span class="math">ψ</span> 是该平面旋转荷 <span class="math">J<sub>i</sub></span> 的</strong>本征态<strong>，且本征值 <span class="math">ne 0</span>。</strong></p>
+</blockquote>
+<p><strong>为什么必须是「本征态」而不是「期望值非零」</strong> —— 见 §四的反例（NP-10）。
+直观：只有本征态才有<strong>确定的相位累积</strong>；期望值非零只说明<strong>平均</strong>有旋转，相位仍是不确定的分布。</p>
+<h3>3.2 相容性方程（三行，纯代数）</h3>
+<p>设两个平面的旋转荷为 <span class="math">A,B</span>，<span class="math">[A,B]=iCne 0</span>。假设 <span class="math">ψ</span> <strong>同时锁定两个平面</strong>：
+<span class="math">Aψ = aψ</span>、<span class="math">Bψ = bψ</span>，<span class="math">ane 0</span>、<span class="math">bne 0</span>。则</p>
+<div class="formula"><span class="txt">①</span>  iCψ = [A,B]ψ = ABψ - BAψ = (ab-ba)ψ = 0  ⟹  boxedCψ = 0</div>
+<div class="formula"><span class="txt">②</span>  iAψ = [B,C]ψ = BCψ - CBψ = B· 0 - C·(bψ) = -b Cψ = 0  ⟹  boxeda = 0</div>
+
+<p>与 <span class="math">ane 0</span> <strong>矛盾</strong>。<span class="math">blacksquare</span></p>
+<p>⟹ <strong>两套 4π 相位锁定不可能同时成立</strong>。这就是「共享轴拍频」的严格形式：
+<strong>不对易的两个相位不能同时有确定值</strong>（「拍频」= 相位不确定的物理图象）。</p>
+<h3>3.3 数值穷举（不依赖代数推导）</h3>
+<table>
+<thead>
+<tr>
+<th><span class="math">j</span></th>
+<th>维数</th>
+<th>共同本征态数</th>
+<th>其中「两本征值都非零」的</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td><strong>0</strong></td>
+<td>平凡（本征值全 0 ⟹ 无涡）</td>
+</tr>
+<tr>
+<td>1/2, 1, 3/2, 2, 5/2, 3, 4, 5</td>
+<td>2…11</td>
+<td><strong>0</strong></td>
+<td><strong>0</strong></td>
+<td>无解</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>9 个不可约表示全部无解</strong>（NP-6）；<strong>可约表示</strong>（<span class="math">0⊕<span class="frac"><span class="num">1</span><span class="den">2</span></span>⊕ 1⊕<span class="frac"><span class="num">3</span><span class="den">2</span></span></span>，10 维）
+同样 <strong>0 个</strong>非平凡共同本征态（NP-8）⟹ <strong>结论不依赖不可约性</strong>。</p>
+<h3>3.4 四档判定全部落地</h3>
+<table>
+<thead>
+<tr>
+<th>平面数</th>
+<th>代数条件</th>
+<th>结论</th>
+<th>严格性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0</strong></td>
+<td><span class="math">J<sub>i</sub>ψ = 0 ∀ i</span></td>
+<td>无旋转荷 ⟹ <strong>无涡</strong></td>
+<td>✅ 退化（定义性）</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td><span class="math">J<sub>1</sub>ψ = aψ</span>, <span class="math">ane 0</span></td>
+<td><strong>存在</strong>（<span class="math">2j</span> 个非零本征态，NP-9）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><span class="math">J<sub>1</sub>ψ=aψ</span> ∧ <span class="math">J<sub>2</sub>ψ=bψ</span>，<span class="math">a,bne 0</span></td>
+<td><strong>不存在</strong>（§3.2）</td>
+<td>✅ <strong>本轮定理</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><span class="math">J<sub>i</sub>ψ = 0 ∀ i</span></td>
+<td>平凡表示 ⟹ <strong>无涡</strong></td>
+<td>✅ 退化</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>四、反面与反例（两个便宜但关键的检查）</h2>
+<p><strong>① 单平面锁定确实存在</strong>（NP-9）：每个 <span class="math">jge 1/2</span> 有 <span class="math">2j+1-[j∈<span class="bb">Z</span>]</span> 个非零 <span class="math">J<sub>z</sub></span> 本征态
+（实测 <span class="math">j=<span class="frac"><span class="num">1</span><span class="den">2</span></span>→ 2</span>、<span class="math">j=1→ 2</span>、<span class="math">j=<span class="frac"><span class="num">3</span><span class="den">2</span></span>→ 4</span>、<span class="math">j=2→ 4</span>）⟹ 涡可以有一个确定的旋转轴 ✓</p>
+<p><strong>② ⚠️ 「期望值非零」不是正确判据</strong>（NP-10）：取 <span class="math">H=ω<sub>1</sub>J<sub>1</sub>+ω<sub>2</sub>J<sub>2</sub></span>（<span class="math">ω=1,2</span>）的本征态，
+它给出 <span class="math">langle J<sub>1</sub>rangle = 0.447214</span>、<span class="math">langle J<sub>2</sub>rangle = 0.894427</span> —— <strong>两个都非零</strong>，
+但它对 <span class="math">J<sub>1</sub></span>、<span class="math">J<sub>2</sub></span> <strong>都不是本征态</strong>（残差 0.632 / 0.316）。
+⟹ 若用「期望值非零」当判据，会<strong>误判双平面锁定可行</strong>。这条反例正是定义必须取「本征态」的理由。</p>
+<hr />
+<h2>五、自由参数清点（甲-5 的判据：「方程可写且无自由参数」）</h2>
+<table>
+<thead>
+<tr>
+<th>输入</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>su(2) 对易关系 <span class="math">[J<sub>i</sub>,J<sub>j</sub>]=iε<sub>ijk</sub>J<sub>k</sub></span></td>
+<td>标准李代数</td>
+</tr>
+<tr>
+<td>「锁定」= 本征态 ＋ 非零本征值</td>
+<td>由 N1 的相位条件定义（§3.1）</td>
+</tr>
+<tr>
+<td>三根平面法线 <span class="math">(<span class="acc"> ̂</span>x,<span class="acc"> ̂</span>y,<span class="acc"> ̂</span>z)</span></td>
+<td>衬底几何（第 30 轮 T-6，简单立方）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>框架特有输入：0 个</strong>（4π 已由 SU(2) 的最低自旋给出，§2.1）
+<strong>自由参数：0 个</strong> —— 结论是「<strong>无解</strong>」，不含任何可调量。</p>
+<p>⟹ <strong>第 99 轮为甲-5 定的判据满足。</strong></p>
+<hr />
+<h2>六、三处更正</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>内容</th>
+<th>证据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C-68</strong></td>
+<td>「4π」的<strong>两种读法</strong>（A：绕数偶数／B：旋量任意）<strong>论文未写明</strong> ⟹ 下游引用「最小涡荷」会有 2 倍歧义</td>
+<td>NP-4</td>
+</tr>
+<tr>
+<td><strong>C-69</strong></td>
+<td>论文 §4.9 引用的「数值：稳定性 <strong>0.00/1.00/0.30/0.05</strong>」—— ① 产生它的脚本 <strong><code>_now_numeric.py</code> 已丢失</strong>（无脚本可复现）；② 备忘录<strong>自承</strong>「稳定性评分为<strong>启发式</strong>（数值定性，<strong>缺严格动力学证明</strong>）」而论文未带此限定</td>
+<td>NP-12</td>
+</tr>
+<tr>
+<td><strong>C-70</strong></td>
+<td><strong>英文稿同一处两个口径</strong>：§1 写【<strong>Derivation</strong>, proposition chain in §4.9】，§4.9 写【<strong>Framework assumption</strong>】⟹ 自相矛盾；中文稿 §4.9 写【本框架设定】（与 EN §4.9 一致、与 EN §1 不一致）</td>
+<td>NP-13</td>
+</tr>
+<tr>
+<td><strong>C-71</strong></td>
+<td><strong>更正表的块被后续轮次切开</strong>（第 103 轮引入、第 104 轮修）：第 103 轮把 <strong>C-67</strong> 插在 <code>\| &lt;strong&gt;C-66&lt;/strong&gt; \|</code> 之前，而 C-66 属第 102 轮连续块（C-64/C-65/C-66）⟹ <strong>把块切开</strong>；本轮追加 C-68/69/70 时叠加。已把 C-67…C-70 作为<strong>连续组</strong>移到 C-64 之前并登记溯源</td>
+<td>第 104 轮（<code>_patch_104c.py</code>）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>另：N1–N4 四项严格性各不相同</strong>（NP-14），而论文用<strong>同一个【本框架设定】标签</strong>覆盖：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>内容</th>
+<th>严格性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N1</td>
+<td>4π ⟹ 必须锁轴</td>
+<td>设定 ＋ <strong>表示论必然</strong>（4π ← <span class="math">j=1/2</span>）</td>
+</tr>
+<tr>
+<td>N2</td>
+<td>恰好一个平面</td>
+<td><strong>✅ 本轮升级为定理</strong></td>
+</tr>
+<tr>
+<td>N3</td>
+<td>「现在」定义性</td>
+<td>定义</td>
+</tr>
+<tr>
+<td>N4</td>
+<td>初始微扰破缺 SO(3)</td>
+<td>原文 ＋ 经典 SSB（微扰<strong>来源</strong>仍未推导）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>七、判决与诚实边界</h2>
+<h3>判决</h3>
+<p><strong>§10.2#7 的「N2 的 4π 相位锁定相容性方程」结项</strong> ——
+方程可写、<strong>无自由参数</strong>、结论是<strong>严格的无解</strong>；N2 的严格性从「⚠️ 启发式」升级为「✅ 定理」。</p>
+<h3>诚实边界（必须一起读）</h3>
+<ol>
+<li><strong>「锁定 = 本征态」是约定</strong>，其依据是 N1 的相位条件，而 N1 本身标【本框架设定】。
+   ⚠️ 但 §四② 的反例说明这个约定<strong>不是随意的</strong>（换成「期望值非零」会得到相反的结论）。</li>
+<li><strong>「恰好一个」中的「至少一个」仍用 N1 的原文主张</strong>（「涡 ⟹ 有确定的旋转轴」）。
+   本轮严格化的是<strong>上界</strong>（不可能 2 个），不是<strong>下界</strong>。</li>
+<li><strong>本轮没有证明「涡态必须是某个不可约表示」</strong> —— 正因为不需要（NP-8 覆盖了可约表示），结论更强。</li>
+<li><strong>N4 的初始微扰来源仍未推导</strong>（备忘录遗留 2）—— 本轮未触及。</li>
+<li><strong>C-69 的那个数值本轮没有重算</strong>：它测的是「数值稳定性评分」，而本轮给出的是<strong>代数判定</strong>。
+   两者不是同一个量 —— 本轮<strong>不声称</strong>复现了 0.00/1.00/0.30/0.05（脚本已丢失，无法复现）。</li>
+</ol>
+<hr />
+<h2>八、下一步</h2>
+<p>甲类（环境已就绪、纯本地、判据硬）<strong>全部结项</strong>：甲-1 ✅100 ／ 甲-2 ✅101 ／ 甲-3 ✅102 ／ 甲-4 ✅103 ／ <strong>甲-5 ✅104</strong>。</p>
+<p>剩下两类：
+- <strong>乙｜并轨 O1–O5</strong>（已登记、带判据、从未推演，第 99 轮 I-23）；
+- <strong>丙｜EMRI 材料包</strong>（等 LISA ~10–15 年）／<strong>私审准备包</strong>（§4.5b／§9／§8.1）。</p>
+<p>§10.2#7 的「两维时间卷曲」由此<strong>完整收口</strong>（3−1=2 定义性 ＋ N1–N4 严格化）：
+剩下的是 N4 的微扰来源（属另一议题，与 ε 泄漏／宇宙学侧衔接）。</p>
+
+<div class="footer">甲-5 结项：N2 的 4π 相位锁定相容性方程 —— 从启发式评分到 su(2) 定理 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 甲5结项_N2的4π相位锁定相容性方程.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

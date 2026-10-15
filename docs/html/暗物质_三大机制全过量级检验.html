@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>暗物质：三个候选机制，没有一个过得了数量级检验</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、原文主张（批05 §2.3 / §3）</div>
+  <h1>暗物质：三个候选机制，没有一个过得了数量级检验</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-09-17 ｜ 核验脚本：<code>_darkmatter_probe.py</code>（DM-1…DM-4，纯标准库）
+<strong>一句话：框架目前对暗物质没有任何定量预言。ε·ρ_raw 路线差 32 倍，
+镜像支朴素模型差 5.31 倍（可真判的硬否证），空间/时间投影比只有数值凑合。
+最该补的是 f_space（空间活跃度）的第一性定义。</strong></p>
+</blockquote>
+<hr />
+<h2>一、原文主张（批05 §2.3 / §3）</h2>
+<blockquote>
+<p>【原文】<strong>暗物质 = 诸元对涨落的空间分布残余（ε × 空间活跃度）；
+宇宙学常数 = 同一涨落的时间累积残余（ε × 时间积分）</strong>
+<strong>暗物质和暗能量同源，都是普朗克尺度诸元对涨落的统计残余——
+暗物质是空间投影，宇宙学常数是时间投影。</strong></p>
+</blockquote>
+<p>三个候选机制（原文<strong>未统一</strong>，批05 §5.3 标为框架内未决议题）：
+- <strong>A</strong> 真空刷新：物质消耗诸元对、真空积累 ⟹ 与可见物质分布负相关（子弹星系团）
+- <strong>B</strong> ε × ρ_raw × f_space ≈ 10⁻²⁶ kg/m³
+- <strong>C</strong> 镜像支引力投影（void-CPT-κ，批1）</p>
+<p>原文自记存疑：绝对密度 10⁻²⁶ vs 观测 2.3×10⁻²⁷，"差 ~4 倍"。</p>
+<h2>二、DM-1：ε_eff = 1/N 路线差 32 倍（不是 4 倍）</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ρ_P</td>
+<td>5.15485×10⁹⁶ kg/m³</td>
+</tr>
+<tr>
+<td>N = (R_H/l_P)²</td>
+<td>7.15581×10¹²¹</td>
+</tr>
+<tr>
+<td>ε_eff = 1/N</td>
+<td>1.39747×10⁻¹²²</td>
+</tr>
+<tr>
+<td>ρ_DM（框架，f_space=1）</td>
+<td>7.20373×10⁻²⁶ kg/m³</td>
+</tr>
+<tr>
+<td>ρ_DM（观测）</td>
+<td>2.25117×10⁻²⁷ kg/m³</td>
+</tr>
+<tr>
+<td><strong>超出</strong></td>
+<td><strong>32.000 倍</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 需要 <strong>f_space = 1/32 = 0.03125</strong>（精确）。</p>
+<p>（注意：原文的"差 4 倍"是它用了不同的 ρ_raw / ε 取值；
+用全息稀释 ε = 1/N 时是 32 倍。<strong>两个数字别混用。</strong>）</p>
+<p>等价写法：<code>ρ_DM = ρ_P/(32N)</code> ⟹
+<code>Ω_cdm = [H²/(32G)] / [3H²/(8πG)] = 8π/96 = &lt;strong&gt;π/12&lt;/strong&gt;</code></p>
+<p>⚠️ <strong>注意别重复计数</strong>：「f_space = 1/32」与「Ω_cdm = π/12」<strong>是同一句话的两种写法</strong>
+（因为 <code>λ_micro = 8π/3</code> 已定，<code>f_space = Ω_cdm/λ_micro</code>）。
+它们<strong>不是两个独立发现</strong>，只需要一个机制：<strong>32 从哪来</strong>。</p>
+<h2>三、DM-2：镜像支模型被<strong>硬否证</strong> 5.31 倍（本轮最实的结论）</h2>
+<p>A2 的方向性：<strong>反份入镜像支 B−、正份留本支 B+</strong>，50:50 ⟹ <code>ρ_B− = ρ_B+</code>。</p>
+<p>若暗物质 = B− 的引力投影，则看 B− 装了什么：</p>
+<table>
+<thead>
+<tr>
+<th>B− 的内容</th>
+<th>预言 Ω_dm</th>
+<th>观测</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>只含与重子对应的反份</td>
+<td><strong>= Ω_b = 0.0493</strong></td>
+<td>0.2618</td>
+<td><strong>差 5.31 倍</strong> ✗</td>
+</tr>
+<tr>
+<td>B+ 的完整镜像（全部组分）</td>
+<td><strong>≈ 1</strong></td>
+<td>0.2618</td>
+<td><strong>差 3.82 倍</strong> ✗</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两种读法都被否证。</strong> ⟹ 镜像支模型必须再加"稀释/屏蔽"机制才能落在 0.26 上，
+而框架目前没有。<strong>这是可以写进论文的硬检验结果。</strong></p>
+<h2>四、DM-3：空间/时间投影比 = 0.380（只有数值凑合）</h2>
+<p><code>Ω_cdm / Ω_Λ = 0.2618 / 0.6889 = 0.380026</code></p>
+<table>
+<thead>
+<tr>
+<th>候选</th>
+<th>值</th>
+<th>偏差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1/φ²</td>
+<td>0.381966</td>
+<td>+0.51%</td>
+</tr>
+<tr>
+<td>3/8</td>
+<td>0.375000</td>
+<td>−1.32%</td>
+</tr>
+<tr>
+<td>π/8</td>
+<td>0.392699</td>
+<td>+3.33%</td>
+</tr>
+<tr>
+<td>1/e</td>
+<td>0.367879</td>
+<td>−3.20%</td>
+</tr>
+</tbody>
+</table>
+<p>凑得上的不少，<strong>没有一个有机制</strong>。数值占卜不是推导，勿采信。</p>
+<h2>五、DM-4：π/12 的接近——<strong>看了误差棒就不那么神了</strong></h2>
+<p><code>π/12 = 0.26179939</code></p>
+<table>
+<thead>
+<tr>
+<th>参数组</th>
+<th>Ω_c h²</th>
+<th>h</th>
+<th>Ω_c</th>
+<th>对 π/12 偏差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Planck18 TT,TE,EE+lowE</td>
+<td>0.12011</td>
+<td>0.6736</td>
+<td>0.26471</td>
+<td><strong>−1.10%</strong></td>
+</tr>
+<tr>
+<td>Planck18 +lensing</td>
+<td>0.12011</td>
+<td>0.6766</td>
+<td>0.26237</td>
+<td><strong>−0.22%</strong></td>
+</tr>
+<tr>
+<td>Planck18 +BAO</td>
+<td>0.11933</td>
+<td>0.6766</td>
+<td>0.26067</td>
+<td><strong>+0.43%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 我脚本里一度显示"差 0.0002%"——那是假象：我用的 Ω_cdm = 0.2618
+是由 <code>Ω_m − Ω_b</code> 倒推的四位舍入值，恰好撞上 π/12。
+<strong>真实偏差是 −1.10% ~ +0.43%，精度不足以采信。</strong></p>
+<p>⟹ 真正需要的是 <strong>1/32 = f_space 的机制</strong>；有机制后 Ω_cdm = π/12 才是预言。</p>
+<h2>六、结论</h2>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A 真空刷新</strong></td>
+<td>定性图像，无定量（f_space 未定义）</td>
+</tr>
+<tr>
+<td><strong>B ε·ρ_raw·f_space</strong></td>
+<td>差 <strong>32 倍</strong>，需 f_space = 1/32（无机制）</td>
+</tr>
+<tr>
+<td><strong>C 镜像支投影</strong></td>
+<td><strong>被硬否证</strong>：差 5.31 倍（或 3.82 倍）</td>
+</tr>
+<tr>
+<td>空间 / 时间投影比</td>
+<td>0.380，仅数值凑合</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>框架目前对暗物质没有任何定量预言。</strong></p>
+<p><strong>最该补的</strong>：<code>f_space</code>（空间活跃度）的<strong>第一性定义</strong>——它是批05 机制 B 的核心缺口，
+也是唯一能让 A、B 两个机制真正定量化的东西。</p>
+<h2>七、下一步</h2>
+<ol>
+<li><strong>定义 f_space</strong>：若"空间活跃度"能由框架微观量（诸元对密度、湮灭率、
+   真空/物质区的刷新率差）算出，则 Ω_cdm 可得。目标值 1/32 ≈ 0.031。</li>
+<li>在 f_space 有定义之前，把镜像支模型标记为"已被观测否证 5.31 倍"，
+   避免论文继续把它当候选。</li>
+<li>剩下的两个老问题仍在：Ω_Λ 的 23.76 倍（O-Λ）、为何重子能标 ~1 TeV。</li>
+</ol>
+
+<div class="footer">暗物质：三个候选机制，没有一个过得了数量级检验 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 暗物质_三大机制全过量级检验.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

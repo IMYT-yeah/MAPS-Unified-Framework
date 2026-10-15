@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>能否借用 Soai 机制把 ε 放大到 η ≈ 6×10⁻¹⁰ —— 三难判定</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>能否借用 Soai 机制把 ε 放大到 η ≈ 6×10⁻¹⁰ —— 三难判定</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-09 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 151 轮</strong> ｜ 2026-10-09 ｜ 核验脚本 <code>_soai151.py</code>（32 项 0 失败）
+承接：第 150 轮（硖合效应对照）末提出的可判定问题；涉及 <strong>N-40</strong>、<strong>N-43</strong></p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<blockquote>
+<p><strong>「借用 Soai 机制的形式」可以（骨架同构、载体类型匹配）；但「用它把 ε 放大到 η ≈ 6×10⁻¹⁰」判否（N-52）。</strong>
+<strong>理由不是"框架没有这一环"，而是放大机制的【终态】只有三种可能，每一种都撞一个已知问题 —— 三难。</strong></p>
+</blockquote>
+<hr />
+<h2>二、先钉框架现状：现在是「<strong>无放大</strong>」</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>论文原文</th>
+<th>含意</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>重子不对称的写法</td>
+<td>「E ~ 1 TeV → ε ~ 6×10⁻¹⁰（<strong>重子不对称 η ≈ ε</strong>）」</td>
+<td>「<strong>≈</strong>」= <strong>直接等同，没有放大因子</strong></td>
+</tr>
+<tr>
+<td>放大类词条</td>
+<td>自催化／反馈／正反馈／指数增长／雪崩／级联／<strong>分岔</strong>／临界慢化／双稳／对称破缺 —— <strong>各 0 处</strong></td>
+<td>框架无放大语言</td>
+</tr>
+<tr>
+<td>「放大」4 处</td>
+<td>EMRI 相位累积（2 处）／<code>E_c</code> 对 β 敏感度／串行归一化排除</td>
+<td><strong>全部与手性、自催化无关</strong></td>
+</tr>
+<tr>
+<td>能标</td>
+<td>已带 <strong>N-40</strong> 口径注：<strong>能标是输入</strong>（一维简并族）</td>
+<td>1 TeV 不是推出来的</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>所以用户的问题实质是「能不能补一个放大机制」</strong>，而框架现在<strong>根本不经过放大</strong>。</p>
+<p>⚠️ <strong>附带观察</strong>：「η ≈ ε」里的那个「<strong>≈</strong>」缺一步说明 —— 泄漏<strong>概率</strong>（无量纲）如何变成重子-<strong>数密度比</strong>（无量纲），需要<strong>一个效率映射</strong>。论文用「≈」跨过了这一步。<strong>（登记项，本轮不改稿。）</strong></p>
+<hr />
+<h2>三、Soai 机制的数学结构（独立数值复算，不引任何二手说法）</h2>
+<h3>3.1 四环对照</h3>
+<table>
+<thead>
+<tr>
+<th>环</th>
+<th>Soai 机制</th>
+<th>框架</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① 起点严格对称</strong></td>
+<td>非手性反应物（50:50）</td>
+<td>公理 1（<strong>正反物质对 50:50 平衡</strong>）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>② 出现微小偏差</strong></td>
+<td>随机涨落（~10⁻⁵）</td>
+<td>公理 2（ε 泄漏）＋ <strong>P3（泊松随机）</strong></td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>③ 放大机制</strong></td>
+<td>非线性效应 ＋ 不对称自催化</td>
+<td><strong>无</strong>（自催化／反馈各 0 处）</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><strong>④ 单向不对称</strong></td>
+<td>99.99% 单一手性</td>
+<td>η ≈ 6×10⁻¹⁰（<strong>只能拟合</strong>）</td>
+<td>⚠️</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>①② 是真的对上了</strong> —— 尤其<strong>框架的 P3（泄漏时刻泊松随机）与 Soai 的「随机涨落启动」是结构对应</strong>。
+<strong>这是本轮的一个正面发现</strong>（不是"框架没有起点"，是"起点机制已具备、缺的是下一步"）。</p>
+<h3>3.2 Frank 模型的饱和行为（数值验证）</h3>
+<p>模型：自催化 ＋ 互毁 ＋ 恒定供给，<code>dv/dt = k_a·(1−u)·v</code>（<strong>v = L−D 的方程是线性的</strong>）。</p>
+<table>
+<thead>
+<tr>
+<th>初始 ee₀</th>
+<th>终态 ee（T = 400）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+1e-6 ／ +1e-4 ／ +1e-2</td>
+<td><strong>+1.000000000000</strong></td>
+</tr>
+<tr>
+<td>−1e-6 ／ −1e-4 ／ −1e-2</td>
+<td><strong>−1.000000000000</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>初始幅度扫 4 个数量级，终态幅度完全不变 ⟹ 幅度由【动力学参数】决定，初始值只决定【符号】。</strong></p>
+</blockquote>
+<p>⚠️ <strong>实现坑（本轮踩过、值得记）</strong>：直接对 (L, D) 做 Euler 积分时，<code>|v|</code> 会<strong>指数越界</strong>（L 或 D 变负），而 clamp 在越界<strong>之后</strong>才生效 ⟹ 污染 ⟹ <strong>符号被翻</strong>（−1e-4 都给 +1，看着像"物理结论"）。
+✅ 正解：用 <strong>(u, v) 变量</strong>积分 ＋ 对 <code>|v| ≤ u</code> 投影。<strong>这类"饱和型动力学"必须用正确的变量对。</strong></p>
+<h3>3.3 有限时间（未饱和）时：增益是可调参数</h3>
+<p><code>G = exp(∫[k_a(1−u) − k_r] dt)</code>，实测随 (k_a, k_r) 变化 12 个数量级（0.001 → 1e-15）⟹ <strong>G 是一个自由参数</strong>。</p>
+<h3>3.4 Kagan 非线性效应式（Soai 实测标定）</h3>
+<p><code>ee_prod = ee_sub·(1+β)/(1+β·ee_sub)</code>；由 Soai 实测点（ee_sub = 5×10⁻⁷ → ee_prod ≈ 0.995）反解 <strong>β ≈ 3.98×10⁸</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>ee_sub</th>
+<th>ee_prod</th>
+<th>放大因子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5×10⁻⁷（<strong>实测点</strong>）</td>
+<td><strong>0.995</strong></td>
+<td>1.99×10⁶</td>
+</tr>
+<tr>
+<td>1×10⁻⁹</td>
+<td>0.285</td>
+<td>2.85×10⁸</td>
+</tr>
+<tr>
+<td>1×10⁻¹²</td>
+<td>3.98×10⁻⁴</td>
+<td>3.98×10⁸</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>小 ee_sub 区是线性放大（因子 ≈ 1+β）；而 Soai 的实测点本身已经近饱和（0.995 ≈ O(1)），不是 10⁻¹⁰ 量级。</strong></p>
+<hr />
+<h2>四、三难判定（本轮的落点）</h2>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>放大机制的终态</th>
+<th>与 η = 6.12×10⁻¹⁰ 的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① 亚临界</strong>（G ≤ 1）</td>
+<td><strong>η = ε_seed</strong></td>
+<td>需要 ε_seed <strong>本身就是</strong> 6.12×10⁻¹⁰ ⟹ <strong>放大机制等于没加</strong></td>
+</tr>
+<tr>
+<td><strong>② 饱和型</strong>（Frank/Soai 完整非线性）</td>
+<td><strong>η = O(1)</strong></td>
+<td>与观测差 <strong>9.21 个数量级</strong> ⟹ 世界会几乎只有正物质</td>
+</tr>
+<tr>
+<td><strong>③ 有限增益型</strong></td>
+<td><strong>η = G·ε_seed</strong></td>
+<td>★ <strong>G 必须是恰好那个数</strong> ⟹ 自由参数</td>
+</tr>
+</tbody>
+</table>
+<h3>档③ 需要的增益（对几个候选种子）</h3>
+<table>
+<thead>
+<tr>
+<th>若 ε_seed =</th>
+<th>ε_seed</th>
+<th>需要的 G</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>框架自己的 ε₀ = ε(M_Pl)</strong></td>
+<td>7.73×10⁻²⁰</td>
+<td><strong>7.92×10⁹（10^9.90）</strong></td>
+</tr>
+<tr>
+<td>SM/CKM 型 CP 破坏产物（外部对照）</td>
+<td>10⁻²⁰</td>
+<td>6.12×10¹⁰</td>
+</tr>
+<tr>
+<td>1/√N（N ~ 10⁸⁰ 微变数）</td>
+<td>10⁻⁴⁰</td>
+<td>6.12×10³⁰</td>
+</tr>
+<tr>
+<td>ε(1 TeV)（框架的锚点）</td>
+<td>6×10⁻¹⁰</td>
+<td>1.02（<strong>= 不需要放大</strong>）</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>最后一行的讽刺</strong>：若种子取框架自己的锚点 ε(1 TeV) = 6×10⁻¹⁰，则<strong>需要的增益 = 1.02 —— 也就是「不需要放大机制」</strong>。
+<strong>这恰恰证明：现有的「η ≈ ε」写法已经把答案填进去了。</strong>（<strong>C-76 族</strong>：把「填进去的」当成「推出来的」。）</p>
+<h3>档③ 与 N-40 是同一个病</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>N-40（第 95 轮）</th>
+<th>档③（本轮）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>形式</td>
+<td>对<strong>任意</strong> E<em> 都存在 (ε₀</em>, β*) 使两锚点成立</td>
+<td>对<strong>任意</strong> G 都能凑出 η</td>
+</tr>
+<tr>
+<td>结论</td>
+<td>该能标<strong>不被约束</strong></td>
+<td>该增益<strong>不被约束</strong></td>
+</tr>
+<tr>
+<td>参数账</td>
+<td>{ε₀, β} = 2 参数 ／ 2 锚点 ⟹ 能标是输入</td>
+<td><strong>+1（G）或 +2（k_a, k_r）</strong> ⟹ 可识别性<strong>变差</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>⟹ 「借 Soai 机制」不解决 N-40，只是把「拟合 ε₀/β」换成「拟合 G」。自由度增加，不是减少。</strong></p>
+</blockquote>
+<hr />
+<h2>五、外部对照：标准物理面临<strong>同一个</strong>问题，而它的解法不是自催化</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>观测值</td>
+<td><strong>η = (6.12 ± 0.04)×10⁻¹⁰</strong>（Planck 2018 CMB）；BBN 独立给 (5.9 ± 0.5)×10⁻¹⁰（1% 一致）</td>
+</tr>
+<tr>
+<td><strong>SM/CKM 型 CP 破坏给出的</strong></td>
+<td><strong>~10⁻²⁰</strong> ⟹ 需要放大 <strong>10.8 个数量级</strong></td>
+</tr>
+<tr>
+<td>标准解法</td>
+<td><strong>GUT 重子发生</strong>（~10¹⁶ GeV）／<strong>Leptogenesis</strong>（~10⁹–10¹² GeV）／<strong>Affleck–Dine</strong></td>
+</tr>
+<tr>
+<td>共同特征</td>
+<td>靠<strong>新物理能标</strong>，<strong>不是靠化学自催化</strong> —— 文献里<strong>没有</strong>这类主流方案</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>「差 10 个数量级」是重子发生领域的经典难题</strong>，而它的一致答案是「<strong>新物理</strong>」。
+<strong>本框架若走「自催化放大」这条路，等于在一个有 50 年历史的领域里走一条无人走过的路 —— 且没有先例支撑。</strong></p>
+<h3>能标错配</h3>
+<p>Soai 反应发生在<strong>化学能标</strong>（室温溶液，kT ~ 25 meV）；框架的 ε 相关能标是 <strong>1 TeV</strong> ⟹ <strong>相差 13.6 个数量级</strong>（<strong>N-14 同族</strong>）。
+⟹ <strong>可借「形式」（数学骨架），不可借「物理」（机制类别）</strong> —— 1 TeV 能标下不存在「化学自催化」。</p>
+<hr />
+<h2>六、诚实边界</h2>
+<p><strong>✅ 是推导/验证的</strong>：
+- Frank 模型饱和行为（数值验证，6 个初值 × ODE 积分）；
+- Kagan 式与 β 的反解（解析 + 数值）；
+- 三档的数值后果（算术）；
+- 四环对照（逐环引论文原文）。</p>
+<p><strong>⚖️ 是判定的</strong>：
+- 「② 与观测差 9.21 个数量级」——这是<strong>如果我们采用饱和型机制</strong>的推论，<strong>不是</strong>说框架采用了它；
+- 「档③ 与 N-40 同病」——两者形式同构（都存在一维解族），但<strong>不是同一条链</strong>，只能标「同族」；
+- 「无先例」——这是<strong>文献检索的负面结果</strong>（未见自催化型重子发生方案），不是穷举证明。</p>
+<p><strong>❌ 没做的</strong>：
+- 没有构造任何<strong>具体的</strong>自催化型重子发生模型（那需要新增公理级输入，属第 123 轮的「条件构造」档）；
+- 没有检查框架的 <strong>λ_c（相变）</strong> 是否可作为"临界放大"的载体（相变确实是一个自然的放大机制，且框架有相图）—— ⚠️ 但这<strong>仍然需要动力学层</strong>（N-43）；
+- 没有核 λ_c 与 1 TeV 的关系。</p>
+<p><strong>⚠️ 术语边界</strong>：框架的「手性」（16 处）<strong>全是粒子物理 chirality</strong>，不是分子手性。共同语言只在「镜像不可重合」这一群论骨架上。</p>
+<hr />
+<h2>七、判决</h2>
+<blockquote>
+<h3><strong>N-52</strong>：「用 Soai 型自催化机制把 ε 放大到 η」= <strong>判否</strong>（当前公理集下）</h3>
+<p><strong>失效条件</strong>：任何<strong>新增公理级输入</strong>使下列之一成立 ⟹ 本判否自动重开 ——
+① 引入一个<strong>动力学层</strong>（时间演化 ＋ 非线性反馈）；
+② 给出一个<strong>非 O(1) 的饱和值</strong>（即放大"恰好停在"一个框架算得出的小数，而不是 ±1）；
+③ 引入<strong>新物理能标</strong>（走 GUT/leptogenesis 式路径，而非化学自催化）。</p>
+</blockquote>
+<h3>⭐ 判否 ≠ 无事可做：可做的那一半</h3>
+<p><strong>若用户仍要走这条路，它属于第 123 轮的「条件构造」档</strong> —— 需要显式声明三条输入：
+1. 一个<strong>动力学层</strong>（N-43 已判不可内部推出）；
+2. 一个<strong>自催化型非线性项</strong>（引入增益参数 G，或 k_a/k_r）；
+3. ⭐ <strong>一个截断机制</strong>使得终态停在 ~10⁻¹⁰（<strong>这一条最难</strong> —— 因为它要求"恰好停下"，而恰好 = 拟合）。</p>
+<p><strong>⚠️ 而即使三条都给，真预言仍 = 0</strong>（第 123 轮的既有结论）。</p>
+<hr />
+<h2>八、下一步</h2>
+<ol>
+<li>⭐ <strong>唯一未查的角度</strong>：<strong>相变（λ_c）能否作为"临界放大"的载体？</strong> —— 相变点附近系统敏感度发散，是<strong>物理上真实存在</strong>的放大机制（与化学自催化不同类）。
+   框架<strong>有</strong>相图与 λ_c（第 101/102 轮），但 ⚠️ <strong>仍然需要动力学层</strong>；且 λ_c 是<strong>格点耦合</strong>，与 1 TeV 的关系未建立。</li>
+<li><strong>不改稿</strong>：本轮无论文改动（正式稿仍 99,725 字符，余量 275）。</li>
+<li><strong>登记</strong>：清单零表第 151 轮 ＋ 日志 ＋ MEMORY ＋ 技能陷阱 134。</li>
+</ol>
+
+<div class="footer">能否借用 Soai 机制把 ε 放大到 η ≈ 6×10⁻¹⁰ —— 三难判定 · 2026-10-09 · 由 _md2html_generic.py 生成 · 源文件 能否借用Soai机制放大ε到η_三难判定.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

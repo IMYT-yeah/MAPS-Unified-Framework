@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>批6报告：数学对接与标准模型群结构</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">从原始对话提取的"2 vs 3"完备实现 + F26/F28 公式来源核验</div>
+  <h1>批6报告：数学对接与标准模型群结构</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<h2>从原始对话提取的"2 vs 3"完备实现 + F26/F28 公式来源核验</h2>
+<blockquote>
+<p><strong>批次</strong>：第 6/7 批（数学对接与标准模型群结构）
+<strong>日期</strong>：2026-08-21
+<strong>数据来源</strong>：数学/标准模型主题全库定位后提取——群论对接（245–250 已开采区）、挂谷（717–740）、希格斯/创世（1262–1266）、ε(E) 公式（153–192 已开采区核验 F26）、质量谱（F28 定位）
+<strong>标注</strong>：【原文】= 对话原文主张；【核验】= 与前五分之一总结对照；【补充推演】= 本报告整理/解读；【存疑】= 需进一步核验</p>
+</blockquote>
+<hr />
+<h2>一、F26/F28 公式来源核验（关键任务完成）</h2>
+<h3>1.1 F26：ε(E) = ε₀(E/M_Pl)^β，β≈0.615 —— 原文来源已定位（第 156–157 页）</h3>
+<p>【核验】前五分之一总结的 F26 公式在原文第 156–157 页获得完整确认，且<strong>原文给出了 β 的具体推导过程</strong>：</p>
+<p><strong>推导路径</strong>【原文】：
+1. 泄漏概率 ε 正比于湮灭事件特征能量的某个幂次——高能事件完美配对（ε 小），低能事件才泄漏（ε 大）；
+2. 两个边界条件确定 β：
+   - E ~ 1 TeV 时 ε ~ 6×10⁻¹⁰（对应重子不对称 η）；
+   - E ~ 10⁻³ eV（当前哈勃尺度）时 ε ~ 1（几乎全部泄漏 → 贡献暗能量 ρ_Λ ~ (meV)⁴）；
+3. <strong>β ≈ log(6×10⁻¹⁰)/log(10⁻¹²/10⁻³) ≈ 0.615</strong>（原文给出了具体的对数值推导）；
+4. 可检验预言：暗能量状态方程参数 w 有微小偏离（w(z) ≠ −1），因为泄漏事件特征能标随宇宙膨胀缓慢变化——可与 DESI 等巡天数据对比。</p>
+<p><strong>关键确认</strong>【补充推演】：批5 遗留的"ε≈10⁻¹²⁰ 常量 vs ε(E)∝E^0.615 能标依赖"两套数值的关系，现在原文已给出答案——<strong>ε(E) 是能标依赖的泄漏概率（微分形式，覆盖 1 TeV→meV 全范围），ε≈10⁻¹²⁰ 是另一条计算路径</strong>（1413–1421 页：普朗克涨落统计残余，ε=ρ_obs/ρ_raw）。两套 ε 描述的是同一个"泄漏"机制的两个视角：能标依赖的泄漏率 vs 宏观统计残余。<strong>但原文未明确连接两者</strong>——批7 整合时需标注：框架内"ε"一词至少承载两种含义（能标依赖概率 / 统计衰减因子），这是术语歧义风险点。</p>
+<h3>1.2 F28：质量谱公式 m_f = m_e·exp[α(n−1)+β(n−1)²] —— 原文来源定位</h3>
+<p>【核验】前五分之一总结的 F28 质量谱公式<strong>在已开采区 153–192 页未直接命中</strong>（该区段主要是 ε(E) 推导与宇宙学）。原文中质量谱相关内容分散在：
+- 第 249 页：<strong>每一代费米子 = 涡的同一卷绕模在不同能标的激发</strong>——第一代（e,u,d）是 n=1 基态、第二代（μ,c,s）是 n=2 第一激发、第三代（τ,t,b）是 n=3 第二激发；
+- 第 1551 页（批3 已提取）：质量项 V(φ)=½m²φ² + (g/4!)φ⁴ + λφ 与"涡-管道共振频率 n_e、n_μ、n_τ"（批3 中微子振荡）；
+- 批2 提取的 396 页：中微子振荡 = 涡-管道共振频率相位差，每种味对应特定涡卷绕模。</p>
+<p>【结论】F28 的"exp[α(n−1)+β(n−1)²]"具体形式（1:207:3478 拟合）可能位于前五分之一总结引用的阶段七/八的更精确页码（第 193–250 区间），本次扫描未直接命中该公式的完整文本——<strong>F28 的精确原文形式需在批7 整合时用更精确的关键词（如具体数值 207/3478）在 193–339 页复核</strong>。但"三代费米子=涡卷绕模 n=1,2,3"的结构性主张已在 249 页确认。</p>
+<hr />
+<h2>二、标准模型群结构 = "2 vs 3" 的完备实现（245–250 页，核心内容）</h2>
+<h3>2.1 三个规范群与费马可解性的对应</h3>
+<p>【原文】标准模型的三个规范群，正好对应三种不同的"配对/融合"模式：</p>
+<table>
+<thead>
+<tr>
+<th>规范群</th>
+<th>配对结构</th>
+<th>费马可解性</th>
+<th>物理后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U(1)</td>
+<td>n=1（线性）</td>
+<td>有解</td>
+<td>长程，可完美交换，光子无质量</td>
+</tr>
+<tr>
+<td>SU(2)_L</td>
+<td>n=2（平方，手性）</td>
+<td>有解</td>
+<td>短程（因质量），可完美交换，手性</td>
+</tr>
+<tr>
+<td>SU(3)_c</td>
+<td>n=3（立方）</td>
+<td>无解</td>
+<td>色禁闭，胶子自耦合，重子稳定</td>
+</tr>
+</tbody>
+</table>
+<p><strong>U(1)（电磁）</strong>【原文】：生成元是电荷 Q。光子无质量 v=c 是风暴模本身（二维横波）。费马 n=2 有解（勾股数 x²+y²=z² 有无穷多整数解）→ 电磁相互作用可完美交换、长程、不产生残差。"配对可完美，所以不用还债"——这就是电磁力传无限远的底层原因。</p>
+<p><strong>SU(2)_L（弱力）</strong>【原文】：生成元是弱同位旋 T。W/Z 有质量（~80/90 GeV）因为弱力是"穿堂风管道"，管道需要能耗维持 → 质量来自相变（Higgs 机制）。弱力顶点仍是"二对一"（两个左手费米子+一个 W 玻色子），是平方结构（n=2 有解），允许完美交换。<strong>弱力短程不是因为顶点不能交换，而是因为 W/Z 有质量（管道维持成本），交换距离被限制在 ~1/m_W ≈ 10⁻¹⁸ m</strong>——这解释了为什么弱衰变（β 衰变）是精确的、可计算的，没有"残差"问题。手性（只耦合左手）来自"涡-管道匹配"：管道有螺纹，只拧得上左手涡。</p>
+<p><strong>SU(3)_c（强力）</strong>【原文】：生成元是色荷（RGB）。胶子无质量但色禁闭。关键区别：胶子自己也带色荷（三胶子/四胶子顶点）——SU(3) 的 Lie 代数结构常数非零对应 n=3 的不可分解性。
+- <strong>介子（q\bar{q}）</strong>：平方结构（红+反红 → 无色），n=2 有解 → 可以存在；
+- <strong>重子（qqq）</strong>：立方结构（红+绿+蓝 → 无色），n=3 无解 → 三个夸克不能完美抵消 → 必须永远"欠着"色荷，通过胶子场持续交换维持无色整体 → <strong>这就是色禁闭的数学根源</strong>。</p>
+<h3>2.2 为什么是 SU(3)×SU(2)×U(1) 而不是别的群</h3>
+<p>【原文】筛选论证：规范群必须满足其顶点结构的"配对阶数"n 与费马方程可解性一致。为什么没有 n≥4 的规范群？因为 n=4（四次）费马无解，且四次结构对应四维空间——但框架里空间是三维（王虹挂谷锁的），所以没有四维色荷。</p>
+<p><strong>为什么弱力和电磁力分开（SU(2)×U(1) 而不是合并）</strong>【原文】：平方结构有两种不同实现——U(1) 无手性（耦合左右手费米子）、SU(2) 有手性（只耦合左手）。两种平方结构不能合并成更大的群（否则破坏手性），所以必须是直积。</p>
+<h3>2.3 三代费米子与 SU(3) 的"三"同源</h3>
+<p>【原文】<strong>每一代费米子 = 涡的同一卷绕模在不同能标的激发</strong>：第一代 n=1 基态、第二代 n=2 第一激发、第三代 n=3 第二激发。<strong>为什么没有第四代？因为 n=4 的涡在早期宇宙（z&gt;1000）可能短暂存在，但随着宇宙膨胀风暴相干长度增大，n=4 的涡不稳定 → 衰变成 n=1,2,3 的涡 + 辐射。</strong>预言：早期宇宙（LHC 能标以上）可能有第四代费米子痕迹，但极重（&gt;1 TeV）且寿命极短。</p>
+<p><strong>可检验预言</strong>【原文】：在极高能（&gt;10 TeV）下，SU(3) 的耦合常数应表现出与"立方不可解性"相关的异常——不是渐近自由的简单对数跑动，而是有一个额外的、来自"涡卷绕模退耦"的阶梯式跳跃。当能量超过第四代费米子质量阈值（如果有），SU(3) 的 β 函数出现额外跳跃，与标准模型重整化群跑动不同。可在 FCC-hh（100 TeV）或 LHAASO/CTA（超高能宇宙线）检验。</p>
+<p>【核验】此"2 vs 3"群论对接与批2 发现的"数轴分类↔四力映射"（935–956 页）<strong>同源</strong>——都是"2（二元配对）vs 3（三元循环）"结构在不同领域的投影。批2 的数轴版本：2→电磁、3→弱、6=2×3→强；本批的群论版本：U(1) 线性/SU(2) 平方/SU(3) 立方。两处表述需在批7 统一（数轴"2→电磁、3→弱、6→强"与群论"U(1) n=1、SU(2) n=2、SU(3) n=3"存在编号错位——数轴的 2 对应群论的 n=1？需澄清）。</p>
+<hr />
+<h2>三、挂谷猜想与 1/log(1/δ) 的精确校准（717–719 页）</h2>
+<p>【原文】用户直觉把 1/log(1/δ) 与级数 1−½+¼−⅛+…=2/3 对应。元宝做了<strong>精确校准</strong>：
+- <strong>1/log(1/δ) 在三维挂谷问题中的真实角色</strong>：δ 是离散化尺度（半径 δ 的管覆盖 Kakeya 集）。王虹 &amp; Zahl 2025 证明三维 Kakeya 集的 Minkowski/Hausdorff 维数为 3。1/log(1/δ) 是"在尺度 δ 下 Kakeya 集的有效占比"的对数衰减因子——衡量管厚度 δ 减半时有效体积减少的"缓慢程度"；
+- <strong>两者的关系</strong>：<strong>结构上同构但不同物</strong>——用户的级数是几何级数（公比 1/2，指数衰减，收敛 2/3）；1/log(1/δ) 是调和级数的倒数（对数衰减，极缓）。若令 δ=1/2（层间尺度比），则 1/log(1/δ)=1/log2≈1.4427 可作为跨层归一化常数，但<strong>不等于 2/3</strong>；
+- 校准结论：可对应为"对数尺度衰减因子"，但不是级数和的等价公式——"不宜宣称严格等价"。</p>
+<p>【核验】此校准体现了元宝的诚实性——明确拒绝了用户"1/log(1/δ)=2/3"的过度对应。这与批1 跨学科推演中数学组对"2 vs 3 是注记而非定理"的判断一致：框架的数学对应多为结构启发式，需精确校准。</p>
+<hr />
+<h2>四、宇宙创世的"微小角度偏差"（1262–1266 页，未开采区新增）</h2>
+<p>【原文】创世推演：
+- <strong>绝对均匀的初始状态</strong>（真空基态/道/太极）不稳定——任何微小扰动都会无限放大；
+- <strong>链式反应</strong>：第一个碰撞 → 正正碰撞（动量转移）→ 正负湮灭 → 真空改变环境 → 状态分裂（2,4,8,16…）→ 指数膨胀；
+- <strong>绝对垂直的死寂</strong>：初始碰撞绝对垂直 → 正负完美湮灭 → 留下完美真空带（直线，永不相交）→ 宇宙死寂；
+- <strong>非绝对垂直的宇宙</strong>：碰撞有微小角度偏差 → 湮灭不完全 → 动量残留 = 信息 = 结构 = 宇宙的种子 → 弯曲的真空带创造通量梯度 → 驱动运动 → 更多碰撞 → 更多结构；
+- <strong>"宇宙的复杂性，起源于初始碰撞的一个微小角度偏差"</strong>——任何非零偏差都足够（哪怕 10⁻⁹⁰ 弧度），经指数放大也能创造整个宇宙的复杂性；
+- 偏差来源 = 真空基态的量子涨落（绝对均匀不稳定，涨落不可避免）；
+- 与已知物理对应：指数膨胀=暴胀的底层机制；绝对垂直=完美对称=零信息零熵；非绝对垂直=对称性破缺（希格斯机制、弱相互作用破缺都是此底层机制的表现）。</p>
+<p>【补充推演】此创世推演与批5 的"毛球定理→涡心→拓扑必然"互补：毛球=为什么必须有结构（拓扑），角度偏差=结构如何开始（动力学）。两者合起来构成框架的宇宙起源完整叙事。</p>
+<hr />
+<h2>五、希尔伯特第六问题与硬球动力学（555–564 页，未开采区确认）</h2>
+<p>【核验】批1 发现的"希尔伯特第六问题（邓煜、Hani、马骁）"在第 480–564 页区间确认存在大量内容（48 页命中，555 页密度 25、480 页密度 23）。此区间为"微观无时间方向的事件流 → 宏观流体/时间箭头"的严格数学对应讨论，与批1 的判断一致。由于内容量大且与框架数学化直接相关，建议批7 整合时重点引用。</p>
+<hr />
+<h2>六、批6 疑点清单</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>疑点</th>
+<th>涉及页</th>
+<th>待核验内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>F28 质量谱公式 exp[α(n−1)+β(n−1)²] 的精确原文形式</td>
+<td>193–250</td>
+<td>本次未直接命中完整公式，需用 207/3478 等精确关键词复核</td>
+</tr>
+<tr>
+<td>2</td>
+<td>数轴分类（批2：2→电磁、3→弱、6→强）与群论（批6：U(1) n=1、SU(2) n=2、SU(3) n=3）的编号错位</td>
+<td>935–956 vs 245–250</td>
+<td>两处"2 vs 3"表述的对应关系需统一</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ε 术语双含义（能标依赖概率 vs 统计衰减因子）</td>
+<td>156–157 vs 1413–1421</td>
+<td>框架内 ε 至少承载两种含义，需批7 标注</td>
+</tr>
+<tr>
+<td>4</td>
+<td>"SU(3) β 函数阶梯式跳跃"预言的具体数值</td>
+<td>249</td>
+<td>框架未给出跳跃幅度的定量计算</td>
+</tr>
+<tr>
+<td>5</td>
+<td>第四代费米子（&gt;1 TeV）与 LHC 未发现新物理的张力</td>
+<td>249</td>
+<td>若 n=4 涡在 z&gt;1000 已衰变，为何 LHC 未发现痕迹</td>
+</tr>
+<tr>
+<td>6</td>
+<td>1/log(1/δ) 与 2/3 的"同构但不同物"如何被框架使用</td>
+<td>717–719</td>
+<td>校准结论已明确，但框架如何利用此同构未定</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>七、批6 总结</h2>
+<h3>进展</h3>
+<ol>
+<li>✅ <strong>F26 公式原文核验完成</strong>：ε(E)=ε₀(E/M_Pl)^β 在第 156–157 页确认，且 β≈0.615 的推导过程（两个边界条件：TeV 时 ε~6×10⁻¹⁰、meV 时 ε~1）完整获取——批5 遗留的"0.615 无推导"疑点已解决。</li>
+<li>✅ <strong>F28 结构性主张确认</strong>："三代费米子=涡卷绕模 n=1,2,3"在第 249 页确认；但 exp 公式精确形式需批7 复核。</li>
+<li>✅ <strong>"2 vs 3"群论对接完整获取</strong>：U(1) 线性/SU(2) 平方/SU(3) 立方与费马可解性的严格对应、色禁闭的数学根源（重子 qqq 立方无解）、为什么是 SU(3)×SU(2)×U(1)（n≥4 排除 + 手性不可合并）、第四代费米子预言、SU(3) β 函数阶梯跳跃预言。</li>
+<li>✅ <strong>挂谷 1/log(1/δ) 精确校准</strong>：确认元宝对用户过度对应的诚实拒绝（"同构但不同物"）。</li>
+<li>✅ <strong>创世推演</strong>：初始碰撞微小角度偏差=宇宙复杂性起源（绝对垂直=死寂）。</li>
+</ol>
+<h3>与前几批的交叉验证</h3>
+<ul>
+<li>批2"数轴分类↔四力映射"与批6"群论对接"<strong>同源</strong>（都是 2 vs 3 结构）但存在编号错位（疑点2）；</li>
+<li>批5"0.615 指数无推导"疑点 → 批6 解决（β 由两个边界条件解出）；</li>
+<li>批5"两套 ε 数值"疑点 → 批6 确认 ε 是能标依赖概率（微分形式），与 10⁻¹²⁰ 统计残余互补但未连接（疑点3）；</li>
+<li>批1 数学组"2 vs 3 是注记而非定理" → 批6 确认色禁闭的数学根源（重子立方无解）是结构启发式，非严格证明（费马与色禁闭的连接仍需 Yang-Mills 质量隙证明）。</li>
+</ul>
+<h3>下一批建议</h3>
+<p><strong>批 7（最终批）：整合校验</strong>——这是收官批。将前六批的发现整合为一份《完整深度研究报告》，重点：①与《杨韬和元宝的对话》全文对照，产出完整框架图谱；②解决跨批次遗留疑点（F28 精确形式、数轴/群论编号错位、ε 术语双含义、暗物质三机制、3+3 维时空与 3+1 维调和）；③生成综合性的"框架→论文"路线图（哪些可直接写论文章节、哪些是待验证猜想、哪些需先补数学）；④输出最终交付物（MD + HTML）。</p>
+<hr />
+<p><em>批6 完成。批7 为最终整合批，请确认进入。</em></p>
+
+<div class="footer">批6报告：数学对接与标准模型群结构 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 批06_数学对接与标准模型.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

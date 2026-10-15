@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>论文增补：§8 宇宙学收口 + 新增 §8.6（视界热力学与平坦性）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">§A　三处必须修改</div>
+  <h1>论文增补：§8 宇宙学收口 + 新增 §8.6（视界热力学与平坦性）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-17/18（第 17 轮）
+<strong>核验脚本</strong>：<code>outputs/_paper_sec8_check.py</code>（检查项 PA-1 … PA-7，失败项：无）
+<strong>一句话结论</strong>：本来以为只是「改措辞」，实际核查发现 <strong>§8.2 与 §8.3 现在写的结论已被后续轮次否证</strong>（f_space 旧值错 2.23 倍、镜像支作暗物质反向差 5.31/3.82 倍），而 9 月的整套视界热力学链条（β、等分账、平坦性）<strong>从未进过论文</strong>；另外发现 <strong>λ 在论文里已被 §5 弦网耦合占用</strong>，宇宙学必须改用 <code>Ω_tot</code>——而这一改，所谓「λ = 1」立刻显形为「Ω_tot = 1」，也就是平坦性本身。</p>
+</blockquote>
+<p>本文件包含两部分：</p>
+<ul>
+<li><strong>§A</strong>　三处<strong>必须修改</strong>的原文（给出替换文本，可直接粘贴）</li>
+<li><strong>§B</strong>　新增 <strong>§8.6 视界热力学与平坦性</strong> 的完整稿件</li>
+</ul>
+<hr />
+<h2>§A　三处必须修改</h2>
+<h3>A-1　§8.2 第 632 行：<code>f_space ≈ 0.014</code> 是过期值（❌）</h3>
+<p><strong>原句</strong>：「…与观测 2.3×10⁻²⁷ 差 ~70 倍——<strong>【待验证】</strong>需 f_space ≈ 0.014 或机制修正」</p>
+<p><strong>问题</strong>：在全息稀释 <code>ε_eff = (l_P/R_c)² = 1.3975×10⁻¹²²</code> 下，<code>⟨f_space⟩</code> 不是待定 knob，而是<strong>被观测量唯一解出</strong>的：</p>
+<pre><code>⟨f_space⟩ = ρ_DM / (ε_eff · ρ_P) = 2.2511×10⁻²⁷ / 7.2037×10⁻²⁶ = 0.031250073
+          = 1/32.000        （相对偏差 2.3×10⁻⁶）
+</code></pre>
+<p>旧值 0.014 <strong>小了 2.23 倍</strong>。而且该机制已被判定为<strong>零预言力</strong>（第 13/14 轮）：</p>
+<ul>
+<li>朴素体积读法：需空洞占 3.13% 体积，实测 50–80% ⟹ <strong>否证 16–26 倍</strong>；</li>
+<li>换「速率抑制」读法：指数/幂律/阈值/线性四种自洽律给<strong>四个不同答案</strong>，每种都能靠调参凑到 1/32 ⟹ 预言力 = 0。</li>
+</ul>
+<p><strong>替换为</strong>：</p>
+<blockquote>
+<p>【修正 v2.9】在全息稀释 <code>ε_eff = (l_P/R_c)²</code> 下，<code>⟨f_space⟩</code> 由观测量<strong>唯一确定</strong>为
+<code>⟨f_space⟩ = ρ_DM/(ε_eff ρ_P) = 1/32.000</code>（早期「≈0.014」为不同 <code>ε_eff</code> 取值下的结果，作废）。
+<strong>【诚实标注】</strong>该式目前是<strong>拟合式而非预言</strong>：<code>f_space</code> 的唯一值是被解出来的；若把它读成
+空洞体积分数，与实测 50–80% 差 16–26 倍；若读成速率抑制因子，缺一条无自由参数的抑制律
+<code>f_space(ρ_m)</code>。<strong>暗物质的定量解释在本框架中仍然是空白</strong>（见第 13/14 轮）。</p>
+</blockquote>
+<h3>A-2　§8.3 第 647 行：镜像支作暗物质主体（❌ 已否证）</h3>
+<p><strong>原句</strong>：「ρ ~ 4×10⁻²⁷ kg/m³ <strong>与观测同量级</strong>——<strong>暗物质主体可能来自镜像支引力投影</strong>【待验证】」</p>
+<p><strong>问题</strong>：50:50 的两种自然读法给出<strong>方向相反</strong>的偏差，都远超误差棒：</p>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>内容</th>
+<th>预言 Ω_dm</th>
+<th>与观测 0.2618 的偏差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>只有引力跨支共享，其余被支界过滤 ⟹ ρ_mirror 的引力效应 ≈ ρ_baryon</td>
+<td>0.0493</td>
+<td><strong>低 5.31 倍</strong></td>
+</tr>
+<tr>
+<td>B</td>
+<td>沿用论文自己的 κ_extra ≈ Ω_mirror/Ω_total ≈ 0.5 ⟹ Ω_dm ~ 1</td>
+<td>~1</td>
+<td><strong>高 3.82 倍</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>替换为</strong>：</p>
+<blockquote>
+<p>【修正 v2.9】原「暗物质主体来自镜像支投影」的判断<strong>已被否证</strong>：50:50 的两种自然读法分别给
+Ω_dm = Ω_b = 0.0493（低 5.31 倍）与 Ω_dm ~ 1（高 3.82 倍），<strong>方向相反且均远超误差棒</strong>。
+该节保留为<strong>开放问题</strong>；void-CPT-κ 异常（原 §8.3 的可检验预言）仅在此机制被重建后才成立。</p>
+</blockquote>
+<h3>A-3　§8.1 第 628 行：E_c 写法精度 + β 敏感度（✅ 结论不变）</h3>
+<p><code>E_c = M_Pl c²·ε₀^{1/β} = 1.0181 meV</code>（原写 1.01 meV，<strong>同式</strong>，仅两位小数）。</p>
+<p>建议补一句敏感度，因为它与 Ω_Λ 定量路的失败同源（<code>dlnΩ_Λ/dβ = 465</code>，第 7 轮）：</p>
+<blockquote>
+<p>【诚实标注】<code>E_c</code> 对 β 极度敏感：β 增加 1% ⟹ <code>E_c = 2.068 meV</code>（2.0 倍）；增加 2% ⟹ <code>4.14 meV</code>（4.1 倍）。
+因此 <code>E_c</code> 的<strong>量级</strong>（meV）是稳健结论，其<strong>数值</strong>的可靠性完全绑定于 β = 0.615 的取值。</p>
+</blockquote>
+<hr />
+<h2>§B　新增 §8.6　视界热力学与平坦性</h2>
+<blockquote>
+<p><strong>符号约定（重要）</strong>：本节的密度比<strong>不使用 λ</strong>——<code>λ</code> 在本论文 §5 中已被弦网哈密顿量耦合常数
+与临界值 λ_c ≈ 0.14 占用（§5 有 11 行含 λ，全文 26 行；§8 当前 0 行）。此处统一使用标准符号
+<strong><code>Ω_tot ≡ ρ/ρ_crit</code></strong>，配套 <code>Ω_K = 1 − Ω_tot</code>。
+副作用是有益的：早前记录中的「λ = 1」即 <strong><code>Ω_tot = 1</code></strong>，也就是<strong>平坦性本身</strong>。</p>
+</blockquote>
+<h3>8.6.1　热力学面 = 平流停滞面</h3>
+<p>【推导】框架的微观组分以 c 传播。均匀膨胀中存在与 k 无关的精确关系 <code>v_rec = Hr</code>，故风暴成分无法向外回传的界面位于</p>
+<div class="formula">R<sub>c</sub> = c/H<sub>0</sub> = 14.4516 <span class="txt">Gly</span>   (H<sub>0</sub> = 2.1927×10<sup>-18</sup> <span class="rm">s^{-1}</span>)</div>
+
+<p>该面的表面引力取 <code>κ = c²/R_c = cH₀</code>，与 pacientes Unruh 温度给出</p>
+<div class="formula">k<sub>B</sub>T = <span class="frac"><span class="num">ℏ H<sub>0</sub></span><span class="den">2π</span></span>  ⟹  T = 2.66558×10<sup>-30</sup> <span class="rm">K</span></div>
+
+<p>【假设 B5（准定理）】<strong>热力学面取上述平流停滞面</strong>。这不是 GR 的表观视界，也不是事件视界；判别见 8.6.5。</p>
+<p>【诚实标注】框架的这条面<strong>不是零表面</strong>：<code>dR_c/dt = (1+q₀)c</code>，ΛCDM 的 q₀ = −0.5333 ⟹ 面以 <strong>0.4667c</strong> 外移，是 timelike 面。仅在纯 de Sitter（w = −1）极限下它才是零表面。<strong>因此不能把它表述为「观测者因果补丁的边界」</strong>；支持它的正确理由是 8.6.4 的时间尺分离。</p>
+<h3>8.6.2　β = 1/(2π) 与 2π 的来源</h3>
+<p>【推导】每个 Planck 面元 <code>l_P²</code> 的平均能量为 <code>Ė = k_BT = ℏH₀/(2π)</code>，即</p>
+<div class="formula">β ≡ <span class="frac"><span class="num"><span class="txt">每bit能量</span></span><span class="den">k<sub>B</sub>T<sub>GH</sub></span></span> = <span class="frac"><span class="num">1</span><span class="den">2π</span></span></div>
+
+<p><strong>该系数与 Ω_tot 无关</strong>（第 1 轮）；且其来源可追溯至 F3 熵公式：由 <code>S = k_BA/(4l_P²)</code> 与 <code>dE = TdS</code> 直接得 <code>T = ℏc³/(8πGMk_B)</code>，太阳质量黑洞算得 6.1687×10⁻⁸ K，与标准 Hawking 温度偏差 &lt; 10⁻⁹。<strong>即 1/(2π) 源自 F3 中那个「4」</strong>，不是从 QFT 借来的。</p>
+<p>【诚实标注】<code>S = k_BA/(4l_P²)</code> 的系数 1/4 是 Bekenstein–Hawking 值（已由太阳黑洞 S/k_B = 1.0494×10⁷⁷ 独立核验），属标准物理输入，非本框架推导。</p>
+<h3>8.6.3　等分账 ⟹ 平直 Friedmann 约束方程</h3>
+<p>【推导】在该面上写代数等分 <code>E = Nk_BT</code>，<code>N = A/(4l_P²) = πR_c²/l_P²</code>：</p>
+<div class="formula"><span class="frac"><span class="num">4π</span><span class="den">3</span></span>ρ(<span class="frac"><span class="num">c</span><span class="den">H<sub>0</sub></span></span>)<sup>3</sup> c<sup>2</sup>  =  <span class="frac"><span class="num">π(c/H<sub>0</sub>)<sup>2</sup></span><span class="den">l<sub>P</sub><sup>2</sup></span></span>·<span class="frac"><span class="num">ℏ H<sub>0</sub></span><span class="den">2π</span></span>
+ ⟹  ρ = <span class="frac"><span class="num">3H<sub>0</sub><sup>2</sup></span><span class="den">8π G</span></span></div>
+
+<p><strong>输入全部为定义或框架既有结果，未预设 Friedmann。</strong> 数值：<code>ρ = 8.5983×10⁻²⁷ kg/m³</code>。</p>
+<p>⟹ <strong><code>Ω_tot = 1</code>，即 <code>Ω_K = 0</code>，即 k = 0</strong>，且</p>
+<pre><code>M = c³/(2GH₀) = 9.20550×10⁵² kg ； R_S = 2GM/c² = R_c （精确，相对误差 &lt;10⁻¹²）
+</code></pre>
+<p>故 <strong>哈勃球 = 史瓦西半径</strong>：「黑洞宇宙」在此得到机制说明，不再是数值巧合。</p>
+<p>【诚实标注】上述 <code>M</code> 用的是 Misner–Sharp 质量表达式，即<strong>已在 FRW 内部</strong>使用 GR ⟹ 严格地说是「在 FRW 内推出 k = 0」，不是从零推出引力。另外 <code>*ρ = 3H²/8πG</code> 是<strong>约束方程</strong>；加速度方程与连续性方程仍缺（二者在给定约束后等价，见下）。</p>
+<h3>8.6.4　为什么两端数的是同一批相干块（时间尺分离论证）</h3>
+<p>第 15 轮确定：观测者端的相干块单位与统计端一致（<strong>每 4l_P² 为 1 纳特，不是 1 比特</strong>，由 Hawking 温度裁决：1 bit 会给 8.8995×10⁻⁸ K，偏差 +44.27%）。余下的问题是两端是否数同一批块。</p>
+<p>【推导】块分解是<strong>瞬时量</strong>——由风暴当前的微观结构定义，不带历史。风暴以 <code>ν = 1/t_P = 1.85486×10⁴³ s⁻¹</code> 刷新，而视界几何只以 H₀ 变化：</p>
+<div class="formula"><span class="frac"><span class="num">ν</span><span class="den">H<sub>0</sub></span></span> = <span class="frac"><span class="num">R<sub>c</sub></span><span class="den">l<sub>P</sub></span></span> = 8.45924×10<sup>60</sup>,   H<sub>0</sub>t<sub>P</sub> = 1.18214×10<sup>-61</sup></div>
+
+<p>一个哈勃时内每个面元被刷新 <strong>8.46×10⁶⁰ 次</strong>。因此两种分解之差的上界为 <code>O(H₀t_P) = 1.18×10⁻⁶¹</code>。</p>
+<p>⟹ <strong>「同一批块」在 O(10⁻⁶¹) 精度上成立</strong>。对照组：<strong>若 ν → 0（冻结微观结构），失配为 O(1+q₀) = 0.47，即 20%~47% 的块数误差</strong>——因此 A1 的 <code>ν ~ 1/t_P</code> 正是让这条链接成立的东西。</p>
+<p>【诚实标注】这是<strong>上界论证</strong>，不是构造性证明。它依赖两个未独立证明的前提：(i) 两端的计数都是瞬时的（若任一端是历史累积量则失效）；(ii) 刷新率为 1/t_P。</p>
+<h3>8.6.5　为什么不是别的面（判别表）</h3>
+<p>由 8.6.3 的一般形式（面在半径 R 处）可得 <code>Ω_tot = (R/R_c)²</code>（温度由 H₀ 定）或 <code>= R/R_c</code>（温度由该面表面引力定）。代入各候选：</p>
+<table>
+<thead>
+<tr>
+<th>候选面</th>
+<th>R/R_c</th>
+<th>Ω_tot</th>
+<th>Ω_K</th>
+<th>判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>表观视界 + Kodama 温度</td>
+<td>—</td>
+<td>0.59</td>
+<td>+0.41</td>
+<td>❌ 偏离 <strong>217σ</strong>（第 9/12 轮）</td>
+</tr>
+<tr>
+<td>表观视界（λ_micro = 8π/3）</td>
+<td>0.3455</td>
+<td>0.1194</td>
+<td>+0.881</td>
+<td>❌ 差 O(1)</td>
+</tr>
+<tr>
+<td>事件视界（乙式）</td>
+<td>1.1473</td>
+<td>1.1473</td>
+<td>−0.1473</td>
+<td>❌ 78σ（Planck+BAO）/ <strong>5.7σ</strong>（Planck 单独）</td>
+</tr>
+<tr>
+<td>事件视界（甲式）</td>
+<td>1.1473</td>
+<td>1.3163</td>
+<td>−0.3163</td>
+<td>❌ 167σ / 15.1σ</td>
+</tr>
+<tr>
+<td><strong>平流停滞面 c/H</strong></td>
+<td><strong>1.0000</strong></td>
+<td><strong>1.0000</strong></td>
+<td><strong>0.0000</strong></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p>（<code>R_EH/R_c = 1.147288</code>，即 16.5802 Gly；参照 Ω_K 观测：Planck+BAO 0.0007±0.0019，Planck 单独 −0.044±0.018。）</p>
+<p>⟹ 在自然候选面中 <strong><code>R_c = c/H</code> 是唯一幸存者</strong>。</p>
+<p>【诚实标注】这个「唯一性」是用 Ω_K 观测量排除出来的 ⟹ <strong>B5 带有数据成分，不是纯先验推导</strong>。其先验支持来自涌现次序：<code>R_c = c/H</code> 只需 (c, H)，而 <code>R_A = c/(H√Ω_tot)</code> 需要 G——G 在框架中是涌现量。</p>
+<h3>8.6.6　关于 α–β 路的说明（为什么它不算证据）</h3>
+<p>早前记录中有 <code>Ω_tot = 4α²β²</code>（α = 4π/ξ 来自熵系数，β = ξ/(8π) 由第一定律反解）。核验表明：</p>
+<div class="formula">4α<sup>2</sup>β<sup>2</sup> = 4·<span class="frac"><span class="num">16π<sup>2</sup></span><span class="den">ξ<sup>2</sup></span></span>·<span class="frac"><span class="num">ξ<sup>2</sup></span><span class="den">64π<sup>2</sup></span></span> = 1   <span class="txt">对任意 </span>ξ<span class="txt"> 恒成立</span></div>
+
+<p>ξ = 1, 2, 3, 4, 4ln2, 8, 16 全部给出 <code>1.000000000000</code>。<strong>该式看不见 R</strong>，因此对任何面的选择都不敏感 ⟹ 它既不能挑面，也<strong>不能作为「Ω_tot = 1 已获验证」的独立证据</strong>。早前记为「ξ-稳健性」的这一性质应当降调为<strong>一致性检查</strong>：它不是稳健，它是重言式。</p>
+<p><strong>有内容的只有一条</strong>：等分账写在 <code>R_c = c/H</code> 上 ⟹ 解出 <code>ρ = 3H²/(8πG)</code>（8.6.3）。</p>
+<hr />
+<h2>诚实边界（新增内容的最低声明）</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>平流停滞面 <code>R_c = c/H</code>、温度 <code>T = ℏH₀/(2πk_B)</code></td>
+<td>【推导】（只需 v_rec = Hr = c 与 κ = c²/R_c）</td>
+</tr>
+<tr>
+<td><code>ρ = 3H²/(8πG)</code>、<code>Ω_tot = 1</code>、<code>R_S = R_c</code></td>
+<td>【推导 + 数值】，但用了 Misner–Sharp 质量表达式 ⟹ 在 FRW 内部成立</td>
+</tr>
+<tr>
+<td>「同一批相干块」</td>
+<td><strong>上界论证</strong>，非构造性证明；依赖两个未证前提</td>
+</tr>
+<tr>
+<td>B5 的唯一性</td>
+<td><strong>含数据成分</strong>（用 Ω_K 排除竞争者）</td>
+</tr>
+<tr>
+<td><code>α = π</code>、<code>β = 1/(2π)</code> 的数值</td>
+<td>来自标准物理（BH 熵、GH 温度）；框架原创性在于把它们用在 <code>R_c</code> 上</td>
+</tr>
+<tr>
+<td>绝对密度量级</td>
+<td><strong>未解决</strong>——框架继承宇宙学常数问题，只是换了语言</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>判决与下一步</h2>
+<p><strong>判决</strong>：✅ 本轮交付了可直接粘贴的论文补丁；✅ 修掉 §8.2/§8.3 两处<strong>已被后续轮次否证</strong>的结论；✅ 查符号冲突时顺带发现「λ = 1」应改写成 <code>Ω_tot = 1</code>（= 平坦性本身），并据此把 α–β 路降调为重言式。</p>
+<p><strong>下一步（待你拍板）</strong>：</p>
+<ol>
+<li><strong>是否真的把 §B 落进论文主文件</strong>（本轮只产出可粘贴的补丁稿，<strong>未改动论文正文</strong>，避免未经你同意修改主稿）；</li>
+<li>英文版 <code>Paper_MatterAntimatterPairStorm_v2.8_EN.md</code> 需同步同样三处修改（EN 版同样缺这条链）；</li>
+<li>§9 可检验预言表可新增一行：<strong>「wa = 0 + Ω_K = 0」联合检验</strong>（框架对 Ω_K 是硬性预测，DESI/Euclid 可直接判别）。</li>
+</ol>
+<p><strong>附：本轮修订一览</strong></p>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>性质</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§8.2（第 632 行）</td>
+<td>❌ 结论过期</td>
+<td><code>f_space ≈ 0.014</code> → <code>1/32.000</code>，并标注零预言力</td>
+</tr>
+<tr>
+<td>§8.3（第 647 行）</td>
+<td>❌ 已被否证</td>
+<td>镜像支作暗物质主体 → 开放问题（低 5.31 倍 / 高 3.82 倍）</td>
+</tr>
+<tr>
+<td>§8.1（第 628 行）</td>
+<td>✅ 精度 + 敏感度</td>
+<td><code>1.01 meV</code> → <code>1.0181 meV</code>，补 β 敏感度（β+1% ⟹ ×2.0）</td>
+</tr>
+<tr>
+<td>新增 §8.6</td>
+<td>✅ 新章节</td>
+<td>视界热力学与平坦性（含时间尺分离论证、判别表、诚实边界）</td>
+</tr>
+<tr>
+<td>符号</td>
+<td>⚠️ 冲突处理</td>
+<td>宇宙学禁用 λ（§5 已占用），改用 <code>Ω_tot ≡ ρ/ρ_crit</code></td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">论文增补：§8 宇宙学收口 + 新增 §8.6（视界热力学与平坦性） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 论文增补_§8收口与新8.6视界热力学.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

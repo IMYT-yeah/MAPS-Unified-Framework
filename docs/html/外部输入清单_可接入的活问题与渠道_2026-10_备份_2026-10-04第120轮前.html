@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>外部输入清单 —— 可接入的活问题与渠道（2026-10 版）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>外部输入清单 —— 可接入的活问题与渠道（2026-10 版）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>素材 = <strong>7 组联网检索</strong>（2026-10-04 快照）＋ 本项目 100–117 轮的自身记录。</p>
+</blockquote>
+<h1>外部输入清单 —— 可接入的活问题与渠道（2026-10 版）</h1>
+<h2>一、一句话结论</h2>
+<p><strong>你的判断与项目自身记录一致</strong>：100–117 的每一轮都是「结项 / 口径更正 / 资产恢复 / 元任务」，<strong>没有一轮产出新物理或新自由参数</strong>；「框架独有 + 可测 + 已有数字」的预言 = <strong>1</strong>（EMRI，等 LISA ~10–15 年）。搜索找到 <strong>4 类、约 10 个可接入的外部变量</strong>。最短路径仍然是<strong>把已备好的私审送出去</strong>（0 新增工作量）；其次是三件可本地开工的「外部对标」——其中我认为最值得先做的是 <strong>I-17（Φ 的第五力窗口）</strong> 和 <strong>文献锚定升级</strong>。</p>
+<h2>二、判断校准：为什么「内部到极限」是对的</h2>
+<ul>
+<li>最近 18 个轮次（100–117）的产出结构：<strong>结项 12 / 更正 5 / 元任务 1</strong>，新增自由参数 <strong>0</strong>、新增现象 <strong>0</strong>；</li>
+<li>「待办全清」（第 117 轮）的真实含义是 <strong>内部清</strong> —— 外部输入本来就只剩三类渠道：<strong>人（私审）、数据（观测）、文献（对照）</strong>；</li>
+<li>因此「增加外部输入变量」不是选项，而是<strong>唯一的方向</strong>；本清单就是给这三类渠道各配几个具体入口。</li>
+</ul>
+<h2>三、搜索发现（按类分列；★ = 我认为优先级高）</h2>
+<h3>A. 数据 / 观测类</h3>
+<p>★<strong>A1. DESI 演化暗能量之争已进入「统计方法之争」</strong>（活跃，2025-03 → 2026-08）
+- DESI DR2（2025-03）：BAO+CMB+SN 组合下 w₀wₐCDM 偏好 <strong>2.8–4.2σ</strong>（依赖 SN 样本）；
+- <strong>DES-Y6 全数据</strong>（2026-05，arXiv:2605.27221）：单巡天最强，w₀ = −0.84，wₐ = −0.53，<strong>3.0σ</strong>；
+- 「Unite」SN 目录（2,884 颗）：w₀ = −0.861，wₐ = −0.60，<strong>w 越过 −1 在 z ≈ 0.3</strong>，3.1–3.3σ；
+- ⚠️ <strong>贝叶斯反分析</strong>（arXiv:2511.10631，2026-08）：嵌套采样给出 <strong>偏好 ΛCDM</strong>（lnB = −0.57±0.26），并论证「演化偏好主要来自 DESI DR2 与 DES-Y5 的<strong>数据集间张力被两个额外参数吸收</strong>」。
+- → <strong>挂钩</strong>：§8.4 的 ε(z) 漂移（w = −1 + 4ε/3）。<strong>但</strong>：第 73 轮已登记「框架不覆盖宇宙学判别」⟹ 若要做，须先说明<strong>判别力从哪来</strong>，否则是一次「一致性构造」（勿先做）。</p>
+<p>★<strong>A2. 空间引力波三线并存</strong>（时间线比「LISA 一家」更丰富）
+- <strong>LISA</strong>：发射 <strong>2035</strong>（Ariane 6）；2026 年因 NASA FY26/FY27 预算风波，ESA 启动<strong>双轨</strong>：2026-05 望远镜替代合同（Thales，€26.1M）、2026-01 推进子系统合同；<strong>激光系统</strong>的欧替路线仍未定 ⟹ 2035 有滑期风险，值得<strong>每半年盯一次</strong>；
+- <strong>天琴（中国）</strong>：「0123」路线图 —— 天琴一号 ✅（2019）／<strong>天琴二号双星 ~2026 发射窗口</strong>（星间激光干涉在轨验证）／天琴三号 ~2035；白皮书《Gravitational Wave Astronomy With TianQin》2025-05 发表于 <em>Reports on Progress in Physics</em>；
+- <strong>太极（中国）</strong>：太极一号 ✅；<strong>2026-05 全功能干涉仪光学平台</strong>地面测试通过（皮米级、稳定性 ×10）——进入工程研制。
+- → <strong>挂钩</strong>：EMRI 是唯一出口；天琴二号本身不产科学数据，但<strong>天琴开放课题 + 国际研讨会是现成的渠道</strong>（见 D2）。另：EMRI 参数区间（10⁵–10⁷ M☉）与三家都重叠，<strong>时间线变量</strong>直接影响「10–15 年」这个数。</p>
+<p><strong>A3. PTA 现状</strong>（低优先）
+- 五台联合分析 ~<strong>4.3σ</strong>（2026）仍未达 5σ；FAST/CPTA 2023 年 4.6σ（14 nHz）。→ 与 §9 只作互补，暂不构成新入口。</p>
+<h3>B. 理论对照类</h3>
+<p>★<strong>B1. 指数度规（= 本框架度规）文献在 2025–2026 是「活的」</strong></p>
+<blockquote>
+<p>材料包 §2.1 已登记：<strong>度规即 Yilmaz–Rosen exponential metric</strong>（Papapetrou 1954／Yilmaz 1958／Rosen 1962）。以下是<strong>它最新的外部动态</strong>：
+- <strong>arXiv:2511.13471</strong>（2025-11，31 页）：指数度规的<strong>光子球 / ISCO / Regge–Wheeler 方程 / 阴影</strong> —— 与你们 §4.5b/§4.6 的强场分叉<strong>逐项对应</strong>，可做外部基准核对；文中定位：无事件视界、可解释为「标量场源的非真空解 / 可穿越虫洞 / 无毛致密天体玩具」；
+- <strong>EPJC 85, 531</strong>（2025-05，arXiv:2506.04304）：暗物质完美流体 → 指数度规（旋转曲线）；
+- <strong>EPJC</strong>（2026，doi:10.1140/epjc/s10052-026-15641-z）：指数度规中的磁偶极场（带电粒子运动）。
+- → <strong>用途</strong>：① 论文 v2.4 的「文献对照」补丁<strong>已过期</strong>，一次升级即可；② 拿到<strong>外部计算的对照数字</strong>（他们的 ISCO/阴影 vs 你们的）；③ 引用网络入口（这群人在乎这个度规）。</p>
+</blockquote>
+<p>★<strong>B2. EMRI 超 GR 波形 2026 年井喷</strong>（与唯一出口同轴）
+- <strong>arXiv:2607.09310</strong>（2026-07）：<strong>首个自协力 + 后绝热（1PA）+ 标量荷</strong>的 I/EMRI 波形；LISA 贝叶斯注入-恢复；结论：纯 GR 模板分析带标量荷信号 → 显著偏差；
+- <strong>arXiv:2606.27429</strong>（2026-06）：大质量标量场 + <strong>偏心</strong>轨道 Kerr EMRI，标量辐射通量（Chebyshev 插值）+ FIM 预报；
+- <strong>arXiv:2608.28037</strong>（2026-08）：非最小耦合毛黑洞 + EMRI  plunge，~O(10) rad 失相。
+- → <strong>用途</strong>：材料包 <strong>Q1（「Peters–Mathews+quadrupole 是否够用」）现在有了 2026 年的答案</strong>——不够，但升级路径清楚；同时这就是<strong>私审候选人的具体圈层</strong>（Warburton / Maselli / Sotiriou 等）。</p>
+<p><strong>B3. 黑洞-宇宙耦合（「暗能量来自黑洞」）</strong>（登记，不承诺）
+- Faraoni et al.（2026-09，arXiv:2608.21222）「Black holes become comoving with the universe」；Croker–Tarlè 线（PRL / SciAm 报道）；Nojiri–Odintsov（<em>Phys. Dark Univ.</em> 50, 102104，2025）；Dialektopoulos et al.（<em>Phys. Lett. B</em> 870, 139948，2025）。
+- → 与「黑洞宇宙」家族<strong>概念同族</strong>，但<strong>接口未知</strong>（本项目 C-17 已查明「哈勃球=史瓦西半径」是恒等式类对象）⟹ 只登记为观察项。</p>
+<h3>C. 实验约束类</h3>
+<p>★<strong>C1. 第五力约束在 2025–2026 大幅收紧</strong>（<strong>能改变结论</strong>的那种输入）
+- 悬浮传感（对 chameleon 的约束进步 <strong>~2 个数量级</strong>）、光学悬浮微球（Yukawa，5–6 μm）、<strong>MORRIS</strong>（毫米级，目标 α ≲ 10⁻⁴→10⁻⁵）、<strong>长基线原子干涉</strong>（AION-10 / VLBAI）、<strong>Th-229 核钟</strong>（亚微米标量耦合）、<strong>Juno 轨道进动</strong>（~10⁻¹⁴ eV 中介子）。
+- → <strong>挂钩：I-17</strong>（Φ = KK 标量模 = radion 的质量与耦合<strong>未定义</strong>——框架唯一没关上的口子）。做法：把 Φ 作为轻标量放进这些约束表 ⟹ <strong>大概率判死或只剩窄窗口</strong>。这是「外部输入<strong>直接改变结论</strong>」的最干净候选。</p>
+<p><strong>C2. 脉冲星高阶 PN 检验的新动向</strong>（定期重校输入）
+- APS 2026-04 报告（Haster）：双重脉冲星 + BNS <strong>前四个 PN 阶</strong>联合约束与相关矩阵；
+- 集合约束：标量-张量 |α₀| ≲ 5×10⁻⁵（95%）；SKA 时代目标含 <strong>PSR–SBH 系统</strong>（可直接测黑洞自旋/强场）。
+- → <strong>挂钩</strong>：论文里「2PN 分叉当前不可分辨（双脉冲星）」这句 <strong>需要定期重校</strong>——现在有人在做「多阶联合」，这正是你们分叉所在的层级。</p>
+<h3>D. 人与渠道类（最缺的其实是这个）</h3>
+<p>★<strong>D1. 私审</strong>（已备好；唯一 0 工作量项）
+- 两包已就绪：《私审准备包》（§4.5b/§9/§8.1 三处 + 9 问 + 20 分钟版）、《EMRI 材料包》（S-E1–E4 + 三边界 + 口径节）。
+- 候选圈层（本轮搜索直接提供）：<strong>B2 的作者群</strong>（EMRI 超 GR）、<strong>B1 的作者群</strong>（指数度规）、<strong>C2</strong>（脉冲星 PN）。我自己最建议先从 EMRI 圈里挑 —— 因为那是与唯一出口同轴的人。</p>
+<p><strong>D2. 天琴计划渠道</strong>（现成的「外部输入接口」）
+- <strong>开放课题</strong>：年度指南（2025 版于 2025-11 发布、11-30 截止）⟹ <strong>2026 年版预计 2026-11 前后</strong>，方向含引力波数据处理/科学应用 —— 与 EMRI 材料包对口；
+- <strong>国际研讨会</strong>：「天琴科学任务国际研讨会」每年一届（第 8 届 2026-05，新加坡国立大学）。
+- → 低成本、合法的「把材料递到懂行的人手上」的渠道。</p>
+<p><strong>D3. arXiv 预印</strong> —— 若决定公开，负面边界（I-16）先行的旧建议<strong>不变</strong>。</p>
+<h2>四、建议（按成本 / 价值排序）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>动作</th>
+<th>成本</th>
+<th>预期结果形态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>送私审</strong>（选人即可；先 EMRI 圈）</td>
+<td><strong>0</strong>（已备好）</td>
+<td>外部人对 3 处核心的风险判定</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>文献锚定升级</strong>（B1+B2 六篇 → 更新论文 §4.5b 对照 + 材料包 Q1）</td>
+<td>约 1 轮（本地）</td>
+<td>「外部已有人做到哪一步」的准确标尺</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>I-17 第五力窗口</strong>（C1：把 Φ 放进 2025–26 约束表）</td>
+<td>约 1 轮（本地）</td>
+<td><strong>判死或窄窗口</strong> —— 一种「能改变结论」的输入</td>
+</tr>
+<tr>
+<td>4</td>
+<td>渠道注册（D2：天琴开放课题/会议；观察 LISA 滑期）</td>
+<td>低（待窗口）</td>
+<td>长期接口</td>
+</tr>
+<tr>
+<td>5</td>
+<td>DESI 形状检验（A1）</td>
+<td>1 轮+</td>
+<td>⚠️ 先过第 73 轮判据，否则不做</td>
+</tr>
+<tr>
+<td>6</td>
+<td>黑洞-宇宙耦合（B3）</td>
+<td>观察</td>
+<td>只登记</td>
+</tr>
+</tbody>
+</table>
+<p><strong>我的推荐顺序：1 → 2 → 3。</strong> 理由：#1 是唯一「已经做好、只差寄出」的；#2 让 #1 的材料更强（私审包引用 2026 文献 vs 1962 文献，说服力不同）；#3 是清单里<strong>唯一可能真的改变现有结论</strong>的本地项。</p>
+<h2>五、诚实边界</h2>
+<ul>
+<li>本清单 = <strong>2026-10-04 的检索快照</strong>；部分条目来自聚合器/百科（未逐篇核原文），arXiv 号为预印本；</li>
+<li>「挂钩」评估用的是本项目四类判定标准（真预言/postdiction/半拟合/失败）；<strong>A1 项尤其危险</strong>（一致性构造），已标注前置条件；</li>
+<li>本轮<strong>无新物理、无新自由参数</strong>；不改变任何既有判决；材料包/论文中「等 LISA ~10–15 年」的表述<strong>不变</strong>（A2 只是补充了「时间线有滑期风险 + 中国两条线并行」）。</li>
+</ul>
+
+<div class="footer">外部输入清单 —— 可接入的活问题与渠道（2026-10 版） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 外部输入清单_可接入的活问题与渠道_2026-10_备份_2026-10-04第120轮前.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

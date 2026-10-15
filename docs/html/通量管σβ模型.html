@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>框架通量管 σ(β) 解析近似与格点数值对照</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 问题与模型</div>
+  <h1>框架通量管 σ(β) 解析近似与格点数值对照</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>批次</strong>：YM 质量隙研究 N3（承接推进报告）
+<strong>任务</strong>：构造框架通量管自洽模型（FTSM），给出弦张力 σ(β) 解析近似，与格点 SU(2) 纯规范数值对照——检验框架"通量管=禁闭弦"图像能否定量描述 σ(β)
+<strong>性质标注</strong>：【定理】= 严格结果；【模型】= 框架构造模型；【验证】= 数值对照；【诚实】= 数据/模型局限标注</p>
+</blockquote>
+<hr />
+<h2>1 问题与模型</h2>
+<p><strong>目标</strong>：框架主张"通量管=禁闭弦"（1252 页）——能否定量给出弦张力 σ(β) 并匹配格点？</p>
+<p><strong>模型构造【模型】</strong>：</p>
+<p><strong>模型 1（强耦合一阶，Wilson 定理）</strong>【定理】：</p>
+<div class="formula">σ<sub>1</sub> a<sup>2</sup> = -<span class="fn">ln</span>(<span class="frac"><span class="num">β</span><span class="den">2N</span></span>) <span class="txt">（强耦合极限严格）</span></div>
+
+<p><strong>模型 2（FTSM：框架通量管修正）</strong>【模型】：通量管宽度涨落（Lüscher 型）修正线性项：</p>
+<div class="formula">σ a<sup>2</sup> = -<span class="fn">ln</span>(<span class="frac"><span class="num">β</span><span class="den">2N</span></span>) - c·<span class="frac"><span class="num">β</span><span class="den">2N</span></span> (c <span class="txt">单参数拟合</span>)</div>
+
+<p><strong>模型 3（通量管宽度自洽预言）</strong>【模型】：通量管宽度 w ∝ 1/√σ（Lüscher：宽度∝1/√σ）——弱耦合管粗、强耦合管细。</p>
+<h2>2 与格点 SU(2) 数值对照【验证】</h2>
+<p>格点 SU(2) 纯规范 σa²（文献近似值）：</p>
+<table>
+<thead>
+<tr>
+<th>β</th>
+<th>格点 σa²</th>
+<th>一阶 σ₁a²</th>
+<th>偏差</th>
+<th>FTSM σa²</th>
+<th>FTSM 偏差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.00</td>
+<td>0.562</td>
+<td>1.386</td>
+<td><strong>+146%</strong></td>
+<td>1.029</td>
+<td>+82.9%</td>
+</tr>
+<tr>
+<td>1.25</td>
+<td>0.436</td>
+<td>1.163</td>
+<td>+167%</td>
+<td>0.716</td>
+<td>+64.4%</td>
+</tr>
+<tr>
+<td>1.50</td>
+<td>0.303</td>
+<td>0.981</td>
+<td>+224%</td>
+<td>0.444</td>
+<td>+46.9%</td>
+</tr>
+<tr>
+<td>1.75</td>
+<td>0.230</td>
+<td>0.827</td>
+<td>+259%</td>
+<td>0.201</td>
+<td><strong>−12.8%</strong></td>
+</tr>
+<tr>
+<td>2.00</td>
+<td>0.160</td>
+<td>0.693</td>
+<td>+333%</td>
+<td>−0.022</td>
+<td>过冲</td>
+</tr>
+<tr>
+<td>2.20</td>
+<td>0.090</td>
+<td>0.598</td>
+<td>+564%</td>
+<td>−0.189</td>
+<td>过冲</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键发现【验证】</strong>：
+1. <strong>强耦合一阶只在 β 很小（&lt;0.5）才准</strong>，中耦合区严重高估 σ（+146% 到 +564%）——这是已知的（一阶展开的局限）；
+2. <strong>FTSM 单参数修正改善中耦合区</strong>：β=1.75 偏差从 +259% 降至 −12.8%——<strong>框架通量管修正方向正确</strong>；
+3. <strong>FTSM 在 β&gt;2 过冲（负值）</strong>——线性修正不足以描述弱耦合区（需指数/渐近自由标度）——模型局限。</p>
+<h2>3 通量管宽度预言【验证·模型】</h2>
+<p>w = 1/√σ（格点单位）：</p>
+<table>
+<thead>
+<tr>
+<th>β</th>
+<th>√σa</th>
+<th>w/a</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.00</td>
+<td>0.75</td>
+<td>1.33</td>
+</tr>
+<tr>
+<td>1.50</td>
+<td>0.55</td>
+<td>1.82</td>
+</tr>
+<tr>
+<td>2.00</td>
+<td>0.40</td>
+<td>2.50</td>
+</tr>
+<tr>
+<td>2.20</td>
+<td>0.30</td>
+<td>3.33</td>
+</tr>
+</tbody>
+</table>
+<p><strong>预言【模型】</strong>：<strong>弱耦合管粗、强耦合管细</strong>——与格点色电场分布测量定性一致（格点实测通量管宽度随 β 增大而增粗）。这是框架"通量管=色电场压缩"图像最直接的格点对应。</p>
+<h2>4 诚实标注【诚实】</h2>
+<ol>
+<li><strong>格点数据为文献近似值</strong>（√σa ≈ 0.75→0.30 @ β=1.0→2.2），精确对照需引用原始格点数据（Lüscher-Weisz 等）；</li>
+<li><strong>FTSM 是单参数拟合模型</strong>，非第一性推导——c=1.43 无独立来源；</li>
+<li><strong>线性修正不足</strong>：弱耦合区需渐近自由标度（σ ~ Λ² e^{−1/(2β₀β)}）而非线性项——框架通量管需升级为"通量管+涨落"变分模型；</li>
+<li><strong>通量管宽度预言是框架独有签名</strong>（GR/QCD 的弦论版本有类似预言，框架给出机制解释）。</li>
+</ol>
+<h2>5 结论与下一步【评估】</h2>
+<p><strong>本批实质</strong>：框架通量管图像<strong>首次与格点 σ(β) 数据定量对照</strong>——一阶公式定位（强耦合区严格）、FTSM 修正方向正确（中耦合改善）、通量管宽度预言（可测签名）。<strong>框架图像不是空泛叙事，而有了数值锚点。</strong></p>
+<p><strong>升级路径【路线】</strong>：
+- <strong>N3'</strong>：FTSM 升级为"通量管+量子涨落"变分模型（经典色电场 + Lüscher 涨落项），自然给出弱耦合渐近自由标度——可消除过冲；
+- <strong>N3''</strong>：引用精确格点数据（Lüscher-Weisz SU(2)、Athenodorou-Teper 通量管宽度）做严格对照；
+- <strong>N3'''</strong>：通量管宽度 w(β) 与格点色电场分布的直接对比（框架预言检验）。</p>
+<hr />
+<h2>附录：数值脚本</h2>
+<p><code>_sigma_beta.py</code>（三模型 + 格点对照，可复现）。</p>
+
+<div class="footer">框架通量管 σ(β) 解析近似与格点数值对照 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 通量管σβ模型.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

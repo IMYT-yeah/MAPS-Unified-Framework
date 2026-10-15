@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>甲-3 结项：toric code 相变点 —— 数值不能判别 `1/3` 与 `0.328`，而「h_c = K/J」缺机制</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、结论（先说）</div>
+  <h1>甲-3 结项：toric code 相变点 —— 数值不能判别 `1/3` 与 `0.328`，而「h_c = K/J」缺机制</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 102 轮</strong>（2026-10-04）｜任务来源：第 99 轮四源清点点选的「甲-3」
+｜原定判据（§99 清点）：框架给 <code>h_c = K/J = 1/3</code>，文献 <code>0.32／0.328</code> ⟹ <strong>差距是否随尺寸→0</strong>
+｜脚本：<code>_toric102.py</code>（扇区求解器）／<code>_toric102_run.py</code>（验证+扫描）／<code>_toric102_analyze.py</code>（判据）</p>
+</blockquote>
+<hr />
+<h2>一、结论（先说）</h2>
+<p><strong>三条，按重要性排序：</strong></p>
+<h3>① ⚠️ <strong>数值不能判别 <code>1/3 = 0.3333</code> 与 <code>0.3285</code></strong> —— 因为本方法的判据分辨率 <strong>±0.03</strong>，而两者只差 <strong>1.5%</strong></h3>
+<table>
+<thead>
+<tr>
+<th>判据</th>
+<th>数值结果（L = 3–4）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Binder 交叉</strong>（U 相交，无需微分）</td>
+<td><strong>0.2975 ／ 0.3213（3×3 vs 3×4，有交叉）</strong>；<strong>3×3 vs 4×4 与 3×4 vs 4×4 无交叉</strong>，最小间距点分别在 <strong>0.3100（0.0181）</strong>、<strong>0.3100（0.0200）</strong> ⟹ <strong>合起来 0.31 ± 0.02</strong></td>
+</tr>
+<tr>
+<td><strong>保真度磁化率</strong>峰</td>
+<td>0.3771（3×4）／<strong>0.3683（4×4）</strong></td>
+</tr>
+<tr>
+<td><strong>两判据跨度</strong></td>
+<td><strong>0.31 – 0.377</strong>（中心 ≈ 0.34）</td>
+</tr>
+<tr>
+<td>文献精确值</td>
+<td><strong>0.328474</strong>（在跨度<strong>内</strong>）</td>
+</tr>
+<tr>
+<td>框架</td>
+<td><strong>1/3 = 0.3333</strong>（在跨度<strong>内</strong>）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>两个候选值都落在判据分歧区间里 ⟹ 本轮既不能确认、也不能否证「J/K = 3」</strong>（<strong>这是诚实的负结果</strong>；与甲-2 的教训同族：<strong>判据系统分歧 &gt; 待测效应</strong>）。</p>
+<h3>② ⚠️⚠️ <strong>结构性结论：「h_c = K/J」缺少机制 —— 相变完全不依赖 J</strong>（机器精度验证）</h3>
+<p><code>A_v = Π_{e∋v} X_e</code> 是 <strong>X 型</strong> ⟹ <strong><code>[A_v, Σ_e X_e] = 0</code> 是算符恒等式</strong> ⟹ A_v 守恒 ⟹ 在 A_v = +1 扇区内 J 项<strong>退化为常数</strong> <code>−J·V</code>。</p>
+<p><strong>数值验证</strong>（<code>J = 1</code> vs <code>J = 3</code>，K = 1）：</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>h</th>
+<th>E0(J=1)</th>
+<th>E0(J=3)</th>
+<th>平移后</th>
+<th>m(J=1)</th>
+<th>m(J=3)</th>
+<th>ΔE1−E0 差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3×3</td>
+<td>0.30</td>
+<td>−18.555770544</td>
+<td>−36.555770544</td>
+<td>差 <strong>恰为 (J−1)V = 18</strong></td>
+<td>0.267732</td>
+<td>0.267732</td>
+<td><strong>5e-14</strong></td>
+</tr>
+<tr>
+<td>3×3</td>
+<td>0.35</td>
+<td>−18.843517849</td>
+<td>−36.843517849</td>
+<td>差 <strong>18</strong></td>
+<td>0.376308</td>
+<td>0.376308</td>
+<td><strong>6e-14</strong></td>
+</tr>
+<tr>
+<td>3×4</td>
+<td>0.30</td>
+<td>−24.692790435</td>
+<td>−48.692790435</td>
+<td>差 <strong>恰为 24</strong></td>
+<td>0.248878</td>
+<td>0.248878</td>
+<td><strong>2e-13</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>相变点与 J 无关</strong>（<code>Δm ~ 1e-12</code>）。</p>
+<p><strong>⟹ 判定</strong>：论文写「J/K = 3 ⟹ <strong>相变点 h_c = K/J</strong> = 1/3」——<strong>这一步的"⟹"没有机制</strong>。
+若相变当真不依赖 J，则 <code>h_c = K/J</code> <strong>在形式上就预测了「h_c 随 J 变化」，与事实矛盾</strong>。
+数值上 <code>1/(J/K) = 1/3</code> 与 <code>h_c = 0.3285</code> 差 1.5% —— 但这是<strong>两个不同量的数值接近</strong>，
+与 <strong>C-62</strong>（3D Ising <code>β_c</code> 轴混淆）<strong>同族</strong>。<strong>登记为「机制缺失」，不撤回数值符合的说法但不承认其为推导。</strong></p>
+<h3>③ ⚠️ <strong>论文的「X 场 0.32 ／ σ^z 场 0.328」区分是错的</strong></h3>
+<p>论文 v1.23（§5.7，标"重要"）写：「<code>h_c=0.328474(3)</code> 是 <strong>σ^z 场</strong>的临界值…框架 <strong>X 场版本应对标 <code>h_xc≈0.32</code></strong>…v1.22 的『h_c≈0.328 同量级』系两版本混用，已修正」。</p>
+<p><strong>文献核实（本轮）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>事实</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>模型就是 <strong><code>H ≡ −Σ_v A_v − Σ_p B_p − h Σ_ℓ X_ℓ</code>（on the torus）</strong></td>
+<td>arXiv 2603.14098（2026）逐项一致 ⟹ <strong>与框架模型相同</strong></td>
+</tr>
+<tr>
+<td><strong><code>h_c = 0.328474(3)</code></strong></td>
+<td>Trebst et al. 2007；Blöte &amp; Deng 2002；Wu et al. 2012</td>
+</tr>
+<tr>
+<td><strong><code>h_x^c ≈ 0.328 when h_z = 0</code></strong>（即 <strong>X 场就是 0.328</strong>）</td>
+<td>arXiv 1309.7438 引 Trebst 2007／Vidal 2009／Tupitsyn 2010</td>
+</tr>
+<tr>
+<td><strong><code>h_x^c ≈ 0.34</code> 是「对称线 h_z = h_x」上的值</strong> —— <strong>另一条线</strong></td>
+<td>同上</td>
+</tr>
+<tr>
+<td>X ↔ Z + 对偶格 <strong>是模型的严格对偶</strong>（⟹ 两个纯场版本<strong>同值</strong>）</td>
+<td>arXiv 2011.06611</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>论文很可能把「对角线的 0.34」误记成了「X 场版本的 0.32」</strong>。
+⟹ <strong>应改回</strong>：X 场（<code>h_z = 0</code>）版本 = <strong>0.328474</strong>，与 σ^z 场<strong>相同</strong>（自对偶）；0.34 属<strong>自对偶线</strong>。</p>
+<blockquote>
+<p>⚠️ <strong>额外的自相矛盾（当年脚本 vs 论文）</strong>：<code>_p03_torus.py</code> 的文档字符串自己写着
+「H(κ) = −ΣA_v − ΣB_p − κΣX_e（<strong>X 场版本</strong>，与 P0-3 同约定，<strong>文献 h_c≈0.328 同约定</strong>）」
+—— <strong>脚本是对的</strong>，v1.23 的"修正"把它改错了。</p>
+</blockquote>
+<hr />
+<h2>二、数值</h2>
+<h3>2.1 Binder 交叉（两两尺寸）</h3>
+<table>
+<thead>
+<tr>
+<th>配对</th>
+<th>交叉点 h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×2 vs 2×3</td>
+<td>无（最小间距 0.0206 @ 0.50）</td>
+</tr>
+<tr>
+<td>2×2 vs 3×3</td>
+<td>0.4686</td>
+</tr>
+<tr>
+<td>2×2 vs 3×4</td>
+<td>0.4255</td>
+</tr>
+<tr>
+<td>2×2 vs 4×4</td>
+<td>0.3928</td>
+</tr>
+<tr>
+<td>2×3 vs 3×3</td>
+<td>0.3940</td>
+</tr>
+<tr>
+<td>2×3 vs 3×4</td>
+<td>0.3730</td>
+</tr>
+<tr>
+<td>2×3 vs 4×4</td>
+<td>0.3530</td>
+</tr>
+<tr>
+<td><strong>3×3 vs 3×4</strong></td>
+<td><strong>0.2975, 0.3213</strong></td>
+</tr>
+<tr>
+<td><strong>3×3 vs 4×4</strong></td>
+<td>无（最小间距 0.0181 @ 0.3100）</td>
+</tr>
+<tr>
+<td><strong>3×4 vs 4×4</strong></td>
+<td>无（最小间距 0.0200 @ 0.3100）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>读法</strong>：含 L=2 的 7 组给 <strong>0.35–0.47</strong> 并随另一尺寸增大单调下降 —— 这是 <strong>L=2 太小</strong>的伪影；
+<strong>L ≥ 3 的 3 组一致给 0.30–0.32</strong>，且<strong>互相之间不再漂移</strong>。
+⚠️ 但「不再漂移」<strong>不能</strong>当作「已收敛」（甲-2 的教训：小尺寸区间的"无漂移"是判据分辨率的产物）。</p>
+<h3>2.2 Binder U 的原始对照（决定交叉点）</h3>
+<table>
+<thead>
+<tr>
+<th>h</th>
+<th>U(3×3)</th>
+<th>U(4×4)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.28</td>
+<td>−0.22244</td>
+<td>−0.18281</td>
+</tr>
+<tr>
+<td>0.30</td>
+<td>−0.12029</td>
+<td>−0.10071</td>
+</tr>
+<tr>
+<td><strong>0.32</strong></td>
+<td><strong>−0.01543</strong></td>
+<td><strong>+0.00669</strong> ⟸ <strong>仍未变号（U₄ &gt; U₃），两组不交叉</strong></td>
+</tr>
+<tr>
+<td>0.34</td>
+<td>+0.08617</td>
+<td>+0.12809</td>
+</tr>
+<tr>
+<td>0.40</td>
+<td>+0.33032</td>
+<td>+0.41808</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>修正（核验 V-30 抓出）</strong>：3×3 与 4×4 的 U 曲线<strong>不交叉</strong>（U₄ 在 0.20–0.50 全程略高于 U₃，差 −0.020 → −0.022 → −0.042），<strong>最小间距点在 0.3100（间距 0.0181）</strong>。
+⟹ <strong>L ≥ 3 的三组配对合起来支持 h_c ≈ 0.30–0.32</strong>，其中只有 (3×3, 3×4) 真正相交（0.2975／0.3213）。
+⚠️ <strong>本报告初稿曾把 3×3 vs 4×4 写成「交叉 ≈ 0.317」—— 那是错的，已更正。</strong></p>
+<h3>2.3 与当年的对照（复现性）</h3>
+<ul>
+<li>全部尺寸 <strong>E(h=0) = −N_v</strong> ✓（−8／−12／−18／−24／−32）</li>
+<li><strong>扇区 vs 全空间</strong>（2×2、2×3、3×3，各 6 个 h 点）：<strong>ΔE₀ ~ 1e-14、Δm ~ 1e-13</strong> ✓</li>
+<li>3×3、h=0.35 的 m = <strong>0.376308</strong> 与当年 <code>_p03_torus_std</code> 记录的 <strong>0.376308</strong> 一致 ✓</li>
+</ul>
+<hr />
+<h2>三、工程：<strong>A_v = +1 扇区</strong>把可算尺寸从 3×4 推到 <strong>4×4</strong></h2>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>全空间 2^n</th>
+<th><strong>扇区 2^(n−rank)</strong></th>
+<th>压缩</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×2</td>
+<td>256</td>
+<td>32</td>
+<td>8×</td>
+</tr>
+<tr>
+<td>2×3</td>
+<td>4096</td>
+<td>128</td>
+<td>32×</td>
+</tr>
+<tr>
+<td>3×3</td>
+<td>2.6e5</td>
+<td>1024</td>
+<td>2.6e2×</td>
+</tr>
+<tr>
+<td>3×4</td>
+<td>1.7e7（<strong>当年的上限</strong>）</td>
+<td>8192</td>
+<td>2.0e3×</td>
+</tr>
+<tr>
+<td><strong>4×4</strong></td>
+<td><strong>4.3e9</strong></td>
+<td><strong>131072</strong></td>
+<td><strong>3.3e4×</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong><code>rank(C) = V − 1</code> 恒成立</strong>（V = 顶点数），nullity = <code>n − V + 1</code>。</li>
+<li>扇区 = GF(2) 零空间（约束 <code>Π_{e∋v} x_e = +1</code>）。零空间基由 <strong>完整 RREF</strong> 构造
+  （⚠️ 只做行阶梯而不做向上消元会互相污染 pivot 列 —— 本轮踩过，靠自检 <code>assert</code> 兜住）。</li>
+<li><strong>X 基下 H 极简</strong>：对角 <code>−J·V − h·Σ_e(−1)^{w_e}</code> ＋ 翻转项 <code>−K·Σ_p |w ⊕ f_p⟩</code>
+  ⟹ 任意 X 算符的矩都是<strong>对角</strong>的 ⟹ <strong>Binder 累积量零额外成本</strong>。</li>
+<li>4×4 实测：31 个 h 点 × (k=2 的 Lanczos) ≈ <strong>3.5 分钟</strong>（204 s）。</li>
+</ul>
+<p><strong>⚠️ Binder 在本模型恒等失效的风险已排查</strong>：<code>m = Σ_e X_e/n</code> 不是幂等量（不同于甲-2 的 <code>A_c² = I</code>），
+Binder 有实数取值（实测 −0.50 … +0.57）✓ <strong>可用</strong>。</p>
+<hr />
+<h2>四、三条更正</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>内容</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C-64</strong></td>
+<td>⭐⭐ <strong>论文 v1.23 的「X 场 0.32 ／ σ^z 场 0.328」区分错误</strong>：文献给 <strong>X 场（h_z=0）= 0.328474</strong>，且 X↔Z 是<strong>严格自对偶</strong>（两版本同值）；<strong>0.34 是自对偶线 h_z = h_x 上的值</strong>，是<strong>另一条线</strong>。⚠️ 当年脚本 <code>_p03_torus.py</code> 的文档本来就写对了（"X 场版本…文献 h_c≈0.328 同约定"），v1.23 的"修正"把它改错了。</td>
+<td>论文中英 §5.7 改回</td>
+</tr>
+<tr>
+<td><strong>C-65</strong></td>
+<td>⭐⭐ <strong>「h_c = K/J」缺机制</strong>：<code>[A_v, ΣX_e] = 0</code> ⟹ <strong>相变不依赖 J</strong>（J=1 vs 3，Δm~1e-12 验证）。故「J/K = 3 ⟹ h_c = K/J」的"⟹"<strong>无推导</strong>；与 0.3285 的 1.5% 接近是<strong>两个不同量的数值巧合</strong>（同族：<strong>C-62</strong>）。</td>
+<td>论文中英 §5.7／§10.2#11 加口径注</td>
+</tr>
+<tr>
+<td><strong>C-66</strong></td>
+<td>⭐ <strong>跨约定比较</strong>：论文 §5.7 把「<strong>框架约定</strong>」的 <code>κ*≈0.20±0.01</code>／<code>m(h=0.32)≈0.84</code>／<code>κ_c≈0.25–0.32</code> 与文献 <code>h_xc</code> 直接比较，而两个约定（0.5 系数 vs J_A=J_B=1）<strong>差一个换算因子且未给</strong>（脚本自注：只有<strong>对称约定</strong>才"直接对标文献"）。</td>
+<td>论文 §5.7 加"两个约定不可混比"注</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>五、诚判与下一步</h2>
+<p><strong>本轮实际得到的</strong>：
+1. ⭐ <strong>一个可判定的结构性事实</strong>：<strong>相变不依赖 J</strong>（算符恒等式 + 机器精度数值验证）⟹ 直接指出框架那条推理链缺一环。
+2. ⭐ <strong>文献口径的修正</strong>（C-64）：把"X 场 0.32"改回 <strong>0.328474</strong>，并澄清 0.34 的归属。<strong>这使得"1/3 vs 0.3285 差 1.6%"成为一个合法比较</strong>（此前论文把它说成跨版本比较，反而是错的）。
+3. ⭐ <strong>工程</strong>：扇区法把 max L 从 3×4（1.7e7）提到 <strong>4×4（131072）</strong>，且 Binder 零额外成本。
+4. ⚠️ <strong>诚实的负结果</strong>：<strong>判据分辨率 ±0.03 &gt; 待判别的 1.5%</strong> ⟹ <strong>本法不能判别</strong>。</p>
+<p><strong>要真正判别 <code>1/3</code> 与 <code>0.3285</code>，需要：</strong>
+- 更大尺寸（5×5 扇区 = 2^26，需重写为<strong>隐式参数化</strong>避免 13 GB 的翻转表）；<strong>或</strong>
+- 换用 <strong>QMC</strong>（本模型无符号问题，文献的 0.328474 正是 QMC 给的）；<strong>或</strong>
+- 换判据（<strong>磁通弦/Wilson 环的周长–面积律交叉</strong>，而非 X 场磁化）</p>
+<p><strong>⚠️ 即使数值将来确认了 0.3285，也不构成对「J/K = 3」的验证</strong> —— 因为相变与 J 无关（C-65）；
+要验证 J/K = 3，必须<strong>另找一条依赖 J 的可观测量</strong>。</p>
+<hr />
+<h2>六、脚本与数据</h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>_toric102.py</code></td>
+<td>扇区构造（GF(2) RREF 零空间）+ <code>SectorToric</code> + 自检</td>
+</tr>
+<tr>
+<td><code>_toric102_run.py</code></td>
+<td><code>verify</code>（扇区 vs 全空间；含 <code>FullToric</code>）／<code>scan</code></td>
+</tr>
+<tr>
+<td><code>_toric102_analyze.py</code></td>
+<td>Binder 交叉 + 保真度磁化率 + 能隙（能隙判据<strong>已作废</strong>，见下）</td>
+</tr>
+<tr>
+<td><code>_toric102_t22/t23/t33/t34/t44.npz</code></td>
+<td>五个尺寸的扫描数据</td>
+</tr>
+<tr>
+<td><code>_toric102_datadump.txt</code></td>
+<td>全部数值表（列定义见文件头）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⚠️ 一条判据作废记录</strong>：<strong>能隙 Δ = E1−E0 的极小点</strong>在本模型<strong>不可用</strong> ——
+h = 0 时 toric code 基态 <strong>4 重简并</strong> ⟹ Δ(0) = 0 ⟹ 极小点恒落在 h 区间边界（实测全部在 h = 0.20）⟹ 无信息。
+（与甲-2 的"dw ≡ 0 是恒等式"同族：<strong>选判据前先问它在极限处是否退化</strong>。）</p>
+
+<div class="footer">甲-3 结项：toric code 相变点 —— 数值不能判别 `1/3` 与 `0.328`，而「h_c = K/J」缺机制 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 甲3结项_toric_code相变点_判据不能判别与h_c=K-J缺机制.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

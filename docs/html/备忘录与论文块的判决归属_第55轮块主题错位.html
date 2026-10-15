@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「备忘录 vs 论文块」的判决归属：1 处块主题错位</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>「备忘录 vs 论文块」的判决归属：1 处块主题错位</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 92 轮</strong> ｜ 脚本 <code>_memoalign_92.py</code>（<strong>MA-1…MA-7，0 失败</strong>）、核验 <code>_verify_92.py</code>（<strong>V-1…V-10，0 失败</strong>）
+题源：<strong>第 91 轮的诚实边界 §八.1</strong> —— 第 89 轮查的是「有没有<strong>遗漏</strong>」，本轮查「同一命题两处表述是否<strong>冲突/错位</strong>」。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p><strong>判决方向的对照结果是「通过」</strong>：42 个「备忘录 ↔ 论文块」配对里，<strong>38 个（90%）的否定判决都进了论文块</strong>。
+剩下 4 个候选里，<strong>3 个是用词层面</strong>（实质结论已在，只是没用那个词），<strong>1 个是真问题</strong>：</p>
+<blockquote>
+<p>⚠️ <strong>第 55 轮的块主题取错了</strong> —— 块的标题是「跨支通道的用途限于「信息」，不含「能量」」，
+而该轮<strong>备忘录的主题</strong>是「战略审查：<strong>电池能量密度</strong>能否由框架支撑」。
+该轮的核心判否（<strong>框架对化学储能零内容、三条路径全部判否</strong>），
+在它<strong>自己的块里一个词都没有</strong>（「储能 / 电池 / 化学 / 判否 / 不覆盖 / 零内容」<strong>各 0 处</strong>），
+只作为<strong>下一轮块的首句背景</strong>出现。</p>
+</blockquote>
+<p>⟹ ⭐ <strong>新形态：不是「缺块」，而是「块的主题错了」</strong> —— 一轮产出多条时，主题取成了<strong>分支里的一条</strong>，
+   主产物的判决<strong>在论文里没有归属</strong>。</p>
+<hr />
+<h2>二、⚠️ 两个检测器实测都失败（先把它俩否掉，省一整轮）</h2>
+<table>
+<thead>
+<tr>
+<th>检测器</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① 数值近邻</strong>（同前缀异尾数，如 <code>0.4330</code> vs <code>0.4334</code>）</td>
+<td><strong>29 对候选，全部是假警报</strong> —— 它们是 <strong>(2,2,L) 族里 N=8/16/24 三个不同格点</strong>的合法值，两边都出现是<strong>正常的</strong>。加「标签共现」（±60 字符内的 <code>(N,N,N)</code> / <code>N=</code>）过滤后<strong>仍有 56 对</strong>（表格行同时含 (2,2,2)/(2,2,4)/(2,2,6)）⟹ <strong>数值本身不携带身份</strong></td>
+</tr>
+<tr>
+<td><strong>② 标题字面重合度</strong>（bigram）</td>
+<td>把<strong>第 88 轮判成 0%</strong> —— 块标题「C-43：这个 ~90% 的度量是什么？」vs 备忘录「横向一致性审计_成熟度自评与三张表不相容」= <strong>同一件事换了措辞</strong> ⟹ <strong>假警报</strong></td>
+</tr>
+</tbody>
+</table>
+<p>📌 <strong>通则（第 15 类判据陷阱）</strong>：<strong>「换措辞就认不出」的检测器都不是判据。</strong>
+   <strong>只有「概念在块里缺席」才算冲突。</strong> 数值/标题都是<strong>措辞层</strong>；判决是<strong>概念层</strong>。</p>
+<hr />
+<h2>三、成立的判据（内容判据）</h2>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>判据</th>
+<th>实测</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><strong>配对</strong>：论文的 <code>【v2.9…（第 N 轮…】</code> 块 × 备忘录头部的轮次 ID</td>
+<td><strong>42 对</strong></td>
+</tr>
+<tr>
+<td>②</td>
+<td><strong>判决方向</strong>：否定词表（判否／不成立／不可判定／无路径／已被排除／零预言力／零内容／结项／撤回／作废／降调／不覆盖／不可识别／没有对象／无机制／失败）在备忘录「一句话结论／判决／净增量／收口」区 vs <strong>论文块全文</strong></td>
+<td><strong>备忘录有否定词的轮次里，38/42（90%）论文块里也有</strong> ⟹ <strong>通过</strong></td>
+</tr>
+<tr>
+<td>③</td>
+<td>剩下 4 轮逐条落地</td>
+<td>3 条用词层面 ＋ <strong>1 条真错位</strong></td>
+</tr>
+<tr>
+<td>④</td>
+<td>⭐ <strong>真问题判据 = 「概念在块里缺席」</strong></td>
+<td>第 55 轮块内六词<strong>各 0 处</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>3.1 四个候选的落地</h3>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>31</strong></td>
+<td><strong>假警报（用词层面）</strong></td>
+<td>论文块写「两种读法<strong>都强制方向数 = 4</strong>，<strong>不能用外空间配位 6</strong>」—— 排除义已在，只是没用「失败」一词</td>
+</tr>
+<tr>
+<td><strong>34</strong></td>
+<td><strong>假警报（用词层面）</strong></td>
+<td>论文块写「第 33 轮默认的 <code>w = 1 − f</code> <strong>少了一个平方，是错的</strong>」—— 正是备忘录的「失败」所指</td>
+</tr>
+<tr>
+<td><strong>47</strong></td>
+<td><strong>假警报（用词层面）</strong></td>
+<td>论文块判决 2 写「H/N <strong>非单调</strong>」（修正上一条）；「不成立」落在第 78 轮块</td>
+</tr>
+<tr>
+<td><strong>55</strong></td>
+<td>⚠️⚠️ <strong>真问题（内容缺失）</strong></td>
+<td>见 §四</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>四、⭐ C-47：第 55 轮的块主题错位</h2>
+<h3>4.1 证据（可复核）</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>论文块标题（ZH/EN）</td>
+<td>「跨支通道的用途限于「信息」，不含「能量」」／<code>the cross-branch channel carries *information*, not *energy*</code></td>
+</tr>
+<tr>
+<td>备忘录标题</td>
+<td>「战略审查_<strong>电池能量密度</strong>能否由框架支撑」</td>
+</tr>
+<tr>
+<td>块内「储能／电池／化学／判否／不覆盖／零内容」</td>
+<td><strong>各 0 处</strong></td>
+</tr>
+<tr>
+<td>核心判否的下落</td>
+<td><strong>下一轮（第 56 轮）块的首句背景</strong>：「第 55 轮把战略目标「电池能量密度」审为<strong>框架不覆盖</strong>……」</td>
+</tr>
+<tr>
+<td>中英</td>
+<td><strong>对称缺失</strong>（EN 块内 <code>storage</code>/<code>battery</code>/<code>chemical</code>/<code>not covered</code> <strong>各 0 处</strong>）</td>
+</tr>
+</tbody>
+</table>
+<h3>4.2 为什么这是问题</h3>
+<ul>
+<li><strong>外部可读性</strong>：审稿人顺着轮次块读，在「第 55 轮」处看不到「框架不覆盖储能」这条<strong>判否</strong>；
+  只会在「第 56 轮」块的首句里撞见它 —— 而那时它已经是<strong>背景</strong>，不是<strong>结论</strong>。</li>
+<li><strong>台账 vs 论文</strong>：清单里有 <code>S-13 = 框架不覆盖储能</code>，但<strong>论文里没有对应的归属点</strong>。</li>
+<li>这与 <strong>C-44</strong>（第 64 / 79 轮无备忘录）是<strong>不同</strong>的缺口：C-44 是「档不存在」，C-47 是「<strong>档在，但主题不对</strong>」。</li>
+</ul>
+<h3>4.3 处置</h3>
+<p><strong>在块首加「归属注」</strong>（写明该轮的<strong>两个</strong>产物、缺口的量化证据、必须同时引用的第 56 轮块与清单 <code>S-13</code>），
+<strong>不删改原块</strong>（跨支通道那条本身是对的，且它对应第 55 轮的<strong>次产物</strong>）。</p>
+<hr />
+<h2>五、诚实边界</h2>
+<ol>
+<li><strong>判据是「否定词的出现」，不是「结论是否正确」</strong> —— 它只能发现「判决没进块」，<strong>不能</strong>判断判决本身对错。</li>
+<li><strong>否定词表是我拟的</strong>（16 个词）。换一套词表，42 轮里的「通过／不通过」分布会变
+   ⟹ 与第 89 / 92 轮同族：<strong>词表一变结论就变，因此必须把词表写进结论</strong>（本节 §三 已列）。</li>
+<li><strong>配对只覆盖 42 轮</strong>（论文块 43 轮 ∩ 有轮次 ID 的备忘录）。
+   ⚠️ 第 89 轮已登记 <strong>第 64 / 79 轮没有备忘录</strong> ⟹ 那两轮<strong>无法做本项检查</strong>（它们的缺口已在 C-44 登记）。</li>
+<li><strong>「内容缺席」的判据是 6 个关键词</strong>（储能／电池／化学／判否／不覆盖／零内容）。
+   若某轮的核心判否用了<strong>这 6 个词以外的措辞</strong>，本项会<strong>漏判</strong> ⟹ 我只人工核了那 4 个候选。</li>
+<li><strong>本轮没有新的物理结论</strong> —— 产出是<strong>1 处归属修复 ＋ 两个失败检测器的记录 ＋ 一条溯源规范</strong>。</li>
+</ol>
+<hr />
+<h2>六、判决与产出</h2>
+<ul>
+<li><strong>判决</strong>：<strong>C-47</strong>（第 55 轮块主题错位 ⟹ 该轮核心判否在论文里没有归属）。</li>
+<li>总账：<strong>更正 45 → 46</strong>；<strong>负面条数不变</strong>。</li>
+<li>论文 <strong>ZH / EN</strong>：第 55 轮块首加<strong>归属注</strong>（中英同步，<strong>只加注、不动内容</strong>）。</li>
+<li>清单：新增 <strong>C-47</strong> 行 ＋ 总账 <strong>46 条</strong>。</li>
+<li>交接说明：§三 第 92 轮段；技能：<strong>陷阱 86</strong>；记忆：铁律 <strong>38/39/40</strong> 合并重写（含第 15 类陷阱）。</li>
+<li>备忘录：本文件。</li>
+</ul>
+<h2>七、下一步（第 93 轮建议）</h2>
+<ol>
+<li>⭐ <strong>把「块主题 = 备忘录主题」做成一次全量扫描</strong>：本轮只<strong>发现</strong>了 1 处（因为它是唯一一处
+   「核心判否词在块里 0 处」的）；但<strong>标题不匹配而内容仍在</strong>的情形（第 65 / 88 轮那种）没有系统查过。
+   ⟹ 建议用<strong>主产物判据</strong>（该轮备忘录的<strong>一句话结论</strong>里的核心名词，在块里出现几次）扫 42 轮。</li>
+<li><strong>候选池 #5（PPN 优越系 α₁ ≲ 10⁻⁴）</strong> —— ⚠️ 先按<strong>陷阱 50</strong> 自查：若框架给 <code>α₁ = 0</code>（与 GR 同），
+   则<strong>判别力 = 0</strong>（与 <strong>N-22</strong> 的 <code>Ω_K = 0</code> 同病）⟹ <strong>先算「它排除了什么」再开工</strong>。</li>
+<li><strong>第 1–38 轮备忘录缺口</strong>（C-44 登记）是否从 <code>本轮推演总结_2026-09-17/21.md</code> 反向重建。</li>
+</ol>
+
+<div class="footer">「备忘录 vs 论文块」的判决归属：1 处块主题错位 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 备忘录与论文块的判决归属_第55轮块主题错位.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>⟨|O|⟩ 的标度律与形状依赖 —— 以及三条收口的取证（3.2 / 4.1 / 4.2 / H5）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、3.2（I-15）：⟨|O|⟩ 的标度律 —— 答案是**形状依赖**，不是一个幂指数</div>
+  <h1>⟨|O|⟩ 的标度律与形状依赖 —— 以及三条收口的取证（3.2 / 4.1 / 4.2 / H5）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-10-02 ｜ 轮次：第 80 轮 ｜ 脚本：<code>outputs/_shape_scaling_80.py</code>（<strong>SH-1 … SH-7，7 项 0 失败</strong>）
+补丁后复跑：仍 <strong>7 项 0 失败</strong>（其中 SH-5 首跑翻红 —— 见 §五）</p>
+<p><strong>一句话结论</strong>：
+<strong>3.2 的交付是「严格界 ＋ 形状依赖 ＋ 不外推」，而不是一个幂指数</strong> —— ⟨|O|⟩ <strong>不是</strong> N 的单值函数，
+同一 N = 16 换形状可差 <strong>33.8 倍</strong>；<strong>4.1</strong> 把第 51 轮块末的「是否该登记」<strong>落成声明</strong>；
+<strong>4.2</strong> 把「遍历性」拆成<strong>三个互不相同的层</strong>（顺带查明候选池 14 的第三项<strong>用词不实</strong>）；
+<strong>H5 早在第 29 轮就做完了</strong> —— 台账却仍标「待办」（<strong>C-31</strong>，与第 74 轮 C-19 同族）。</p>
+</blockquote>
+<hr />
+<h2>一、3.2（I-15）：⟨|O|⟩ 的标度律 —— 答案是<strong>形状依赖</strong>，不是一个幂指数</h2>
+<h3>1.1 形状依赖（SH-1）</h3>
+<p>k = N/2 层、构型等权。<strong>同一 N 换形状，值显著改变</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>格点</th>
+<th>M = C(N,k)</th>
+<th>轨道数</th>
+<th><strong>⟨|O|⟩</strong></th>
+<th>覆盖率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>(2,2,2)</td>
+<td>70</td>
+<td>14</td>
+<td><strong>5.00</strong></td>
+<td>7.1429%</td>
+</tr>
+<tr>
+<td>8</td>
+<td>(2,4,1)</td>
+<td>70</td>
+<td>10</td>
+<td><strong>7.00</strong></td>
+<td>10.0000%</td>
+</tr>
+<tr>
+<td>8</td>
+<td>(8,1,1)</td>
+<td>70</td>
+<td>13</td>
+<td><strong>5.38</strong></td>
+<td>7.6923%</td>
+</tr>
+<tr>
+<td>16</td>
+<td>(2,2,4)</td>
+<td>12 870</td>
+<td>253</td>
+<td><strong>50.87</strong></td>
+<td>0.3953%</td>
+</tr>
+<tr>
+<td>16</td>
+<td>(2,4,2)</td>
+<td>12 870</td>
+<td>253</td>
+<td><strong>50.87</strong></td>
+<td>0.3953%</td>
+</tr>
+<tr>
+<td>16</td>
+<td>(4,2,2)</td>
+<td>12 870</td>
+<td>253</td>
+<td><strong>50.87</strong></td>
+<td>0.3953%</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>(4,4,1)</strong></td>
+<td>12 870</td>
+<td><strong>25</strong></td>
+<td><strong>514.80</strong></td>
+<td><strong>4.0000%</strong></td>
+</tr>
+<tr>
+<td>16</td>
+<td>(16,1,1)</td>
+<td>12 870</td>
+<td>845</td>
+<td><strong>15.23</strong></td>
+<td>0.1183%</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>✅ <strong>旋转等价检验通过</strong>：(2,2,4) / (2,4,2) / (4,2,2)（同一格点，只是轴的写法不同）
+  给出<strong>逐位相同</strong>的轨道数 253 与 ⟨|O|⟩ 50.869565 ⟹ <strong>实现无歧义</strong>（内部一致性 ✓）；</li>
+<li>⭐ <strong>换形状则改变</strong>：N = 16 上 <strong>514.80 / 15.23 = 33.8 倍</strong>；N = 8 上 7.00 / 5.00 = 1.40 倍。
+  ⚠️ <strong>(4,4,1) 是 4×4 平面</strong>（最"方"），<strong>(16,1,1) 是 1D 链</strong>（最"细"）—— 两端差 33.8 倍。</li>
+</ul>
+<p>⟹ ⚠️ <strong>⟨|O|⟩ 是形状依赖量</strong>（第 47/48 轮「形状是独立变量」的又一次确认）⟹
+<strong>工作流 3.2 的验收要求「必须标注形状依赖、不外推」，这一条现在有了定量依据。</strong></p>
+<h3>1.2 标度律（SH-2）</h3>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th>⟨|O|⟩</th>
+<th>ln⟨|O|⟩</th>
+<th>ln⟨|O|⟩/N</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td>5.00</td>
+<td>1.6094</td>
+<td>0.2012</td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>16</td>
+<td>50.87</td>
+<td>3.9293</td>
+<td>0.2456</td>
+</tr>
+<tr>
+<td>(2,2,6)</td>
+<td>24</td>
+<td>426.93</td>
+<td>6.0566</td>
+<td>0.2524</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>不是幂律</strong>：ln⟨|O|⟩ 对 lnN 的两段斜率为 <strong>3.34 → 5.25</strong>（差 57%）；</li>
+<li><strong>对 N^{2/3} 近线性</strong>：两段斜率 <strong>0.9873 → 1.0795</strong>（差 <strong>9.3%</strong>）⟹ 可记
+  「≈ exp(c·N^{2/3})，c ≈ 1.03」，<strong>但三点不足以判定幂指数</strong>；</li>
+<li>⚠️ <strong>与第 50 轮的 <code>h_min·N^{−2/3}</code> 不是同一个量</strong> —— 那是 <strong>h_min</strong>（熵密度本身）、
+  这是 <strong>⟨|O|⟩</strong>（轨道大小）；两者数值形式相似是<strong>巧合级</strong>的接近，<strong>不得互相引证</strong>（铁律 2）。</li>
+</ul>
+<p><strong>严格界</strong>（<code>1 ≤ ⟨|O|⟩ ≤ C(N,k)</code>）：三点全部落在区间内 ✓ —— 上界来自「整层一条轨道」。</p>
+<h3>1.3 ⭐ 严格界（续）：可迁性判据的<strong>适用域</strong>（SH-3）</h3>
+<p><strong>若 G 在 k-层上可迁，则轨道数 = 1，故</strong>必要条件** <code>|G| ≥ C(N,k)</code>：</p>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>|G|（第 41 轮）</th>
+<th>C(N,N/2)</th>
+<th>|G|/C(N,k)</th>
+<th>可迁？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>8</td>
+<td>70</td>
+<td>0.1143</td>
+<td><strong>否（严格）</strong></td>
+</tr>
+<tr>
+<td>16</td>
+<td>128</td>
+<td>12 870</td>
+<td>0.009946</td>
+<td><strong>否（严格）</strong></td>
+</tr>
+<tr>
+<td>24</td>
+<td>648</td>
+<td>2 704 156</td>
+<td>0.0002396</td>
+<td><strong>否（严格）</strong></td>
+</tr>
+<tr>
+<td><strong>64</strong></td>
+<td><strong>2.79×10³⁷</strong></td>
+<td>1.8326×10¹⁸</td>
+<td><strong>1.522×10¹⁹</strong></td>
+<td><strong>未排除</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ ⭐ <strong>N ≤ 24 全部严格不可迁</strong>（与实测轨道数 &gt; 1 一致 ✓），
+<strong>而 N = 64 的必要条件已满足</strong>（<code>|G|/C(N,k)</code> 达 <strong>10¹⁹</strong>）⟹ <strong>判据在 N = 64 上不能裁决</strong>。
+⟹ 第 41 轮「结果 C」（<strong>若</strong>高度可迁则 ⟨|O|⟩ ≈ C(N,N/2) ⟹ H ≈ ½lnN ⟹ 面积律不成立）
+在 <strong>N ≤ 24 上无法判定</strong> ⟹ <strong>该判据的适用域 = N ≤ 24（细长格点）</strong>，<strong>宏观行为不能由它推出</strong>。</p>
+<hr />
+<h2>二、4.1：把「格点离散结构 ↔ 面积律」<strong>正式登记</strong>为「框架不覆盖」</h2>
+<p><strong>补丁前状态（用备份底本取证，陷阱 20 两列法）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>词</th>
+<th>补丁前·全文</th>
+<th>补丁后·全文</th>
+<th>补丁前·正文</th>
+<th>补丁后·正文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>框架不覆盖</td>
+<td>4</td>
+<td>6</td>
+<td><strong>0</strong></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>不覆盖</td>
+<td>4</td>
+<td>7</td>
+<td><strong>0</strong></td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>松不等式</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>登记为不覆盖</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>「是否该…登记为不覆盖」式的<strong>提问</strong>：补丁前 <strong>1 处</strong>（L521）⟹ <strong>事实齐备但停在提问</strong>；</li>
+<li>⟹ <strong>4.1 的剩余工作 = 把它写成声明</strong>（本轮已补，写在<strong>轮次块</strong>内，正文仍 0 处 ⟹ 不冲突）。</li>
+</ul>
+<p><strong>登记内容</strong>（四条依据，全部负面）：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>依据</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><strong>无等式</strong> —— 链上唯一的定量关系是<strong>不等式</strong> <code>H/N ≤ 0.25</code></td>
+<td>N-13（第 51 轮）</td>
+</tr>
+<tr>
+<td>②</td>
+<td><strong>无机制</strong> —— <code>4</code> 是【本框架设定】；B5 的 0.25 = 被 Hawking 温度钉住的<strong>乘积</strong> ＋ <strong>不可观测的因式分解</strong></td>
+<td>第 51 轮裁决</td>
+</tr>
+<tr>
+<td>③</td>
+<td><strong>不可证伪</strong> —— 真实黑洞 <code>N ≥ 10⁷⁷</code>、<strong>余量 ≈ 10⁵⁰</strong></td>
+<td>T-9</td>
+</tr>
+<tr>
+<td>④</td>
+<td><strong>判据适用域受限（本轮新增）</strong> —— ⟨|O|⟩ 形状依赖（33.8 倍）＋ 可迁性必要条件在 N ≤ 24 严格不成立、N = 64 已满足</td>
+<td>本轮 SH-1/SH-3</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 与 <strong>N-13</strong>（等式 → 不等式）、<strong>N-29</strong>（判别点 → 包含关系）<strong>同族</strong>：<strong>判据方向错了</strong>。
+⚠️ <strong>登记的是「这条链不覆盖面积律」，不是「面积律错」</strong> —— §4.8 的等分账（<code>ρ = 3H²/8πG</code>）
+<strong>本身仍有内容</strong>（不假设 Friedmann，第 75 轮）；本条只否定<strong>从句点离散结构反推面积律</strong>这条路。</p>
+<hr />
+<h2>三、4.2：「遍历性」的三个层次（含一条<strong>用词不实</strong>的更正）</h2>
+<p><strong>补丁前状态</strong>：全文「遍历」命中 <strong>10 行</strong>，含<strong>相反结论</strong>且<strong>无区分说明</strong>（「分层 / 三种含义」式 <strong>0 处</strong>）。</p>
+<p>分类（补丁前）：<strong>速度空间</strong> 6 行（L168/177/178/185/210/1786）｜<strong>构型空间</strong> 4 行（L186/191/437/1131）。</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>空间</th>
+<th>所问的问题</th>
+<th>结论</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>L1 速度空间</strong></td>
+<td>单粒子速度 <strong>v</strong></td>
+<td>时间平均 = 系综平均？</td>
+<td>✅ <strong>遍历成立</strong>（Birkhoff：离散度 0.971 → 0.183 单调下降；冻结对照恒为 1.012）</td>
+<td>§4 命题链第 2 条</td>
+</tr>
+<tr>
+<td><strong>L2 构型空间</strong></td>
+<td>衬底占据位型（2^N 或 C(N,k)）</td>
+<td>一条轨迹能访问整个空间？</td>
+<td>❌ <strong>非遍历</strong>（tick 群把空间切成<strong>不变轨道</strong>）</td>
+<td>第 40 / 57 轮</td>
+</tr>
+<tr>
+<td><strong>L3 空间输运</strong></td>
+<td>标记（信息 / 物质）的位移</td>
+<td>混合 / 输运走多远？</td>
+<td><strong>慢</strong>：<code>R_mix = l_P√(t/t_P)</code> = <strong>47 μm</strong>（并行归一化）</td>
+<td>§4.2 ②</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>三者不矛盾，因为问的不是同一件事</strong>：<strong>L1 是速度的局域平衡</strong>（快，~4 t_P）；
+<strong>L2 是构型的轨道封闭</strong>（<strong>不是</strong>「没热化」，是「<strong>到不了</strong>」）；<strong>L3 是位移</strong>（慢）。
+⟹ 第 40 轮「等分账<strong>瞬时</strong>成立 / <strong>不需要</strong>热化」用的正是 <strong>L1 与 L3 的时标分离</strong>（~10⁶⁰ 倍）。</p>
+<p>⭐ <strong>顺带更正一条用词（本轮显式判据）</strong>：候选池 14 把第三项记作「第 21 轮 <strong>47 μm 空间输运</strong>」
+并称之为一种「<strong>遍历性</strong>」，但<strong>底本里「遍历」的行中与「47 μm / R_mix」同行的 = 0 行</strong> ⟹
+47 μm 是<strong>扩散标度</strong>、底本<strong>从未</strong>称其为遍历性 ⟹ <strong>「三个遍历性」这个说法用词不实</strong>，
+本注把它单列为 <strong>L3 并改名</strong>为「空间输运」。</p>
+<p><strong>写作规范（已写进论文）</strong>：写「遍历性成立」必须写明 <strong>L1（速度空间）</strong>；
+写「非遍历」必须写明 <strong>L2（构型空间）</strong>；「everything」四读之 (c) 指的是 <strong>L2</strong>。</p>
+<hr />
+<h2>四、H5：<strong>第 29 轮就做完了</strong>（C-31）</h2>
+<table>
+<thead>
+<tr>
+<th>核查点</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 29 轮备忘录 <code>六处4的分层判定_四会同源两处独立且等价于三维.md</code></td>
+<td><strong>存在</strong>（含 SF-1…SF-6、四会同源、LST/Borsuk）</td>
+</tr>
+<tr>
+<td>论文里的<strong>分级修正注</strong></td>
+<td><strong>已加</strong>（L679）</td>
+</tr>
+<tr>
+<td>第 39 轮修正<strong>两处标注错位</strong></td>
+<td><strong>已做</strong>（L687）</td>
+</tr>
+<tr>
+<td>结论</td>
+<td><strong>「四会同源（锚在 <code>k = 4</code> = LST/Borsuk）+ 两处独立（表面 4 邻居 / Clifford 4 分量）」</strong></td>
+</tr>
+<tr>
+<td>⟹ <strong>H5 的剩余工作</strong></td>
+<td><strong>无</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>而台账 <code>全量待办总账</code> 的 H5 行标的是「低（成本）」而非 ✅</strong> ⟹ 登记 <strong>C-31</strong>
+（<strong>陈年待办已做却仍标待办</strong>），与第 74 轮 <strong>C-19</strong> 同族 —— 这是该族的<strong>第 11 条</strong>。</p>
+<hr />
+<h2>五、⚠️ 过程记录：<strong>一天内三次翻红</strong>（两条新陷阱）</h2>
+<h3>5.1 陷阱 65 的<strong>第四次命中</strong> —— 掩码判据要匹配「模式」而非枚举「名字」</h3>
+<p>补丁后复跑当场翻红（<strong>7 项 → 6 项</strong>），原因是 <strong>SH-5 的计数</strong>：
+我在论文里新写的块标题是「<strong>【v2.9 分层注（第 80 轮：…）】</strong>」与「<strong>【v2.9 登记（第 80 轮…）】</strong>」——
+而 <code>block_mask</code> 的正则<strong>枚举</strong>了块名（<code>v2.9 补充（第</code> / <code>v2.9 更正（第</code> / …），<strong>不含「分层注」「登记」</strong>
+⟹ 掩码漏 ⟹ 「分层」一词从 0 处变成 2 处 ⟹ 判据翻红。</p>
+<p>✅ <strong>正解</strong>：判据<strong>模式化</strong> —— <code>v2\.9\s*[^\n（|]{0,16}（第\s*\d+\s*轮</code> ＋ <code>【第 N 轮…</code> ＋ 三类「加注」。
+📌 <strong>教训</strong>：<strong>不要枚举块的名字（名字会变），要匹配块的模式</strong> —— 这是陷阱 65 的第四次命中
+（前三次：第 47 轮 <code>&gt;</code> 块、第 65 轮跨段注、第 76 轮全文计数）。
+📌 另按<strong>陷阱 20/22</strong> 的执行细则，SH-4/SH-5 的「0 处」型论证已改为<strong>并列打印「补丁前 / 补丁后」两列</strong>。</p>
+<h3>5.2 ⭐ <strong>陷阱 72（本轮新增）：判据和文件一样会过期</strong> —— 修复型检查项必须写成两段</h3>
+<p>补丁后复跑，<strong>SH-7 又翻红了一次</strong>（7 项 → 6 项）：SH-7 的判据是
+「台账 H5 行 <strong><code>"✅" not in row</code></strong>」（用来证明「标记过期」）—— 而<strong>本轮恰好把该行改成了 ✅</strong>
+⟹ <strong>它检查的那个状态，已经被我自己改掉了</strong> ⟹ 判据失败。
+<strong>不是文件错了，是判据过期了。</strong></p>
+<p>✅ <strong>规范（已写进技能陷阱 72）</strong>：凡「<strong>检查某个 Bad 状态</strong>」的检查项，若本轮会把它变好，
+<strong>必须拆成两段</strong>，且分别用<strong>底本 / 当前稿</strong>判：</p>
+<pre><code class="language-python">pre_row  = grep(底本备份, &quot;&lt;strong&gt;H5&lt;/strong&gt;&quot;)          # 补丁前
+curr_row = grep(当前稿,   &quot;&lt;strong&gt;H5&lt;/strong&gt;&quot;)
+chk(tag, (&quot;✅&quot; not in pre_row) and (&quot;✅&quot; in curr_row),
+    &quot;补丁前：标记过期（取证）／补丁后：已修复（确认）&quot;)
+</code></pre>
+<p>📌 <strong>一般化</strong>：<strong>判据与文件一样会过期</strong>。否则「改好了反而翻红」会浪费一整轮排查。</p>
+<p>⭐ <strong>本轮的完整账</strong>：① SH-5（掩码漏「v2.9 <strong>分层注</strong> / <strong>登记</strong>（第 80 轮…）」⟹ 陷阱 65 第四次命中）；
+② SH-7（判据自己过期 ⟹ <strong>陷阱 72</strong>）；③ <strong>两次都靠「补丁后必须复跑核验」当场抓到</strong> ——
+该纪律已连续四轮救场（<strong>72 / 75 / 76 / 80</strong>）。</p>
+<hr />
+<h2>六、判决与总账</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>条目</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3.2 ✅</strong></td>
+<td>I-15 ⟨|O|⟩ 标度律 —— 交付 = <strong>严格界 ＋ 形状依赖（33.8 倍）＋ 适用域 ＋ 不外推</strong></td>
+<td>工作流</td>
+</tr>
+<tr>
+<td><strong>4.1 ✅</strong></td>
+<td>「格点离散结构 ↔ 面积律」<strong>正式登记为框架不覆盖</strong>（候选池 32）</td>
+<td>工作流</td>
+</tr>
+<tr>
+<td><strong>4.2 ✅</strong></td>
+<td>「遍历性」三层分层注（含一条<strong>用词不实</strong>更正）</td>
+<td>工作流</td>
+</tr>
+<tr>
+<td><strong>H5 ✅</strong></td>
+<td><strong>第 29 轮已完成</strong>（本轮取证）</td>
+<td>陈年待办</td>
+</tr>
+<tr>
+<td><strong>C-31</strong></td>
+<td>台账 H5 标记过期（<strong>C-19 族第 11 条</strong>）</td>
+<td>更正</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 更正 <strong>30 → 31</strong>（C-31）；难题 / 负面条数不变（本轮是<strong>计算 ＋ 登记 ＋ 核查</strong>）。</p>
+<p>⭐ <strong>工作流第 3 批 / 第 4 批全部清空</strong>：3.1 ✅／3.2 ✅／3.3 ✅｜4.1 ✅／4.2 ✅／4.3 ✅。
+<strong>剩余待办</strong>（组 III–VI）：候选池 #1/#2/#4/#5/#7/#8（C1 η 能标｜C2 暗能量能标｜C4 η/s｜C5 PPN 优越系｜
+C7 void-CPT-κ｜C8 EMRI）；H1/H2/H3/H4；A1（Lean 恢复）。<strong>其中「有可判定入口」的只有 A1</strong>。</p>
+<hr />
+<h2>七、诚实边界</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⟨|O|⟩ 的 8 个形状值</td>
+<td>【数值】，k = N/2 层、构型等权；生成元 = <code>_tickgroup.gens_correct</code>（第 48 轮更正版）</td>
+</tr>
+<tr>
+<td>旋转等价检验</td>
+<td>【数值】，三个轴写法<strong>逐位相同</strong> ✓（轨道数与 ⟨|O|⟩ 均为精确有理数比值）</td>
+</tr>
+<tr>
+<td>「对 N^{2/3} 近线性」</td>
+<td>【拟合】，<strong>三点</strong>，斜率差 9.3% ⟹ <strong>不足以判定幂指数</strong>，仅记为量级观察</td>
+</tr>
+<tr>
+<td>「形状依赖 33.8 倍」</td>
+<td>【数值】，<strong>仅 N = 8 / 16 两档</strong>已验证；⚠️ <strong>(2,2,6) 的 426.93 引用第 46 轮</strong>（本轮未重算：C(24,12) = 270 万枚举 × 多形状<strong>超时</strong>）</td>
+</tr>
+<tr>
+<td>「可迁性必要条件」</td>
+<td>【推导】，<code>|G| ≥ C(N,k)</code> 是<strong>标准群论</strong>；⚠️ N = 64 的 |G| 是<strong>引用第 41 轮</strong>（sympy Schreier–Sims），<strong>本轮未复算</strong></td>
+</tr>
+<tr>
+<td>「47 μm 不是遍历性」</td>
+<td>【判定】，基于<strong>底本全文检索</strong>（「遍历」行与「47 μm / R_mix」同行 = <strong>0 行</strong>）</td>
+</tr>
+<tr>
+<td>H5 已完成</td>
+<td>【引文取证】，基于第 29 轮备忘录 ＋ 论文 L679/L687；<strong>本轮未重跑</strong> <code>_six_fours.py</code></td>
+</tr>
+<tr>
+<td>本轮<strong>未</strong>改任何物理结论</td>
+<td>四条都是<strong>登记 / 分层 / 复算 / 核查</strong>，无一处新增或推翻框架的定量输出</td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">⟨|O|⟩ 的标度律与形状依赖 —— 以及三条收口的取证（3.2 / 4.1 / 4.2 / H5） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 ⟨O⟩标度律与形状依赖_以及三条收口的取证.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>读法 A/B 裁决：取 B2（4 个平面内连接 × 正/负支 ⟹ 2⁴ = 16），第 19 轮「四态唯一解」撤回</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、候选模型枚举</div>
+  <h1>读法 A/B 裁决：取 B2（4 个平面内连接 × 正/负支 ⟹ 2⁴ = 16），第 19 轮「四态唯一解」撤回</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-19（第 32 轮）
+<strong>脚本</strong>：<code>outputs/_reading_ab.py</code>（检查项 AB-1 … AB-6，<strong>失败项：无</strong>）
+<strong>一句话结论</strong>：第 31 轮登记的 A/B 歧义<strong>已裁决</strong>——取<strong>读法 B2</strong>：4 个平面内连接、每个承载正支或负支 ⟹ 2⁴ = 16 = 4 bits/面元。它是五条约束打分矩阵里<strong>唯一全过者</strong>；第 19 轮的读法 A（1-of-4 方向 × 4 内部态）落选，因为它让「真空」「湮灭中」与「正/负」等权，与第 20 轮的 C-1（满占位）和 C-4（零测度过渡态）冲突。<strong>16、4 bits、0.25 nat/面元、压缩因子 16 ln2 = 11.0904 全部不变</strong>，变的只是「16 是怎么数出来的」——且 B2 第一次把 A1 的 50:50 直接用上了。代价：{正, 负, 湮灭中, 真空} 中只有正/负进入熵的计数。</p>
+</blockquote>
+<hr />
+<h2>一、候选模型枚举</h2>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>态数</th>
+<th>bits/面元</th>
+<th>= 4 bits?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A　1-of-4 方向 × {正,负,湮灭中,真空}</td>
+<td>16</td>
+<td>4.000000</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>A′　1-of-4 方向 × {正,负}（真空/湮灭中不占权重）</td>
+<td>8</td>
+<td>3.000000</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>B1　4 槽 × {连接, 不连接}</td>
+<td>16</td>
+<td>4.000000</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>B2　4 槽 × {正支, 负支}</strong></td>
+<td><strong>16</strong></td>
+<td><strong>4.000000</strong></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>B3　4 槽 × {正,负,湮灭中,真空}</td>
+<td>256</td>
+<td>8.000000</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>C　外空间 6 槽 × 二元</td>
+<td>64</td>
+<td>6.000000</td>
+<td>✗</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 给出恰好 16 的有 <strong>A / B1 / B2</strong> 三个，需要进一步判别。</p>
+<hr />
+<h2>二、五条约束的打分矩阵（决定性）</h2>
+<p>约束来源：
+- <strong>C-a</strong>：原始可读 4 bits/面元（B5 原文 1651）
+- <strong>C-b</strong>：满占位 f = 1（第 20/26 轮 C-1）⟹ 「真空」不占权重
+- <strong>C-c</strong>：「湮灭中」= 拍内零测度过渡态（第 20 轮 C-4）⟹ 不占权重
+- <strong>C-d</strong>：方向数 = 4（第 31 轮：§4.9 引理 1 的平面内 4）
+- <strong>C-e</strong>：A1 的 50:50 ⟹ 正 / 负两分支等概率</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>C-a</th>
+<th>C-b</th>
+<th>C-c</th>
+<th>C-d</th>
+<th>C-e</th>
+<th>全过</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A　1-of-4 × {正,负,湮灭中,真空}</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>A′　1-of-4 × {正,负}</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>B1　4 槽 × {连接,不连接}</td>
+<td>✓</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>B2　4 槽 × {正支,负支}</strong></td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td><strong>✅</strong></td>
+</tr>
+<tr>
+<td>B3　4 槽 × 四值</td>
+<td>✗</td>
+<td>✗</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+</tr>
+<tr>
+<td>C　6 槽 × 二元</td>
+<td>✗</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✓</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>B2 是唯一全过者</strong>（脚本断言：全过模型数 = 1，且全过者含 "B2"）。</p>
+<p>B1 为何落选：它不含正 / 负分支，<strong>与 A1 的 50:50 无关</strong>（C-e 不过）。它是原文 1651「连接状态」更字面的读法——<strong>若将来框架给出「连接 = 分支标签」的机制，B1 与 B2 将合并</strong>；目前取约束更严的 B2。</p>
+<hr />
+<h2>三、读法 A 为何落选（量化）</h2>
+<p>读法 A 把内部四态等权 ⟹ 「真空」占 1/4、「湮灭中」占 1/4 的权重。但第 20 轮的 C-1（满占位，没有空格点）与 C-4（湮灭/真空是拍内零测度过渡态）要求这两者<strong>不占权重</strong>。</p>
+<p>剔除后 A 退化为 A′：<code>4 × 2 = 8</code> 态 = <strong>3 bits</strong>，与 4 bits/面元冲突。若硬沿用压缩因子 11.0904：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A′ 的每面元熵</td>
+<td>ln 8 / 11.0904 = 0.1875 nat</td>
+</tr>
+<tr>
+<td>与 BH 要求 0.25 nat/面元 之比</td>
+<td><strong>0.75</strong></td>
+</tr>
+<tr>
+<td>标准 Hawking 温度（太阳质量）</td>
+<td>6.168678×10⁻⁸ K</td>
+</tr>
+<tr>
+<td>A′ 情形下的 T</td>
+<td>8.224904×10⁻⁸ K</td>
+</tr>
+<tr>
+<td><strong>偏差</strong></td>
+<td><strong>+33.33%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>对照：第 31 轮 N = 24 的偏差 −12.76%；第 15 轮比特/纳特混淆 +44.27%。⟹ A′ 被排除在 33% 水平。</p>
+<hr />
+<h2>四、B2 不改变任何已落的数值</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>原始熵/面元</td>
+<td>ln 16 = 2.772589 nats（= 4 bits）</td>
+<td>不变</td>
+</tr>
+<tr>
+<td>所需压缩因子</td>
+<td>4 ln 16 = <strong>16 ln 2 = 11.090355</strong></td>
+<td>不变</td>
+</tr>
+<tr>
+<td>压缩后熵密度</td>
+<td><strong>0.25 nat/面元</strong></td>
+<td>不变（= BH 熵）</td>
+</tr>
+</tbody>
+</table>
+<p>变的只是「16 是怎么数出来的」：</p>
+<ul>
+<li>旧（读法 A）：4 方向 × 4 内部态（含真空、湮灭中）</li>
+<li><strong>新（读法 B2）：4 个平面内连接，各承载正支 / 负支 ⟹ 2⁴</strong></li>
+</ul>
+<p><strong>而且 B2 第一次把 A1 的 50:50 直接用了起来</strong>——每槽正/负等概率，16 态等概率 ⟹ 熵恰为 ln 16（脚本显式枚举 16 态并核算：等概率熵 = 2.77258872224 nats = 4.000000 bits）。读法 A 里 50:50 只体现为「四态等权」，与 A1 无关。</p>
+<hr />
+<h2>五、诚实边界</h2>
+<p><strong>✅ 属于推导的</strong>：
+- 候选模型枚举与打分矩阵（无自由参数）；
+- B2 唯一全过（脚本断言）；
+- 读法 A → A′ 的后果与 Hawking 温度偏差（数值核验）；
+- 压缩因子、熵密度不变（由 N = 16 唯一确定）。</p>
+<p><strong>⚠️ 属于判定 / 假设的</strong>：
+- <strong>C-b、C-c 的适用性</strong>：把「真空 / 湮灭中不占权重」从衬底占位层（第 20 轮的动力学结论）搬到<strong>面元状态计数</strong>层——这是跨层的判定，不是直接推论。若这两态确实携带熵权重，则 B2 的论据减弱、A 回升。
+- <strong>B1 与 B2 未彻底分开</strong>：B1 是更字面的读法，只因 C-e（50:50 未用上）而落选。若「连接」本身被证明等价于「分支标签」，两者合并，结论不变；若被证明不等价，则 B2 需要额外说明「为什么 50:50 出现在连接上」。
+- <strong>B2 要求每条平面内连接恒有通量</strong>（满占位的推论），这一推论本身待独立核验。</p>
+<p><strong>❗ 仍未解决</strong>：11.0904 的自然性；「连接」是否等价于「分支标签」；读法 B2 是否要求在任意时刻 4 条连接同时存在（相干块结构是否容许）。</p>
+<hr />
+<h2>六、论文已改（中英同步，6 项 0 失败）</h2>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>改动</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>摘要·微态计数</td>
+<td>改为「原始态 = <strong>2⁴ = 16</strong>（4 个平面内连接 × {正支, 负支}，读法 B2）」</td>
+</tr>
+<tr>
+<td>§4.8</td>
+<td>在第 31 轮的 A/B 歧义块之后追加<strong>【v2.9 修正（第 32 轮：读法 A/B 的裁决）】</strong>：五条约束依据 + A 落选的量化 + <strong>第 19 轮「q = 4 唯一解」撤回</strong></td>
+</tr>
+<tr>
+<td>§4.8 中间量可证伪</td>
+<td>「16 = 4 方向 × 4 状态」→「<strong>16 = 2⁴（4 平面内连接 × 正/负支）</strong>」</td>
+</tr>
+</tbody>
+</table>
+<p>原 v2.9 已备份至 <code>paper/history/*_备份_2026-09-19第32轮前.md</code>。</p>
+<hr />
+<h2>七、下一步</h2>
+<ol>
+<li><strong>独立核验 C-b/C-c 跨层适用性</strong>（最关键）：「真空 / 湮灭中不占权重」目前是从衬底占位动力学搬过来的判定。入口：在面元状态计数里显式引入权重 w，扫描 w ∈ [0, 1]，看 Hawking 温度约束能把它压到多窄。</li>
+<li>论文收口待办（已挂两轮）：§4.10 覆盖半径改解析值（k=3 → 90.0000°、k=4 → 70.5288°）；第 29 轮的两处标注错位（① 标「推论」实为【设定】、④ 标【设定】实可由 ③ 推出）。</li>
+<li>之后回到主链：载流子两类型收口（唯一还有产出空间的独立支线）。</li>
+</ol>
+
+<div class="footer">读法 A/B 裁决：取 B2（4 个平面内连接 × 正/负支 ⟹ 2⁴ = 16），第 19 轮「四态唯一解」撤回 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 读法AB裁决_取B2且四态撤回.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

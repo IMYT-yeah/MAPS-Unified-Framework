@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P1 结项：`g` 的精确值与 `α_s/α_EM` 的映射 —— **两半都判否，理由是同一条**</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>P1 结项：`g` 的精确值与 `α_s/α_EM` 的映射 —— **两半都判否，理由是同一条**</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 77 轮 ｜ P1（论文 §10.2 #11 末句）｜ 核验脚本 <code>_alpha_map_77.py</code>
+<strong>QG-1 … QG-12，12 项 0 失败</strong></p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>P1 的两半都给不出，而且封死的方式是同一条</strong>：<code>g</code> 在框架内<strong>处处相消</strong>（不可识别），
+而 <code>α</code> 需要的正是它的<strong>绝对归一化</strong>。再加上从弦网到连续规范场的<strong>那一跃还没发生</strong>、
+以及<strong>四个换算因子一个都没有</strong>，<code>α_s/α_EM</code> 的映射在框架内<strong>不存在</strong>。</p>
+<p><strong>附带</strong>：论文那句「耦合强度谱系预言强:弱:电磁 = 3:2:1」若按字面读作耦合常数比，
+与观测差 <strong>5.03 倍</strong>（约 100σ）⟹ 建议措辞更正（<strong>C-24</strong>）。</p>
+<hr />
+<h2>一、P1 的原文出处（QG-1 / QG-2）</h2>
+<p>§10.2 #11（第 1702 行）末句：</p>
+<blockquote>
+<p>「v2.9 A3 第一性推导：<strong>J = n_G·E_P·g</strong>（配对 = n_G 事件凝聚，n_SU(3)=3）、
+<strong>K = m_G·E_P·g</strong>（闭合 = m_G 绕卷通量环，m_U(1)=1），<strong>同源几何因子 g 相消</strong> ⟹
+J/K = n_SU(3)/m_U(1) = 3（动力学推导，非启发式）……
+耦合强度谱系预言强:弱:电磁 = 3:2:1（配对阶数）；<strong>g 精确值与 α_s/α_EM 完整映射仍开放</strong>」</p>
+</blockquote>
+<p>§5.7 正文（第 858 行）有对应的一句。<strong>两处都只说「g 相消」</strong>。</p>
+<h3>词条存量</h3>
+<table>
+<thead>
+<tr>
+<th>词</th>
+<th>全文</th>
+<th>正文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>α_s</code></td>
+<td><strong>1</strong></td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td><code>α_EM</code></td>
+<td><strong>1</strong></td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td><code>精细结构</code> / <code>1/137</code> / <code>0.118</code></td>
+<td>0</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>无量纲耦合</code> / <code>跑动</code></td>
+<td>0</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>格点间距</code></td>
+<td>1</td>
+<td><strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong><code>α_s</code> 与 <code>α_EM</code> 全文各只出现 1 处</strong>（就是 §10.2 #11 那一行）。
+这个映射<strong>从未被写过一行</strong> —— 不是「推导不足」，是<strong>从未开工</strong>。
+⟹ 与第 76 轮 C-22 同类：<strong>待办与正文的对应关系缺失</strong>。</p>
+<hr />
+<h2>二、⭐ 第一半：「<code>g</code> 的精确值」是一个<strong>没有对象</strong>的待办（QG-3）</h2>
+<p>扫 <code>g</code>（跨 18 个数量级），算 <code>J = n_G·E_P·g</code>、<code>K = m_G·E_P·g</code>：</p>
+<table>
+<thead>
+<tr>
+<th>g</th>
+<th>J [eV]</th>
+<th>K [eV]</th>
+<th><strong>J/K</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1e−6</td>
+<td>3.6627e+22</td>
+<td>1.2209e+22</td>
+<td><strong>3.000000</strong></td>
+</tr>
+<tr>
+<td>0.01</td>
+<td>3.6627e+26</td>
+<td>1.2209e+26</td>
+<td><strong>3.000000</strong></td>
+</tr>
+<tr>
+<td>1</td>
+<td>3.6627e+28</td>
+<td>1.2209e+28</td>
+<td><strong>3.000000</strong></td>
+</tr>
+<tr>
+<td>1e3</td>
+<td>3.6627e+31</td>
+<td>1.2209e+31</td>
+<td><strong>3.000000</strong></td>
+</tr>
+<tr>
+<td>1e12</td>
+<td>3.6627e+40</td>
+<td>1.2209e+40</td>
+<td><strong>3.000000</strong></td>
+</tr>
+<tr>
+<td>π</td>
+<td>1.1507e+29</td>
+<td>3.8356e+28</td>
+<td><strong>3.000000</strong></td>
+</tr>
+<tr>
+<td>137.036</td>
+<td>5.0192e+30</td>
+<td>1.6731e+30</td>
+<td><strong>3.000000</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>J/K</code> 的极差 = 4.4×10⁻¹⁶</strong>（纯浮点噪声）⟹ <strong>框架能给出的只有比值，而它与 <code>g</code> 无关</strong>。</p>
+<p>⟹ 结论：<code>g</code> <strong>在框架的这两处从未被赋予数值，也从未需要数值</strong> ⟹
+<strong>「<code>g</code> 的精确值」这个待办没有对象</strong>。与第 75 轮「缺的不是方程，是对象」<strong>同构</strong>。</p>
+<p>⚠️ 且 <code>J</code> 的<strong>绝对尺度是普朗克标度</strong>（<code>3 E_P</code> = 3.663×10²⁸ eV），
+比 <code>M_Z</code> = 9.1188×10¹⁰ eV 高 <strong>17.6 个数量级</strong> ⟹ 从 <code>J</code> 到 <code>α</code> 还要跨能标鸿沟。</p>
+<hr />
+<h2>三、⭐ 第二半：<code>α_s/α_EM</code> 的映射被<strong>四条独立理由</strong>封死</h2>
+<h3>3.1 数字：若按字面读「3:2:1」，与观测差 5 倍（QG-4）</h3>
+<p>外部锚点（PDG 2024 / CODATA，<strong>能标写明</strong>）：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>α_s(M_Z)</code></td>
+<td><strong>0.1180 ± 0.0009</strong></td>
+</tr>
+<tr>
+<td><code>α_EM⁻¹(M_Z)</code></td>
+<td>127.95 ⟹ <code>α_EM(M_Z)</code> = 0.007816</td>
+</tr>
+<tr>
+<td><code>α_EM⁻¹(0)</code></td>
+<td>137.036 ⟹ <code>α_EM(0)</code> = 0.007297</td>
+</tr>
+<tr>
+<td><code>sin²θ_W(M_Z)</code></td>
+<td>0.23129 ⟹ <code>α_W ≡ α_EM/sin²θ_W</code> = 0.033791</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>比值</th>
+<th>框架</th>
+<th>观测（同能标 M_Z）</th>
+<th>差（倍）</th>
+<th>用 <code>α_EM(0)</code> 的差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>强 : 电磁</td>
+<td><strong>3</strong></td>
+<td><strong>15.0981</strong></td>
+<td><strong>5.03</strong></td>
+<td>5.39</td>
+</tr>
+<tr>
+<td>弱 : 电磁</td>
+<td><strong>2</strong></td>
+<td>4.3236</td>
+<td><strong>2.16</strong></td>
+<td>2.32</td>
+</tr>
+</tbody>
+</table>
+<p>以 <code>α_s</code> 的 0.8% 误差计，强/电磁的偏离 ≈ <strong>100σ</strong>。
+⟹ <strong>这条读法被直接否证</strong></p>
+<h3>3.2 数性：<code>n_G = 3,2,1</code> 是<strong>群论整数</strong>，<code>α</code> 是<strong>能标依赖量</strong>（QG-5）</h3>
+<ul>
+<li><code>n_G</code> 的定义（§5.2）= <strong>最小非平凡不可约表示维数</strong> <code>d_min(G)</code> ⟹ <strong>整数、无量纲、与能标无关</strong></li>
+<li><code>α_s</code> 自己<strong>从 τ 能标（~2.5 GeV，0.32）跑到 Z 极点（91 GeV，0.1180）—— 差 2.7 倍</strong></li>
+<li>论文里「<strong>跑动</strong>」正文 <strong>0 处</strong>、「<strong>无量纲耦合</strong>」<strong>0 处</strong>、「RG」与「α」的实质同行共现 <strong>0 处</strong></li>
+</ul>
+<p>⟹ 铁律 6（能标依赖量必带 <code>(@E)</code>）直接给出结论：<strong>整数比与 <code>@E</code> 的 <code>α</code> 不可比</strong>。
+要建立映射，至少需要一个<strong>能标换算（跑动）</strong>，而框架里没有这个机制。</p>
+<h3>3.3 定义域：<strong>连续规范场还没涌现出来</strong>（QG-6）</h3>
+<p>§5.8 自己写着：</p>
+<blockquote>
+<p>「涌现 U(1) 路径明确化【引用 + <strong>开放</strong>】：Wen 弦网玻色化（光子 = 弦网相位模式）——
+严格化三步：对偶（严格 ✓）→ <strong>连续极限 Z₂→U(1)（开放）</strong> → <strong>麦克斯韦 L_eff = −(1/4)F² 验证（开放）</strong>」</p>
+</blockquote>
+<p>§3.4 的标题就是「<strong>连续极限的开放问题</strong>」。</p>
+<p>⟹ 框架<strong>尚无连续规范场</strong> ⟹ <strong><code>α</code> 连定义域都还没有</strong>（<code>α</code> 是连续场论里的耦合常数）。
+⚠️ 这比第 72 轮（Φ 的耦合给不出）<strong>更根本</strong>：那边是「有场、有质量、无耦合」，
+这边是「<strong>连那个场都还没涌现出来</strong>」。</p>
+<h3>3.4 换算因子：<strong>需要的四个，一个都没有</strong>（QG-7，第 54/61 轮三步法的第 3 步）</h3>
+<table>
+<thead>
+<tr>
+<th>需要的东西</th>
+<th>从哪到哪</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 群论比值 → 耦合常数</td>
+<td><code>J/K = n_G/m_G</code> ⟹ <code>α ∝ ?</code></td>
+<td><strong>缺</strong>（论文未给任何 <code>α = f(n_G)</code> 形式）</td>
+</tr>
+<tr>
+<td>② 弦网标度 → 物理能标</td>
+<td><code>J ≈ 3 E_P</code> ⟹ <code>M_Z</code></td>
+<td><strong>缺</strong>（10³⁸ 量级的换算）</td>
+</tr>
+<tr>
+<td>③ 格点单位 → 物理长度</td>
+<td>弦势 <code>d</code> 的单位 = 「1 个格点」</td>
+<td><strong>缺格点间距 <code>a</code></strong>（正文 0 处）</td>
+</tr>
+<tr>
+<td>④ 绝对归一化</td>
+<td><code>g</code> 的数值</td>
+<td><strong>不可识别</strong>（§二）</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 第 ③ 项在第 55 / 60 轮已被指出过（那时是给<strong>化学键</strong>量纲）⟹ <strong>第二次撞到同一个缺失</strong>。</p>
+<hr />
+<h2>四、<code>g</code> 的两义核对（QG-8，与第 72 轮 C-15 衔接）</h2>
+<table>
+<thead>
+<tr>
+<th><code>g</code> 的出处</th>
+<th>身份</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① §6.1 作用量：钉扎项 <code>gΦψ̄ψ</code></td>
+<td>Φ–物质耦合</td>
+<td><strong>有值需求，但零约束</strong>（第 72 轮）</td>
+</tr>
+<tr>
+<td>② §5.7 A3：<code>J = n_G·E_P·g</code></td>
+<td>弦网<strong>几何因子</strong></td>
+<td><strong>无值需求，处处相消</strong>（本轮）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两处既无共同定义，也无任何方程联系二者</strong> ⟹ P1 的第一半有两种读法，<strong>两种都判否</strong>：</p>
+<ul>
+<li>读作 ②（§5.7）：<strong>它不需要值</strong> ⟹「精确值」这个待办<strong>没有对象</strong></li>
+<li>读作 ①（§6.1）：<strong>它不可识别</strong>（第 72 轮）⟹ 给不出值</li>
+</ul>
+<p>⟹ <strong>P1 独立于第 72 轮的 I-17</strong>（第 74 轮的总账已如此标注，本轮证实）。</p>
+<hr />
+<h2>五、判别力检查（QG-9，第 61/76 轮判据）</h2>
+<p>假如（反事实）某天建立了 <code>α = F(n_G, g, E)</code>：</p>
+<ul>
+<li><code>F</code> 的形式<strong>未知</strong>（框架 0 处）</li>
+<li><code>g</code> <strong>自由</strong> ⟹ 可用它把 <code>α</code> 调到任何观测值 ⟹ <strong>拟合，非预言</strong></li>
+<li><code>E</code>（能标）<strong>无跑动</strong> ⟹ 无法与 RG 对照</li>
+</ul>
+<p>真正被检验的只有「<strong>3 : 2 : 1 这个整数比是否出现在某个物理量里</strong>」——
+而观测的 <code>α_s/α_EM</code> = <strong>15.10</strong> 不是 3 ⟹ <strong>该比值在 <code>α</code> 上已被排除</strong>。</p>
+<p>⟹ <strong>判别力 = 0</strong>。</p>
+<hr />
+<h2>六、⭐ 本轮<strong>唯一的正面产出</strong>：一条措辞更正（QG-11 / C-24）</h2>
+<p>问题句把两样东西放在一起：</p>
+<blockquote>
+<p>「<strong>耦合强度谱系</strong>预言强:弱:电磁 = <strong>3:2:1</strong>（配对阶数）」</p>
+</blockquote>
+<ul>
+<li><code>3:2:1</code> 是 <strong><code>n_G</code> 之比</strong>（群论整数，<strong>与耦合常数无关</strong>）</li>
+<li>而「<strong>耦合强度谱系</strong>」在标准用法里指的正是<strong>耦合常数谱系</strong></li>
+</ul>
+<p>⟹ <strong>建议改为</strong>：</p>
+<blockquote>
+<p>「<strong>配对阶数之比</strong> <code>n_G = 3 : 2 : 1</code>（<strong>群论整数，不是耦合常数之比</strong>；
+<code>α_s/α_EM</code> 的映射仍开放 —— 且若按字面读作耦合常数比，将与观测差 <strong>5.03 倍</strong>）」</p>
+</blockquote>
+<p>这是<strong>低成本、无争议</strong>的一条更正，与第 76 轮 C-23（记号歧义）同族。</p>
+<hr />
+<h2>七、判决与总账</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内容</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1</strong></td>
+<td><code>g</code> 的精确值 ＋ <code>α_s/α_EM</code> 的完整映射</td>
+<td>→ <strong>✅ 第 77 轮结项</strong>（两半均判否）</td>
+</tr>
+<tr>
+<td><strong>N-33</strong></td>
+<td>把「<code>g</code> 的精确值」当作一个<strong>可求的量</strong></td>
+<td><strong>负面</strong>（弦网 <code>g</code> 处处相消；钉扎 <code>g</code> 零约束 —— 两种读法都判否）</td>
+</tr>
+<tr>
+<td><strong>N-34</strong></td>
+<td>把「<code>n_G = 3,2:1</code> → <code>α_s/α_EM</code>」当作<strong>可达映射</strong></td>
+<td><strong>负面</strong>（四重封死：整数 vs @E／无跑动／无连续极限／缺 4 个换算因子）</td>
+</tr>
+<tr>
+<td><strong>C-24</strong></td>
+<td>「耦合强度谱系预言…= 3:2:1」的<strong>措辞</strong>把群论整数比与耦合常数比混在一起</td>
+<td><strong>撤回 / 更正</strong>（按字面读差 5.03 倍，约 100σ）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总账</strong>：负面 <strong>32 → 34</strong>（N-33 / N-34）｜更正 <strong>23 → 24</strong>（C-24）｜难题条数不变（P1 属 §10.2 开放项，不入难题表）</p>
+<p>⭐ <strong>与第 72 / 76 轮并列</strong>：这是「<strong>第四力/规范侧对外接口</strong>」的第三次探底 ——
+72（Φ–物质耦合给不出）＋ 76（非交换化是外加的）＋ <strong>77（弦网耦合 → <code>α</code> 无路径）</strong>。</p>
+<hr />
+<h2>八、诚实边界（五条）</h2>
+<ol>
+<li><strong>第 3.1 节的「5.03 倍」是「按字面读」的后果</strong>，而论文括号里写了「（配对阶数）」
+   ⟹ 严格说这不是「论文算错了」，而是<strong>措辞有被误读的风险</strong>（故登记为 C-24 而非 N）。</li>
+<li><strong>外部锚点是 PDG 2024 / CODATA 的引文</strong>，本轮未独立复算其误差；<code>α_W</code> 用的是
+   <code>α_EM/sin²θ_W</code> 这一常用口径（弱耦合的定义方式在文献里不唯一，已在脚本里注明）。</li>
+<li><strong>「<code>g</code> 处处相消」只针对 §5.7 的两处</strong>（<code>J</code>、<code>K</code> 的定义式）；本轮<strong>未证明</strong>框架在别处
+   也不能给 <code>g</code> 一个值 —— 证的是「在当前清单下它是自由参数」。</li>
+<li><strong>QG-7 的四个换算因子是「必要性清点」</strong>，不是「充分性证明」：补上它们也<strong>不保证</strong>映射存在
+   （还需 <code>α = f(n_G)</code> 的形式）。</li>
+<li><strong>本轮不改 §10.2 #11 的实质内容</strong>，只加<strong>口径注</strong>并在 §5.7 追加【第 77 轮】块 ——
+   历史留痕是本项目刻意的做法（技能 §7）。</li>
+</ol>
+<hr />
+<h2>九、下一步</h2>
+<table>
+<thead>
+<tr>
+<th>优先</th>
+<th>项</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>★★★</td>
+<td><strong>3.1 不完备度比值重算</strong></td>
+<td>工作流第 3 批，有对照值（1.00/1.63/5.93），成本低</td>
+</tr>
+<tr>
+<td>★★</td>
+<td><strong>4.3 ＋ 4.1 ＋ 3.3 ＋ H5</strong></td>
+<td>一轮可清四条，无依赖（引号清理／登记不覆盖／审查拟合／§4.10 复查）</td>
+</tr>
+<tr>
+<td>★★</td>
+<td><strong>C3 §7 剩余</strong></td>
+<td>已在第 76 轮做（I-21 结项）</td>
+</tr>
+<tr>
+<td>★</td>
+<td><strong>A1 Lean 资产恢复</strong></td>
+<td>5 分钟，但需要那台机器</td>
+</tr>
+<tr>
+<td>⛔</td>
+<td>~~C1 η 能标 / C2 暗能量能标~~</td>
+<td>都是<strong>配出来的数</strong> ⟹ 做了也不会有判别力</td>
+</tr>
+<tr>
+<td>⛔</td>
+<td>~~C5 PPN 优越系~~</td>
+<td>第 72 轮已给出同族结论（框架无屏蔽机制 ⟹ 约束只能来自桌面实验）</td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">P1 结项：`g` 的精确值与 `α_s/α_EM` 的映射 —— **两半都判否，理由是同一条** · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 耦合映射审计_g与α_sα_EM为什么都给不出.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

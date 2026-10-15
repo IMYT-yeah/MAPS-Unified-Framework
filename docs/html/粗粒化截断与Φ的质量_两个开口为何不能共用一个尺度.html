@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>粗粒化截断与 Φ 的质量 —— 两个开口为何不能共用一个尺度</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>粗粒化截断与 Φ 的质量 —— 两个开口为何不能共用一个尺度</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 70 轮（2026-10-02）｜I-18 ＋ I-17 <strong>合并轮</strong>
+核验脚本：<code>_coarsegrain_70.py</code>（<strong>CG-1…CG-10，11 项 0 失败</strong>）</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p><strong>两个开口不能共用一个尺度</strong> —— 框架的「粗粒化」（群论轨道划分）是<strong>无尺度</strong>的纯组合操作，
+而所有的「截断」<strong>每一个都必须带一个尺度</strong>，两者<strong>结构上不同</strong>。</p>
+<p>但本轮把这个失败追问变成了两件<strong>更有用的东西</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>开口</th>
+<th>本轮给出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>I-18</strong>（平滑层从哪来）</td>
+<td>⭐ <strong>追问方向要改</strong>：衬底动力学<strong>不产生</strong>平滑（2 步内摧毁）；框架<strong>有</strong>一个从公理来的截断（第 322 行「<strong>截断 = 普朗克</strong>」）⟹ <strong>平滑 = 「在大于 l_P 的尺度上读数」</strong>，是<strong>观测者侧</strong>的，不是衬底侧的结构</td>
+</tr>
+<tr>
+<td><strong>I-17</strong>（Φ 的质量与耦合）</td>
+<td>⚠️ 仍缺独立约束（挂在<strong>两个纯输入</strong>上）；⭐ <strong>但给出可判别的质量档位</strong>：弦网档 ⟹ 力程 <strong>0.81 l_P</strong>（永不可测）；粗粒化档 ⟹ 力程 <strong>0.19 mm</strong>（<strong>在亚毫米窗口内</strong>）⟹ <strong>相差 31.2 个数量级</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、为什么选合并轮</h2>
+<p>第 69 轮末我加的建议：<strong>I-18 与 I-17 都指向 §2.3 的「孤子化」那一步</strong>。
+本轮取证时找到<strong>更硬的合并理由</strong>：</p>
+<blockquote>
+<p>§4.5b（第 791 行）明写 Φ 的<strong>数学身份是谱作用</strong> <code>S = Tr f(D²/Λ²)</code> —— <strong>它自带一个截断 Λ</strong>。
+而第 423 行给出「粗粒化」的<strong>群论定义</strong>：<strong>G 的轨道划分就是最大的 tick 不变粗粒化</strong>。</p>
+</blockquote>
+<p>⟹ 若两者共用同一个截断，就是<strong>一条机制</strong>；若不是，各自缺什么？<strong>这是可判定的。</strong></p>
+<hr />
+<h2>三、框架里「粗粒化 / 截断」的全部实现（CG-2）</h2>
+<table>
+<thead>
+<tr>
+<th>实现</th>
+<th>出处</th>
+<th>内容</th>
+<th>尺度从哪来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① <strong>群论粗粒化</strong></td>
+<td>第 423 行</td>
+<td>「G 的轨道划分就是最大的 tick 不变粗粒化」</td>
+<td><strong>无尺度</strong>（纯组合）</td>
+</tr>
+<tr>
+<td>② 宏观不可逆的来源</td>
+<td>第 1317 行</td>
+<td>「底层无熵产生，<strong>宏观不可逆只能来自粗粒化</strong>」</td>
+<td>—</td>
+</tr>
+<tr>
+<td>③ <strong>普朗克截断</strong></td>
+<td>第 322 行</td>
+<td>「<strong>截断 = 普朗克（公理 1 自然给出）</strong>」</td>
+<td>l_P</td>
+</tr>
+<tr>
+<td>④ <strong>谱作用截断 Λ</strong></td>
+<td>第 791 行</td>
+<td><code>S = Tr f(D²/Λ²)</code>（Φ 的数学身份）</td>
+<td>❌ <strong>Λ 未给值</strong></td>
+</tr>
+<tr>
+<td>⑤ F2 降标机制</td>
+<td>第 311 行</td>
+<td><code>δ = √(R·l_P)</code> ⟹ <code>E(R) = E_P·√(l_P/R)</code></td>
+<td>R（扩散恢复长度）</td>
+</tr>
+<tr>
+<td>⑥ <code>Q_res</code></td>
+<td>第 674 行</td>
+<td><code>Q_res = E(R)/m_unit</code>（第 56 轮命名「粗粒化截断能标」）</td>
+<td>R</td>
+</tr>
+<tr>
+<td>⑦ 概率归一化能标 <code>E_c</code></td>
+<td>第 1090 行</td>
+<td><code>ε_A(E_c) = 1</code> ⟹ 1.0181 meV</td>
+<td>1 meV（<strong>恒等式</strong>，C-4）</td>
+</tr>
+<tr>
+<td>⑧ <strong>Φ⁴ 势的 μ</strong></td>
+<td>第 984 行</td>
+<td><code>V(Φ) = −½μ²Φ² + ¼λΦ⁴</code> ⟹ <code>m_Φ² = 2μ²</code></td>
+<td>❌ <strong>μ 是输入</strong></td>
+</tr>
+<tr>
+<td>⑨ 强度截断 <code>r_c</code></td>
+<td>第 1585 行</td>
+<td><code>r_c = GM/c² = 视界</code></td>
+<td>GM/c²</td>
+</tr>
+<tr>
+<td>⑩ 玻尔兹曼弱场截断</td>
+<td>第 187/261 行</td>
+<td><code>e^{−Φ/c²}</code> 仅弱场/局部有效</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>10 个实现里只有 2 个是「纯输入」（④ 谱作用 Λ、⑧ Φ⁴ 势 μ）—— 而恰恰这两个决定 Φ 的质量。</strong></p>
+<hr />
+<h2>四、核心判据：一个无尺度、一个必须有尺度（CG-6）</h2>
+<p>判据一句话：</p>
+<blockquote>
+<p><strong>群论粗粒化只用置换群，算法里不含任何量纲量</strong> —— 而<strong>截断每一个都必须带一个尺度</strong>。</p>
+</blockquote>
+<p>可核查的两条：</p>
+<ol>
+<li><code>_tickgroup.gens_correct</code> 的实现里<strong>浮点字面常数 = 0 个</strong> ⟹ 没有任何物理长度 ✓</li>
+<li>⑤⑥⑦⑨ 的定义式里<strong>每一个都有一个长度或能量参数</strong>（R、R、1 meV、GM/c²）✓</li>
+</ol>
+<p>⟹ <strong>两者不可能是一个东西</strong> —— 一个是<strong>组合的</strong>（数构型），一个是<strong>度量的</strong>（比长度）。</p>
+<hr />
+<h2>五、I-18：平滑层不是衬底产生的（CG-4 / CG-4b / CG-5）</h2>
+<h3>5.1 ⚠️ 先踩一个坑：(2,2,4) 让度量本身退化了</h3>
+<p>第一次在 (2,2,4)（z 线长 4）上测「轨道内块方差极差」，结果<strong>全是 0</strong>。
+一开始我以为「块方差是 tick 不变量」，查下去发现是<strong>最小算例退化</strong>：</p>
+<pre><code>(2,2,4) 的相位 1 匹配 = (1 2)(3 0)   ← 恰好把「被 z 配对切开的两块」整体互换
+⟹ 块 0 的密度 d₀ ↦ 1 − d₀
+⟹ 方差 B = (d₀ − 0.5)² 恒不变 ⟹ B 在这个格点上「变成」了 tick 不变量
+</code></pre>
+<p>⚠️ 这与<strong>陷阱 22 / 62</strong>（最小算例退化）同族，但<strong>方向相反</strong>：
+前两次是「算例太小还原不出口径」，<strong>这次是「算例太小让度量本身退化」</strong>。</p>
+<h3>5.2 换 (2,2,6)（z 线长 6）重做 —— 两个度量都大幅变化</h3>
+<p>初态 <code>c0</code> = <code>z ∈ {0,1,2}</code> 全满（12 个格点，k = 12），z 线长 6：</p>
+<table>
+<thead>
+<tr>
+<th>度量</th>
+<th>初值</th>
+<th>轨道内最小</th>
+<th>轨道内极差</th>
+<th>随机基线</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>块密度方差 B</strong></td>
+<td>0.250000</td>
+<td><strong>0.000000</strong></td>
+<td><strong>0.250000</strong></td>
+<td>0.020833</td>
+</tr>
+<tr>
+<td><strong>相邻对同值比例 S</strong></td>
+<td>0.909091</td>
+<td>0.318182</td>
+<td><strong>0.590909</strong></td>
+<td>0.500000</td>
+</tr>
+<tr>
+<td><strong>|d₀ − d₁|</strong></td>
+<td>1.0000</td>
+<td><strong>0.0000</strong></td>
+<td>1.0000</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><code>c0</code> 的<strong>轨道大小 = 324</strong>（单构型 BFS，未枚举全层）。</p>
+<p>⟹ <strong>同一个 tick 轨道里既有极平滑（S = 0.909）也有极粗糙（S = 0.318）的构型</strong> ⟹
+<strong>平滑度不是 tick 不变量</strong>（这在非退化格点上成立）。</p>
+<h3>5.3 ⭐ 关键实验：tick 演化<strong>摧毁</strong>平滑，不产生平滑</h3>
+<p>从<strong>极端平滑</strong>初态（<code>z ∈ {0,1,2}</code> 全满 / 其余全空）出发跑 tick：</p>
+<table>
+<thead>
+<tr>
+<th>t</th>
+<th>B</th>
+<th>S</th>
+<th>|d₀−d₁|</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0</strong></td>
+<td><strong>0.250000</strong></td>
+<td><strong>0.909091</strong></td>
+<td><strong>1.000000</strong></td>
+</tr>
+<tr>
+<td>1</td>
+<td>0.111111</td>
+<td>0.659091</td>
+<td>0.666667</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>0.006944</strong></td>
+<td>0.590909</td>
+<td>0.166667</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0.000000</td>
+<td>0.363636</td>
+<td>0.000000</td>
+</tr>
+<tr>
+<td>200</td>
+<td>0.006944</td>
+<td>0.545455</td>
+<td>0.166667</td>
+</tr>
+</tbody>
+</table>
+<p><strong>B 在 2 步内从 0.25 衰减到 0.0069</strong>（随机基线 0.0208）。</p>
+<p>⟹ <strong>tick 演化摧毁平滑，而且极快</strong>（2 步）。
+⟹ <strong>平滑层不能来自衬底动力学。</strong></p>
+<h3>5.4 那平滑从哪来？—— 答案在框架里已经有了</h3>
+<p>框架自己写着（第 322 行）：</p>
+<blockquote>
+<p>「<strong>截断 = 普朗克（公理 1 自然给出）</strong>」</p>
+</blockquote>
+<p>再加上 B5（观测者分辨率 <code>δ = 1 纳特/4l_P²</code>，其<strong>面积</strong>尺度 √4 = 2 l_P）：</p>
+<blockquote>
+<p>⭐ <strong>「平滑」= 「在大于 l_P 的尺度上读数」</strong> —— 这是<strong>观测者侧</strong>的性质，
+不是衬底自发形成的结构。</p>
+</blockquote>
+<p>⟹ <strong>I-18 的追问方向应改</strong>：原来问「衬底怎么粗粒化出平滑层」，
+现在应问「<strong>观测者的粗粒化尺度是多少</strong>」—— 而那一半框架<strong>已经给了</strong>（B5 + 第 322 行）。
+第 66/67 轮用高斯核 σ = 0.55 弧度做平滑，那是<strong>玩具模型的外部选择</strong>，不是框架参数。</p>
+<hr />
+<h2>六、I-17：Φ 的质量（CG-7 / CG-8 / CG-9）</h2>
+<h3>6.1 反解 F2 降标机制</h3>
+<p><code>E(R) = √(ℏc·E_P/R)</code>（全 eV 制，ℏc = 1.97327×10⁻⁷ eV·m）：</p>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>E(R)</th>
+<th>R / l_P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>l_P（普朗克）</td>
+<td>1.2209×10²⁸ eV</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>0.15 nm（真实键长）</td>
+<td>4.01×10¹⁵ eV</td>
+<td>9.28×10²⁴</td>
+</tr>
+<tr>
+<td>1 μm</td>
+<td>4.91×10¹³ eV</td>
+<td>6.19×10²⁸</td>
+</tr>
+<tr>
+<td>1 mm</td>
+<td>1.55×10¹² eV</td>
+<td>6.19×10³¹</td>
+</tr>
+<tr>
+<td><strong>R_H（哈勃半径）</strong></td>
+<td><strong>4.1894 meV</strong></td>
+<td>8.49×10⁶⁰</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>反解</strong>：<code>E(R) = 1 meV</code> ⟹ <strong>R = 2.324×10²⁷ m = 16.93 R_H</strong>
+（交叉验证：<code>(4.19/1.0181)² = 16.93</code> ✓ 与 <code>R_ec/R_H = 16.93</code> 逐位一致）</p>
+<p>⚠️ <strong>C-4 / C-6 提醒</strong>：1 meV 是<strong>恒等式</strong>（第 53 轮，M_Pl 被消掉）；4.19 meV 与标准暗能量
+能标 <code>√(M_Pl H₀) = 4.17 meV</code> <strong>是同一个组合</strong> ⟹ <strong>这两个 meV 都不是框架的新成果</strong>。</p>
+<h3>6.2 ⭐⭐ 三个候选 ⟹ 力程差 31 个数量级</h3>
+<p><strong>假设</strong>（⚠️ 是假设，不是推导）：<code>m_Φ =</code> 该截断能标。</p>
+<table>
+<thead>
+<tr>
+<th>候选</th>
+<th>来源</th>
+<th>m_Φ</th>
+<th>力程 λ = ℏc/m</th>
+<th>在第五力窗口内？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(a) 弦网标量扇区能隙</strong></td>
+<td>§5.8 <code>Δ_标量 = 0.41 J</code></td>
+<td>1.5017×10²⁸ eV</td>
+<td><strong>1.314×10⁻³⁵ m = 0.813 l_P</strong></td>
+<td>❌ 差 <strong>28.9</strong> 个数量级</td>
+</tr>
+<tr>
+<td><strong>(b) 粗粒化截断 @ E_c</strong></td>
+<td>第 1090 行（恒等式）</td>
+<td>1.0181 meV</td>
+<td><strong>1.938×10⁻⁴ m = 0.1938 mm</strong></td>
+<td>✅ <strong>是</strong></td>
+</tr>
+<tr>
+<td><strong>(c) 粗粒化截断 @ R_H</strong></td>
+<td>第 674 行（暗能量能标）</td>
+<td>4.1894 meV</td>
+<td><strong>4.710×10⁻⁵ m = 0.0471 mm</strong></td>
+<td>✅ <strong>是</strong></td>
+</tr>
+<tr>
+<td>(d) 普朗克（公理 1）</td>
+<td>第 322 行</td>
+<td>1.2209×10²⁸ eV</td>
+<td>1.616×10⁻³⁵ m = 1.000 l_P</td>
+<td>❌ 差 28.8 个数量级</td>
+</tr>
+</tbody>
+</table>
+<pre><code>(a) 与 (b) 的力程比 = 1.475×10³¹  ⟹  差 31.2 个数量级
+</code></pre>
+<p>⟹ <strong>「第五力能不能被看到」取决于 Φ 的质量取哪一档</strong> —— 这是一个<strong>可判别的结构</strong>。</p>
+<p>⚠️ <strong>但「力程在窗口内」只是必要条件</strong>：0.05–0.2 mm 的新长程标量力若<strong>与引力同强度</strong>，
+<strong>早已被 Eöt-Wash 一类实验排除</strong>；未被排除的只剩<strong>极弱耦合</strong>的窄带。
+而<strong>耦合强度正是 I-17 未给的另一半</strong> ⟹ <strong>本轮的 (b)/(c) 仍不是可检验预言</strong>。</p>
+<hr />
+<h2>七、诚实边界</h2>
+<ol>
+<li>⚠️ <strong>「m_Φ = Λ」是假设，不是推导。</strong> 框架对 Φ 只写「VEV 决定耦合常数与质量」（§4.5b），
+   <strong>从未把 Φ 的质量与任何具体能标连起来</strong>。本轮的 (b)/(c)/(d) 是<strong>三个候选映射</strong>，
+   四类判定 = <strong>半拟合</strong>（能标是挑的）。</li>
+<li>⚠️ <strong>「平滑 = 在大于 l_P 的尺度上读数」是本轮的<em>解释</em><strong>，</strong>不是框架的原文</strong>。
+   框架有第 322 行的「截断 = 普朗克」与 B5 的观测者分辨率，<strong>但从未把两者与「平滑」连起来</strong>。
+   本轮给出的是<strong>相容的读法</strong>，不是引用。</li>
+<li>⚠️ <strong>(2,2,6) 仍是小格点</strong>（N = 24、z 线长 6）。未做 L ≥ 8 的外推
+   （轨道 BFS 成本随 |G| 增长，(2,2,6) 已是 7 生成元 / |G| = 648）。
+   ⚠️ 而 <strong>(2,2,4) 的退化说明：小格点上「度量本身」可能失效</strong> ⟹ L = 6 也<strong>未验证非退化</strong>。</li>
+<li>⚠️ <strong>本轮没有新增演化方程</strong> —— 用的是框架原有的 tick（§8.6.7）。
+   这一点与第 67 轮不同（那一轮的图热流是新增假设）。</li>
+<li>⚠️ <strong>力程在窗口内 ≠ 可观测</strong>（见 6.2 的注）。</li>
+<li>⚠️ <strong>两个「31」不是同一个口径</strong>：第 62 轮的「28.9 – 55.4 个数量级」是<strong>候选与窗口的距离</strong>；
+   本轮的「31.2」是<strong>两个候选之比</strong>。<strong>不要混引</strong>。</li>
+<li>⚠️ <strong>实现层发现</strong>（须记）：<strong>(2,2,4) 的 L = 4 让块方差退化成 tick 不变量</strong> ——
+   任何以后用「块方差」做判据的脚本，<strong>必须避开 z 线长 = 4</strong>。</li>
+</ol>
+<hr />
+<h2>八、判决</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>答案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 框架有「粗粒化」的<strong>定义</strong>吗？</td>
+<td>✅ <strong>有</strong>，而且<strong>可判定</strong>（第 423 行：不变 ⟺ 轨道函数）</td>
+</tr>
+<tr>
+<td>② 它是「截断」吗？</td>
+<td>❌ <strong>不是</strong> —— <strong>无尺度</strong>（纯组合，CG-6）</td>
+</tr>
+<tr>
+<td>③ 平滑层能来自 tick 动力学吗？</td>
+<td>❌ <strong>不能</strong> —— tick <strong>摧毁</strong>平滑（2 步，CG-5）</td>
+</tr>
+<tr>
+<td>④ Φ 的质量由哪个截断给？</td>
+<td>⚠️ <strong>未定</strong> —— 两个<strong>纯输入</strong>各管一半，无独立约束</td>
+</tr>
+<tr>
+<td>⑤ <strong>共用尺度成立吗？</strong></td>
+<td>❌ <strong>不成立</strong>（结构上不同：一个无尺度、一个必须有尺度）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>四类判定</strong>：
+- ① ② ③ = <strong>结构性判定</strong>（负面边界，不怕公开）
+- ④ = <strong>失败</strong>（沿用第 62 轮的诊断：公设上移）
+- 6.2 的力程档位 = <strong>半拟合</strong>（能标是挑的，且耦合未给）</p>
+<hr />
+<h2>九、下一步</h2>
+<table>
+<thead>
+<tr>
+<th>候选</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>候选池 36</strong></td>
+<td>S-12 与 ΛCDM 的判别点 —— 找不出就登记「框架不覆盖宇宙学判别」</td>
+</tr>
+<tr>
+<td><strong>I-19（本轮新登记）</strong></td>
+<td><strong>观测者的粗粒化尺度是多少？</strong> —— 本轮把 I-18 改写成这个问句；框架有 B5 与第 322 行两块拼图，<strong>能不能拼成一条推导</strong>是可判定的</td>
+</tr>
+<tr>
+<td><strong>I-17 的耦合侧</strong></td>
+<td>本轮只碰了质量；<strong>耦合强度</strong>（它与谁耦合、多强）完全未动 —— 而 6.2 已说明它是可观测性的另一半</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>不建议</strong>：继续追「m_Φ 取哪一档」—— 因为那是<strong>挑能标</strong>（半拟合），
+在拿到「Φ 的耦合」之前，挑质量档位<strong>不会增加任何判别力</strong>（铁律 5：可识别性）。</p>
+
+<div class="footer">粗粒化截断与 Φ 的质量 —— 两个开口为何不能共用一个尺度 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 粗粒化截断与Φ的质量_两个开口为何不能共用一个尺度.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kerr 版 EMRI 重算 —— `ΔlnL`、`σ_δ` 三口径与「条件 vs 剖面」更正（**C-81 / C-82**）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>Kerr 版 EMRI 重算 —— `ΔlnL`、`σ_δ` 三口径与「条件 vs 剖面」更正（**C-81 / C-82**）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<h1>Kerr 版 EMRI 重算 —— <code>ΔlnL</code>、<code>σ_δ</code> 三口径与「条件 vs 剖面」更正（<strong>C-81 / C-82</strong>）</h1>
+<h2>一、一句话结论</h2>
+<p>材料包 §五第三行（Kerr 版）的三个数全部重算，并顺带更正第 116 轮条 ③ 的解释：</p>
+<ul>
+<li><strong><code>δ_true</code>：2.000% → 2.222%</strong>（<code>κ_rel(e=0) = 1/3</code> 解析，取代唯象 <code>0.30</code>）；</li>
+<li><strong><code>ΔlnL</code>：338.4 → 399.2</strong>（精确内积<strong>期望值</strong> = <code>ρ²</code>；上界 810 的 49%；实现值 385.9，噪声投影 ±28 → <strong>引用期望值</strong>）；</li>
+<li><strong><code>σ_δ</code>：旧 <code>9.65×10⁻⁴</code> 撤回</strong>（「平台 + 噪声」的粗网格二次拟合伪影）；新三口径 <strong>条件 7.90×10⁻⁷ ／ φ₀ 剖面 1.588×10⁻⁶ ／ 有效 7.87×10⁻⁴</strong>；</li>
+<li>⚠️ <strong>结构性发现</strong>：δ 似然是<strong>针状</strong>的（宽 ~10⁻⁶）—— <strong>粗网格会整段错过针</strong>；旧「精确恢复 δ = 2.00%」只因 <code>0.02</code> <strong>恰为格点</strong>；</li>
+<li><strong>C-81</strong>：第 116 轮把 <code>2.54×10⁻⁶</code> 标为「实测似然半宽」、解释为「⟨w²⟩ vs Var（似然用方差）」—— <strong>不成立</strong>；它是 <strong>φ₀ 剖面宽</strong>，真·似然半宽（φ₀ 固定）= <code>1.23×10⁻⁶</code> <strong>= Fisher 值</strong>；<strong>原因是条件 vs 剖面</strong>；</li>
+<li><strong>C-82</strong>：<code>_emri_ad_mcmc.py</code> 总结句 <code>σ_δ(1D)=1/(2wGR_T)≈1e-5</code> 与其<strong>自身实测</strong> <code>1.63×10⁻⁶</code> 不符（该式缺 <code>ρ</code> 因子）。</li>
+</ul>
+<h2>二、Kerr 重算（<code>_kerr_recalc_117.py</code>，种子 7 与旧脚本同一噪声实现）</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>旧</th>
+<th>新</th>
+<th>口径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>δ_true</code></td>
+<td>2.000%</td>
+<td><strong>2.222%</strong></td>
+<td><code>κ_rel(e=0) = 1/3</code>（第 113 轮解析）</td>
+</tr>
+<tr>
+<td><code>ΔlnL</code>（<strong>期望</strong>）</td>
+<td>—</td>
+<td><strong>399.2</strong></td>
+<td>精确内积 <code>½⟨Δh|Δh⟩</code> = <code>ρ²</code>；上界 <code>½(ρ+ρ_GR)² = 809.9</code> 的 <strong>49%</strong></td>
+</tr>
+<tr>
+<td><code>ΔlnL</code>（实现）</td>
+<td>338.4（粗网格）</td>
+<td><strong>385.9</strong>（细网格）</td>
+<td>期望值 ±28（噪声投影）</td>
+</tr>
+<tr>
+<td><code>σ_δ</code> 条件（φ₀ 固定）</td>
+<td>—</td>
+<td><strong>7.904×10⁻⁷</strong></td>
+<td>解析 <code>1/(2ρ√⟨ω²⟩)</code> = 8.031×10⁻⁷（差 1.6%）</td>
+</tr>
+<tr>
+<td><code>σ_δ</code> φ₀ 剖面</td>
+<td>—</td>
+<td><strong>1.588×10⁻⁶</strong></td>
+<td>解析 <code>1/(2ρ√Var)</code>（吻合 0.0%）</td>
+</tr>
+<tr>
+<td><code>σ_δ</code> 有效（对外）</td>
+<td>—</td>
+<td><strong>7.865×10⁻⁴</strong></td>
+<td><code>δ/√(2ΔlnL)</code></td>
+</tr>
+<tr>
+<td>旧报 <code>σ_δ</code></td>
+<td>9.65×10⁻⁴</td>
+<td><strong>撤回</strong></td>
+<td>见 §三（多种子去伪）</td>
+</tr>
+<tr>
+<td>显著性</td>
+<td>26.0σ</td>
+<td><strong>28.3σ</strong></td>
+<td><code>√(2ΔlnL)</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>三个技术点</strong>：</p>
+<ol>
+<li><strong>旧的 <code>338.4</code> 不是口径错</strong>：它与旧 δ 下的精确期望 <code>405.5</code> 差 <strong>−67.1 ≈ −2.4×(±28)</strong> ⟹ 纯粹是那一个噪声实现的投影项（<code>ΔlnL_realized = ΔlnL_exact + ΣU·n/σ²</code>）。旧、新 δ 的期望都 <strong>≈ <code>ρ²</code></strong>（399.2 / 405.5）—— 因为饱和区 <code>ΔlnL ≈ ρ²(1−M)</code>、<code>M ~ 10⁻²</code>。</li>
+<li><strong>上界校验</strong>：399.2 &lt; <code>½(ρ+ρ_GR)² = 809.9</code> ✓（判据「χ² 型显著性 ≤ √2·ρ」继续成立）。</li>
+<li><strong>采样</strong>：<code>dt/T_carrier = 23.0</code>（欠采样，旧脚本同样如此）⟹ 对<strong>积分类量</strong>（<code>ΔlnL</code>、三个宽度）无碍 —— <code>n = 3×10³</code> vs <code>3×10⁴</code>：<code>ΔlnL</code> 差 <strong>1.7%</strong>、条件宽差 <strong>0.02%</strong>（机制：carrier 相位在样本上「泛化平均」，慢进动部分积分稳定）。</li>
+</ol>
+<h2>三、结构性发现：针状似然（Kerr 链与 a–δ 链共有）</h2>
+<ul>
+<li><strong>针宽 ~10⁻⁶</strong>（= 条件宽 <code>7.90×10⁻⁷</code>），而旧脚本的粗网格步长 <code>0.07/399 = 1.754×10⁻⁴</code> —— <strong>比针宽大 ~100 倍</strong>；</li>
+<li><strong>12 个种子重做</strong>（粗网格 + ±0.008 掩模 + 二次拟合，完全复刻旧流程）：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>统计</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>δ̂</code>（粗网格argmax）</td>
+<td>散布整个区间 <code>[0.00386, 0.05807]</code>（<strong>不是</strong> δ_t）</td>
+</tr>
+<tr>
+<td><code>ΔlnL</code>（粗网格）</td>
+<td><code>[13.0, 97.0]</code>（真实 ≈400 —— 少一个数量级）</td>
+</tr>
+<tr>
+<td><code>σ_d</code>（二次拟合）</td>
+<td><code>1.4×10⁻³ – 2.1×10⁻²</code>，<strong>5/12 给 NaN</strong>（曲率反号）</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>旧结果为何「精确」</strong>：<code>−0.01 + 171×(0.07/399) = 0.020000</code> <strong>恰为格点</strong>（且当时 δ_true 也是 0.02）；a–δ 脚本同理（其粗网格 <code>linspace(0.014, 0.026, 201)</code> 步长 6×10⁻⁵，0.02 恰为中点）。
+  ⚠️ <strong>两个玩具都以「已知真值」布置网格</strong> ⟹ 「δ̂ 精确恢复」这句话<strong>必须附这句说明</strong>才诚实。</li>
+<li><strong>细网格（±3×10⁻⁶，步长 1×10⁻⁸）</strong>：种子 3/5/7 恢复到 <code>+8.9×10⁻⁷ / +4.6×10⁻⁷ / −4.9×10⁻⁷</code>（≲1.1σ_cond）。</li>
+<li><strong>GR 对照</strong>：<code>δ̂ = 9.6×10⁻⁷</code>、<code>ΔlnL(0 vs 最优) = 0.72</code>（噪声级，无假阳性）✓。</li>
+</ul>
+<h2>四、C-81 的取证（两个诊断脚本）</h2>
+<p><strong>(1) 直接验证「两个函数」（<code>_kerr_diag_117b.py</code>；第 116 轮 C1 案例：ρ = 15.319，<code>w_GR(T) = 44467 rad</code>）</strong></p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>数值</th>
+<th>对照</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>φ₀ <strong>固定</strong>（条件）似然半宽</td>
+<td><strong>1.2307×10⁻⁶</strong></td>
+<td>Fisher <code>1/√Γ_δδ</code> = 1.2348×10⁻⁶（差 <strong>0.3%</strong>）✓</td>
+</tr>
+<tr>
+<td>φ₀ <strong>剖面</strong>（数值 <code>max_φ₀</code>）半宽</td>
+<td><strong>2.5416×10⁻⁶</strong></td>
+<td>第 116 轮「M 曲线」= 2.5404×10⁻⁶；公式 <code>1/(2ρ√Var)</code> = 2.5396×10⁻⁶（差 <strong>0.08%</strong>）✓</td>
+</tr>
+<tr>
+<td>深度曲线逐点（3 个 δ）</td>
+<td>剖面公式 vs 直接 max</td>
+<td>吻合 0.0–0.3%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>(2) Kerr 版同结构</strong>（<code>_kerr_recalc_117.py</code> §B）：剖面/条件 = <strong>2.009</strong> ⟹ 等效 <code>|ρ(δ,φ₀)| = 0.867</code>。
+（线性 <code>ω(t)</code> 时解析比 = 2：条件 ∝ <code>1/√⟨ω²⟩ = √3/(2ρW)</code>，剖面 ∝ <code>1/√Var = √3/(ρW)</code>。）</p>
+<p><strong>(3) 结论</strong>：<strong>两个数都对，但回答不同问题</strong> —— 「φ₀ 已知时 δ 有多准」vs「φ₀ 未知（剖面掉）时 δ 有多准」。
+第 116 轮的「原因」（<code>Γ_δδ ∝ ⟨w²⟩</code>（二阶矩）而似然用方差 <code>Var</code>）<strong>不成立</strong>：真因是条件 vs 剖面；
+两个比值（<code>√(Var/⟨w²⟩) = 1/2.06</code> 与简并膨胀 <code>√(1−ρ²) = 1/2.06</code>）<strong>数值恰好相同</strong>（线性 ω 下的巧合），故当年「实测吻合」并没能把错误暴露。</p>
+<p><strong>(4) 下游数字重记</strong>：<code>σ_eff/σ_cond</code> = <strong>853（2 yr）／1810（4 yr）</strong>；原 <code>413/862</code> 应读作 <code>σ_eff/σ_φ0剖面</code>。</p>
+<h2>五、C-7 的结案与 C-82</h2>
+<ul>
+<li><strong>C-7 的「459 倍」精确复现 = 459.2</strong>（差 <strong>0.04%</strong>）：用 a–δ 管线<strong>自己的两个数</strong> —— <code>σ_eff = δ/√(2ΔlnL) = 7.481×10⁻⁴</code> ÷ 实测 <code>s1 = 1.629×10⁻⁶</code>。
+  ⟹ 459 就是 <code>σ_eff ÷ φ₀剖面宽</code>（同族比值），<strong>不是</strong>「不自洽」。第 116 轮的「413（差 11%）」是<strong>跨案例</strong>比较（Fisher 案例 vs a–δ 案例）。</li>
+<li><strong>C-82</strong>：用 <code>_emri_ad_mcmc.py</code> 自己的机器复现其 step① —— 实测 <code>s1 = 1.629×10⁻⁶</code>（2 yr）／<code>7.25×10⁻⁷</code>（4 yr），<strong>与其 φ₀ 剖面解析口径（1.589/0.756×10⁻⁶）相符（2.5%）</strong>；
+  而总结句写 <code>1/(2wGR_T) ≈ 1e-5</code>（缺 <code>ρ</code> 因子，给出 9.17×10⁻⁶，偏 <strong>5.6 倍</strong>）；「虚高 ~100×」应为 <strong>~600×</strong>（<code>9.7×10⁻⁴ ÷ 1.63×10⁻⁶ = 595</code>）。<strong>实测数对、公式错</strong>。</li>
+</ul>
+<h2>六、改动清单</h2>
+<ul>
+<li><strong>论文（中英同步）</strong>：116 块 ③ 内加 2 行更正指针（C-81）；「仍未做：Kerr」标 ✅；§4.5b 正文 v1.32 数字加更正指针；<strong>追加第 117 轮注</strong>（23 行/语）。</li>
+<li><strong>材料包</strong>：§2.2d 加【第 117 轮更正】段；<strong>新增 §2.2e</strong>（重算表 ＋ 针状似然警告 ＋ 口径更正）；§五第三行重写；§三注的 459 归属更正。</li>
+<li><strong>清单</strong>：第 117 轮行；<strong>C-81 ＋ C-82</strong>（撤回计数 79 → <strong>81</strong>）。</li>
+<li><strong>交接说明</strong>：§七 新条目（116 条目改为「历史」）。</li>
+<li><strong>技能</strong>：陷阱 114（条件 vs 剖面）、115（针状似然/粗网格 + 二次拟合伪影）。</li>
+<li><strong>旧报告（08-23 历史件）</strong>：<code>KerrEMRI波形与贝叶斯分析.md</code> 加<strong>更正横幅</strong>（三个旧数 → 指向本备忘录/材料包 §2.2e）；顺带修其生成器 <code>_kerr_report_html.py</code> 的<strong>旧机硬编码路径</strong>（<code>D:/Users/IMYT.YT/…</code> → 脚本自身目录）并重生成 HTML（<code>docs/html/</code> 同步）。</li>
+</ul>
+<h2>七、诚实边界与下一步</h2>
+<ul>
+<li><strong>本轮无新物理、新增自由参数 0</strong>；改的是「口径登记」＋ 一次同口径重算。</li>
+<li><strong>未做</strong>（登记，不隐藏）：① <code>κ_rel</code> 的 <code>O(y³)</code> 项；② Kerr 链的<strong>真·参数重拟合</strong>（只做了固定 φ₀ / 剖面两档；7 参边际未做）；③ a–δ 链条的 σ 数未整体重跑（本轮只做了口径核对）；④ 针状似然在<strong>真实</strong> LISA 分析中的对应物（那里先验/搜索策略不同，未必针状）—— 这是给 LISA 组的 §2.2e 警告所依赖的<strong>外推</strong>，本身未验证。</li>
+<li><strong>剩余待办</strong>：① 对外：送私审／等 LISA。</li>
+</ul>
+
+<div class="footer">Kerr 版 EMRI 重算 —— `ΔlnL`、`σ_δ` 三口径与「条件 vs 剖面」更正（**C-81 / C-82**） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 Kerr版EMRI重算_delta与lnL与sigma口径_C-81与C-82.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

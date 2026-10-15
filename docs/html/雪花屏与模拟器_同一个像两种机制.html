@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>雪花屏与模拟器 —— 同一个「像」，两种机制</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>雪花屏与模拟器 —— 同一个「像」，两种机制</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 65 轮讨论纪要 ｜ 2026-10-01 ｜ 核验脚本 <code>_snow_65.py</code>（<strong>SN-1…SN-9，11 项 0 失败</strong>）
+＋ 模拟器面板测试 <code>_sim_snow_test.js</code>（<strong>ST4-1…ST4-6，6 项 0 失败</strong>）</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>你的观察在「单帧 + 局部」这一档上完全正确 —— 那是 4 条判据，全部分不开。</strong>
+<strong>区别只在「时间序列」与「全局守恒量」里 —— 那是 5 条判据，全部分得开。</strong></p>
+<p>用一句话概括：</p>
+<blockquote>
+<p><strong>雪花屏与模拟器的差别，不在任何一帧里，只在一串帧里。</strong></p>
+</blockquote>
+<hr />
+<h2>一、先把「雪花屏」的物理说清楚</h2>
+<p>老式电视无信号时的雪花，是<strong>接收机的热噪声</strong>被显像管逐点映射出来的。它的统计性质是：</p>
+<ul>
+<li>每个像素<strong>独立</strong>（i.i.d.）</li>
+<li>每帧<strong>重新抽</strong>（帧与帧之间无记忆）</li>
+<li>点亮的像素数 k <strong>每帧都在跳</strong>，幅度 ≈ <code>√(N/4)</code></li>
+</ul>
+<p><strong>最后一条常常被忽略 —— 但它才是真正的判据入口。</strong></p>
+<p>而模拟器的衬底层（§8.6.7 的 tick）是：</p>
+<pre><code>一 tick = ① 随机选一个轴
+        ＋ ② 沿该轴的&lt;strong&gt;每条线独立&lt;/strong&gt;抽一个相位
+        ＋ ③ 沿该轴做完美匹配（配对交换）—— 全部同时发生
+</code></pre>
+<p><strong>它是置换。</strong> 于是：双射、可逆、信息严格守恒、k 不变。</p>
+<hr />
+<h2>二、九条判据的实测结果</h2>
+<p>格点 12³ = 1728 个位点，占据密度 1/2（k = 864）。</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>判据</th>
+<th>tick</th>
+<th>白噪声</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>单点密度</td>
+<td>0.500</td>
+<td>0.499</td>
+<td>❌ 相同</td>
+</tr>
+<tr>
+<td>2</td>
+<td>最近邻两点关联 C(1)</td>
+<td>+1.0×10⁻⁴</td>
+<td>+5.1×10⁻⁴</td>
+<td>❌ <strong>信号比噪声基线（6.2×10⁻⁴）还小</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>块密度方差（粗粒化）</td>
+<td>3.642×10⁻³</td>
+<td>3.990×10⁻³</td>
+<td>❌ 差 <strong>8.7%</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>帧间逐位变化量 Δ</strong></td>
+<td>0.503</td>
+<td>0.500</td>
+<td>❌ <strong>相同</strong>（见 §三）</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>轴对齐的线级重排</strong></td>
+<td><strong>1.0000</strong></td>
+<td><strong>0.1802</strong></td>
+<td>✅ 差 <strong>5.5 倍</strong>，且是结构性恒等</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>k（亮点数）</strong></td>
+<td>极差 <strong>0</strong></td>
+<td>极差 <strong>104</strong>（±21）</td>
+<td>✅ 守恒 vs 不守恒</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>可逆性</strong></td>
+<td>双射 + 对合</td>
+<td>不可逆</td>
+<td>✅ 可分</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>有序初态的混合时间</strong></td>
+<td><strong>62 步</strong></td>
+<td><strong>1 步</strong></td>
+<td>✅ 差 <strong>62 倍</strong></td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>混合时间的尺寸标度</strong></td>
+<td>τ ∝ L²</td>
+<td>τ = 1（与 L 无关）</td>
+<td>✅ 可分</td>
+</tr>
+</tbody>
+</table>
+<p><strong>分界干净得不像话</strong>：前 4 条全在「单帧 / 局部」，全部不可分；后 5 条全在「时间 / 守恒量」，全部分得开。</p>
+<p><strong>第 1–3 条解释了你为什么觉得「一模一样」</strong>：人眼能做的运算恰好是<strong>局部的、粗粒化的</strong>——读块密度、读边缘、读纹理。它读不到全局守恒量，也读不到轨道身份。</p>
+<p><strong>顺带与第 44 轮对上</strong>：那一轮我算过「真随机相位 vs 确定性相位，两点关联差 <strong>0.14σ</strong>」，当时的结论是「不可判」。本轮的判据 2 是<strong>同一件事</strong>——只不过这次比的对象不是两种随机源，而是<strong>随机源 vs 根本没有随机性</strong>，结果一样：<strong>空间关联这个入口是死的</strong>。</p>
+<hr />
+<h2>三、⚠️ 一个被我自己数据推翻的预测</h2>
+<p>我原本的推理是这样的（写脚本时还觉得挺漂亮）：</p>
+<blockquote>
+<p>tick 只沿<strong>一个轴</strong>交换 ⟹ 只有 1/3 的机会动到某个方向；
+且沿该轴是<strong>配对交换</strong> ⟹ 一半的配对「换了等于没换」。
+⟹ <code>Δ_tick = 1/2 × 1/2 = 0.25</code>，而白噪声 = 0.5，<strong>差 2 倍</strong>。</p>
+</blockquote>
+<p><strong>实测：0.503 vs 0.500 —— 一模一样。</strong></p>
+<p><strong>错在哪</strong>：tick 的<strong>每一个位置都必然被改写</strong>为「它的伙伴的旧值」（相位只决定<strong>伙伴是谁</strong>，而伙伴永远 ≠ 自己）。所以</p>
+<pre><code>P(值改变) = P(伙伴的值与我不同) = 1/2   ← 与白噪声完全相同
+</code></pre>
+<p><strong>这是一条负面发现，值得登记</strong>：连「逐位变化率」这种看起来最显然的判据，都<strong>分不开</strong>。</p>
+<hr />
+<h2>四、τ ∝ L² —— 本轮唯一的正面定量</h2>
+<p>从<strong>有序初态</strong>出发（轴 0 的左半全满、右半全空），看它多久变成雪花：</p>
+<table>
+<thead>
+<tr>
+<th>L</th>
+<th>N</th>
+<th>混合步数 τ</th>
+<th>L²</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td>64</td>
+<td>4</td>
+<td>16</td>
+</tr>
+<tr>
+<td>6</td>
+<td>216</td>
+<td>15</td>
+<td>36</td>
+</tr>
+<tr>
+<td>8</td>
+<td>512</td>
+<td>23</td>
+<td>64</td>
+</tr>
+<tr>
+<td>10</td>
+<td>1000</td>
+<td>46</td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<pre><code>τ / L²  =  0.25 / 0.42 / 0.36 / 0.46      （L = 4 太小，忽略）
+</code></pre>
+<p><strong>比值稳定 ⟹ τ ∝ L²。</strong></p>
+<p><strong>为什么必须是 L²</strong>：tick 交换的是<strong>相邻配对</strong>，所以它是<strong>局域扩散</strong>步骤，而不是全局重抽。
+若它是全局重抽（像真雪花屏），τ 就与 L 无关（恒为 1）。</p>
+<p>⚠️ <strong>与 §4.2 的 <code>R_mix = l_P·√(t/t_P)</code> 是同一个标度</strong>（<code>R² ∝ t</code> ⟺ <code>t ∝ L²</code>）——
+但<strong>来源不同</strong>（这里是置换链的弛豫，那里是扩散方程），所以<strong>不声称深层统一</strong>。
+（第 59 轮已经有过一次同类的「三条 √ 会合、来源不同」，这里不重复升级它。）</p>
+<hr />
+<h2>五、这件事在框架里对应什么</h2>
+<p><strong>它正是第 43 轮那句口径改写的可视图象。</strong></p>
+<p>框架的原话是：「<strong>无信息丢失</strong>说的是<strong>状态</strong>，『<strong>熵增</strong>』说的是<strong>我们对状态的无知</strong>」。</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>tick 里对应什么</th>
+<th>白噪声里对应什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>状态层</strong></td>
+<td>双射 ⟹ <strong>信息严格守恒</strong>（k、可逆性、线级重排）</td>
+<td>无状态可言，每帧重抽</td>
+</tr>
+<tr>
+<td><strong>系综层</strong></td>
+<td>系综熵不变，但<strong>粗粒化的读数</strong>趋于均匀（混合时间 62 步）</td>
+<td>立刻均匀</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>「看起来在熵增」与「真的在丢信息」是两件事。</strong>
+⟹ 雪花屏是<strong>后者</strong>（真的每帧丢光），模拟器是<strong>前者</strong>（一点都不丢，只是你看不见）。</p>
+<p><strong>这解释了为什么「熵增」不需要真随机</strong>（第 43 轮）：只要观测者粗粒化，双射演化照样给出「越来越像雪花」的现象学。</p>
+<hr />
+<h2>六、交付：模拟器新增第 ④ 面板</h2>
+<p><code>宇宙模拟器.html</code> 现在有四个面板，第 ④ 个是 <strong>「雪花屏对照 ★」</strong>：</p>
+<ul>
+<li><strong>左</strong>：tick 置换（框架底层）　<strong>右</strong>：真随机白噪声（每帧重抽）</li>
+<li>两边<strong>同样的密度</strong>（k 都是 864），所以对比是公平的</li>
+<li>旁观有个「<strong>★ k 的极差</strong>」行：<strong>左边永远 0，右边会不断变大</strong></li>
+<li>「<strong>★ 轴对齐线级重排</strong>」：左边恒 1.00，右边 ≈ 0.18</li>
+<li>一个 <strong>「⚑ 有序初态」</strong> 按钮：一键把两边都设成左半满。
+  点播放后：<strong>右边立刻雪花，左边要 60 多步才散开</strong> —— 这是最直观的一幕。</li>
+</ul>
+<p><strong>面板测试</strong> <code>_sim_snow_test.js</code>（stub 掉最小 DOM，直接跑页面里的 JS）：<strong>6 项 0 失败</strong>，
+包括「k 极差 = 0」「线级重排恒为 1.0000」「白噪声 k 极差 = 104」「有序初态后两侧 k 都是 864」。</p>
+<hr />
+<h2>七、诚实边界</h2>
+<p><strong>这是推导 / 数值</strong>
+- 九条判据的实测值（可复算，<code>_snow_65.py</code>）
+- <code>Δ_tick = Δ_white = 1/2</code> 的解析（由「伙伴必 ≠ 自己」直接得到）
+- τ ∝ L² 的四个数据点（L = 4 太小，只用了 6/8/10）
+- 「轴对齐线级重排」是<strong>结构性恒等</strong>（tick 定义直接蕴含），不是数值巧合</p>
+<p><strong>这是判定（有明确判据）</strong>
+- 「单帧 / 局部不可分」：判据是<strong>信号 &lt; 噪声基线</strong>（判据 1–3）与<strong>恒等为 0</strong>（判据 4）
+- 「时间 / 守恒量可分」：判据是<strong>结构性恒等 vs 概率巧合</strong>（判据 5–9）</p>
+<p><strong>这不是本轮做的</strong>
+- ⚠️ <strong>没有</strong>判断「tick 到底是不是更『本质』的选择」—— 这是框架的<strong>公设</strong>（§8.6.7），不是本轮的结论
+- ⚠️ <strong>没有</strong>把「人眼不可分」形式化成一个信息论定理 —— 只给了一个<strong>块密度方差</strong>的具体判据（差 8.7%）
+- ⚠️ <strong>没有</strong>做多尺度的人眼模型（稀疏采样、对比度响应、运动检测等）—— 真实的视觉系统比「块平均」复杂
+- ⚠️ 白噪声的「每帧重抽」在<strong>数值上只能是伪随机</strong>（第 44 轮的硬限制，陷阱 19）——
+  所以严格说，本轮比较的是「高质量的确定性置换」vs「低质量的确定性重抽」，
+  <strong>不是</strong>「确定性 vs 真随机」。这不影响判据 5–9（它们是结构性的），但<strong>必须写明</strong></p>
+<p><strong>未动论文正文</strong>（与第 58/59 轮同例：一次合流 + 一个工具，不是新物理）。</p>
+<hr />
+<h2>八、判决与下一步</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户的观察（「一模一样」）</td>
+<td>✅ <strong>在前 4 条判据上成立</strong>，这就是全部理由</td>
+</tr>
+<tr>
+<td>「所以模拟器像雪花屏 ⟹ 它也是随机的」</td>
+<td>❌ <strong>不成立</strong> —— 前 4 条不可分恰是因为<strong>它们对随机性不敏感</strong></td>
+</tr>
+<tr>
+<td>「哪几条判据真的能判别？」</td>
+<td>✅ 已给出：5 条，全在时间 / 守恒量侧</td>
+</tr>
+</tbody>
+</table>
+<p><strong>判据方向的一条通则（可复用）</strong>：</p>
+<blockquote>
+<p><strong>要判别「确定 vs 随机」，不要比空间快照，要比时间序列与守恒量。</strong>
+因为<strong>快照是系综的一个样本</strong>，而<strong>系综分布在两种情况下可以完全相同</strong>；
+能被分开的东西必然住在<strong>路径</strong>里。</p>
+</blockquote>
+<p><strong>下一步的候选</strong>：
+1. <strong>把这个对照做成「一页讲清 MAPS」的入口</strong> —— 第 63 轮的公开就绪度评估指出论文最缺可读性，而这是目前最好的单一入口；
+2. 候选池 <strong>36</strong>（S-12 与 ΛCDM 的判别点）、<strong>43</strong>（Φ 的质量与耦合）；
+3. 两项小核查：§5.7 的「能隙 Δ = 1」、<code>ε ~ 10⁻⁵⁰</code>。</p>
+
+<div class="footer">雪花屏与模拟器 —— 同一个「像」，两种机制 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 雪花屏与模拟器_同一个像两种机制.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>是「理论超前、工具不够」，还是「理论本身有问题」？—— 判据与理由分布</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">0. 结论</div>
+  <h1>是「理论超前、工具不够」，还是「理论本身有问题」？—— 判据与理由分布</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-09 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 139 轮（元任务 · 超前性审查）</strong> ｜ 2026-10-09 ｜ 核验脚本 <code>_adv139.py</code>
+问题（用户）：<strong>「有没有可能是理论过于超前，现有物理学/工具没跟上，而不是理论本身有问题？」</strong></p>
+</blockquote>
+<hr />
+<h2>0. 结论</h2>
+<p><strong>这个问题可以量化回答，而且答案很干净：</strong></p>
+<blockquote>
+<p><strong>判否理由里，「对象不存在／错位／是假的」: 「算不出」= 13 : 1</strong>
+⟹ <strong>核心障碍不是工具，是对象。</strong></p>
+</blockquote>
+<p><strong>「超前」能解释 3 件事，但一件都不是卡住项目的那个。</strong> 而用户直觉里<strong>有一半是对的</strong>（见 §6b）。</p>
+<hr />
+<h2>1. 先把问题拆开：「超前」有四种机制，只有前三种构成辩护</h2>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>含义</th>
+<th>对应的判据问句</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>M1 数学工具不足</strong></td>
+<td>需要还没发明的数学（黎曼几何之于 GR）</td>
+<td>障碍是「算不出」，还是「<strong>没对象可算</strong>」？</td>
+</tr>
+<tr>
+<td><strong>M2 实验工具不足</strong></td>
+<td>需要还没建成的装置（LIGO 之于引力波）</td>
+<td>出口是否<strong>只是</strong>「等装置」？</td>
+</tr>
+<tr>
+<td><strong>M3 概念框架不足</strong></td>
+<td>学界还没接受的概念</td>
+<td>与现有物理<strong>矛盾</strong>，还是<strong>只是未被使用</strong>？</td>
+</tr>
+<tr>
+<td><strong>M4 理论本身有问题</strong></td>
+<td>——</td>
+<td>由排除法确定</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键</strong>：M1/M2/M3 有一个<strong>共同的可检验特征</strong> —— <strong>被测对象是明确的，缺的只是工具或数据</strong>。这条特征就是本轮的判据。</p>
+<hr />
+<h2>2. 数据：判否理由的分类（第 139 轮统计，48 条负面判定）</h2>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>条数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>③ 量级差太远（<strong>算得出</strong>，如缺口 16 个数量级）</td>
+<td>6</td>
+</tr>
+<tr>
+<td>④ 恒等式／除法／同源（<strong>对象是假的</strong>）</td>
+<td>5</td>
+</tr>
+<tr>
+<td>① <strong>对象不存在／消失</strong></td>
+<td>5</td>
+</tr>
+<tr>
+<td>⑤ 不独有／外部已有</td>
+<td>4</td>
+</tr>
+<tr>
+<td>② <strong>对象错位／载体不符</strong></td>
+<td>3</td>
+</tr>
+<tr>
+<td>⑦ 前提／依据不成立</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>⑥ 工具不足／算不出</strong></td>
+<td><strong>1</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>对象类（①＋②＋④）= 13 ｜ 工具类（⑥）= 1 ⟹ 13 : 1</strong></p>
+</blockquote>
+<p>⚠️ <strong>而且唯一的工具类条目（N-46 质子衰变）同时还有非工具理由</strong> ——「不可算」<strong>＋</strong>「量级关闭：缺口 ~16 个数量级」。<strong>即使把它算进来，它也不是纯粹的工具问题。</strong></p>
+<p>⚠️ <strong>「方法学不足」在整个清单只出现 2 次，且都指向同一个子问题</strong>（<code>λ_c(∞)</code> 定位）。</p>
+<p><strong>如果障碍真是工具，这个分布应该反过来。</strong></p>
+<hr />
+<h2>3. 反证一：形式化工具<strong>已经到位</strong>，结果是「没命题可证」</h2>
+<ul>
+<li>Lean ＋ Mathlib 是<strong>顶级的、成熟的</strong>数学工具，<strong>我们已经在用</strong>；</li>
+<li>用它得到的是：<strong>引力侧 55 条，规范侧 0 条</strong>；</li>
+<li>第 137 轮查明：那不是「工具不够」，是「<strong>那一环没有命题</strong>」—— §5.2 是<strong>筛选非演绎</strong>、<strong>n=3 未从公理锁定</strong>；</li>
+<li>外部基准：OpenAI 用 <strong>166 页证明 / 17 小时</strong>完成形式化 ⟹ <strong>工具已远超我们的需求</strong>。</li>
+</ul>
+<p>⟹ <strong>在这条路上，瓶颈是「有没有命题」，不是「工具够不够」。</strong></p>
+<hr />
+<h2>4. 反证二：<strong>89 条更正是内部口径冲突</strong> —— 工具原理上无法解释</h2>
+<p>例子：C-89（<strong>§9 #8 ↔ §4.8 矛盾</strong>）、C-90（<strong>论文 ↔ 材料包不一致</strong>）、C-45/C-46（§9 表与正文承诺句冲突）、C-75（<code>λ</code> 两处口径）、C-21（<code>ρ</code> 至少 5 义）。</p>
+<blockquote>
+<p><strong>工具不足只能解释「与外部观测的差距」，不能解释「自己跟自己不一致」。</strong></p>
+</blockquote>
+<p>这是最锋利的一刀：<strong>内部自相矛盾与工具无关。</strong></p>
+<hr />
+<h2>5. 历史对照：真正的「超前理论」长什么样</h2>
+<table>
+<thead>
+<tr>
+<th>理论</th>
+<th>提出时<strong>对象</strong>是否明确</th>
+<th>障碍</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GR 引力波（1916）</td>
+<td>✅ 度规波动解</td>
+<td>探测技术</td>
+<td>100 年后证实</td>
+</tr>
+<tr>
+<td>中微子（1930，泡利称"绝望的补救"）</td>
+<td>✅ 能量缺失的那个载体</td>
+<td>探测技术</td>
+<td>26 年后发现</td>
+</tr>
+<tr>
+<td>Yang–Mills（1954）</td>
+<td>✅ 规范场</td>
+<td>用途未知</td>
+<td>20 年后成为标准模型基础</td>
+</tr>
+<tr>
+<td>弱中性流（1960s）</td>
+<td>✅</td>
+<td>加速器能量</td>
+<td>10 年后发现</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>共同特征：对象在提出时就已经明确且逻辑自洽，缺的只是工具或数据。没有一个是「对象不存在」。</strong></p>
+</blockquote>
+<hr />
+<h2>6. 公平承认两件事</h2>
+<h3>6a. 确实有 <strong>3 处</strong>是工具／时间问题 —— 但都不是核心障碍</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>性质</th>
+<th>是否卡住项目</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>λ_c(∞)</code> 未定位</td>
+<td>算法／序参量不足（DMRG 分辨率 ~0.04 与尺寸漂移同量级）</td>
+<td>❌ <strong>子问题</strong>（不影响 λ=1 闭环）</td>
+</tr>
+<tr>
+<td>波形模型（quadrupole／圆轨道／非 Teukolsky）</td>
+<td>技术方法</td>
+<td>❌ <strong>只影响精度</strong>，不影响判别是否存在</td>
+</tr>
+<tr>
+<td>LISA（~10–15 年）</td>
+<td>实验装置</td>
+<td>❌ <strong>只影响验证时机</strong>，不影响「预言是否存在」</td>
+</tr>
+</tbody>
+</table>
+<h3>6b. ⭐ <strong>底层确实「超前」—— 这一点用户是对的</strong></h3>
+<p>衬底尺度 = <strong>l_P ≈ 1.6×10⁻³⁵ m</strong>，比任何实验小约 <strong>20 个数量级</strong> ⟹ <strong>底层本体无法直接检验。</strong></p>
+<p><strong>但关键在于：</strong></p>
+<blockquote>
+<p><strong>「底层不可直接检验」是所有量子引力候选的常态</strong>（弦论、LQG 全都如此），它<strong>不能推出「理论没问题」</strong>。
+因为<strong>任何理论都可以检验它的下游推论</strong>：弦论 → 超对称预言；LQG → 面积谱；<strong>本框架 → 检验下游的结果是：工程 = 0、四力链 = 筛选非演绎、唯一出口 = 1 条（且弱）。</strong></p>
+</blockquote>
+<p>⟹ <strong>「底层超前」只豁免「能否直接检验底层」，不豁免「下游推论是否成立」。</strong></p>
+<hr />
+<h2>7. 判据表（可操作自检，建议每 20 轮跑一次）</h2>
+<table>
+<thead>
+<tr>
+<th>特征</th>
+<th>真正的超前理论</th>
+<th>本项目（实测）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>提出时<strong>对象是否明确</strong></td>
+<td>✅ 明确</td>
+<td>❌ 核心项判否理由多为「对象不存在」</td>
+</tr>
+<tr>
+<td><strong>障碍类型</strong></td>
+<td>计算／测量工具</td>
+<td>❌ 多为「没有对象可算」（<strong>13 : 1</strong>）</td>
+</tr>
+<tr>
+<td><strong>内部一致性</strong></td>
+<td>自洽</td>
+<td>❌ 89 条更正，含内部口径冲突</td>
+</tr>
+<tr>
+<td><strong>独有且正确的预言</strong></td>
+<td>大量</td>
+<td>❌ <strong>1 条</strong>（EMRI，且借来的度规 ＋ 唯象参数）</td>
+</tr>
+<tr>
+<td><strong>工具到位后</strong></td>
+<td>验证成功</td>
+<td>❌ Lean 已到位 ⟹ 得到「<strong>无命题</strong>」</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>8. 结论与风险提示</h2>
+<ol>
+<li><strong>「超前」作为对「核心障碍」的解释 ⟹ 不成立</strong>（13:1 的理由分布 ＋ Lean 的「无命题」＋ 89 条内部冲突）；</li>
+<li><strong>「超前」在有限意义上成立</strong> ⟹ <strong>底层本体确实不可直接检验</strong>（普朗克尺度），但这只影响「<strong>如何检验</strong>」，不影响「下游推论是否成立」；</li>
+<li>⚠️ <strong>风险提示</strong>：这个假设<strong>不可证伪</strong>（任何失败都能被「工具不够」吸收）⟹ 按波普尔判据<strong>不构成科学论证</strong>；更实际的危害是 —— <strong>它会让人停止查错</strong>。项目历史上已经有过一次「过度自我苛责」的教训（第 84/85 轮 C-37 撤回两处过苛指控）⟹ 两个方向都要防，但<strong>「超前」是往放松的方向，风险更大</strong>；</li>
+<li>⭐ <strong>唯一可行的「超前」版本</strong>：把核心障碍从「对象不存在」改造成「<strong>对象存在但算不出</strong>」。做法第 123 轮已给出 —— <strong>条件构造可做</strong>（三样板），<strong>失效条件 = 新增公理级输入</strong>。
+   ⚠️ <strong>但这也不构成「超前」的证据</strong> —— 因为它等于<strong>把内容外包给假设</strong>（任何理论都能靠加公理造出对象），且<strong>真预言仍然 = 0</strong>。</li>
+</ol>
+<hr />
+<h2>附：数据出处</h2>
+<table>
+<thead>
+<tr>
+<th>数据</th>
+<th>出处</th>
+<th>断言</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>判否理由分布 13:1</td>
+<td>清单「负面判定」行逐条分类</td>
+<td><code>_adv139.py</code></td>
+</tr>
+<tr>
+<td>唯一的工具类条目 = N-46（且兼有量级理由）</td>
+<td>同上</td>
+<td><code>_adv139.py</code></td>
+</tr>
+<tr>
+<td>「方法学不足」全清单 2 次（同一问题）</td>
+<td>清单</td>
+<td><code>_adv139.py</code></td>
+</tr>
+<tr>
+<td>Lean 55 条 / 规范侧 0</td>
+<td>第 137 轮</td>
+<td>（已核）</td>
+</tr>
+<tr>
+<td>89 条更正含内部冲突（C-89/C-90/C-45/C-75/C-21）</td>
+<td>清单「撤回/更正」行</td>
+<td>（已核）</td>
+</tr>
+<tr>
+<td>三处工具项（λ_c／波形／LISA）</td>
+<td>第 101 轮结项、材料包 §2.3</td>
+<td>（已核）</td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">是「理论超前、工具不够」，还是「理论本身有问题」？—— 判据与理由分布 · 2026-10-09 · 由 _md2html_generic.py 生成 · 源文件 理论超前还是理论有问题_判据与理由分布.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

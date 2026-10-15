@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>乙类并轨结项 —— O1–O5 逐条判定，与分支 B 的「悬空」</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、总判决（先给结论）</div>
+  <h1>乙类并轨结项 —— O1–O5 逐条判定，与分支 B 的「悬空」</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<p><strong>任务来源</strong>：第 99 轮四源交叉清点的<strong>乙类</strong>（清单第 230 行）：</p>
+<blockquote>
+<p>整条并轨线（<code>python/maps</code> 的 P1–P5／F1–F5／SPB 模型／分支 A‑B／<strong>O1–O5 五条开放问题</strong>）
+在清单／论文／交接／工作流里<strong>命中 0 处</strong> ⟹ <strong>从未被纳入待办体系</strong>（<strong>I-23</strong>）。</p>
+</blockquote>
+<p><strong>本轮性质</strong>：不是新推演，而是<strong>把一块沉没内容做完判定</strong>。
+<strong>脚本</strong>：<code>_rail105.py</code>（<strong>RL-1 … RL-16，39 项 0 失败</strong>）＋ <code>_verify_105.py</code>。
+<strong>原始登记</strong>：<code>MAPS与v2.8融合方案_空间库并轨备忘录.md</code>（2026-09-16，161 行）。</p>
+<hr />
+<h2>一、总判决（先给结论）</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>主题</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>O1</strong></td>
+<td>P(L) ↔ 度规耦合</td>
+<td><strong>构造可行、验证不可行</strong>（判据两端各含一个未定量）</td>
+<td>第 93 轮 PPN 结项 ＋ 本轮 RL-13</td>
+</tr>
+<tr>
+<td><strong>O2</strong></td>
+<td>分支 A/B 观测判据</td>
+<td>⭐ <strong>可判定</strong>：原文量纲不成立；<strong>分支 B = 悬空</strong>、<strong>A 保留</strong></td>
+<td><strong>本轮</strong> RL-7…RL-12</td>
+</tr>
+<tr>
+<td><strong>O3</strong></td>
+<td>P(L) 与 ε_A(E_c) 同源</td>
+<td><strong>不可判定</strong>（同源 = 记法选择）</td>
+<td>第 53/95（E_c 恒等式）＋ <strong>N-40</strong></td>
+</tr>
+<tr>
+<td><strong>O4</strong></td>
+<td>黑洞过载区的定量实现</td>
+<td><strong>不可判定</strong>（缺「势阱型构型差」）</td>
+<td>第 60 轮 <strong>N-21</strong>（同族第 2 次）</td>
+</tr>
+<tr>
+<td><strong>O5</strong></td>
+<td>镜像支 B− 的几何地位</td>
+<td><strong>撞已判死区</strong> ＋ 几何层缺失</td>
+<td>第 55 轮、第 94 轮</td>
+</tr>
+<tr>
+<td>附</td>
+<td><strong>§9 代码修补 4 条</strong></td>
+<td>✅ <strong>已全部落地</strong></td>
+<td>第 98 轮重建（RL-1…RL-6）</td>
+</tr>
+<tr>
+<td>附</td>
+<td><strong>分支 A/B</strong></td>
+<td>✅ <strong>收口</strong>（A 默认、B 悬空）</td>
+<td>本轮 RL-12</td>
+</tr>
+<tr>
+<td>附</td>
+<td><strong>F4「运动=湮灭」两读法</strong></td>
+<td>无新判定（备忘录已自行处置；读法 1 = 与 T4 同的<strong>恒等记账</strong>）</td>
+<td>备忘录 §5.3</td>
+</tr>
+<tr>
+<td>附</td>
+<td>⚠️ <strong>C-73：「O1–O4」两套编号并存</strong></td>
+<td><strong>口径项</strong>（核验抓出；中英各加两处注）</td>
+<td>本轮 §三·补</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、附加块先行：§9 的 4 条代码修补<strong>已全部落地</strong>（结项）</h2>
+<p>并轨备忘录 §9 列了 4 条待修补（当时自注「不动 zip 源文件」）。第 98 轮（A2 包重建）用的是
+<strong>修好的版本</strong>作 A 级逐字来源；本轮逐条取证（RL-1…RL-6）：</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>待修补项</th>
+<th>落地证据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><code>verify.py</code> [PPN] 漏负号</td>
+<td><code>beta_ppn = -series.expand().coeff(x, 2) / 2</code>，且<strong>保留原文/修复对照注释</strong> ＋ <code>chk("PPN-1", …)</code> 判据</td>
+</tr>
+<tr>
+<td>②</td>
+<td><code>maps_framework.py</code> F1 注释方向反</td>
+<td>README 修补表第 2 行记「已按逐字记录改为『高能→ε₀=7.7×10⁻²⁰；低能→1 饱和』」；<code>EPS0 = 7.7e-20</code>；<code>verify.py</code> 有 <code>F1-2</code> 数值判据</td>
+</tr>
+<tr>
+<td>③</td>
+<td>T5 丢 <code>exp(−L/λ_c)</code>、亚普朗克 <code>P&gt;1</code></td>
+<td>F5 已含指数因子；亚普朗克区的口径（「凝结强度/普朗克率」而非概率、使用域 <code>L ≥ l_P</code>）已就地写明</td>
+</tr>
+<tr>
+<td>④</td>
+<td>F5 注释与 README 不一致</td>
+<td>统一为 <code>P(L) = (l_P/L)^α·exp(−L/λ_c)</code>（⚠️ <strong>字面有空格差</strong>：<code>formula.py</code> 写 <code>(l_P / L)</code>、<code>README</code> 写 <code>(l_P/L)</code> ⟹ <strong>忽略空格后逐字一致</strong>，纯排版，不构成 C 类）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>§9 结项</strong>。这也修正了并轨线的整体印象：它<strong>不是全部空白</strong>，而是「<strong>代码块已做、判定块从未做</strong>」。</p>
+<hr />
+<h2>三、O2（唯一可量化的）—— 定量裁决</h2>
+<h3>3.1 ⚠️ C-72：<code>R_net ~ (E_c)⁴/ħ</code> 的量纲<strong>不成立</strong></h3>
+<p>把量纲写成 (M, L, T) 指数：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>指数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>能量 <code>E_c</code></td>
+<td>(1, 2, −2)</td>
+</tr>
+<tr>
+<td><strong>备忘录原文 <code>(E_c)⁴/ħ</code></strong></td>
+<td><strong>(3, 6, −7)</strong> ← 不表示任何率</td>
+</tr>
+<tr>
+<td>「密度率」（B 需要的）</td>
+<td><strong>(1, −1, −3)</strong></td>
+</tr>
+<tr>
+<td>自然补全 <code>(E_c)⁵/(ℏ⁴c³)</code></td>
+<td>(1, −1, −3) ✓</td>
+</tr>
+<tr>
+<td>自然补全 <code>ρ·E_c/ħ</code></td>
+<td>(1, −1, −3) ✓</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 原文缺 <strong>(ℏc)³ 与一个时间尺度</strong>。二者都是自然补全 ⟹ <strong>必须先指定 τ，否则该式不可用</strong>。</p>
+<h3>3.2 ⚠️ τ 的两处自然选择相差 <strong>7.08 × 10²⁹ 倍</strong></h3>
+<table>
+<thead>
+<tr>
+<th>τ</th>
+<th>值</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>τ_ℏ = ℏ/E_c</code></td>
+<td><strong>6.4651×10⁻¹³ s</strong></td>
+<td>能标对应的自然时间（微观）</td>
+</tr>
+<tr>
+<td><code>τ_H = 1/H₀</code></td>
+<td><strong>4.5782×10¹⁷ s</strong>（1.451×10¹⁰ yr）</td>
+<td>哈勃时间（宇宙学）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 备忘录那句「上界」里有 <strong>29 个数量级</strong>的歧义。</p>
+<h3>3.3 ⚠️ ρ_Λ 也有<strong>两个口径</strong>，相差 23.76 倍（C-54 已判）</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>框架值 <code>E_c⁴/(ℏc)³</code>（E_c = 1.0181 meV）</td>
+<td><strong>2.2403×10⁻¹¹ J/m³</strong></td>
+</tr>
+<tr>
+<td>观测值 <code>Ω_Λ ρ_c c²</code></td>
+<td><strong>5.2831×10⁻¹⁰ J/m³</strong></td>
+</tr>
+<tr>
+<td>比</td>
+<td><strong>23.58</strong>（本轮独立复算）／<strong>23.76</strong>（论文 §8.4 口径 <code>0.6889/0.0290</code>，恰合）</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 而框架<strong>已放弃</strong> <code>ρ_Λ = E_c⁴</code> 的定量识别（<strong>C-54</strong>，第 95 轮）⟹ 任何以 ρ_Λ 定标的判据
+<strong>必须同报两个口径</strong>。</p>
+<h3>3.4 ⭐ 定量结果：同一句话里「活」与「死」都成立</h3>
+<p>保守观测上限（若真空在宇宙年龄内持续产生重子）：<code>ρ_b/t_U</code> = <strong>5.776×10⁻¹⁹ 核子/(m³·s)</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>ρ_Λ 口径</th>
+<th>τ_ℏ 读法（快）</th>
+<th>τ_H 读法（慢）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>框架值 E_c⁴</strong></td>
+<td>2.305×10¹¹ ⟹ <strong>超上限 3.99×10²⁹ 倍</strong></td>
+<td>3.255×10⁻¹⁹ ⟹ <strong>0.56 倍（在上限内）</strong></td>
+</tr>
+<tr>
+<td><strong>观测值 Ω_Λρ_cc²</strong></td>
+<td>5.436×10¹² ⟹ <strong>超上限 9.41×10³⁰ 倍</strong></td>
+<td>7.676×10⁻¹⁸ ⟹ <strong>超上限 13.3 倍</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>最干净的「自毁判据」</strong>（不依赖与重子比较，只依赖「Λ 活了 138 亿年」）：
+快读法把 ρ_Λ 耗空只需 <strong>6.4651×10⁻¹³ s</strong>，而宇宙年龄 4.3539×10¹⁷ s ⟹ <strong>差 6.7×10²⁹ 倍</strong> ⟹
+该定标<strong>自我否证</strong>。</p>
+<h3>3.5 判决：<strong>分支 B = 悬空（机制未重建）</strong>、<strong>分支 A 保留为默认</strong></h3>
+<p>按并轨备忘录 §5.2 <strong>自己的规则</strong>（「出现判据 ⟹ B 收缩、A 胜出」）：</p>
+<ol>
+<li><strong>判据已出现</strong>（无需等未来实验）：<strong>现有的</strong>「Λ 存活 138 亿年」＋「重子总量」已是约束，
+   且对快读法是 10²⁹ 量级的硬否证。</li>
+<li><strong>定标机制未重建</strong>：原文量纲不成立（C-72）＋两种补全差 7.08×10²⁹ 倍
+   ⟹ 分支 B <strong>无法被赋予一个自洽的净产生率</strong> ⟹ 按第 37 轮档位 = <strong>悬空（机制未重建）</strong>
+   （＝与 void-CPT-κ 同档，但理由不同：<strong>一个是机制被否证、一个是机制未建立</strong>）。</li>
+<li>⚠️ <strong>更正备忘录 §5.2 的「差异在记账层」</strong> —— <strong>这是错的</strong>。若 B 成立且 <code>R_net ≠ 0</code>，
+   则真空<strong>持续注入净荷</strong>，这在<strong>原则上可观测</strong>（宇宙学重子数、真空稳定性）⟹
+   差异<strong>不是</strong>纯记账，而是「<strong>原则上可观测、当前无从计算</strong>」。</li>
+</ol>
+<hr />
+<h2>三·补｜⚠️ 附加发现（核验抓出）：<strong>C-73 —— 「O1–O4」在同一篇论文里两套并存</strong></h2>
+<p>核验脚本在验证「并轨线是否混入论文」时，<code>SPB</code>／<code>分支 A/B</code>／<code>分支 B</code> 全 <strong>0 处</strong> ✓，
+但<strong>裸串 <code>O1</code>／<code>O2</code> 命中</strong>。追查后确认：命中的是<strong>与并轨无关的第三意</strong> ——</p>
+<table>
+<thead>
+<tr>
+<th>编号体系</th>
+<th>位置</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>第一套：观测者-信息命题链 O1–O4</strong></td>
+<td>论文 <strong>§4.9</strong>（v1.2 补充）</td>
+<td>O1 观测者结构｜O2 可访问信息 = <code>I(R;Σ)</code>｜O3 均匀先验导出｜O4 信息容量 ∝ 表面积</td>
+</tr>
+<tr>
+<td><strong>第二套：宇宙学输出对照表 O1–O9</strong></td>
+<td>论文 <strong>§9</strong></td>
+<td>O1 <code>Ω_K = 0</code>｜O2 <code>ρ = 3H²/8πG</code>｜O3 <code>M = c³/(2GH₀)</code>、<code>R_S = R_c</code>｜O4 <code>T = ℏH₀/2π</code>｜O5 面 = <code>c/H</code>｜…</td>
+</tr>
+<tr>
+<td><strong>第三套：并轨开放问题 O1–O5</strong></td>
+<td>并轨备忘录（<strong>未入本文</strong>）</td>
+<td>O1 P(L)↔度规｜O2 分支 A/B｜O3 同源｜O4 黑洞过载区｜O5 镜像支几何</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>关键</strong>：<strong>前两套都在论文正文里、同名不同物</strong>（如 <code>O4</code>：一套是「信息容量 ∝ 表面积」，
+另一套是「<code>T = ℏH₀/2π</code>」）⟹ 引用「O1」时<strong>读者无法自辨</strong>。
+中文稿 <code>O1</code> 命中 <strong>9 处</strong>、<code>O4</code> <strong>8 处</strong> —— 这不是笔误，而是<strong>两套编号都活着</strong>。</p>
+<p><strong>处置</strong>：中英各加<strong>两处口径注</strong>（§4.9 一处、§9 一处），<strong>不删编号</strong>（编号已在下游被引用）。
+<strong>规范</strong>：引用 O 编号<strong>必须带语境前缀</strong>（「§4.9-O1」／「宇宙学-O1」／「并轨-O1」）。</p>
+<p>📌 <strong>同族</strong>：<strong>C-15</strong>（<code>λ</code> 三义、<code>g</code> 两义）／<strong>C-20</strong>（面积口径差 4 倍）／<strong>C-21</strong>（<code>ρ</code> 五义、<code>w</code> 两义）／
+<strong>C-32</strong>（<code>N</code> 两义）／<strong>C-68</strong>（「4π」两种读法）—— 本次是<strong>第 6 次</strong>符号撞车，
+且是<strong>首次在同一符号体系内部</strong>（<code>O</code> + 序号）撞车。</p>
+<p>📌 <strong>方法论</strong>：本项是<strong>核验脚本的副产品</strong> —— 它本是为「证明没混入」而写，
+却因<strong>判据串选得太裸</strong>（<code>O1</code>）而<strong>假阳性</strong>，追查假阳性时<strong>发现了真问题</strong>。
+⟹ <strong>教训（两面）</strong>：① 检索「某词 0 处」时<strong>判据串必须足够特异</strong>（用 <code>O1｜</code>／<code>SPB</code> 而非 <code>O1</code>）；
+② 但<strong>假阳性不要直接压掉</strong> —— 先问「它命中的是什么」，本次正是这么抓出 C-73 的。</p>
+<hr />
+<h2>四、O1｜P(L) ↔ 度规耦合 —— 构造可行、<strong>验证不可行</strong></h2>
+<p><strong>判据</strong>：能否构造一个截断，使 (a) 弱场 PPN 不变、(b) 过载区有可计算效应？</p>
+<p><strong>截断示例</strong>（备忘录 candidate 的显式化）：<code>Θ(x) = 1 − exp(−(x/ε_c)^n)</code>，<code>x = |Φ|/c²</code>。</p>
+<p>| |Φ|/c² | Θ（ε_c = 10⁻³, n = 4） | 判定 |
+|---|---|---|
+| 地球表面 6.95×10⁻¹⁰ | <strong>0</strong>（机器零） | 安全 ✓ |
+| 太阳表面 2.12×10⁻⁶ | <strong>2.0×10⁻¹¹</strong> | 安全 ✓（比安全线 10⁻¹⁰ 低 5 倍） |
+| 视界 1/2 | <strong>1.000</strong> | 修正全开 ✓ |</p>
+<p><strong>两端都对 ⟹ 可构造</strong> ✓。但<strong>把 ε_c 消掉</strong>才是真判据（两条件相除）：</p>
+<pre><code>过载区开启：  (|Φ|_over / |Φ|_sun)^n  ≳  1e10     ⟹  所需场强比 = 10^(10/n)
+</code></pre>
+<p>| |Φ|_over/c² | 所需场强比 | 所需 n 下限 |
+|---|---|---|---|
+| 10⁻² | 4.72×10³ | 2.72 |
+| 10⁻¹ | 4.72×10⁴ | 2.14 |
+| 1/2 | 2.36×10⁵ | 1.86 |</p>
+<p><strong>ε_c 的可用窗口</strong>（给定 n）：n = 2 ⟹ <strong>空集</strong>；n = 3 ⟹ 0.3 个数量级；
+n = 4 ⟹ 1.2；n = 6 ⟹ 2.0。</p>
+<p>⟹ <strong>判决：O1 = 构造可行、验证不可行</strong>。理由三条：
+1. <strong>判据两端各含一个未定量</strong>：右端是 <strong>n</strong>（本轮新增的自由参数、无依据），
+   左端是 <strong>|Φ|_over</strong>（框架对「过载区」只有定性描述：退局域／光锥外／强引力，<strong>无定量门槛</strong>）；
+2. <strong>「n ≥ 3」这个下界不是框架给的</strong>，而是由「太阳表面的场强」这个<strong>外部事实</strong>逼出来的；
+3. 代价是 <strong>自由参数 +2</strong>（ε_c、n）—— 框架的「参数表 0 处」会变成 +2 处，且二者<strong>不可识别</strong>（<strong>铁律 5</strong>）。</p>
+<p>⟹ <strong>不建议做</strong>；若要做，必须同时登记这两个参数不可识别。</p>
+<hr />
+<h2>五、O3｜P(L) 与 ε_A(E_c) 是否同源 —— <strong>不可判定</strong></h2>
+<p>两套函数的参数账：</p>
+<table>
+<thead>
+<tr>
+<th>谱</th>
+<th>形式</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>凝结谱</td>
+<td><code>P(L) = (l_P/L)^α · exp(−L/λ_c)</code></td>
+<td>α、λ_c</td>
+</tr>
+<tr>
+<td>泄漏截断</td>
+<td><code>ε(E) = ε₀(M_Pl/E)^β</code></td>
+<td>β、ε₀</td>
+</tr>
+</tbody>
+</table>
+<p>可用锚点：<strong>只有 η</strong>（重子不对称 6×10⁻¹⁰）。而：
+- ρ_Λ <strong>已放弃定量</strong>（C-54，差 23.76 倍）；
+- <strong>E_c 是恒等式</strong>（第 53/95 轮：<code>E_c = 1TeV·ε(1TeV)^{1/β}</code>，<strong>M_Pl 消掉</strong>）；
+- <strong>η 能标不可独立导出</strong>（<strong>N-40</strong>：一维简并族 ⟹ 任意 E* 都能配住）。</p>
+<p>⟹ <strong>可识别性判据</strong>：待定参数 <strong>4</strong> 个 &gt; 独立锚 <strong>1</strong> 个 ⟹ 「同源」<strong>加不出新约束</strong>（<strong>铁律 5</strong>）。
+「同源」的实质 = 用一个关系把 4 个参数换成 3 个 + 1 个关系 ⟹ 这是<strong>记法选择</strong>，
+<strong>不是可检验命题</strong> —— 除非有<strong>第三方观测量</strong>同时钉住两套，而 N-40 说没有。</p>
+<p>⟹ <strong>判决：O3 = 不可判定</strong>。（且 <code>λ_c = 1.3×10²⁶ m</code> 本身是<strong>候选值</strong>，第 98 轮登记为 O3。）</p>
+<hr />
+<h2>六、O4｜黑洞过载区的定量实现 —— <strong>不可判定（框架缺该层）</strong></h2>
+<p>O4 要求「溶解-重聚焦的<strong>定量实现</strong>」，约束是 <code>S = A/4</code> 不变。
+定量实现需要<strong>溶解的热力学账</strong>（自由能／潜热／化学势／势函数）。</p>
+<p>而第 60 轮 <strong>N-21</strong> 已登记：<strong>框架有 4 个哈密顿量，却没有一个势函数</strong>；
+边界扩到化学键／相变潜热／电离能，公共需求是「<strong>势阱型构型差</strong>」，而框架只有
+「谱内差／参数差／无极小弦势」三类差。</p>
+<p>⟹ <strong>O4 与化学键/潜热/电离能同族 ⟹ 同族第 2 次命中同一障碍</strong>。
+<strong>判决：O4 = 不可判定</strong>（不是「没算」，而是<strong>该层不存在</strong>）。
+（关联：「表观视界做能账」自第 18 轮起即判死，O4 若要定量必然撞上它。）</p>
+<hr />
+<h2>七、O5｜镜像支 B− 的几何地位 —— <strong>撞已判死区 ＋ 几何层缺失</strong></h2>
+<p>O5 有两半：</p>
+<p><strong>(a) 「量子直线 = 跨支 ER 通道」的几何实现</strong> ⟹ <strong>撞已判死区</strong>：
+- <strong>第 55 轮</strong>已判（论文 <strong>L794–810</strong> 有【v2.9 补充（第 55 轮）】）：跨支通道的用途
+  <strong>限于「信息」，不含「能量」</strong>；
+- 可穿越虫洞（Morris–Thorne 1988）要求<strong>违反 ANEC</strong>（喉部 <code>ρ + P &lt; 0</code>）；
+- 即使允许 ANEC 违反，<strong>量子不等式把预算锁死</strong>（<code>ΔE·Δt ≲ ℏ</code>）⟹ 能量通路被两重量子不等式封死。</p>
+<p><strong>(b) 「CPT 镜像支的几何地位」</strong> ⟹ 需要<strong>新的几何层</strong>（公理 3 目前是<strong>代数性</strong>陈述：
+两支互为 CPT 镜像），而框架无此层 ⟹ 不可判定。
+关联：void-CPT-κ 已于<strong>第 94 轮</strong>判「悬空」（机制 2026-09-16 硬否证）⟹ 镜像支侧连<strong>判定</strong>都已降级。</p>
+<p>⟹ <strong>判决：O5 = 撞已判死区 ＋ 几何层缺失</strong>。</p>
+<hr />
+<h2>八、I-23 的收口方式（本轮最重要的元结论）</h2>
+<p><strong>整条并轨线不进论文正文。</strong></p>
+<p>理由：5 条里 <strong>4 条是「不可判定／撞死区」</strong>（O1 不推荐、O3–O5 判否），
+唯一可取的 <strong>O2</strong> 给出的是一条<strong>否证式子结论</strong>（分支 B 悬空、A 保留）——
+而「A」正是论文<strong>本来就在的立场</strong>（A2 定理 P/C 全局严格成立，旧证明一行不改）
+⟹ <strong>对论文的增量 = 0</strong>。</p>
+<p>⟹ 正确处置 = <strong>登记在台账／交接／备忘录</strong>，并在台账里把 I-23 标记为「<strong>已判定</strong>」。
+⚠️ <strong>不硬并入</strong> —— 并入一份「4/5 不可判定」的内容只会稀释论文。</p>
+<hr />
+<h2>九、诚实边界</h2>
+<ol>
+<li>本轮<strong>不声称</strong>解决了 O1–O5 中的任何一条「物理问题」；本轮做的是<strong>判定</strong>（可判定性筛查＋定量裁决）。</li>
+<li>O2 的定量结论<strong>依赖保守上限口径</strong>（「若真空持续产生重子，则 ≤ ρ_b/t_U」）。
+   该口径是<strong>必要条件的下界式约束</strong>，不是精确的观测上限；它的作用是<strong>证伪快读法</strong>（差 29 个数量级），
+   这一条<strong>不依赖口径细节</strong>。</li>
+<li>O1 的截断是<strong>示例</strong>（<code>1−exp(−(x/ε_c)^n)</code>），不是框架的推导；结论（「可构造、不可验证、+2 参数」）
+   对<strong>任何</strong>同类截断都成立，但具体窗口数字依赖该示例形式。</li>
+<li><strong>§9 的「已落地」</strong>指<strong>代码层</strong>；它不等于「并轨内容已被验证」——工作流文档与清单的接入仍未做。</li>
+<li>本轮的 <code>0.56 倍 / 13.3 倍</code> 两个数<strong>必须成对引用</strong>，单独引用任一个都是口径不全（C-54 的教训）。</li>
+</ol>
+<hr />
+<h2>十、状态</h2>
+<ul>
+<li><strong>乙类并轨：5 条判定完毕</strong>（O1 不推荐／<strong>O2 收口</strong>／O3–O5 判否）＋ <strong>§9 结项</strong> ＋ <strong>A/B 收口</strong>。</li>
+<li>⚠️ <strong>并轨线仍不进论文</strong>；I-23 由「未入体系」改为「<strong>已判定：不进论文</strong>」。</li>
+<li>剩余待办：<strong>丙类</strong> —— EMRI 材料包（等 LISA ~10–15 年）／私审准备包（§4.5b／§9／§8.1）。</li>
+<li>下一轮若继续推进并轨侧，唯一可能的正面入口是 <strong>O1</strong>（需先给「过载区」一个定量门槛），
+  但那会引入 2 个不可识别参数 ⟹ <strong>建议停在判定层</strong>。</li>
+</ul>
+
+<div class="footer">乙类并轨结项 —— O1–O5 逐条判定，与分支 B 的「悬空」 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 乙类并轨结项_O1-O5逐条判定与分支B的空悬.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

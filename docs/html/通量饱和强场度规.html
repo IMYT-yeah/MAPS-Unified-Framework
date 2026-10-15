@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>通量饱和强场度规：数学排除与风暴过载机制</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 问题陈述</div>
+  <h1>通量饱和强场度规：数学排除与风暴过载机制</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>批次</strong>：框架强场描述的最终定位（衔接 v1.13 强场分叉裁决遗留①）
+<strong>任务</strong>：构造通量饱和强场度规候选，以 GR 强场事实（视界 2GM、光子球 3GM、阴影 5.196GM）为检验标准，裁决"饱和修正能否恢复 GR 强场"
+<strong>性质标注</strong>：【定理】= 严格数学结果；【推导】= 框架内推导；【验证】= 数值验证；【排除】= 被数学/观测排除；【定位】= 框架最终定位</p>
+</blockquote>
+<hr />
+<h2>1 问题陈述</h2>
+<p>v1.13 裁决：玻尔兹曼 g₀₀=−e^{−2Φ/c²}（β=1）是弱场-中场的正确描述，但<strong>永不归零</strong>（无 g₀₀=0 几何视界）。遗留：<strong>通量饱和机制能否产生视界？</strong></p>
+<p>原文锚点【89 页】："黑洞表面（视界）是风暴压强达到临界值的等势面"；【46 页】："视界就是通量降到零的那个等势面"。</p>
+<h2>2 候选构造与 GR 检验基准</h2>
+<p><strong>GR 强场事实（检验标准）</strong>：视界 2GM/c²（x=1/2）、光子球 3GM/c²（x=1/3）、阴影 5.196GM/c²。</p>
+<p><strong>候选</strong>（全部在玻尔兹曼弱场形式 g₀₀=−e^{−2x} 上叠加饱和截断，x=GM/(c²r)）：</p>
+<table>
+<thead>
+<tr>
+<th>候选</th>
+<th>形式</th>
+<th>思路</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>软核饱和 δ</td>
+<td>−e^{−2x}·[1−e^{−(x_h−x)/δ}]</td>
+<td>指数软截断</td>
+</tr>
+<tr>
+<td>线性饱和</td>
+<td>−e^{−2x}·(1−x/x_h)</td>
+<td>线性硬截断</td>
+</tr>
+<tr>
+<td>对数饱和</td>
+<td>−e^{−2x}·(1−x/x_h)²</td>
+<td>二次平滑截断</td>
+</tr>
+</tbody>
+</table>
+<h2>3 检验结果【验证】</h2>
+<h3>3.1 光子球与阴影（决定性检验）</h3>
+<table>
+<thead>
+<tr>
+<th>度规</th>
+<th>光子球</th>
+<th>阴影</th>
+<th>vs GR 3.00/5.196</th>
+<th>判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GR 史瓦西</strong></td>
+<td>3.00 GM</td>
+<td>5.196 GM</td>
+<td>基准</td>
+<td>—</td>
+</tr>
+<tr>
+<td>玻尔兹曼（无饱和）</td>
+<td><strong>1.00 GM</strong></td>
+<td>2.718 GM</td>
+<td>小 3 倍</td>
+<td>✗ 排除</td>
+</tr>
+<tr>
+<td>软核饱和 δ=0.1</td>
+<td>2.74 GM</td>
+<td>4.585</td>
+<td>偏差 9%</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>软核饱和 δ=0.01</td>
+<td>2.16 GM</td>
+<td>3.475</td>
+<td>偏差 28%</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>线性饱和</td>
+<td>3.42 GM</td>
+<td>7.110</td>
+<td>偏差 14%</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>对数饱和</td>
+<td>4.56 GM</td>
+<td>10.114</td>
+<td>偏差 52%</td>
+<td>✗</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 解析证明：玻尔兹曼光子球必然错误【定理】</h3>
+<p>有效势 V(x) = e^{−2x}·x²（r=1/x 归一化），dV/dx = 2xe^{−2x}(1−x) = 0 ⟹ <strong>x=1 ⟹ r=1GM</strong>。</p>
+<p><strong>任何基于玻尔兹曼形式的度规，其光子球在 1GM（除非强场修正改变度规形状）</strong>——而 GR 在 3GM。这是结构性的：e^{−2x} 的曲率行为与 1−2x 不同。</p>
+<h3>3.3 β 保真度（弱场污染检验）【验证】</h3>
+<p>饱和因子在弱场（x=0.01）已泄漏：g₀₀(0.01) = −0.973（软核 δ=0.1）vs 纯玻尔兹曼 −0.980——<strong>饱和修正破坏弱场 β=1</strong>。</p>
+<h2>4 裁决结论【排除 + 定位】</h2>
+<div class="formula">boxed<span class="txt">所有基于玻尔兹曼的通量饱和强场度规均被数学排除——框架没有强场度规公式</span></div>
+
+<p><strong>三层排除链</strong>：
+1. <strong>弱场 β=1 存活</strong>（v1.13）→ 强场永不归零 → 无 g₀₀=0 视界；
+2. <strong>光子球 1GM</strong>（本批解析）→ 玻尔兹曼形式的曲率行为错误；
+3. <strong>饱和截断失败</strong>（本批数值）→ 任何修正要么光子球错、要么破坏 β。</p>
+<h2>5 框架强场最终定位【定位】</h2>
+<p><strong>"视界 = 风暴压强临界等势面"（原文 89）而非 g₀₀=0 几何奇点</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>弱场-中场</td>
+<td>玻尔兹曼 g₀₀=−e^{−2x}（β=1 通过）✓</td>
+</tr>
+<tr>
+<td>强场</td>
+<td><strong>无度规公式</strong>（数学排除）；视界=风暴过载/压强临界（物理机制）</td>
+</tr>
+<tr>
+<td>视界内部</td>
+<td>过载区（七环机制：风暴压制/正物质浆糊/有限压强）</td>
+</tr>
+<tr>
+<td>与 EHT</td>
+<td><strong>无冲突</strong>——框架无强场度规承诺，阴影须由风暴机制独立推导</td>
+</tr>
+</tbody>
+</table>
+<p><strong>这完成了框架强场的闭环定位</strong>：不是"有度规但形式未知"，而是"强场无度规描述、由物理机制接管"——与 v1.1 撤回强场外推、v1.13 分叉裁决一脉相承，且现在有了数学排除的坚实依据。</p>
+<h2>6 遗留与下一步【待验证】</h2>
+<ol>
+<li><strong>风暴过载机制的观测效应</strong>：视界=压强临界等势面 → 阴影/QNM 如何由风暴机制计算（非度规公式）——框架强场观测预言的唯一路径；</li>
+<li><strong>过载区的几何描述</strong>：内部=正物质浆糊（最大熵），"流形熔化"的定量形式；</li>
+<li><strong>"通量抽零面"（46 页）与"压强临界面"（89 页）的统一</strong>：两个视界定义的等价性论证。</li>
+</ol>
+<hr />
+<h2>附录：数值脚本</h2>
+<p><code>_sat_metric.py</code>（4 候选光子球/阴影 + β 保真度，可复现）。</p>
+
+<div class="footer">通量饱和强场度规：数学排除与风暴过载机制 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 通量饱和强场度规.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

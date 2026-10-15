@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>验证：衬底层「8 类」是否 = 3 个独立的 Z₂ 指标 ⟹「层层」是否对应这 3 个指标</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">0. 结论（三行）</div>
+  <h1>验证：衬底层「8 类」是否 = 3 个独立的 Z₂ 指标 ⟹「层层」是否对应这 3 个指标</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-09 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 143 轮（元任务 · 命题验证）</strong> ｜ 2026-10-09 ｜ 核验脚本 <code>_verify143.py</code>
+待验命题（用户提出）：<strong>「如果衬底层的 8 类能写成『3 个独立的 Z₂ 指标』，那么『层层』就可能对应这 3 个指标」</strong></p>
+</blockquote>
+<hr />
+<h2>0. 结论（三行）</h2>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① <strong>8 类 = 3 个独立的 Z₂ 指标？</strong></td>
+<td>✅ <strong>成立</strong> —— 就是<strong>三坐标的奇偶类</strong> <span class="math">π(p)∈(Z<sub>2</sub>)<sup>3</sup></span>（第 41 轮的原始定义）</td>
+</tr>
+<tr>
+<td>② <strong>「层层」对应这 3 个指标？</strong></td>
+<td>❌ <strong>不成立</strong> —— 这是<strong>范畴错误</strong>：3 个 Z₂ 是<strong>同一层的 3 个并行属性</strong>，<strong>不是 3 个层</strong></td>
+</tr>
+<tr>
+<td>③ ⭐ <strong>但验证给出了更好的东西</strong></td>
+<td>框架的衬底层<strong>不是「层层嵌套」，而是「3 个并行的二值通道」（8 态）</strong>，且<strong>通道间不传递</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>一句话</strong>：命题的<strong>前半步成立、后半步是范畴跳跃</strong> —— 而跳跃暴露出来的那个东西（<strong>平铺的 3 通道</strong>）比原来的设想<strong>更可判定</strong>。</p>
+<hr />
+<h2>一、第一步：8 类到底是什么（回到原始定义）</h2>
+<p><strong>原始出处 = 第 41 轮</strong>（<code>把N推大_tick群在宏观格点上爆炸并找到Z2^3不变量.md</code>）：</p>
+<blockquote>
+<p>设 <span class="math">π(p)∈(Z<sub>2</sub>)<sup>3</sup></span> 为<strong>三坐标奇偶类</strong>，则任何 tick 都保持 <span class="math">δ(p,q)=π(p)+π(q) (<span class="rm">mod</span> 2)</span>
+—— "<span class="math">s<sub>j</sub></span> 保持 <span class="math">π</span>；<span class="math">M<sub>a</sub></span> 把<strong>全体格点</strong>的奇偶类<strong>同一个</strong> <span class="math"><span class="acc"> ̂</span>e<sub>a</sub></span> 平移"。
+<strong>穷举全部生成元 × 全部点对验证通过。</strong></p>
+</blockquote>
+<p>⟹ 这里的 <span class="math">π(p)</span> 定义就是：<strong><span class="math">(p<sub>x</sub> bmod 2, p<sub>y</sub> bmod 2, p<sub>z</sub> bmod 2)</span></strong></p>
+<p><strong>所以「8 类」= <span class="math">π</span> 的 8 个取值 = <span class="math">|(Z<sub>2</sub>)<sup>3</sup>| = 2<sup>3</sup></span>。</strong></p>
+<p>⚠️ <strong>两个数字要分开</strong>（第 68 轮 <strong>C-10</strong> 更正）：
+| 量 | 值 |
+|---|---|
+| <span class="math">δ</span> 的<strong>取值数（类数）</strong> | <strong>严格 ≤ 8</strong>（= <span class="math">lvert(Z<sub>2</sub>)<sup>3</sup>rvert</span>），与 N 无关 |
+| <strong>完整轨道数</strong>（实测） | <strong>7 / 9 / 10</strong>（N = 8/16/24）—— <strong>不是 8</strong> |</p>
+<p>⟹ "8 类"指<strong>奇偶类的 8 个取值</strong>，<strong>不是</strong> 8 条轨道。（第 40 轮块曾误写「点对恰有 8 条轨道」，已由 C-10 更正。）</p>
+<hr />
+<h2>二、✅ 第一步成立：8 = 2³ ⟹ <strong>确实</strong>是 3 个独立的 Z₂ 指标</h2>
+<ul>
+<li><span class="math">2<sup>3</sup> = 8</span> ⟹ 8 个取值 ⟹ <strong>恰好是 3 个二值自由度</strong>；</li>
+<li>三个坐标 <span class="math">p<sub>x</sub>,p<sub>y</sub>,p<sub>z</sub></span> <strong>互相独立</strong> ⟹ 8 种组合<strong>全部可达</strong> ⟹ <strong>3 个指标独立</strong>；</li>
+<li>第 41 轮的穷举验证<strong>通过</strong> ⟹ 这是<strong>严格的不变量</strong>，不是猜测。</li>
+</ul>
+<p><strong>用户命题的前半步：✅ 成立。</strong></p>
+<hr />
+<h2>三、❌ 第二步不成立：这是<strong>范畴错误</strong></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>3 个 Z₂ 指标</th>
+<th>「3 个层」</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>它们是什么</td>
+<td><strong>同一个格点</strong>的三个坐标的奇偶</td>
+<td><strong>三种不同本体</strong>的描述层级</td>
+</tr>
+<tr>
+<td>本体</td>
+<td><strong>同一个</strong>（格点／置换）</td>
+<td><strong>不同</strong>（置换 ／ 通量 ／ 连续场）</td>
+</tr>
+<tr>
+<td>关系</td>
+<td><strong>并行、独立、平权</strong></td>
+<td><strong>嵌套、有层级</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>「3 个属性」被当成了「3 个层」</strong> —— 这是<strong>范畴错误</strong>（不是算术错误）。</p>
+<p><strong>类比</strong>：一个点的 (x, y, z) 坐标有 3 个分量，但<strong>不构成 3 个空间</strong>；同理，一个格点的 3 个奇偶指标<strong>不构成 3 层</strong>。</p>
+<p><strong>而且第 68 轮的三层表恰恰说明</strong>：衬底层<strong>本身</strong>是<strong>一层</strong>（用置换描述），弦网层、场论层是<strong>另外两个本体</strong>。
+所以框架的"3"（三层）<strong>并不来自</strong>衬底层内部的"3"（三个坐标奇偶）—— <strong>两个「3」来源不同。</strong></p>
+<hr />
+<h2>四、⭐ 但验证给出了更好的东西：<strong>「3 个并行二值通道」</strong></h2>
+<p><span class="math">s<sub>j</sub></span> 保持 <span class="math">π</span>；<span class="math">M<sub>a</sub></span> 把<strong>全体</strong>格点的奇偶类<strong>沿同一个</strong> <span class="math"><span class="acc"> ̂</span>e<sub>a</sub></span> 平移。</p>
+<p>⟹ 一个 tick <strong>只改变一个坐标的奇偶</strong>（<span class="math">a</span> 方向），且是<strong>全体一起</strong>改变
+⟹ <strong>三个通道之间没有任何耦合／传递</strong>（改变 <span class="math">x</span> 奇偶不会引起 <span class="math">y</span> 奇偶变化）</p>
+<p>⭐ <strong>所以衬底层的结构精确说是：</strong></p>
+<blockquote>
+<p><strong>3 个并行的、互相独立的二值通道（8 态）；翻转可以是"翻 1 个 / 2 个 / 3 个"，共 8 种。</strong></p>
+</blockquote>
+<p><strong>这与「层层嵌套」是两种不同的结构：</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>「层层嵌套」（您原来的意象）</th>
+<th>「3 个并行通道」（框架实际给的）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>翻转外层</td>
+<td>带动内层</td>
+<td><strong>不影响</strong>其他通道</td>
+</tr>
+<tr>
+<td>状态数</td>
+<td>各层状态数<strong>相乘</strong>（可任意大）</td>
+<td><strong>固定 8</strong></td>
+</tr>
+<tr>
+<td>依赖关系</td>
+<td>有</td>
+<td><strong>无</strong>（三个坐标独立）</td>
+</tr>
+<tr>
+<td>可判定性</td>
+<td>需要"层"的定义</td>
+<td>✅ <strong>直接可判定</strong>（就是 3 个独立二值量）</td>
+</tr>
+</tbody>
+</table>
+<p>📌 <strong>这解释了第 142 轮查出的那个冲突</strong>：意象要「自相似嵌套」，框架给的是<strong>「平铺的 3 通道」</strong> —— 不是"异质三层"那么简单，而是<strong>衬底层内部就是平的</strong>。</p>
+<hr />
+<h2>五、⚠️ 附加限制：这 3 个通道<strong>不足以刻画位置</strong></h2>
+<p><strong>第 46 轮的验证结果</strong>：</p>
+<blockquote>
+<p><span class="math">|(Z<sub>2</sub>)<sup>3</sup></span> 不变量在 <span class="math">Nge 16</span> 上<strong>立即不完备</strong>（N=24：轨道 <strong>6224</strong> 条 vs 等值集 <strong>1050</strong> 个，公式高估 <strong>6.032</strong> 倍）；N=8 上的「14 = 14」是<strong>偶然</strong>（不变量退化）。</p>
+</blockquote>
+<p>⟹ 这 3 个通道只给出<strong>粗糙的分辨率</strong>；<strong>它不构成"位置"的完整描述</strong>。
+⟹ 所以即使接受"3 通道"这个结构，它<strong>也不是</strong>第 68 轮所说"位置的量子化"的<strong>替代品</strong> —— <strong>缺口仍在</strong>。</p>
+<hr />
+<h2>六、对意象的最终裁定</h2>
+<table>
+<thead>
+<tr>
+<th>意象成分</th>
+<th>裁定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「棋盘布满黑子」</td>
+<td>✅ 满占位衬底</td>
+</tr>
+<tr>
+<td>「天元下一手白子 → 黑子全部消失」</td>
+<td>⚠️ 最接近的条目是 <span class="math">(-1)<sup>N<sub><span class="txt">exchange</span></sub></sup></span>（交换符号）＋ 翻转面，但<strong>两者从未连起来</strong></td>
+</tr>
+<tr>
+<td>「<strong>层层嵌套</strong>」</td>
+<td>❌ 衬底层内部是<strong>平的</strong>（3 个并行通道，非嵌套）；三层之间是<strong>异质</strong>的</td>
+</tr>
+<tr>
+<td>「自相似」</td>
+<td>❌ 论文空白</td>
+</tr>
+<tr>
+<td>「<strong>一旦反转 → 层层翻转</strong>」</td>
+<td>❌ <strong>不成立</strong>（3 通道互不传递 ⟹ 翻转不会"层层"传播）</td>
+</tr>
+<tr>
+<td>「保持稳定性与规律」</td>
+<td>⚠️ 需要额外结构（拓扑保护 / 硬倾角）—— 3 通道本身不给</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⭐ 所以命题的最终答案</strong>：</p>
+<blockquote>
+<p><strong>8 类确实是 3 个独立 Z₂ 指标（✅）；但这 3 个指标既不构成"层"，也不构成"层层翻转"（❌）——它们构成「3 个互不相干的开关」。</strong></p>
+</blockquote>
+<hr />
+<h2>七、由此产生的一个<strong>新</strong>可检验问题（比原命题更锐利）</h2>
+<p>原命题走不通，但验证过程<strong>暴露了一个新的、可判定的问题</strong>：</p>
+<blockquote>
+<p><strong>既然衬底层的 3 个通道互不传递，那么框架里有没有任何机制能让"翻转"在通道之间传播？</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>若</th>
+<th>则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>没有</strong>任何传递机制</td>
+<td>「层层翻转」在框架里<strong>结构性不可能</strong>（与"缺势阱型构型差"同级）</td>
+</tr>
+<tr>
+<td><strong>有</strong>（例如弦网层的 <span class="math">A<sub>v</sub></span>／<span class="math">B<sub>p</sub></span> 耦合）</td>
+<td>那么"层"就该定义在<strong>那个耦合</strong>上，而不是衬底层的坐标奇偶上</td>
+</tr>
+</tbody>
+</table>
+<p>📌 <strong>这一步不需要新公理</strong>，只需在已有条目里查：<strong>弦网层的 <span class="math">A<sub>v</sub></span>／<span class="math">B<sub>p</sub></span> 是否承载跨通道/跨层的耦合？</strong>
+（第 76 轮已判：唯一非交换的 Clifford 投影是<strong>记号的改变</strong>，<strong>N-31</strong> —— 这是一个<strong>负面线索</strong>。）</p>
+<hr />
+<h2>附：出处</h2>
+<table>
+<thead>
+<tr>
+<th>事实</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math">π(p)∈(Z<sub>2</sub>)<sup>3</sup></span> 三坐标奇偶类；<span class="math">δ</span> 不变量；穷举验证</td>
+<td><strong>第 41 轮</strong>（<code>把N推大_…md</code>）</td>
+</tr>
+<tr>
+<td><span class="math">δ</span> 取值数 ≤ 8；<strong>轨道数 7/9/10</strong>（<strong>C-10 更正</strong>）</td>
+<td>第 68 轮</td>
+</tr>
+<tr>
+<td><span class="math">(Z<sub>2</sub>)<sup>3</sup></span> 不变量 <strong>N ≥ 16 不完备</strong>（6224 vs 1050，高估 6.032×）</td>
+<td><strong>第 46 轮</strong>（<code>k等于N2的精确轨道_…md</code>）</td>
+</tr>
+<tr>
+<td>三层异质表（衬底层 = 置换 ／ 弦网层 = 通量 ／ 场论层 = 连续场）</td>
+<td>第 68 轮（I-16）</td>
+</tr>
+<tr>
+<td>「唯一非交换的 Clifford 投影是记号的改变」（<strong>N-31</strong>）</td>
+<td>第 76 轮</td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">验证：衬底层「8 类」是否 = 3 个独立的 Z₂ 指标 ⟹「层层」是否对应这 3 个指标 · 2026-10-09 · 由 _md2html_generic.py 生成 · 源文件 验证_衬底层八类与三通道.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

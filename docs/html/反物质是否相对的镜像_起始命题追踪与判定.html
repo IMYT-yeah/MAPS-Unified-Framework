@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>反物质是「相对的反状态」吗：起始命题追踪与判定</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、⭐ 追溯：这是**整个 433 轮对话的第 1 句话**</div>
+  <h1>反物质是「相对的反状态」吗：起始命题追踪与判定</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-09 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>轮次</strong>：第 147 轮 · 2026-10-09
+<strong>输入</strong>：「我们有可能同时是正粒子和负粒子的宏观稳定节点，而我们只观察到所谓正粒子的稳定，其实是世界的假象，而我们想要单独提取出的反物质，其实是一种永远与我们当下状态恒定保持反状态的一团物质」
+<strong>判定工具</strong>：四类判定 ＋ 外部事实核验 ＋ 内部张力显式化；核验 <code>_anti147.py</code>（<strong>A–E 五组 24 项 0 失败</strong>）
+<strong>本轮论文改动</strong>：<strong>无</strong>（正式稿仍 99,725 字符）</p>
+</blockquote>
+<hr />
+<h2>一、⭐ 追溯：这是<strong>整个 433 轮对话的第 1 句话</strong></h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>数据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>「反物质」在原文</strong></td>
+<td><strong>1081 次 / 289 轮</strong> —— <strong>全对话最高密度的核心词</strong></td>
+</tr>
+<tr>
+<td><strong>用户说「反物质」的消息</strong></td>
+<td><strong>289 条</strong>（约 67% 的轮次都在谈）</td>
+</tr>
+<tr>
+<td><strong>第 1 轮（2026-07-19 03:35）用户首句</strong></td>
+<td>「忽然想到<strong>反物质的去向</strong>了，<strong>反物质在未来，它成为了时间本身</strong>」</td>
+</tr>
+<tr>
+<td><strong>第 2 轮（03:37）用户澄清</strong></td>
+<td>「<strong>正反物质是严格对称的</strong>，我们所观察到的<strong>不对称，是因为两者会在时间箭头上相反</strong>，必然有一个<strong>反物质世界</strong>它的时间箭头和我们是相反的」</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 本轮不是新话题，是「第 0 号命题」的第三次回到原处。</strong> 比「正负枝」（第 165 轮）早 164 轮，比「挂谷」（第 188 轮）早 187 轮。<strong>整个框架就是从这个猜想长出来的。</strong></p>
+<p>⚠️ 三个数字要摆在前面：
+- 论文里「<strong>反氢／反质子／正电子／反氦</strong>」<strong>各 0 处</strong> ⟹ <strong>框架从未讨论过实验中的反物质</strong>（只把它当底层机制名，如「正反物质对风暴」）；
+- 「宏观稳定节点」「恒定保持反状态」「世界的假象」<strong>原文与论文皆 0 处</strong> ⟹ 本轮新造措辞。</p>
+<hr />
+<h2>二、四问，逐一判定</h2>
+<h3>① 「我们同时是正粒子和负粒子的宏观稳定节点」→ <strong>必须分两层，一层对一层错</strong></h3>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>衬底层</strong></td>
+<td>✅ <strong>成立</strong></td>
+<td><strong>公理 1 明文</strong>：「宇宙底层是正反物质对持续相遇—湮灭—再生事件流，各向同性、<strong>50:50 平衡</strong>」——<strong>每个格点、每 tick 都有正反对相遇</strong></td>
+</tr>
+<tr>
+<td><strong>宏观层</strong></td>
+<td>❌ <strong>不成立</strong></td>
+<td>宏观是<strong>正物质主导</strong>：<strong>重子不对称 η ≈ 6×10⁻¹⁰</strong>（框架自己列为解释目标；实测值）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>「同时是正反粒子的节点」在底层是对的（那就是公理 1）；在宏观是错的。</strong> 这两个"节点"不是同一层的东西。</p>
+<h3>② 「只观察到正粒子的稳定，其实是世界的假象」→ ❌ <strong>两重问题</strong></h3>
+<p><strong>（a）与框架自己的机制互斥。</strong> 框架对"为什么我们这一支占优"给的是 <strong>ε 泄漏</strong>（公理 2：正份漏入正支、反份漏入镜像支）—— 一个<strong>真实的统计偏向</strong>，靠 ε 在宏观上累积。<strong>若不对称是"假象"，那 ε 就没有存在的必要。</strong> 两者不能同时成立。</p>
+<p><strong>（b）不可证伪。</strong> 「真实是 A，我们看到 B，且无法区分」按本项目四类判定<strong>不进预言表</strong>（<strong>N-50 族</strong>：第 135 轮「纠缠=结构态」、第 146 轮「粒子→层」同一堵墙）。</p>
+<p>⚠️ 而且现实里 <strong>η ≈ 6×10⁻¹⁰ 是实测物理量</strong>（CMB + BBN），不是观测偏差；框架对它的<strong>定量解释已被判 N-40（η 能标不可导出）</strong>。</p>
+<h3>③ 「反物质是永远与我们当下状态恒定保持反状态的一团物质」→ ❌ <strong>术语内部互斥</strong></h3>
+<p><strong>「恒定」与「随当下状态相对」不可能同时成立</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>含意</th>
+<th>是否固定映射</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(a)「恒定」</strong></td>
+<td>一个固定的对应关系</td>
+<td>✅ 固定 —— 那它就是 <strong>CPT</strong>（<strong>框架公理 3</strong>），<strong>与你／观测者无关</strong></td>
+</tr>
+<tr>
+<td><strong>(b)「与当下状态相对」</strong></td>
+<td>映射随观测者态变化</td>
+<td>❌ 非固定 —— 那就<strong>不是</strong>"恒定"</td>
+</tr>
+</tbody>
+</table>
+<p><strong>二选一。</strong> 选 (a) 就是框架已有的公理 3（CPT <strong>联合</strong>镜像，不是新东西）；选 (b) 则与"恒定"矛盾。</p>
+<p>⚠️ 补一句精度问题：<strong>CPT 是联合变换</strong>，单独的 <strong>C、P、T 在标准物理里都不守恒</strong>（弱相互作用破坏 C 与 P）。所以「反物质 = 时间反演的那个东西」<strong>不严格</strong> —— 反物质是 <strong>C 变换</strong>的产物，不代表时间反演。</p>
+<p><strong>框架里有没有"相对的观测者"？</strong> 有半个：<strong>观测者 = 现在平面孤子</strong>（§4.9），但<strong>「现在平面」是固定的</strong>（N1–N4：由涡动力学锁定 ＋ 对称性自发破缺），<strong>不随观测者状态变化</strong>。<strong>⟹「相对的反状态」在框架里无载体。</strong></p>
+<h3>④ 「想要单独提取出的反物质」（隐含：难以提取）→ ⚠️ <strong>前提不成立</strong></h3>
+<p><strong>反物质已经被单独提取、储存、甚至长距离运输了。</strong></p>
+<table>
+<thead>
+<tr>
+<th>事实</th>
+<th>数据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>首次捕获反氢</td>
+<td><strong>2010</strong>（CERN ALPHA）</td>
+</tr>
+<tr>
+<td>现在单次可积累</td>
+<td>约 <strong>1500 个</strong>反原子／次；累计分析 <strong>24,000 个</strong></td>
+</tr>
+<tr>
+<td><strong>反氢基态超精细劈裂</strong></td>
+<td><strong>1,420,404.8 kHz ± 6 kHz（4 ppm）—— 与氢一致</strong></td>
+</tr>
+<tr>
+<td>反氢 1S–2S 跃迁</td>
+<td>已达 <strong>10⁻¹²</strong> 量级精度，与氢一致</td>
+</tr>
+<tr>
+<td><strong>ALPHA-g 重力</strong></td>
+<td><code>a_ḡ/g = 0.75 ± 0.13 ± 0.16</code> ⟹ <strong>反物质向下落</strong>（不是"反向"）</td>
+</tr>
+<tr>
+<td><strong>卡车运输</strong></td>
+<td><strong>2026-03</strong>，CERN → 汉堡 <strong>约 850 km</strong>（人类首次用卡车运反物质）</td>
+</tr>
+</tbody>
+</table>
+<p><em>来源：APS Physics 19.79（ALPHA 超精细劈裂）／ALPHA-g 博士论文（重力）／多源报道（2026-03 运输）</em></p>
+<p><strong>⟹ 「反物质提取不出来」不是问题：它已经被提取出来了。</strong> 而且<strong>反氢的性质与氢在 4 ppm 精度上一致且不依赖"我们"</strong>——这直接反驳"它是相对于我们的反状态"。</p>
+<hr />
+<h2>三、⭐ 本轮的结构性发现（比原命题有价值）</h2>
+<p>把四问串起来，得到的不是"对/错"，而是一个<strong>三段结构</strong>：</p>
+<blockquote>
+<p><strong>整个 433 轮对话的起点命题，在框架里被升格为公理 3（两支互为 CPT 镜像）；</strong>
+<strong>但框架对它的定量兑现（重子不对称 η）已被判 N-40（能标不可导出）；</strong>
+<strong>而现实实验（ALPHA）既未证实也未否证「反物质世界」——它只把「反物质与物质不同」的可能性压到了 4 ppm 以下。</strong></p>
+</blockquote>
+<p><strong>⛔ 同时，本轮的"假象"读法与框架自身的 ε 机制互斥</strong> —— 这是<strong>内部</strong>矛盾，不是外部证据不足：</p>
+<table>
+<thead>
+<tr>
+<th>若主张</th>
+<th>则框架的哪一部分必须放弃</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「不对称是假象」</td>
+<td><strong>公理 2（ε 泄漏）</strong> —— 因为 ε 正是用来产生"真实的不对称"的</td>
+</tr>
+<tr>
+<td>「反物质是相对的反状态」</td>
+<td><strong>公理 3（CPT 镜像）</strong> —— 因为 CPT 是固定映射</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 这两句想支持的东西，恰恰要求先放弃框架自己的两条公理。</strong></p>
+<hr />
+<h2>四、如果想让它成立，唯一路径</h2>
+<p><strong>第 123 轮的三档判定</strong>在这里同样适用：<strong>内部推导 = 判否</strong>；<strong>条件构造 = 可以做，但必须显式新增公理</strong>。</p>
+<p>要让它成立，需要新增：
+1. <strong>一条"相对性"公理</strong> —— 把"反状态"定义在<strong>观测者态</strong>上（而非固定 CPT）。⚠️ 但这会<strong>与公理 3 冲突</strong>，得先说明两者如何共存；
+2. <strong>一个可观测后果</strong> —— 否则与 ② 一样落入不可证伪。</p>
+<p>⚠️ 而真正的困难在于：<strong>"相对于观测者"的物理在标准物理里有名字，但它不是反物质</strong>——它是<strong>观测者依赖的粒子内容</strong>（加速观测者 vs 惯性观测者看到的粒子谱不同）。<strong>这两件事很容易被混为一谈，而它们是完全不同的机制。</strong></p>
+<hr />
+<h2>五、判定小结</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>命题</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td>同时是正反粒子的<strong>节点</strong></td>
+<td><strong>分层</strong>：衬底 ✅／宏观 ❌</td>
+<td>公理 1（50:50）／η ≈ 6×10⁻¹⁰</td>
+</tr>
+<tr>
+<td>②</td>
+<td>只看到正粒子稳定是<strong>世界的假象</strong></td>
+<td>❌ <strong>与 ε 机制互斥 ＋ 不可证伪</strong></td>
+<td>公理 2；N-50 族</td>
+</tr>
+<tr>
+<td>③</td>
+<td>反物质是<strong>恒定</strong>的<strong>相对</strong>反状态</td>
+<td>❌ <strong>术语互斥</strong>（恒定 vs 相对，二选一）</td>
+<td>CPT 是固定映射</td>
+</tr>
+<tr>
+<td>④</td>
+<td>需要"单独提取"反物质</td>
+<td>⚠️ <strong>前提不成立</strong></td>
+<td>2010 起已提取；2026-03 已运输 850 km</td>
+</tr>
+<tr>
+<td>⭐</td>
+<td>起点命题的现状</td>
+<td><strong>升为公理 3，但定量兑现 N-40；实验压到 4 ppm</strong></td>
+<td>本文件 §三</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>特别提醒</strong>：②③ 两条的失败<strong>不是"证据不足"，是"内部矛盾"</strong> —— 这一点比"暂无证据"严重得多（<strong>第 139 轮</strong>的方法学：工具不足只能解释"与外部观测的差距"，<strong>不能解释"自己跟自己不一致"</strong>）。</p>
+<hr />
+<h2>六、意象／命题迭代系列索引（第 142–147 轮）</h2>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>命题</th>
+<th>判定</th>
+<th>备忘录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>142</td>
+<td>棋盘翻转 / 自相似互斥</td>
+<td>冲突：三层<strong>异质</strong></td>
+<td><code>棋盘翻转意象_翻译与检验.md</code></td>
+</tr>
+<tr>
+<td>143</td>
+<td>8 类 ＝ 3 个 Z₂ 指标 ⟹ 层层</td>
+<td>前半 ✅；后半<strong>范畴错误</strong></td>
+<td><code>验证_衬底层八类与三通道.md</code></td>
+</tr>
+<tr>
+<td>144</td>
+<td>层层扩大的无限性</td>
+<td>结构 ✅ 但<strong>零内容</strong></td>
+<td><code>层层扩大意象_权衡与判定.md</code></td>
+</tr>
+<tr>
+<td>145</td>
+<td>1+1 ≠ 1 ⟹ 累积 ⟹ 新最小因子</td>
+<td><strong>归零 vs 累积</strong>；层生不出的位置</td>
+<td><code>一加一不等于一的代数核验_归零与累积.md</code></td>
+</tr>
+<tr>
+<td>146</td>
+<td>正负枝 ⟷ 粒子/层 互换</td>
+<td>①② 已有；③④ 判否；⑤ <strong>负支无累积</strong></td>
+<td><code>正负枝的粒子层互换_追溯与判定.md</code></td>
+</tr>
+<tr>
+<td><strong>147</strong></td>
+<td><strong>反物质 ＝ 相对的反状态</strong></td>
+<td>①分层 ②③④ 判否；<strong>起点命题现状</strong></td>
+<td><strong>本文件</strong></td>
+</tr>
+</tbody>
+</table>
+<p>📌 <strong>趋势（五轮连续）</strong>：142–147 的判定<strong>全部落在同一类</strong> —— <strong>「需要一个框架不具备的对象或映射」</strong>（异质层／累积／跨支能量／相对反状态）。<strong>这与第 138–140 轮的结论闭合</strong>：工程缺「势阱型构型差」，意象缺「同一种东西：一个能把 D 变成 E 的中间层」。</p>
+<hr />
+<p><em>核验：<code>_anti147.py</code>，<strong>A–E 五组 24 项 0 失败</strong>；外部事实见 §二④ 来源；本轮无论文改动（99,725 字符）。</em></p>
+
+<div class="footer">反物质是「相对的反状态」吗：起始命题追踪与判定 · 2026-10-09 · 由 _md2html_generic.py 生成 · 源文件 反物质是否相对的镜像_起始命题追踪与判定.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

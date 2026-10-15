@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>机翼升力：伯努利哪里"牵强"、你的直觉抓到了什么、框架缺哪一环</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、先纠正前提：伯努利并不"牵强"，错的是"等时通过"</div>
+  <h1>机翼升力：伯努利哪里"牵强"、你的直觉抓到了什么、框架缺哪一环</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-23（<strong>讨论纪要，不占正式轮次</strong> —— 无新脚本、无新数值）
+<strong>触发</strong>：用户提出「伯努利解释有些牵强；在本框架下升降力来自机翼与空气接触的<strong>间接通量差</strong>」
+<strong>一句话结论</strong>：① 错的<strong>不是伯努利</strong>，是教科书里的「<strong>等时通过</strong>」那个流行解释；
+② 你的直觉（「升力 = 间接的通量差」）恰好命中了<strong>正确的那一半</strong> —— 升力就是<strong>动量通量差</strong>，
+但那正是标准物理（环量 + 库塔-茹科夫斯基 <code>L = ρVΓ</code> + 牛顿第三定律），不是新东西；
+③ 框架对流体<strong>零内容</strong>（<code>伯努利/升力/机翼/环量/纳维-斯托克斯/雷诺/马赫</code> 全 0 命中），
+且<strong>你的提法与框架自己的力表结构同构</strong>（引力 = 通量负压、电磁 = 通量压力梯度）；
+④ <strong>但它是双重计数</strong> —— 通量通道<strong>已经被标定在引力与电磁上</strong>，机翼造成的通量差其效应<strong>已计入</strong>
+已知的接触力；⑤ 框架真正缺的那一环是 <strong>玻尔兹曼 → 流体力学的连续极限（Chapman–Enskog）</strong>，
+而 §3.4 已把它明确列为【待验证】。</p>
+</blockquote>
+<hr />
+<h2>一、先纠正前提：伯努利并不"牵强"，错的是"等时通过"</h2>
+<table>
+<thead>
+<tr>
+<th>层次</th>
+<th>内容</th>
+<th>对错</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>流行教科书说法</strong></td>
+<td>上表面路程长 ⟹ 空气必须"同时到达"后缘 ⟹ 上表面更快 ⟹ 压力更低</td>
+<td>❌ <strong>错</strong>（"等时通过"谬误）。实验上<strong>上表面气流先到</strong>，两者根本不会合</td>
+</tr>
+<tr>
+<td><strong>伯努利原理本身</strong></td>
+<td>沿流线 <code>p + ½ρv² + ρgh = const</code>（不可压、定常、无粘）</td>
+<td>✅ <strong>对</strong>，但它是<strong>"计算器"不是"原因"</strong>：给定速度场才算得出压力</td>
+</tr>
+<tr>
+<td><strong>真正的原因</strong></td>
+<td>机翼的<strong>环量</strong> Γ（由库塔条件唯一确定）+ <strong>牛顿第三定律</strong>（持续把空气向下偏转 = 下洗）</td>
+<td>✅ 现代标准解释</td>
+</tr>
+<tr>
+<td><strong>定量</strong></td>
+<td><code>L' = ρVΓ</code>（库塔-茹科夫斯基）</td>
+<td>✅ 已是工程标准</td>
+</tr>
+<tr>
+<td><strong>超声速</strong></td>
+<td>伯努利不成立；升力来自<strong>激波/膨胀波</strong>造成的上下压力差</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p><strong>NASA 的原话</strong>（Glenn 研究中心）：<em>"both 'Bernoulli' and 'Newton' are correct"</em> —— 对压力分布积分、
+或对速度变化积分，<strong>给出同一个力</strong>。它们是<strong>同一件事的两个视角</strong>，不是竞争的解释。
+（"equal transit time theory" 是"the most popular incorrect theory of lift"。）</p>
+<p>⟹ 所以：你说的"牵强"，<strong>指对了症状（教科书那套是错的），但病因不在伯努利</strong>。
+伯努利不需要被"救"，它只需要被放到<strong>下游</strong>的位置。</p>
+<h2>二、你的直觉：抓到了对的那一半</h2>
+<blockquote>
+<p>「在正负诸元作用下，机翼与空气接触增大了升力，形成了<strong>间接的通量差</strong>」</p>
+</blockquote>
+<ul>
+<li><strong>"通量差"这个词选对了。</strong> 升力的现代表述就是<strong>动量通量差</strong>：机翼每秒把多少向下的动量交给空气
+  （下洗），反过来受到多大的升力。这正是牛顿第三定律的积分形式。</li>
+<li><strong>"间接"也说对了。</strong> 是<strong>经由流体</strong>（中介）传递的，不是机翼与空气分子的直接接触斥力总和
+  —— 但两者在动量意义上等价（压力差积分 = 下洗动量通量）。</li>
+<li>但<strong>"增大了升力"是循环</strong>：需要解释的恰恰是"升力从哪来"。而"通量差"若要成为机制，
+  必须先给出<strong>速度场/环量</strong> —— 那需要流体力学方程。</li>
+</ul>
+<p>⟹ 你的直觉 = 标准物理的正确部分。<strong>它不是新解释，但它也不是错的。</strong></p>
+<h2>三、框架里有什么（逐项检索）</h2>
+<table>
+<thead>
+<tr>
+<th>检索</th>
+<th>论文正文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>伯努利 / 升力 / 机翼 / 飞机 / 航空</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>环量 / Kutta / 茹科夫斯基</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>流体（5 处）</td>
+<td>全是<strong>定位声明</strong>（"GR 是几何描述，本框架是统计流体描述"）与<strong>过载区物态</strong></td>
+</tr>
+<tr>
+<td>纳维 / 斯托克斯 / 雷诺 / 马赫 / 激波</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>涡（26 处）</td>
+<td>是<strong>衬底</strong>的涡（卷绕模、涡动力学），不是流体的涡量</td>
+</tr>
+<tr>
+<td>通量（83 处）</td>
+<td>全是<strong>衬底级</strong>：湮灭事件率密度、<strong>通量遮挡亏损</strong>（引力）、<strong>通量压力梯度</strong>（电磁）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>框架自己的力表</strong>（§正文）：</p>
+<table>
+<thead>
+<tr>
+<th>力</th>
+<th>机制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>引力</td>
+<td><strong>通量负压</strong>（长程极弱的通量遮挡亏损）</td>
+</tr>
+<tr>
+<td>电磁</td>
+<td><strong>长程通量压力梯度</strong>（空腔模型）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>结构上，你的提法与框架的机制同构</strong>：某物"挡/改"了通量 ⟹ 通量差 ⟹ 压力梯度 ⟹ 力。
+所以你的直觉不是凭空来的 —— 它就是框架的语言。</p>
+<h2>四、但它不成立：三条独立的理由</h2>
+<h3>① 双重计数（最硬的一条）</h3>
+<p>框架的通量通道<strong>已经被用掉了</strong>：引力与电磁<strong>都</strong>是通量差的表现，而且<strong>已经被标定</strong>
+（PPN <code>γ = 1</code>、与 CODATA 的一致性差 <code>−1.17×10⁻⁷</code>）。
+机翼与空气的<strong>接触力本身就是电磁力</strong>（分子间斥力）⟹ 机翼造成的任何通量差，
+其效应<strong>已经</strong>包含在已知的接触力/压力里。
+<strong>再加一条"升力通量"通道 = 把同一份效应算两遍</strong> ⟹ 会破坏框架已有的成功标定。</p>
+<blockquote>
+<p>这一条与第 39 轮的教训<strong>同类</strong>：当时是「在衬底里找压缩因子 5.545 的机制」——
+找到的任何"机制"都会与已有的口径重复计数。<strong>同一个陷阱。</strong></p>
+</blockquote>
+<h3>② 量级差 10⁹</h3>
+<p>框架的引力通量亏损是 <code>Φ/c²</code>：地球表面 <code>GM/(c²R) ≈ 7.0×10⁻¹⁰</code>。
+而升力是<strong>O(1) 的机重</strong>（<code>L/W ≈ 1</code>）。
+⟹ 要"通量差"承担升力，需要一个比引力通量效应强 <strong>10⁹ 倍</strong>的通道 —— 而那正是<strong>接触力/电磁</strong>，
+即已经被算过的那些。</p>
+<h3>③ 事实上框架<strong>没有连续极限</strong></h3>
+<ul>
+<li>§3.4 有一节，标题就叫「<strong>连续极限的开放问题</strong>」，【待验证】里明确写着
+  「<strong>② 连续极限收敛性</strong>（标准因果集理论亦未完全解决）」⟹ <strong>框架自己把它列为未完成</strong>。</li>
+<li>框架<strong>已有</strong>的链条只到<strong>动理学</strong>层：<code>N 事件主方程 → 湮灭型 BBGKY 层级 → 分子混沌截断 + 有效弹性
+  → 玻尔兹曼方程（定理 B）</code>，并有 DSMC 数值支撑。</li>
+<li>但从<strong>玻尔兹曼方程 → 流体力学</strong>（Chapman–Enskog / 希尔伯特第六问题链条）<strong>没有做</strong>
+  （全文中「欧拉方程」「动理学」「宏观极限」<strong>0 命中</strong>）。</li>
+<li>而"过载区物态方程"<code>P = P_P·tanh(ρ/ρ_P)</code> 的密度是<strong>普朗克密度</strong>，与空气差 12 个数量级以上，
+  与机翼毫无关系。</li>
+</ul>
+<p>⟹ <strong>缺的正是那一环</strong>：没有它，连 Γ（环量）都算不出来，更谈不上 <code>L = ρVΓ</code>。</p>
+<h2>五、判决与登记</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>✅ <strong>前提修正</strong>：错的是"等时通过"，不是伯努利。伯努利是<strong>下游计算器</strong>，不需要救</td>
+</tr>
+<tr>
+<td>2</td>
+<td>✅ <strong>你的直觉命中了正确的一半</strong>：升力 = 动量通量差（下洗）= 标准物理，<strong>不是新解释</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>✅ <strong>结构同构成立</strong>：你的提法与框架的「通量 ⟹ 压力梯度 ⟹ 力」同构</td>
+</tr>
+<tr>
+<td>4</td>
+<td>❌ <strong>但"用通量解释升力"是双重计数</strong>（记 <strong>N-11</strong>）⟹ 与第 39 轮同类陷阱</td>
+</tr>
+<tr>
+<td>5</td>
+<td>❌ <strong>量级不合</strong>：<code>Φ/c² ~ 7×10⁻¹⁰</code> vs 升力 O(1) ⟹ 差 10⁹</td>
+</tr>
+<tr>
+<td>6</td>
+<td>⚠️ <strong>框架唯一可能的入口</strong>：补上 <strong>玻尔兹曼 → 流体力学的连续极限</strong>（记 <strong>I-12</strong>）——</td>
+</tr>
+<tr>
+<td></td>
+<td>但<strong>即使成功，它只会把升力"还原"为标准流体力学，而不是给出不同的解释</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>⟹ <strong>框架在流体/升力上没有任何可检验的独立预言</strong>，除非能指出相对纳维-斯托克斯的<strong>偏离尺度</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>第 6 条要展开说（这是本轮最有用的一条）</h3>
+<p>如果框架补上了 <code>玻尔兹曼 → Chapman–Enskog → 欧拉/纳维-斯托克斯</code>，那它得到的是<strong>标准流体力学</strong>
+—— 而标准流体力学给出的升力解释<strong>就是</strong>环量 + 库塔-茹科夫斯基。
+⟹ <strong>框架最多是流体力学的"统计力学地基"，不是它的"修正"。</strong>
+（这与框架对引力的自我定位一致：它自称 GR 的统计力学地基，而不是 GR 的替代。）</p>
+<p><strong>唯一能让框架对升力说出不同话的条件</strong>：它必须给出一个<strong>偏离纳维-斯托克斯的尺度或项</strong>。
+而目前框架里唯一可能的候选尺度 —— 47 μm —— 已在第 40/43 轮查清：那是<strong>诸元在哈勃时间内的
+空间输运尺度<strong>，</strong>不是流体的特征长度</strong>。⟹ <strong>目前没有这样的偏离项。</strong></p>
+<h2>六、诚实边界</h2>
+<ol>
+<li>本纪要是<strong>讨论纪要</strong>，不占正式轮次：没有新脚本、没有新数值，全部是<strong>已有结论对用户陈述的映射</strong>。</li>
+<li>「伯努利是下游计算器」是<strong>流体力学教科书共识</strong>（NASA Glenn、多份教材一致），不是本框架的贡献。</li>
+<li>我<strong>没有</strong>逐一核对框架全文里是否还有别处提到流体（只做了关键词检索 + 人工看命中行）；
+   但 <code>伯努利/升力/机翼/环量/纳维/斯托克斯/雷诺/马赫/激波</code> 的 <strong>0 命中</strong>是确定的。</li>
+<li>「双重计数」论证依赖一个假设：<strong>框架的通量通道已在引力/电磁上被完整标定</strong>。
+   这在框架里是<strong>自述</strong>（力表 + PPN 标定），我按框架自己的口径使用它。</li>
+<li>若用户想要的是"框架给出更好的升力解释"，本纪要的判决是<strong>否</strong>；
+   若想要的是"框架能否成为流体力学的地基"，那是 <strong>I-12</strong>，一个<strong>正经但极难</strong>的问题。</li>
+</ol>
+<h2>七、下一步（若要做，只有两条）</h2>
+<ol>
+<li><strong>I-12（难题，★）</strong>：查 <code>玻尔兹曼方程 → 连续极限</code> 这一环在框架里<strong>到底缺什么</strong> ——
+   具体是缺<strong>守恒量闭合</strong>、缺<strong>分子混沌在粗粒化下保持</strong>、还是缺<strong>碰撞核的尺度分离</strong>？
+   这是一次<strong>文献级的对账</strong>（对照 Chapman–Enskog 与希尔伯特第六问题的现有结果），<strong>不需要新数值</strong>。</li>
+<li><strong>判否路线</strong>：若要判否「框架给升力新机制」，只需一条 ——
+   <strong>框架能否指出相对纳维-斯托克斯的偏离项？</strong> 若三个候选（47 μm、相干块、λ）<strong>都不能</strong>，
+   则可把「通量升力」正式列入"已排除的路"。</li>
+</ol>
+
+<div class="footer">机翼升力：伯努利哪里"牵强"、你的直觉抓到了什么、框架缺哪一环 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 机翼升力_伯努利错在哪与框架缺的那一环.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

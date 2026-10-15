@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>h 能否被可观测量定出？—— 不可观测，且第 26 轮一处数值需修正</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、本轮问题（= 第 42 轮的 🎯 首要项）</div>
+  <h1>h 能否被可观测量定出？—— 不可观测，且第 26 轮一处数值需修正</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-21（第 43 轮）
+<strong>脚本</strong>：<code>outputs/_observable_h_probe.py</code>（检查项 OP-1 … OP-10，<strong>10 项 0 失败</strong>）、
+<code>outputs/_phase_diag.py</code>（维度诊断 + 20 种子统计）
+<strong>一句话结论</strong>：<strong>h 不是可观测量</strong>。第 42 轮设想的「用扩散系数交叉检验 h」<strong>不成立</strong> ——
+真随机相位与<strong>确定性伪随机</strong>相位给<strong>同一个 D</strong>（1.51σ 内一致），而两者的 h 差 <strong>120 个数量级</strong>。
+⟹ <strong>T-7 从「本体不可判、实现可判」进一步降为「连实现也不可判」</strong>；第 42 轮的
+「熵增源头 = 外生注入」宜改写为「<strong>熵增源头 = 无知</strong>」。
+<strong>附带复核</strong>：第 26 轮「全局统一相位 ⟹ ⟨r²⟩ 塌到 n 的 29.7% / 42.5%（两个种子）」的
+<strong>数值部分需修正</strong> —— 该量<strong>非自平均</strong>（20 种子：均值 <strong>1.32 n</strong>、相对散布 <strong>65%</strong>），
+那两个数只是噪声；<strong>结论（每线独立是必需条件）不受影响</strong>。</p>
+</blockquote>
+<hr />
+<h2>一、本轮问题（= 第 42 轮的 🎯 首要项）</h2>
+<p>第 42 轮的结语里写着：</p>
+<blockquote>
+<p>⚠️ 判别线索：§8.6.7 已给「两种实现给不同<strong>扩散系数</strong>」⟹ 扩散系数是可观测量，
+若能独立定出它，就能反推 tick 的随机结构。</p>
+</blockquote>
+<p>本轮把这个「唯一可观测出口」算到底：<strong>h = ln3 + L²ln2 是否 D 的函数？</strong></p>
+<hr />
+<h2>二、模型与四类相位模式</h2>
+<p>模型与第 26 / 30 / 40 轮一致：<strong>简单立方 L³</strong>（配位 6，第 30 轮定案），周期边界；
+一次 tick = 沿随机轴的二分图完美匹配交换；<strong>每条线一个相位 φ</strong> 决定该线上配对是
+<code>(φ,φ+1), (φ+2,φ+3), …</code> ⟹ 每个诸元每 tick 走 ±1 格 ⟹ 轨迹 = 随机游走。</p>
+<p>本轮的关键设计：<strong>相位取值方式</strong>分成四类，它们改变的是「随机性的<strong>来源</strong>」，
+而不是「随机性的<strong>统计</strong>」：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>定义</th>
+<th>对应的物理情形</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>indep</code></td>
+<td>每线每 tick 独立均匀随机</td>
+<td><strong>主实现</strong>（第 26 轮定案），h = ln3 + L²ln2</td>
+</tr>
+<tr>
+<td><code>global</code></td>
+<td>同一 tick 内<strong>所有线共用</strong>一个相位（每 tick 重抽）</td>
+<td>第 26 轮排除的「偷懒 (ii)」</td>
+</tr>
+<tr>
+<td><code>fixed_line</code></td>
+<td>每条线的相位与线绑定、永不改变</td>
+<td>中间情形（第 26 轮未单列）</td>
+</tr>
+<tr>
+<td><code>fixed_global</code></td>
+<td>所有线、所有 tick 共用一个常数相位</td>
+<td>第 26 轮排除的「偷懒 (i)」</td>
+</tr>
+<tr>
+<td><code>lcg</code></td>
+<td>相位由<strong>确定性</strong>线性同余发生器给出</td>
+<td><strong>H2 的代理</strong>（内生确定）</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>方法要点（本轮自己踩到并修正的）</strong>：<strong>单标记轨迹看不出 <code>indep</code> 与 <code>global</code> 的差别</strong> ——
+标记诸元只见到自己那条线所在的 φ，于是「所有线共用」与「每线独立」对它完全等价。
+要谈相位共享，<strong>必须跑完整格点</strong>（或至少测多诸元关联）。</p>
+<hr />
+<h2>三、数值</h2>
+<h3>表 1：完整格点（L = 10 ⟹ 1000 诸元，n = 2000 tick，种子 7）</h3>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>⟨r²⟩</th>
+<th><strong>⟨r²⟩/n</strong></th>
+<th>读法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>indep</code></td>
+<td>2062.06</td>
+<td><strong>1.0310</strong></td>
+<td>每 tick 恰走一步 ⟹ 扩散（复核第 26 轮 ⟨r²⟩ = n）</td>
+</tr>
+<tr>
+<td><code>global</code></td>
+<td>1226.00</td>
+<td><strong>0.6130</strong></td>
+<td>单种子值，但见 §五：<strong>非自平均</strong></td>
+</tr>
+<tr>
+<td><code>fixed_line</code></td>
+<td>681.29</td>
+<td><strong>0.3406</strong></td>
+<td>部分受抑（第 26 轮未单列此情形）</td>
+</tr>
+<tr>
+<td><code>fixed_global</code></td>
+<td><strong>2.00</strong></td>
+<td>0.0010</td>
+<td><strong>严格有界</strong> ⟹ 复核第 26 轮「⟨r²⟩ = 2」✓</td>
+</tr>
+<tr>
+<td><code>lcg</code></td>
+<td>2014.91</td>
+<td><strong>1.0075</strong></td>
+<td>与 <code>indep</code> 同（<strong>这是本轮的核心</strong>）</td>
+</tr>
+</tbody>
+</table>
+<h3>表 2：单标记 vs 完整格点（同模式对比）</h3>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>单标记 ⟨r²⟩/n</th>
+<th>完整格点 ⟨r²⟩/n</th>
+<th>差距</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>indep</code></td>
+<td>0.9933</td>
+<td>1.0310</td>
+<td><strong>3.66%</strong>（一致）</td>
+</tr>
+<tr>
+<td><code>global</code></td>
+<td><strong>0.9933</strong></td>
+<td><strong>0.6130</strong></td>
+<td><strong>62.04%</strong> ⟸ <strong>相位共享只在多诸元关联里显现</strong></td>
+</tr>
+<tr>
+<td><code>fixed_line</code></td>
+<td>0.3471</td>
+<td>0.3406</td>
+<td>1.90%（一致）</td>
+</tr>
+<tr>
+<td><code>lcg</code></td>
+<td>1.0880</td>
+<td>1.0075</td>
+<td>7.99%（一致）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>单标记口径下 <code>indep</code> 与 <code>global</code> 给出逐位相同的统计</strong>（0.9933 vs 0.9933）。
+这是本轮的一个方法论结论：<strong>用「单个粒子的输运」去判相位模式是无效的。</strong></p>
+<h3>表 3：维度诊断（L = 10，n = 2000，种子 7）</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th><code>indep</code></th>
+<th><code>global</code></th>
+<th><code>fixed_line</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1D</td>
+<td>0.8000</td>
+<td><strong>0.8000</strong>（与 indep <strong>等价</strong>）</td>
+<td>0.0000（严格有界）</td>
+</tr>
+<tr>
+<td>2D</td>
+<td>0.9884</td>
+<td><strong>0.1450</strong></td>
+<td>0.1559</td>
+</tr>
+<tr>
+<td>3D</td>
+<td>1.0037</td>
+<td><strong>0.6760</strong></td>
+<td>0.3386</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 在 <strong>1D 环上「全局共享」与「每线独立」是同一件事</strong>（只有一条线）；
+维度越高，「相位共享」的抑制才显现。<strong>第 26 轮未说明维度，这是一个口径缺口。</strong></p>
+<h3>表 4：20 种子统计（3D，L = 10，n = 2000）—— <strong>是否自平均</strong></h3>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>均值 ⟨r²⟩/n</th>
+<th>标准差</th>
+<th>范围</th>
+<th><strong>相对散布</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>indep</code></td>
+<td><strong>1.001</strong></td>
+<td>0.027</td>
+<td>[0.949, 1.048]</td>
+<td><strong>3%</strong> ⟹ 自平均 ✓</td>
+</tr>
+<tr>
+<td><code>global</code></td>
+<td><strong>1.317</strong></td>
+<td>0.861</td>
+<td>[0.364, 3.444]</td>
+<td><strong>65%</strong> ⟹ <strong>非自平均</strong> ✗</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>四、判决（四条）</h2>
+<h3>① <code>h</code> 不是可观测量</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>微观自由度</td>
+<td>每 tick 每条线的相位 = <strong>L² 个比特</strong>（宏观 ≈ 7.211×10¹²¹ 个比特）</td>
+</tr>
+<tr>
+<td>可观测（输运）</td>
+<td><strong>D —— 1 个实数</strong>（等价于 ⟨r²⟩/n）</td>
+</tr>
+<tr>
+<td>D 依赖什么</td>
+<td>只依赖<strong>每诸元的边际移动率</strong>与<strong>步的自相关</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>L² 个比特 → 1 个实数</strong>。这是欠定，不是"很难测"。</p>
+<h3>② 第 42 轮的 T-7 判别入口<strong>关闭</strong></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>H1（外生真随机）</th>
+<th>H2（内生确定，LCG 代理）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>h（每 tick 注入的无知）</td>
+<td>ln3 + N_c²ln2 = <strong>4.998×10¹²¹ 纳特</strong></td>
+<td>种子熵 = 64 ln2 = <strong>44.36 纳特</strong>（一次性）</td>
+</tr>
+<tr>
+<td><strong>D = ⟨r²⟩/n</strong></td>
+<td>0.9700</td>
+<td>1.0704</td>
+</tr>
+<tr>
+<td>差</td>
+<td>—</td>
+<td><strong>0.1005 = 1.51σ</strong>（<strong>噪声内</strong>）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 熵差 <strong>120 个数量级</strong>，而 D 相同 ⟹ 第 42 轮说的「用扩散系数交叉检验 h」<strong>不成立</strong>。</p>
+<h3>③ D 判得了什么（本轮给 D 划出边界）</h3>
+<table>
+<thead>
+<tr>
+<th>相位结构</th>
+<th>D 能否判</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全局<strong>固定</strong>（所有线常数相位）</td>
+<td><strong>能</strong></td>
+<td>⟨r²⟩ → 2.00（严格有界，不随 n 增长）</td>
+</tr>
+<tr>
+<td>每线固定</td>
+<td><strong>部分</strong></td>
+<td>⟨r²⟩/n = 0.3406（受抑但非零）</td>
+</tr>
+<tr>
+<td>全局统一（每 tick 重抽）</td>
+<td><strong>能，但需统计</strong></td>
+<td>非自平均（均值 1.32 n，散布 65%）</td>
+</tr>
+<tr>
+<td>移动率 p</td>
+<td><strong>能</strong></td>
+<td>D ∝ p（p = 1/2 ⟹ 0.4727；p = 1/4 ⟹ 0.2487）</td>
+</tr>
+<tr>
+<td><strong>真随机 vs 确定性伪随机</strong></td>
+<td><strong>不能</strong></td>
+<td>同一 D（1.51σ）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>第 26 轮排除两种「偷懒」是可观测的排除</strong>（不是形而上）—— 但它们靠的是
+<strong>⟨r²⟩ 偏离 n</strong>，而不是靠"随机性的来源"。<strong>「随机性从哪来」在输运层面完全不可见。</strong></p>
+<h3>④ 熵增的源头要改写</h3>
+<p>H1 与 H2 在框架的<strong>全部输运预言</strong>上等价 ⟹ 第 42 轮的表述</p>
+<blockquote>
+<p>熵增的源头 = <strong>外生 tick 随机性</strong></p>
+</blockquote>
+<p>应改写为</p>
+<blockquote>
+<p>熵增的源头 = <strong>无知</strong>（系综熵）。而「无知从哪来」——
+<strong>真空抛硬币</strong>（H1）还是<strong>我们不知道种子</strong>（H2）—— <strong>在框架内不可判定</strong>。</p>
+</blockquote>
+<p>这与第 39 轮的结论<strong>合流</strong>：第 39 轮说"熵增 = 粗粒化 / 不可分辨性的度量"，
+本轮说"注入与粗粒化不可区分"。⟹ 两个来源（第 42 轮的"外生注入"与第 39 轮的"粗粒化"）
+在<strong>可观测层面是同一件事的两种叙事</strong>。</p>
+<hr />
+<h2>五、复核发现：第 26 轮的一处数值需要修正</h2>
+<p>论文 §8.6.7(c) 原文（第 931 行）：</p>
+<blockquote>
+<p>(ii) <strong>即使每 tick 重抽，只要全局共用一个相位</strong>（同一 tick 内所有线同侧），
+相位就与「轴」耦合成系统性取向模式，⟨r²⟩ 塌到 n 的 <strong>29.7% / 42.5%（两个种子）</strong>，
+而每线独立时为 100.0%。</p>
+</blockquote>
+<p>本轮用 20 个种子复测同一模型（3D，L = 10，n = 2000）：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>均值</th>
+<th>标准差</th>
+<th>范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>indep</code></td>
+<td>1.001</td>
+<td>0.027</td>
+<td>[0.949, 1.048]</td>
+</tr>
+<tr>
+<td><code>global</code></td>
+<td><strong>1.317</strong></td>
+<td><strong>0.861</strong></td>
+<td><strong>[0.364, 3.444]</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 两条修正：</p>
+<ol>
+<li><strong>「塌到」是错的</strong>：20 种子的<strong>均值是 1.32 n</strong>（大于 1），不是 0.3 n。
+   该模式的真实特征是<strong>非自平均</strong>（相对散布 <strong>65%</strong>，而 <code>indep</code> 只有 3%），
+   不是"变小"。</li>
+<li><strong>「两个种子」不够</strong>：29.7% 与 42.5% 都落在本轮实测范围内（低端离群值），
+   它们<strong>就是噪声</strong>。</li>
+</ol>
+<p><strong>结论不受影响</strong>：全局共享相位下 ⟨r²⟩ 显著偏离 n，且<strong>不自平均</strong> ⟹
+「每线独立」仍是必需条件（第 26 轮的物理结论保住），但<strong>数值表述必须改</strong>。
+本轮已在论文中改为定性 + 定量并存的写法（见 §八）。</p>
+<hr />
+<h2>六、诚实边界</h2>
+<p><strong>是推导 + 数值（本轮新测）</strong>：
+- 四类相位模式的 ⟨r²⟩/n、单标记与完整格点的差别、维度依赖、20 种子散布 —— 全部本轮实测。
+- <code>h</code> 与 <code>D</code> 的自由度账（L² 比特 → 1 实数）—— 是结构性论证 + 数值对照。</p>
+<p><strong>是复核（修正第 26 轮）</strong>：
+- 「29.7% / 42.5%」的数值表述；「塌到」的方向性错误。
+- ⚠️ 但第 26 轮的<strong>实现细节未完全复原</strong>：本轮不知道他们当时用的是 2D 还是 3D
+  （表 3 显示 2D 给 0.145、3D 给 0.676），也不知道他们的 n 定义。
+  ⟹ 本轮的修正针对「同一模型下的复测结果」，<strong>不排除他们当时另有实现</strong>。</p>
+<p><strong>是判定（不可判定）</strong>：
+- 「H1 vs H2」在输运层面不可区分 —— 这是<strong>不可判定性</strong>结论，不是"暂时算不出"。</p>
+<p><strong>仍需注意</strong>：
+- LCG 只是 H2 的一个<strong>代理</strong>；任何统计等价的确定性生成器都同样不可区分。
+  这等价于"随机性无法由统计检验证明"的物理版。
+- 模型是简单立方 + 周期边界 + 单一标记/全格点两种口径；框架<strong>未规定格点几何</strong>。</p>
+<p><strong>未做</strong>：
+- 两点关联函数、位移分布全形状比较、非马尔可夫相位的相空间、时间平均口径下的自平均性。
+- 若要用 D 之外的量（如关联函数）重新尝试区分 H1/H2 —— <strong>那才是下一个入口</strong>（见 §七）。</p>
+<hr />
+<h2>七、下一步</h2>
+<ol>
+<li><strong>🎯 新的唯一入口：两点关联函数</strong>。本轮证明 D（单体量）不够。
+   若 H1/H2 有<strong>任何</strong>可观测差别，它只能藏在<strong>多体关联</strong>里（表 2 已经指出：
+   相位共享只在多诸元关联中显现）。⟹ 算 ⟪位移-位移关联⟫ 在 H1/H2 下是否相同。
+   <strong>若也相同，则 T-7 可判「彻底不可判」，可以结项。</strong></li>
+<li><strong>把「非自平均」升级为独立结论</strong>：<code>global</code> 模式的相对散布 65% ⟹ 这是一个
+   <strong>动力学非遍历性</strong>的直接证据，与第 40 轮的"轨道保持"是同一现象的两种体现。
+   值得单独登记（可能进工程期望清单）。</li>
+<li>回到主线：<strong>观测者自身的周期 τ</strong>（§4.9 N1–N4）—— 仍是把 B5 分辨率变成推导的唯一入口。</li>
+</ol>
+
+<div class="footer">h 能否被可观测量定出？—— 不可观测，且第 26 轮一处数值需修正 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 h能否被可观测量定出_不可观测且熵增源头改写.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

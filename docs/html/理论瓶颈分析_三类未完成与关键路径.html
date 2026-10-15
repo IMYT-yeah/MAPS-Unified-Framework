@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>理论瓶颈分析：为什么「待办全清」与「感觉做不完」可以同时为真</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>理论瓶颈分析：为什么「待办全清」与「感觉做不完」可以同时为真</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-05 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 122 轮 · 元任务</strong>（分析文档，无新物理）｜2026-10-04｜取证方式：文件直查 ＋ grep（当日 python 通道故障，未跑脚本；所有数字均为可复算的 grep 直计）
+题源：用户提问「分析一下我们理论的瓶颈在哪里，为什么我总觉得还有大量的事情没做完，而不是现在无事可做的困境」</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<blockquote>
+<p><strong>瓶颈只有一条主线</strong>：框架 = 「衬底 ＋ 对称骨架」，<strong>没有「动力学 / 耦合层」</strong> ——
+它无法自己走到「可测量的数」；仅有的两条出口（EMRI、第五力窗口）都是<strong>条件性扩展</strong>，且裁判都在外部。
+<strong>「感觉做不完」不是错觉、也不是全对</strong>：它 = 三样东西的叠加 ——
+<strong>① 影子类</strong>（审计与地图，体量最大，其实<strong>已完成</strong>）＋ <strong>② 外部类</strong>（6 项，全部卡在<strong>一个人的动作</strong>上：
+真实身份 / 收件人 / 按下送出键 —— 含 <strong>08-24 就绪、41 天未动的两套投稿包</strong>）＋
+<strong>③ 根因类</strong>（1 项：零参数新预言 = 0，<strong>再推 N 轮不变</strong>）。
+⟹ 「无事可做」的困境不会到来，因为 ② 是真事；「做不完」的感觉不会消失，因为项目把「完成」定义在
+<strong>文件层</strong>（产出物存在）而不是<strong>行动层</strong>（送达外部）—— 100% 的完成度可以伴随 0% 的闭环。</p>
+</blockquote>
+<hr />
+<h2>一、瓶颈在哪：一条主线 ＋ 两个派生</h2>
+<h3>1.1 主线：缺「动力学 / 耦合层」</h3>
+<pre><code>[公理 / 衬底 / 骨架] ──→ [动力学·耦合层] ──→ [可算量] ──→ [可测世界]
+   替换事件·H/N·D(G)          ↑ 缺口在此           计数/对称/恒等式      实验·观测
+                          「补 = 外加」被判 0
+</code></pre>
+<p>档案证据链（每一环都有轮次与编号）：</p>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>结论</th>
+<th>轮次 / 编号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>势与存储</td>
+<td>框架<strong>没有势函数</strong>（无「势阱型构型差」）⟹ 化学/储能不覆盖</td>
+<td>53–56 / 60 / N-21</td>
+</tr>
+<tr>
+<td>动力学</td>
+<td>加速度＋连续性方程「<strong>在这个账里不存在</strong>」——缺的不是方程，是对象（只给约束）</td>
+<td>75 / I-20 结项</td>
+</tr>
+<tr>
+<td>量子化</td>
+<td>§7 非交换化 = <strong>外加</strong>，判别力 = 0</td>
+<td>76 / I-21 结项</td>
+</tr>
+<tr>
+<td>Φ 的质量</td>
+<td>质量是纯输入（「m_Φ = 截断能标」是假设）</td>
+<td>70</td>
+</tr>
+<tr>
+<td>Φ 的耦合</td>
+<td>耦合 <code>g</code> 是第 4 个纯输入，零约束；「除非第二个可观测量与 g 同台出现，不要再碰」</td>
+<td>72 / I-17</td>
+</tr>
+<tr>
+<td>常数身份</td>
+<td><code>c</code> 有身份，<strong><code>ℏ</code> 不可辨识</strong>（自由度 2），<code>G</code> 是输入</td>
+<td>111 / N-41</td>
+</tr>
+<tr>
+<td>能量标</td>
+<td>η 能标不可独立导出（一维简并族）</td>
+<td>95 / N-40</td>
+</tr>
+<tr>
+<td>宇宙学</td>
+<td>9 条输出<strong>判别力 = 0</strong>（与 ΛCDM 同值或不可测）</td>
+<td>73</td>
+</tr>
+<tr>
+<td>连续极限</td>
+<td>Z₂→U(1)、4D 自旋 2、YM 质量隙 —— 世界级，<strong>不声称</strong></td>
+<td>§10.2 #13</td>
+</tr>
+</tbody>
+</table>
+<p><strong>论文自己的账</strong>（§10.2）：列 13 条开放问题，其中 <strong>5 条明示未闭合</strong>（#2 4D SU(3) 完全涌现、#13 连续极限/质量隙、</p>
+<h1>11 强度来源、#7 剩余严格化……）——<strong>全部标注为世界级 / 数学前沿 / 不声称</strong>。即：**论文承认的未闭合项，</h1>
+<p>没有一条是「再做一轮就能关」的**。</p>
+<h3>1.2 经验正则（121 轮审计的统计规律）</h3>
+<p><strong>每一个曾宣称的「预言 / 推导」，审计后都落入四类归宿之一</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>曾宣称</th>
+<th>归宿</th>
+<th>编号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>λ = 8π/3</code> 的「消掉」</td>
+<td><strong>恒等式</strong>（口径选择人工产生）</td>
+<td>C-17 / C-20 / C-32</td>
+</tr>
+<tr>
+<td>麦克斯韦谱「数值验证」</td>
+<td><strong>恒等式</strong>（赋值 ＋ 泰勒展开）</td>
+<td>C-67</td>
+</tr>
+<tr>
+<td>「q = 4 是唯一解」</td>
+<td><strong>除法表</strong>（<code>2 + log₂q</code> 换写）</td>
+<td>C-76</td>
+</tr>
+<tr>
+<td><code>M²/A</code> 是「普朗克常数」</td>
+<td><strong>量纲不符 ＋ GR 恒等式</strong></td>
+<td>C-77</td>
+</tr>
+<tr>
+<td><code>ℏ</code> 是「导出量」</td>
+<td><strong>不可辨识</strong>（不能主张）</td>
+<td>N-41</td>
+</tr>
+<tr>
+<td><code>h_c = K/J</code></td>
+<td><strong>无机制</strong>（相变不依赖 J）</td>
+<td>C-65</td>
+</tr>
+<tr>
+<td>O2「净产生率上界」</td>
+<td><strong>量纲不成立</strong>（缺 7×10²⁹ 因子）</td>
+<td>C-72</td>
+</tr>
+<tr>
+<td><code>κ = 0.30</code></td>
+<td><strong>唯象默认参</strong>（填的，不是算的）</td>
+<td>C-78</td>
+</tr>
+</tbody>
+</table>
+<p><strong>仅有的两条例外</strong>，都是<strong>条件句</strong>：<code>κ_rel(e) = 1/3 + e²/12</code>（挂 B3 度规）｜第五力窗口 <code>λ ≲ 65–90 μm</code>
+（挂标准 KK 耦合 <code>α_Y = 1/3</code>）。<strong>零参数、可被否证、且已到数字级别的「独有预言」—— 至今 = 0。</strong></p>
+<h3>1.3 派生瓶颈：纯度悖论（结构性，值得单列）</h3>
+<p>框架的审计规范里，「非框架结构」一律记<strong>外加</strong>并判 0 判别力（§7、76 轮）。
+但<strong>不补充结构，就算不出任何可测量</strong>。⟹ 唯一实际能走的路 = <strong>条件扩展 ＋ 外部裁决</strong>：
+「如果补上 X（并声明它是外加的），则预言 Y；由外部实验裁决」。EMRI 与第五力窗口正是这条路上的
+前两个标本。<strong>这条路在跑，但它天然慢</strong>：每一件的判决权都在外部。</p>
+<hr />
+<h2>二、三类「未完成」——为什么感觉总是做不完</h2>
+<h3>2.1 影子类（体量最大，其实已完成）</h3>
+<ul>
+<li>数字：近 24 轮（第 98→121 轮）新增更正 <strong>C-58…C-85 ＝ 28 条</strong>；全文 v2.9 补丁块 <strong>79 处</strong>；
+  <code>outputs/</code> 备忘 <strong>353 份</strong>（含备份）；<code>paper/history/</code> 备份 <strong>173 份</strong>。</li>
+<li>机制：<strong>每结一项就新增 C/N 行</strong> ⟹ 台账在涨 ⟹ 看起来「越做越多」。</li>
+<li>真相：<strong>审计在收敛</strong>。近 5 轮（117–121）判决级更正只有 <strong>1 条</strong>（C-83），其余是口径 / 符号 / 判据数字 ——
+  落点已从「物理判决」移到「表述与判据」。</li>
+<li><strong>陈旧标记放大效应</strong>：多份旧表（如《未完成研究工作流》自第 74 轮未刷新）的 ☐ 标记读起来像
+  「没做」，实为 <strong>C-19 族双向失真</strong>。（本轮已给工作流加「已过期」横幅，见附录。）</li>
+<li>⟹ <strong>影子类是把「完成的东西」读成了「待办」，是感觉体量的主要来源。</strong></li>
+</ul>
+<h3>2.2 外部类（6 项，全部真实未完成，且<strong>全部卡在同一个门</strong>）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>项目</th>
+<th>状态</th>
+<th>卡在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>私审准备包</td>
+<td>第 106 轮就绪</td>
+<td><strong>未送出</strong> —— 需要选人</td>
+</tr>
+<tr>
+<td>2</td>
+<td>EMRI 材料包</td>
+<td>第 106 轮就绪（116–117 已重算）</td>
+<td><strong>未送出</strong> —— 需要收件人</td>
+</tr>
+<tr>
+<td>3</td>
+<td>实验线材料包</td>
+<td>第 121 轮就绪</td>
+<td><strong>未送出</strong> —— 需要收件人</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>投稿包 ×2</strong>（arXiv ＋ paper.edu.cn）</td>
+<td><strong>2026-08-24 就绪（v2.8，43 页 PDF）</strong></td>
+<td><strong>占位符（作者名 / 单位）未填；41 天未动；从未进入任何台账</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Du 2022 设计的 40–60 μm 段投影</td>
+<td>未公布</td>
+<td>等外部（I-27）</td>
+</tr>
+<tr>
+<td>6</td>
+<td>LISA / EMRI</td>
+<td>~10–15 年</td>
+<td>等外部</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>第 4 项是本轮的新发现</strong>：两套投稿包（<code>outputs/arXiv_submission/</code>、<code>outputs/cso_submission/</code>）
+在 <strong>08-24</strong>（第 5 天）就已生成完毕——但作者占位符 <code>AUTHOR NAME</code> 未替换，此后 <strong>41 天未动</strong>；
+且在第 108 轮的四源清点里，它被记为「<strong>✅ 有交付物</strong>」——<strong>记的是文件，不是动作</strong>（I-23 族第 3 例：
+「东西存在」≠「事情发生」）。
+⟹ <strong>1–4 需要的是同一个非技术输入：真实身份 / 收件人 / 按下送出键的人。</strong>
+这条关键路径只有你能走，且已被推迟了 15 轮（自第 106 轮）/ 41 天（自 08-24）。</p>
+<h3>2.3 根因类（1 项，恒在）</h3>
+<ul>
+<li>「零参数、独有、可测、已有数字」的预言 = <strong>1</strong>（EMRI，且条件性）；★★★ = <strong>0</strong>（第 61 轮起）；
+  「参数表」在论文全文 <strong>0 处</strong>（第 63 轮三硬指标）。</li>
+<li>这一项<strong>不因再推 N 轮而变化</strong>——近 24 轮已构成实验证据（新可判测量 = 0）。</li>
+<li>它的打通路径（动力学/耦合层）<strong>目前不在任何已识别的工作中</strong>：所有可攻击的入口都已被试过并关闭
+  （75 / 76 / 53–56 / 60 / 72 / 70），剩下的开放项全是世界级。</li>
+</ul>
+<h3>2.4 为什么「无事可做」的困境没有出现</h3>
+<p>因为：<strong>② 是真事</strong>（4 个未送出的包裹摆在门口）；<strong>① 永远能再扫一层</strong>（但边际价值在递减）；
+<strong>③ 是一个恒在的背景板</strong>（任何「全清」宣言在它面前都显得不诚实）。
+三个叠加，就是「总觉得还有大量事情」的准确来源。</p>
+<hr />
+<h2>三、关键洞察：完成度定义问题</h2>
+<p>本项目把「完成」记在<strong>文件层</strong>：
+<strong>产出物存在 = 线程完成</strong>（第 108 轮把投稿包记为 ✅，同理 κ 脚本「存在即视为状态已记录」等）。
+而<strong>闭环</strong>发生在<strong>行动层</strong>：送出 / 送达 / 答复。
+两层的差，正是「121 轮全部完成」与「外界没有人知道这份工作」可以同时成立的原因。</p>
+<p><strong>改法（本分析的建议）</strong>：往台账里加一层<strong>行动状态</strong>（每件对外物只有三种状态：<code>未送出 / 已送出待回 / 已回</code>），
+并且——<strong>送出前不计完成</strong>。</p>
+<hr />
+<h2>四、怎么办：过滤器 ＋ 三个选项 ＋ 终止条件</h2>
+<h3>4.1 过滤器（对任何候选「下一步」问三句）</h3>
+<ol>
+<li>它是否改变<strong>「可被外部否证的陈述集」</strong>？（结构工作）</li>
+<li>它是否把东西<strong>推到外部读者 / 裁判面前</strong>？（外部工作）</li>
+<li>还是<strong>只清理我们自己的账</strong>？（维护工作）</li>
+</ol>
+<p>⟹ 1、2 优先；3 设上限（例如：每 5 轮最多 1 轮纯维护，且只做「有人会读」的清理）。</p>
+<h3>4.2 三个选项（不互斥）</h3>
+<ul>
+<li><strong>A. 闭环优先（推荐）</strong>：把外部类 1–4 推到「已送出」。最小的第一步：<strong>两处决定</strong> ——
+  投稿用真名/单位还是笔名（以及用 v2.8 重生成 v2.9 还是按 v2.8 先投）；私审/实验线各选 1 个收件人。
+  （重生成 v2.9 投稿包 ≈ 一轮的量。）</li>
+<li><strong>B. 单点攻坚</strong>：只碰根因（动力学 / 耦合层）——但先过「已关闭清单」（61–104 的十余条判否），
+  避免重演。目前在册、且<strong>不</strong>属于世界级的候选极少（如 I-26 的 screened 读法问答——一轮可判）。</li>
+<li><strong>C. 重新定义成品</strong>：把 121 轮的<strong>边界地图</strong>本身当交付物 ——
+  「替换型衬底：能做到什么、不能做到什么」（方法学 / no-go ＋ 结构论文）。终点可达，与 A 兼容。</li>
+</ul>
+<h3>4.3 「做完」的候选定义（勾选其一即可终止焦虑）</h3>
+<ul>
+<li>[ ] 一篇对外文档到 arXiv / paper.edu.cn（v2.9 定稿，或 C 方案的方法学版）；</li>
+<li>[ ] 私审 ≥1 位外部读者给出回执；</li>
+<li>[ ] 实验线材料 ≥1 份送出；</li>
+<li>[ ] 书面宣布「内部推演冻结」（此后只做答复与修订——这是<strong>唯一不需要外界配合就能完成的定义</strong>）。</li>
+</ul>
+<hr />
+<h2>五、诚实边界（六条）</h2>
+<ol>
+<li>本分析是<strong>档案审计</strong>（文件直查 ＋ grep），无新增计算；未使用 python（当日通道故障），统计数为 grep 直计、可复算。</li>
+<li>「根因不在任何已识别工作中」是<strong>基于项目自身记录的判断</strong>，不是定理。</li>
+<li>投稿包「未提交」的依据：占位符未填 ＋ 无提交记录文件 ＋ README 仍是「提交前指南」形态；
+   若实际已投过请纠正。</li>
+<li>「影子类已完成」指<strong>其自身范围</strong>（审计与地图的完整性），不等于「理论已完成」——见 2.3。</li>
+<li>数字口径：C 计数 84 / N 42 为清单自报；近 24 轮更正 28 条为 grep 直计（C-58…C-85）。</li>
+<li>本轮<strong>不改任何物理结论</strong>、<strong>不触发任何外部动作</strong>（对外需本人决定）。</li>
+</ol>
+<hr />
+<h2>附录：本轮的两次台账操作</h2>
+<ol>
+<li>《工程期望清单》「剩余待办」行 → 追加<strong>三层口径</strong>（L1/L2/L3）；</li>
+<li>《未完成研究工作流》 → 加「<strong>已过期</strong>」横幅（其 ☐ 自第 74 轮未刷新；第 108 轮已四源清点）。</li>
+</ol>
+
+<div class="footer">理论瓶颈分析：为什么「待办全清」与「感觉做不完」可以同时为真 · 2026-10-05 · 由 _md2html_generic.py 生成 · 源文件 理论瓶颈分析_三类未完成与关键路径.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

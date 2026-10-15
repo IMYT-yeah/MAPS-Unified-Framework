@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 球对称扩散精确解：火墙厚度判定 F1″ 严格化</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 问题设定</div>
+  <h1>3D 球对称扩散精确解：火墙厚度判定 F1″ 严格化</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>批次</strong>：火墙厚度判定系列第 2 弹（F1 → F1′ 1D 严格解 → <strong>F1″ 3D 球对称精确解</strong>）
+<strong>任务</strong>：把 v1.9 的 1D 扩散近似升级为 3D 球对称扩散的<strong>精确解</strong>，确认火墙厚度 δ 的闭式形式与几何修正量级
+<strong>性质标注</strong>：【定理】= 严格数学/物理结果；【推导】= 框架内推导；【验证】= 数值验证；【待验证】= 需进一步验证</p>
+</blockquote>
+<hr />
+<h2>1 问题设定</h2>
+<p>上一轮（v1.9）用 1D 扩散近似推导火墙厚度 δ = √2·√(R·l_P)，遗留问题：<strong>1D 近似是否正当？球对称几何的 2/r 项会带来多大修正？</strong></p>
+<p>本批求解完整的 3D 球对称扩散方程：</p>
+<div class="formula"><span class="frac"><span class="num">∂ ρ</span><span class="den">∂ t</span></span> = D(<span class="frac"><span class="num">∂<sup>2</sup> ρ</span><span class="den">∂ r<sup>2</sup></span></span> + <span class="frac"><span class="num">2</span><span class="den">r</span></span><span class="frac"><span class="num">∂ ρ</span><span class="den">∂ r</span></span>)</div>
+
+<p><strong>边界条件</strong>【原文 88–90】：
+- 视界处通量抽零：ρ(R, t) = 0
+- 远处恢复背景：ρ(∞, t) = ρ∞
+- 初始：视界外全为背景通量 ρ(r, 0) = ρ∞（r &gt; R）</p>
+<p><strong>扩散系数</strong>【推导，v1.9 严格值】：D = l_P²/(2t_P) = l_P·c/2</p>
+<h2>2 核心洞察：u = rρ 变换【推导·严格】</h2>
+<p>对球对称扩散方程做变换 <strong>u(r,t) = r·ρ(r,t)</strong>：</p>
+<div class="formula"><span class="frac"><span class="num">∂ (rρ)</span><span class="den">∂ t</span></span> = D(r<span class="frac"><span class="num">∂<sup>2</sup>ρ</span><span class="den">∂ r<sup>2</sup></span></span> + 2<span class="frac"><span class="num">∂ρ</span><span class="den">∂ r</span></span>) = D<span class="frac"><span class="num">∂<sup>2</sup>(rρ)</span><span class="den">∂ r<sup>2</sup></span></span></div>
+
+<div class="formula">boxed<span class="frac"><span class="num">∂ u</span><span class="den">∂ t</span></span> = D<span class="frac"><span class="num">∂<sup>2</sup> u</span><span class="den">∂ r<sup>2</sup></span></span></div>
+
+<p><strong>2/r 几何项被 u = rρ 变换精确吸收</strong>——3D 球对称问题归化为 1D 扩散方程（对 u），这正是该变换的经典威力。</p>
+<p><strong>边界/初始条件的变换</strong>：
+- 视界：u(R,t) = R·ρ(R,t) = 0
+- 初始：u(r,0) = r·ρ∞
+- 远处：u(∞,t) = ∞·ρ∞（发散，但对局部问题 x = r−R ≪ R 无影响）</p>
+<h2>3 格林函数解【定理·严格】</h2>
+<p>半无限区域 x = r−R ≥ 0 上的 1D 扩散（Dirichlet 边界 u(0,t) = 0）用<strong>镜像法</strong>格林函数：</p>
+<div class="formula">G(x,x';t) = <span class="frac"><span class="num">1</span><span class="den"><span class="sqrt">√<span class="radicand">4π Dt</span></span></span></span>[e<sup>-<span class="frac"><span class="num">(x-x')<sup>2</sup></span><span class="den">4Dt</span></span></sup> - e<sup>-<span class="frac"><span class="num">(x+x')<sup>2</sup></span><span class="den">4Dt</span></span></sup>]</div>
+
+<p>解为：</p>
+<div class="formula">u(x,t) = ρ<sub>∞</sub> ∫<sub>0</sub><sup>∞</sup> G(x,x';t) (R+x') dx'</div>
+
+<p><strong>解析积出两项</strong>：
+- 第一项（R·erf）：∫G·R dx′ = R·erf(x/√(4Dt))
+- 第二项（x′）：∫G·x′ dx′ = x（可解析验证，镜像法精确相消）</p>
+<p>⟹ <strong>3D 球对称扩散精确解【本批核心成果】</strong>：</p>
+<div class="formula">boxedρ(r,t) = ρ<sub>∞</sub> · <span class="frac"><span class="num">R <span class="rm">erf</span>(<span class="frac"><span class="num">r-R</span><span class="den"><span class="sqrt">√<span class="radicand">4Dt</span></span></span></span>) + (r-R)</span><span class="den">r</span></span></div>
+
+<p><strong>极限检验</strong>【验证①】：
+- r → R（x=0）：erf(0)=0 ⟹ ρ = 0 ✓（视界抽零）
+- r → ∞：erf→1 ⟹ ρ → ρ∞·(R+x)/r = ρ∞ ✓（背景恢复）
+- r ≈ R 附近（x ≪ R）：ρ ≈ ρ∞·erf(x/√(4Dt))——<strong>退化为 1D 解</strong>，几何因子 R/r ≈ 1</p>
+<h2>4 无量纲化与数值验证【验证②③】</h2>
+<p>无量纲化：x = (r−R)/L（L = √(2R·l_P) 特征宽度）、τ = t/(R/c)。</p>
+<p><strong>关键发现【推导】——无量纲扩散常数 D_eff = 1/4（解析恒等）</strong>：</p>
+<div class="formula">D<sub><span class="txt">eff</span></sub> = <span class="frac"><span class="num">RD</span><span class="den">cL<sup>2</sup></span></span> = <span class="frac"><span class="num">R·(l<sub>P</sub> c/2)</span><span class="den">c· 2R l<sub>P</sub></span></span> = <span class="frac"><span class="num">1</span><span class="den">4</span></span></div>
+
+<p>数值验证（有限差分 FTCS 含 2/r 径向项，40 万网格点级）：</p>
+<table>
+<thead>
+<tr>
+<th>验证项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>② 有限差分 vs 精确解最大偏差</td>
+<td><strong>0.0024%</strong>（x=1.20）✅</td>
+</tr>
+<tr>
+<td>③ 半值点数值</td>
+<td>0.476942 vs 理论 erf⁻¹(1/2)=0.476936（偏差 6×10⁻⁶）✅</td>
+</tr>
+<tr>
+<td>① 边界/极限</td>
+<td>ρ(R)=0、ρ(∞)=ρ∞、x≪R 退化 1D ✅</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>排查记录</strong>：初版数值解半值点偏差 2 倍——根因是无量纲化漏乘 D_eff=1/4（FTCS 用 D=1 而非 1/4），修正后偏差从 49.87% 降至 0.0024%。</p>
+</blockquote>
+<h2>5 火墙厚度闭式公式【推导】</h2>
+<p><strong>特征宽度</strong>（erf 自变量 = 1 处）：</p>
+<div class="formula">δ = <span class="sqrt">√<span class="radicand">4Dt<sub><span class="txt">rec</span></sub></span></span> = <span class="sqrt">√<span class="radicand">4·<span class="frac"><span class="num">l<sub>P</sub> c</span><span class="den">2</span></span>·<span class="frac"><span class="num">R</span><span class="den">c</span></span></span></span> = <span class="sqrt">√<span class="radicand">2R l<sub>P</sub></span></span> = <span class="sqrt">√<span class="radicand">2</span></span>·<span class="sqrt">√<span class="radicand">R l<sub>P</sub></span></span></div>
+
+<p><strong>半值厚度</strong>（ρ = ρ∞/2 处，erf⁻¹(1/2) = 0.476936）：</p>
+<div class="formula">δ<sub>1/2</sub> = 0.4769·<span class="sqrt">√<span class="radicand">2R l<sub>P</sub></span></span> = 0.6745·<span class="sqrt">√<span class="radicand">R l<sub>P</sub></span></span></div>
+
+<p><strong>3D 几何修正量级【验证④】</strong>:R/r 因子修正 ~ O(ε) = √(2l_P/R)：</p>
+<table>
+<thead>
+<tr>
+<th>黑洞</th>
+<th>ε = L/R</th>
+<th>修正量级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>太阳</td>
+<td>1.05×10⁻¹⁹</td>
+<td>~10⁻¹⁹</td>
+</tr>
+<tr>
+<td>Sgr A*</td>
+<td>5.23×10⁻²³</td>
+<td>~10⁻²³</td>
+</tr>
+<tr>
+<td>M87*</td>
+<td>1.30×10⁻²⁴</td>
+<td>~10⁻²⁴</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 1D 近似完全正当</strong>：球对称几何修正被 √(l_P/R) 抑制，宏观黑洞 ~10⁻¹⁹——1D 近似的正当性获得严格证明。</p>
+<h2>6 物理厚度表【验证⑤】</h2>
+<table>
+<thead>
+<tr>
+<th>黑洞</th>
+<th>R (m)</th>
+<th>恢复时间 (s)</th>
+<th>δ特征 (m)</th>
+<th>δ半值 (m)</th>
+<th>δ/l_P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>太阳</td>
+<td>2.95×10³</td>
+<td>9.85×10⁻⁶</td>
+<td>3.09×10⁻¹⁶</td>
+<td>1.47×10⁻¹⁶</td>
+<td>1.9×10¹⁹</td>
+</tr>
+<tr>
+<td>Sgr A*</td>
+<td>1.18×10¹⁰</td>
+<td>39.4</td>
+<td>6.18×10⁻¹³</td>
+<td>2.95×10⁻¹³</td>
+<td>3.8×10²²</td>
+</tr>
+<tr>
+<td>M87*</td>
+<td>1.92×10¹³</td>
+<td>6.41×10⁴</td>
+<td>2.49×10⁻¹¹</td>
+<td>1.19×10⁻¹¹</td>
+<td>1.5×10²⁴</td>
+</tr>
+<tr>
+<td>原初 10¹¹ kg</td>
+<td>1.49×10⁻¹⁶</td>
+<td>4.95×10⁻²⁵</td>
+<td>6.93×10⁻²⁶</td>
+<td>3.31×10⁻²⁶</td>
+<td>4.3×10⁹</td>
+</tr>
+</tbody>
+</table>
+<h2>7 物理意义与升级</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>v1.9（1D 近似）</th>
+<th>v1.10（3D 精确解）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>解的形式</td>
+<td>erf 启发式</td>
+<td><strong>闭式解 ρ = ρ∞[R·erf(x/√4Dt)+x]/r</strong></td>
+</tr>
+<tr>
+<td>δ 系数</td>
+<td>√2（D 取 l_P·c）</td>
+<td><strong>√2 确认（D = l_P·c/2 严格）</strong></td>
+</tr>
+<tr>
+<td>半值厚度</td>
+<td>未给出</td>
+<td><strong>0.6745·√(R·l_P)</strong></td>
+</tr>
+<tr>
+<td>1D 近似正当性</td>
+<td>假设</td>
+<td><strong>严格证明（修正 O(ε)~10⁻¹⁹）</strong></td>
+</tr>
+<tr>
+<td>无量纲结构</td>
+<td>—</td>
+<td><strong>D_eff = 1/4（解析恒等）</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>火墙物理图像【原文 227 结合】</strong>:火墙 = 通量恢复的扩散过渡层，通量剖面为精确的 <strong>误差函数型</strong>（3D 闭式），从视界（ρ=0）平滑过渡到宇宙背景（ρ∞）——"饱和"= 0→ρ∞ 的 erf 过渡，"温和"= 宽度 δ ≫ l_P。</p>
+<h2>8 遗留问题【待验证】</h2>
+<ol>
+<li><strong>有限 R 严格格林函数</strong>：本解用半无限近似（x ≪ R）；对原初黑洞（R ~ l_P）需球面有限区域严格解（球谐展开）；</li>
+<li><strong>各向异性残余 O(ε)</strong>：ε 阶修正的显式展开（对原初黑洞 ~10⁻⁹ 量级，可能可观测）；</li>
+<li><strong>t_rec 起点</strong>：视界形成瞬间 vs 稳定态的精确时刻；</li>
+<li><strong>扩散-泄漏耦合</strong>：扩散方程未含 ε 泄漏源项（背景 ρ∞ 的持续供应机制）。</li>
+</ol>
+<hr />
+<h2>附录：数值脚本</h2>
+<p><code>_diff3d_numeric.py</code>（无量纲化 + FTCS 有限差分 + 精确解对照，可复现）。</p>
+<pre><code>验证① 边界/极限: ρ(R)=0 ✓, ρ(∞)=ρ∞ ✓, x≪R→1D ✓
+验证② 有限差分 vs 精确解: 最大偏差 0.0024% ✅
+验证③ 半值点: 0.476942 vs 0.476936 ✅
+验证④ 3D 几何修正: O(ε)=√(2l_P/R) ~ 10⁻¹⁹ ✅
+验证⑤ 厚度表: 太阳 3.09×10⁻¹⁶ m / Sgr A* 6.18×10⁻¹³ m / M87* 2.49×10⁻¹¹ m ✅
+</code></pre>
+
+<div class="footer">3D 球对称扩散精确解：火墙厚度判定 F1″ 严格化 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 3D球对称扩散精确解.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>void-CPT-κ 结项：机制已否证，而「真预言」判定从未降级</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">二、证据链（时间线）</div>
+  <h1>void-CPT-κ 结项：机制已否证，而「真预言」判定从未降级</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 94 轮</strong> ｜ 2026-10-02 ｜ 任务来源：<strong>外部待办——候选池「void-CPT-κ 异常」</strong>（技能陷阱 87 登记）
+｜ 脚本：<code>_voidcpt_94.py</code>（<strong>VC-1…VC-10，22 项 0 失败</strong>）</p>
+<p><strong>一句话结论</strong>：「void-CPT-κ」结项。其唯一机制（镜像支引力投影 → 暗物质 → 空洞弱透镜增强）早在 <strong>2026-09-16/17</strong> 就被<strong>硬否证</strong>
+（读法 A 低 <strong>5.31 倍</strong>／读法 B 高 <strong>3.82 倍</strong>），§8.3 也已自写「<strong>降为开放问题；仅在该机制被重建后才成立</strong>」——
+<strong>但四处下游从未同步</strong>：§9 表、§8.4 的可检验列表、摘要、以及第 90/91 轮的四类判定台账（后者把它标为「<strong>真预言</strong>」）。
+本轮：判定降级为「<strong>悬空（机制未重建）</strong>」并在四处加注（<strong>C-51</strong>）；摘要的暗物质旧表述加限定（<strong>C-52</strong>）；
+候选池引用做编号对账（<strong>C-53</strong>）；登记 <strong>N-39</strong>。</p>
+</blockquote>
+<hr />
+<h2>二、证据链（时间线）</h2>
+<table>
+<thead>
+<tr>
+<th>时点</th>
+<th>位置</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>2026-09-16/17</strong></td>
+<td><code>暗物质_三大机制全过量级检验.md</code></td>
+<td><strong>硬否证</strong>：50:50 ⟹ 读法 A <code>Ω_dm = Ω_b = 0.0493</code>（低 <strong>5.31 倍</strong>）；读法 B <code>Ω_dm ≈ 1</code>（高 <strong>3.82 倍</strong>）——「<strong>两种读法都被否证</strong>」</td>
+</tr>
+<tr>
+<td>2026-09-18</td>
+<td>日志 ＋ 论文 §8.3【v2.9 修正】</td>
+<td>论文<strong>就地标注</strong>：镜像支投影<strong>已被否证</strong>，降为开放问题</td>
+</tr>
+<tr>
+<td>第 74 轮</td>
+<td><code>全量待办回溯…</code></td>
+<td>记作「<strong>悬空｜待重建</strong>」</td>
+</tr>
+<tr>
+<td>第 84 轮</td>
+<td><code>全量冲突审计…</code></td>
+<td>撤回链抽查：确认「镜像支暗物质撤回」<strong>依据仍成立</strong></td>
+</tr>
+<tr>
+<td><strong>第 90 轮</strong></td>
+<td>§9 后台账</td>
+<td>⚠️ 标为「<strong>真预言</strong>」——依据列写「分析方案已给出、结果未出」，<strong>未引任何已登记轮次</strong></td>
+</tr>
+<tr>
+<td><strong>第 91 轮</strong></td>
+<td>正文级台账</td>
+<td>⚠️ 同标「<strong>真预言</strong>」（依据写「未观测（DES/Y3）」）</td>
+</tr>
+<tr>
+<td><strong>第 94 轮（本）</strong></td>
+<td>四处 ＋ 清单</td>
+<td>降级为「<strong>悬空（机制未重建）</strong>」；C-51/52/53 ＋ N-39</td>
+</tr>
+</tbody>
+</table>
+<p><strong>同一命题的三个状态并存了四周</strong>：机制侧「已否证/待重建」（§8.3、S-8、回溯、审计）vs 判定侧「真预言」（两张台账）vs 呈现侧「可检验」（§9 表、§8.4、摘要）。</p>
+<hr />
+<h2>三、判定分析：为什么「真预言」不成立 —— 需要<strong>两根轴</strong>，不是一根</h2>
+<p>第 90/91 轮的判据只看了<strong>观测轴</strong>（「未观测／结果未出」⟹ 真预言），漏了<strong>机制轴</strong>（推导依据是否现役）：</p>
+<table>
+<thead>
+<tr>
+<th>机制轴 ＼ 观测轴</th>
+<th><strong>未观测</strong></th>
+<th><strong>已观测</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>现役</strong></td>
+<td><strong>真预言</strong>（例：S-E1–S-E4）</td>
+<td>postdiction／检验中</td>
+</tr>
+<tr>
+<td><strong>已否证／已撤</strong></td>
+<td><strong>悬空（机制未重建）</strong>（本例）</td>
+<td>失败（例：v1.0 强场外推）</td>
+</tr>
+</tbody>
+</table>
+<p>void-CPT-κ 落在「<strong>已否证 × 未观测</strong>」格：既不是「真预言」（『先算』那一半已被撤回），也不是「失败」
+（作为对自然的陈述尚未被检验）——正确档位 = <strong>悬空</strong>（四类 + 未定量 + 推导/数值之外的<strong>第七档</strong>，本轮首次使用）。</p>
+<hr />
+<h2>四、C-51：四处下游（全部就地加注，中英同步）</h2>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>补丁前</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§8.3/§8.4 列表（L1449）</td>
+<td>「可检验预言：…」（紧随撤回句之后、但<strong>无条件标记</strong>）</td>
+<td>改为「可检验预言（⚠️ <strong>条件性：仅当上句机制被重建后才成立</strong>）」</td>
+</tr>
+<tr>
+<td><strong>§9 表第 2 行</strong>（L1909）</td>
+<td>状态「可检验（分析方案已给出）」</td>
+<td>追加「⚠️ <strong>机制已撤（§8.3 否证）：仅重建后成立</strong>」</td>
+</tr>
+<tr>
+<td><strong>第 90 轮台账行</strong>（L1938）</td>
+<td><strong>真预言</strong></td>
+<td>~~真预言~~ ⟹ <strong>悬空（机制未重建）</strong>；汇总 <code>真预言 11 → 10 ＋ 悬空 1</code>；派生句「11 条」→「10 条」（陷阱 70）</td>
+</tr>
+<tr>
+<td><strong>第 91 轮台账行</strong>（L1981）</td>
+<td><strong>真预言</strong></td>
+<td>同上；汇总 <code>真预言 2 → 1 ＋ 悬空 1</code></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 第 90 轮那张表自己的规范是「每行的判定<strong>必须引一条已登记的轮次作依据</strong>」——而第 2 行的依据列<strong>什么都没引</strong>。本轮补注已写明这一点。</p>
+<hr />
+<h2>五、C-52：摘要第 5 条（L27）</h2>
+<p>原文：「统计衰减因子 ε_B=(l_P/R_U)² <strong>给出暗物质密度</strong>；暗物质 = 本支普朗克涨落残余 + <strong>镜像支引力投影的叠加模型</strong>」——
+与 §8.2（自标「ε_B 机制差 <strong>~70 倍</strong> ⟹ <strong>仍是空白</strong>」）和 §8.3（<strong>已被否证</strong>）不相容。
+处置：<strong>不删原句</strong>，加第 94 轮限定注（以 §8.2／§8.3 为准；与 C-43「不删数、只补口径」同族）。</p>
+<hr />
+<h2>六、C-53：候选池引用对账（编号不可作引用键）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>发现</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td>池表 <strong>#7 = EMRI、#8 = void-CPT-κ</strong>；而「剩余待办」行 <strong>#7 = void-CPT-κ、#8 = EMRI</strong> —— <strong>两套互换</strong></td>
+<td>池表加对账注；<strong>引用一律用名字</strong></td>
+</tr>
+<tr>
+<td>②</td>
+<td>池表 <strong>#6 = 规范群结构</strong>；第 74 轮回溯「组 III」的 <strong>C6 = 宇宙学动力学</strong>（已于第 75 轮结项）—— <strong>#6 异义</strong></td>
+<td>同上</td>
+</tr>
+<tr>
+<td>③</td>
+<td>第 93 轮<strong>漏改一处</strong>：<code>#5（PPN 优越系）</code>（括号写法，不在其锚点样式内）</td>
+<td>本轮补划线</td>
+</tr>
+<tr>
+<td>④</td>
+<td>台账行 <strong>C6 状态过期</strong>（宇宙学动力学第 75 轮已结项、未标）—— <strong>C-19 族第 12 条</strong></td>
+<td>就地补标 ✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>七、N-39</h2>
+<p><strong>「把（机制已撤的）void-CPT-κ 当作可维持的可检验预言（乃至『框架最强预言』）」——判否</strong>：
+唯一机制已硬否证，§8.3 自写「仅在该机制被重建后才成立」⟹ <strong>不得计入可检验预言或出口计数</strong>。
+⚠️ 历史出处（均为<strong>前否证时代</strong>表述，未回溯标注）：M5 报告「已有数据 0–3 年」四项之一；P2 报告「框架目前最强的可检验预言」。</p>
+<hr />
+<h2>八、诚实边界</h2>
+<ol>
+<li><strong>观测侧未复核</strong>：DES Y3 等的现状（是否已有分析结果）本轮<strong>未联网核查</strong>——框架侧不判观测；台账「未观测／分析方案已给出」按原样保留。</li>
+<li><strong>未尝试「重建机制」</strong>：重建 = 一条<strong>新的暗物质机制</strong>，属框架<strong>未解决项</strong>（S-8：三大机制全被否证）；本轮只做登记与口径。按陷阱 41，开工前需先三步审查。</li>
+<li><strong>VC-5 抽查非穷举</strong>：对 8 个「真预言」关键名词做了 ±4 行窗口扫描（带噪声，多数命中为误报——例如 L29 的「结项」来自 S-E5 的旧注）。<strong>除 void-CPT-κ 外未发现第二条「机制已撤而仍列」</strong>，但这<strong>不是</strong>全部 11 行的逐条机制史核查。</li>
+<li><strong>M5 / P2 等历史报告未回溯标注</strong>（其乐观表述保留为历史记录）；以<strong>论文与清单</strong>为准。</li>
+<li>「悬空（机制未重建）」是<strong>新增补充档</strong>（第七档），本轮首次使用；两轴表（§三）为判据而非定理。</li>
+<li><strong>计数影响已扫全</strong>：§9 表与正文级台账的<strong>汇总行、派生句</strong>均同步（陷阱 70）；「独立出口」结论（EMRI 系）<strong>不变</strong>。</li>
+</ol>
+<hr />
+<h2>九、判决与下一步</h2>
+<ul>
+<li><strong>结项</strong>：候选池「void-CPT-κ」⟹ <strong>悬空（机制未重建）</strong>，不再计入可检验预言。</li>
+<li>剩余待办：候选池 <strong>#1 η 能标／#2 暗能量能标／#4 η/s</strong>；<strong>EMRI</strong>（等 LISA）；<strong>A1</strong>（换机资产）。</li>
+<li>若日后要「重建」：入口只有一条 —— 新暗物质机制（S-8 未解决项）；先按陷阱 41 三步审查（内容存量／尺度／可判定入口）。</li>
+</ul>
+
+<div class="footer">void-CPT-κ 结项：机制已否证，而「真预言」判定从未降级 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 void-CPT-κ结项_机制已否证而判定未降级.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

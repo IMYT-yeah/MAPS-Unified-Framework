@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§7 量子力学基础审计 —— 非交换化是**外加的**，判别力 = 0</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>§7 量子力学基础审计 —— 非交换化是**外加的**，判别力 = 0</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 76 轮 ｜ 候选池 <strong>3</strong>（C3：<code>D = ℏ/(3m)</code> vs Nelson <code>ℏ/(2m)</code>）｜ 核验脚本 <code>_qm_audit_76.py</code>
+<strong>QM-1 … QM-12，12 项 0 失败</strong></p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>§7 的非交换化不是「涌现」，是「外加」</strong> —— 框架<strong>自有的</strong>三处代数结构（衬底函数代数、弦网算符、交换权重）
+分别是<strong>交换／交换／阿贝尔</strong>，唯一真非交换的（Clifford 投影）是<strong>表示论记号</strong>而非动力学。
+而候选池 3 提出的 <code>D = ℏ/(3m)</code> vs Nelson <code>ℏ/(2m)</code> <strong>是恒等式对恒等式</strong>，
+「1.5 倍 = 维度因子」是<strong>数字巧合</strong>，不构成判别点。</p>
+<p><strong>§7 的 5 条输出：postdiction 1 ｜ 零内容 1 ｜ 一致性构造 1 ｜ 自认 1 ｜ 恒等式 1 —— 真预言 0 条。</strong></p>
+<hr />
+<h2>一、先看 §7 有多大（QM-1）</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§7 行范围</td>
+<td>1007–1076（70 行）</td>
+</tr>
+<tr>
+<td>其中已登记的轮次块（第 57 / 68 轮）</td>
+<td><strong>41 行</strong></td>
+</tr>
+<tr>
+<td><strong>去掉轮次块后的非空正文</strong></td>
+<td><strong>15 行</strong>（含 4 个标题 ⇒ 实质正文 11 行）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>这是全篇最薄的大章</strong>。此前 14 轮（62–75）只往里加过块，<strong>从未审计过正文</strong>。</p>
+<p>§7 的实质内容只有 4 小节：</p>
+<ul>
+<li><strong>7.1</strong> 经典事件流推不出贝尔违背 ⟹「<strong>框架必须非交换化</strong>」</li>
+<li><strong>7.2</strong> 非交换事件流 ⟹ CHSH = 2√2 / 互补性 / 不确定关系</li>
+<li><strong>7.3</strong> 量子游走 <code>U = S(C⊗I)</code> ⟹ 弹道 vs 扩散</li>
+<li><strong>7.4</strong> 定位澄清：<strong>「与标准 QM 数学上重合」</strong></li>
+</ul>
+<hr />
+<h2>二、候选池 3：<code>D = ℏ/(3m)</code> 与 Nelson 的 <code>ℏ/(2m)</code>（QM-2 / QM-3 / QM-4）</h2>
+<h3>2.1 这两个数<strong>都不在论文里</strong>（C-22）</h3>
+<table>
+<thead>
+<tr>
+<th>词</th>
+<th>全文</th>
+<th>正文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Nelson</code></td>
+<td>0</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>随机力学</code></td>
+<td>0</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>ℏ/(3m)</code></td>
+<td>0</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>ℏ/(2m)</code></td>
+<td>0</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><code>持续长度</code> / <code>λ_C</code> / <code>p_rev</code></td>
+<td>0</td>
+<td><strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 候选池 3 的全部锚点词<strong>在论文里 0 处</strong>。它的真实出处是<strong>第 18/21 轮的备忘录</strong>
+<code>配对机制_湮灭等于相邻格点的对换.md</code> 第 84 行的「🎯 意外收获」，<strong>从未进入论文</strong>。
+⟹ <strong>C-22</strong>：候选池条目与论文正文的对应关系缺失（照此追下去会撞空）。</p>
+<h3>2.2 <code>D = ℏ/(3m)</code> 是<strong>恒等式</strong></h3>
+<p>第 18/21 轮的链条：</p>
+<pre><code>p_rev = m/m_P            ← 【输入】让持续长度恰好 = 康普顿波长
+λ_C   = l_P / p_rev = ℏ/(mc)
+τ_corr= λ_C/c       = ℏ/(mc²)
+D     = c²·τ_corr/3      （d = 3 的各向同性扩散因子）
+      = c·λ_C/3 = c·(l_P·m_P/m)/3 = ℏ/(3m)      ∵ l_P·m_P ≡ ℏ/c
+</code></pre>
+<p><strong>判据</strong>：把<strong>牛顿常数 G 缩放 ×0.25 / ×1 / ×4</strong> —— 此时 <code>l_P ∝ √G</code> 变 ±2 倍、<code>m_P ∝ 1/√G</code> 变 ∓2 倍，
+但 <code>l_P·m_P ≡ ℏ/c</code> <strong>与 G 无关</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>G 缩放</th>
+<th>l_P</th>
+<th>m_P</th>
+<th>l_P·m_P</th>
+<th><strong>D</strong></th>
+<th>相对差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>×0.25</td>
+<td>8.0813e−36</td>
+<td>4.3529e−08</td>
+<td>3.517673e−43</td>
+<td><strong>3.858921e−05</strong></td>
+<td>0.0e+00</td>
+</tr>
+<tr>
+<td>×1.00</td>
+<td>1.6163e−35</td>
+<td>2.1764e−08</td>
+<td>3.517673e−43</td>
+<td><strong>3.858921e−05</strong></td>
+<td>0.0e+00</td>
+</tr>
+<tr>
+<td>×4.00</td>
+<td>3.2325e−35</td>
+<td>1.0882e−08</td>
+<td>3.517673e−43</td>
+<td><strong>3.858921e−05</strong></td>
+<td>0.0e+00</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong><code>l_P</code> 与 <code>m_P</code> 被完全消掉</strong> ⟹ <code>D = ℏ/(3m)</code> <strong>只是 <code>λ_C = ℏ/(mc)</code> 的重述</strong>，
+而 <code>λ_C</code> 又是 <code>p_rev = m/m_P</code> 的<strong>定义式反解</strong> ⟹ <strong>恒等式，不是框架的预言</strong>
+（陷阱 39 / 铁律 7 的标准形态：把中间参数代回去，全消掉）。</p>
+<h3>2.3 「差 1.5 倍 = 维度因子」这个说法<strong>本身</strong>不成立</h3>
+<p>框架的 <code>1/d</code> 是 <strong>d 维各向同性扩散的几何因子</strong>；Nelson 的 <code>1/2</code> 来自欧氏 QM，<strong>与维度无关</strong>。
+所以正确的对照是<strong>扫维度</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>d</th>
+<th>D_frame(d) = ℏ/(d·m)</th>
+<th>D_Nelson = ℏ/(2m)</th>
+<th>比值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1.157676e−04</td>
+<td>5.788382e−05</td>
+<td>2.000000</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>5.788382e−05</td>
+<td>5.788382e−05</td>
+<td><strong>1.000000</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td>3.858921e−05</td>
+<td>5.788382e−05</td>
+<td>0.666667</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2.894191e−05</td>
+<td>5.788382e−05</td>
+<td>0.500000</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>只有 d = 2 恰好重合</strong>。若两个「1/2」真是同一个东西，必须<strong>在所有维度</strong>都相同。
+⟹ 「差 1.5 倍 = 维度因子」是<strong>把 d=3 的『3』与 2m 的『2』摆在一起的数字巧合</strong>，
+<strong>不是</strong>可解释的结构关系 ⟹ <strong>不构成判别点</strong>（铁律 2：数值接近只可登记为「无机制」）。</p>
+<hr />
+<h2>三、§7.1 —— 本轮<strong>唯一</strong>的正面产出（QM-5）</h2>
+<p><strong>枚举全部 2⁴ = 16 个确定性局域策略</strong>（<code>A₀,A₁,B₀,B₁ ∈ {±1}</code>）：</p>
+<pre><code>max S = 2     （达界策略：A₀=+1, A₁=+1, B₀=+1, B₁=+1）
+5000 组随机混合权重：max S = 1.0879 ≤ 2   （凸组合不越过上界）
+</code></pre>
+<p>⟹ <strong>经典（交换）局域模型的最大 CHSH = 2</strong>（枚举 + 凸组合闭包）。</p>
+<p>于是 <strong>§7.1 的主张可以从「断言」升级为「引用 Fine 定理（1982）的推论」</strong>：</p>
+<blockquote>
+<p><strong>定理（升级版）</strong>：若某理论的可观测代数在某个态上允许一个<strong>联合概率分布</strong>
+（⟺ 代数为<strong>交换</strong>），则其关联必然满足 CHSH ≤ 2。故与 CHSH = 2√2 相容的理论，
+<strong>其可观测代数必然非交换</strong>。</p>
+</blockquote>
+<p>⭐ 这是<strong>框架内唯一一条有严格外部定理（Fine / Tsirelson）支撑的「必然性」论证</strong>。</p>
+<p>⚠️ <strong>但要说清它证明了什么</strong>：证明的是「<strong>若</strong>可观测代数交换，则不可能」——
+<strong>不是</strong>「框架的可观测代数交换」。后者是 §7.1 的<strong>前提</strong>（未证），也是 §7.2 用「升级为算子代数」
+这个<strong>动作</strong>绕过去的地方。</p>
+<hr />
+<h2>四、§7.2 的「命题」是<strong>条件命题</strong> —— 零内容判据（QM-6）</h2>
+<p>用 2 个 qubit（Bell 态 <code>|ψ⁻⟩</code> + 最优基）复现：</p>
+<pre><code>S = −2.8284271247      2√2 = 2.8284271247     ✓
+</code></pre>
+<p><strong>这段计算用到的全部输入</strong>：4 个 2×2 Pauli 矩阵、1 个 2-qubit 态、<code>numpy.kron</code>。
+逐项检查 —— <code>tick</code> / <code>置换</code> / <code>弦网</code> / <code>A_v</code> / <code>B_p</code> / <code>Clifford</code> / <code>通量</code> / <code>格点</code> / <code>l_P</code> / <code>E_P</code>：
+<strong>一个都没有出现</strong>。</p>
+<p>⟹ §7.2 的命题形式是「<strong>若</strong>把事件流升级为算子代数（其中含 <code>{Π_μ,Π_ν}≠0</code>）<strong>则</strong> CHSH = 2√2」。
+结论是 <strong>Tsirelson 定理</strong>（算子代数上的代数事实），而<strong>前提已经把结论塞进去了</strong>
+⟹ <strong>命题不含框架特有的内容</strong>（零内容）。</p>
+<p>⚠️ §7.2 自称的「数值验证」证明的是<strong>标准 QM 的一个教科书结果</strong>。</p>
+<hr />
+<h2>五、4 条「框架已有非交换元素」逐条判定（QM-7 / QM-8 / QM-9 / QM-10）</h2>
+<p>论文 §7.2 列了 4 条。逐条核：</p>
+<table>
+<thead>
+<tr>
+<th>论文列的「已有非交换元素」</th>
+<th>判定</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Clifford 代数</strong>（微变不可交换）</td>
+<td><strong>非交换 ✓</strong></td>
+<td>§5.2 的<strong>表示论记号</strong>（内空间 4 分量 / <code>ε_ijk</code>）；非动力学</td>
+</tr>
+<tr>
+<td>路径积分 <code>(−1)^N_exchange</code>（交换符号）</td>
+<td><strong>阿贝尔</strong></td>
+<td>±1 相位 = <strong>对角权重</strong>；框架<strong>无 Fock 空间</strong></td>
+</tr>
+<tr>
+<td>叠加态几何起源（正反风暴中心全局等价）</td>
+<td><strong>等式 / 全局性</strong></td>
+<td>「全局等价」是<strong>相等</strong>，不是算符关系</td>
+</tr>
+<tr>
+<td>量子直线（同源事件）</td>
+<td><strong>通道 / 关联</strong></td>
+<td>ER=EPR 式的关联通道，<strong>不是代数结构</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>4 条里只有 1 条真非交换，且它是表示论记号。</strong></p>
+<h3>5.1 弦网代数（框架的规范侧主力）是<strong>交换的</strong>（QM-7）</h3>
+<p>用 <strong>Pauli 辛表示</strong> <code>(a|b) ∈ F₂^E × F₂^E</code>（交换判据 <code>a·b′ + a′·b ≡ 0 mod 2</code>）
+＋ <strong>L=2 的 256 维全矩阵</strong>交叉验证：</p>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>|E|</th>
+<th>顶点—面共享边数</th>
+<th>不交换的 [A_v,A_v′] / [B_p,B_p′] / <strong>[A_v,B_p]</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×2</td>
+<td>8</td>
+<td>{2}</td>
+<td>0 / 0 / <strong>0</strong></td>
+</tr>
+<tr>
+<td>3×3</td>
+<td>18</td>
+<td>{0,2}</td>
+<td>0 / 0 / <strong>0</strong></td>
+</tr>
+<tr>
+<td>2×4</td>
+<td>16</td>
+<td>{0,2}</td>
+<td>0 / 0 / <strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>全矩阵交叉验证（256 维，逐对 <code>‖AB−BA‖_max</code>）：<strong>最大 = 0.000e+00</strong>。</p>
+<p><strong>机理</strong>：顶点 v 与面 p 共享<strong>恰好 2 条边</strong> ⟹ <code>X···X</code> 与 <code>Z···Z</code> 反对易 <strong>2 次</strong> ⟹ <strong>净交换</strong>。</p>
+<p>⟹ <strong>§7.2 列的 4 条里没有一条是弦网</strong> —— 而弦网是框架<strong>唯一</strong>有严格哈密顿量与数值验证（§5.7）的部分。</p>
+<h3>5.2 <code>(−1)^N_exchange</code> 只能是阿贝尔相位（QM-9）</h3>
+<table>
+<thead>
+<tr>
+<th>词</th>
+<th>全文处数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Fock</code> / <code>二次量子化</code> / <code>产生算符</code> / <code>湮灭算符</code> / <code>交换算符</code> / <code>置换算符</code> / <code>密度矩阵</code></td>
+<td><strong>各 0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>框架<strong>没有二次量子化</strong> ⟹ 「交换符号」只能读作<strong>组态权重</strong>（对角算符，<code>‖[D, diag f]‖ = 0</code>）
+⟹ <strong>U(1) 阿贝尔相位</strong>，不提供任何非交换性。
+⚠️ 若作者本意是「费米子交换算符」，那需要 Fock 空间 —— 而框架没有 ⟹ <strong>记号歧义登记为口径缺口</strong>。</p>
+<hr />
+<h2>六、判别力检查（QM-11 / QM-12）</h2>
+<p>§7 正文的全部物理数值（滤掉节号）：<strong><code>{2√2, ½, −2.8284}</code></strong> ——
+全都是<strong>标准 QM 的教科书常数</strong>，没有一个来自框架。</p>
+<p>而 §7.4 <strong>自己写着</strong>：</p>
+<blockquote>
+<p>「一旦非交换化，框架的量子部分与标准 QM <strong>数学上重合</strong>。框架的独特贡献 =
+<strong>为『为什么是量子力学』提供本体论动机</strong>」</p>
+</blockquote>
+<p>⟹ <strong>判别力 = 0 是自认的</strong> ⟹ 与 <strong>N-29</strong>（宇宙学：<code>ΛCDM ⊂ 框架</code>）<strong>同族</strong>：
+<strong>解释力 ≠ 判别力</strong>（第 61 轮建立）。</p>
+<h3>四类判定归类</h3>
+<table>
+<thead>
+<tr>
+<th>§7 的输出</th>
+<th>判定</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§7.1「必须非交换化」</td>
+<td><strong>postdiction</strong></td>
+<td>被 CHSH 实验（1982 起）逼出；Fine 定理使其严格</td>
+</tr>
+<tr>
+<td>§7.2「非交换 ⇒ CHSH = 2√2」</td>
+<td><strong>失败（零内容）</strong></td>
+<td>条件命题：前提含结论；数值只用到 2 qubit</td>
+</tr>
+<tr>
+<td>§7.3 量子游走 σ~t vs √t</td>
+<td><strong>一致性构造</strong></td>
+<td>标准离散时间量子游走；框架未提供硬币/位移的定义</td>
+</tr>
+<tr>
+<td>§7.4「与标准 QM 数学重合」</td>
+<td><strong>自认</strong></td>
+<td>⟹ 判别力 0</td>
+</tr>
+<tr>
+<td>C3 的 <code>D = ℏ/(3m)</code></td>
+<td><strong>恒等式（非预言）</strong></td>
+<td><code>l_P·m_P</code> 消掉</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>七、结构结论：与 I-16 <strong>同构</strong></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>缺什么</th>
+<th>三层的表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>I-16</strong>（第 68 轮）</td>
+<td>位置的量子化</td>
+<td>衬底有位置无能量｜弦网无位置有能量｜场论都有但 c-数</td>
+</tr>
+<tr>
+<td><strong>本轮</strong></td>
+<td><strong>非交换</strong></td>
+<td>衬底函数代数<strong>交换</strong>｜弦网算符<strong>交换</strong>｜唯一非交换的（Clifford）是<strong>记号</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>同一个「分层」失败形态</strong>：<strong>每一层各有半样东西，没有一层同时给齐。</strong></p>
+<p>而 §7.2 的动作（「把事件流状态从经典概率分布<strong>升级</strong>为算子代数」）
+正是<strong>在分层之上再叠一层假设</strong> ⟹ 与陷阱 23（<strong>公设上移 = 无穷回归</strong>）同族。</p>
+<hr />
+<h2>八、判决与总账</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>内容</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>I-21</strong></td>
+<td><strong>§7 量子力学基础审计</strong></td>
+<td>难题 → <strong>✅ 第 76 轮结项</strong>（结论：非交换化 = 外加，判别力 0）</td>
+</tr>
+<tr>
+<td><strong>N-31</strong></td>
+<td>「§7.2 的非交换化 ⇒ 量子关联」当作框架的<strong>推导</strong></td>
+<td><strong>负面</strong>（条件命题，零内容）</td>
+</tr>
+<tr>
+<td><strong>N-32</strong></td>
+<td>「<code>D = ℏ/(3m)</code> vs Nelson <code>ℏ/(2m)</code>」当作<strong>判别点</strong></td>
+<td><strong>负面</strong>（恒等式；1.5 倍是数字巧合）</td>
+</tr>
+<tr>
+<td><strong>C-22</strong></td>
+<td>候选池 3 的全部锚点词<strong>在论文里 0 处</strong></td>
+<td>撤回 / 更正（条目与正文的对应关系缺失）</td>
+</tr>
+<tr>
+<td><strong>C-23</strong></td>
+<td>「<code>(−1)^N_exchange</code>（交换符号）」<strong>记号歧义</strong>（组态权重 vs 费米子算符）</td>
+<td>撤回 / 更正</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总账</strong>：难题 <strong>15 → 14</strong>（I-21 结项）｜负面 <strong>30 → 32</strong>（N-31 / N-32）｜更正 <strong>21 → 23</strong>（C-22 / C-23）。</p>
+<p>⭐ <strong>战略含义</strong>（与第 61 / 62 / 72 / 73 轮并列）：
+<strong>§7 的对外接口也是 0</strong> —— 而 §7 是<strong>最后一个未被审计的大章</strong>。
+⟹ 框架的<strong>全部对外接口现已逐一核完</strong>（工程 / 新力 / 宇宙学 / 凝聚态 / 量子基础），
+剩下的仍是<strong>唯一一个</strong>：<strong>EMRI</strong>（观测侧，LISA ~10–15 年）。</p>
+<hr />
+<h2>九、诚实边界（五条）</h2>
+<ol>
+<li><strong>QM-5 是「解释力」不是「判别力」</strong> —— 它把 §7.1 的断言接到 Fine 定理上，
+   但<strong>没有</strong>证明「框架的可观测代数交换」。</li>
+<li><strong>QM-6 的「零内容」判据是「不需要框架元素」</strong>，这是一种<strong>充分性</strong>论证：
+   它说明 §7.2 的证明<strong>可以</strong>不用框架完成，不等于「框架一定不能给别的证明」。</li>
+<li><strong>QM-7 只验证了 Z₂ 弦网</strong>（框架 §5.7 的 B1–B5 用的就是 Z₂）。§5.7 的 <strong>S₃ 非阿贝尔面模型</strong>
+   不在此列 —— 那个「非交换」是<strong>群乘法的非交换</strong>，且是<strong>另一个模型（3+1D 面模型）</strong>，
+   <strong>不等于</strong>框架衬底的性质（判别：它的 <code>A_c</code> 是新的哈密顿量项，不是衬底算符）。</li>
+<li><strong>C-22 / C-23 是口径问题，不是物理错误</strong> —— 候选池 3 的物理内容（恒等式判定）见 §2。</li>
+<li><strong>本轮不动 §7.1–§7.4 的正文措辞</strong>，只在 §7.4 之后<strong>追加一个轮次块</strong> +
+   在 §7.2 加一条<strong>判别力标注</strong>（历史留痕是本项目刻意的做法，见技能 §7）。</li>
+</ol>
+<hr />
+<h2>十、下一步</h2>
+<table>
+<thead>
+<tr>
+<th>优先</th>
+<th>项</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>★★★</td>
+<td><strong>P1：<code>g → α_s/α_EM</code> 映射</strong></td>
+<td>与第 72 轮（Φ 耦合）直接接续，是 §10.2 #11 的实质开放项</td>
+</tr>
+<tr>
+<td>★★</td>
+<td><strong>3.1 不完备度比值重算</strong></td>
+<td>工作流第 3 批，低成本、有对照值（1.00/1.63/5.93）</td>
+</tr>
+<tr>
+<td>★★</td>
+<td><strong>4.3（148 处 ASCII 引号）＋ 4.1 ＋ 3.3 ＋ H5</strong></td>
+<td>一轮可清四条，无依赖</td>
+</tr>
+<tr>
+<td>★</td>
+<td><strong>A1 Lean 资产恢复</strong></td>
+<td>5 分钟，但需要那台机器</td>
+</tr>
+<tr>
+<td>⛔</td>
+<td>~~C1 η 能标 / C2 暗能量能标~~</td>
+<td>都是<strong>配出来的数</strong>（半拟合），再做也不会有判别力</td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">§7 量子力学基础审计 —— 非交换化是**外加的**，判别力 = 0 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 量子力学基础审计_非交换化是外加的判别力为零.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

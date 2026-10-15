@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B6：为什么 n=3——数轴/群论编号错位统一与规范侧论证链</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 编号错位诊断（批2 vs 批6 的"矛盾"）</div>
+  <h1>B6：为什么 n=3——数轴/群论编号错位统一与规范侧论证链</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>蓝图条目</strong>：B6（为什么 n=3，规范侧 A6）· P1-4
+<strong>日期</strong>：2026-08-23
+<strong>核心任务</strong>：① 消除批2（数轴分类）与批6（群论对接）的编号错位；② 形式化"为什么恰好是 SU(3)"的多层论证链
+<strong>结论</strong>：编号错位源于<strong>两套不同量纲的编号</strong>（配对阶数 P vs 表示阶数 R），统一映射表给出转换规则；"n=3"获得<strong>数论 + 费马 + 表示论 + 排除 + 框架</strong>五层论证链——虽无 Tammes 式唯一性定理（诚实标注），但各层均严格或半严格。</p>
+</blockquote>
+<hr />
+<h2>1 编号错位诊断（批2 vs 批6 的"矛盾"）</h2>
+<h3>1.1 两套编号体系【原文】</h3>
+<table>
+<thead>
+<tr>
+<th>体系</th>
+<th>出处</th>
+<th>编号含义</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>数轴分类</strong></td>
+<td>批2（954–956 页）</td>
+<td><strong>配对阶数</strong>（费马指数/复合阶数）</td>
+<td>1→引力、2→电磁、3→弱、6=2×3→强</td>
+</tr>
+<tr>
+<td><strong>群论对接</strong></td>
+<td>批6（245–250 页）</td>
+<td><strong>表示阶数</strong>（表示矩阵维数）</td>
+<td>n=1→U(1)、n=2→SU(2)、n=3→SU(3)</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 表面冲突</h3>
+<table>
+<thead>
+<tr>
+<th>力</th>
+<th>数轴编号 P</th>
+<th>群论编号 R</th>
+<th>表面矛盾</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>电磁</td>
+<td><strong>2</strong></td>
+<td><strong>1</strong>（U(1)）</td>
+<td>2 ≠ 1</td>
+</tr>
+<tr>
+<td>弱</td>
+<td><strong>3</strong></td>
+<td><strong>2</strong>（SU(2)）</td>
+<td>3 ≠ 2</td>
+</tr>
+<tr>
+<td>强</td>
+<td><strong>6</strong></td>
+<td><strong>3</strong>（SU(3)）</td>
+<td>6 ≠ 3</td>
+</tr>
+</tbody>
+</table>
+<h3>1.3 诊断：两套编号是不同量纲【推导】</h3>
+<ul>
+<li><strong>配对阶数 P</strong>：配对结构所需的"份数"——P=2（二元配对：±电荷）、P=3（三元/三态）、P=6（2×3 复合：电荷 × 色）；其数论基础是<strong>"2 和 3 是唯一连续素数"</strong>【原文 935–945】——二元与三元是仅有的两个独立原初结构；</li>
+<li><strong>表示阶数 R</strong>：规范群矩阵表示的维数——R=1（U(1) 单分量电荷）、R=2（SU(2) 双分量旋量）、R=3（SU(3) 三分量色荷）。</li>
+</ul>
+<p><strong>两者不自相矛盾</strong>：数轴编号描述"配对需要多少份"，群论编号描述"表示占多少维"——是<strong>同一物理力的两个正交维度</strong>。批2 与批6 的"错位"是维度混淆，非物理冲突。</p>
+<hr />
+<h2>2 统一映射表【推导】</h2>
+<table>
+<thead>
+<tr>
+<th>力</th>
+<th>配对阶数 P（数轴）</th>
+<th>表示阶数 R（群论）</th>
+<th>P 的分解</th>
+<th>R 的分解</th>
+<th>统一解读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>引力</td>
+<td>1（本体）+ 破缺（ε 残余）</td>
+<td>几何（非规范）</td>
+<td>1 = 原初</td>
+<td>—</td>
+<td>本体+残余二分【原文 955–956】</td>
+</tr>
+<tr>
+<td>电磁</td>
+<td>2</td>
+<td>1</td>
+<td>2 = 二元配对（±q）</td>
+<td>1 = 单分量</td>
+<td>配对需 2 份，表示占 1 维（可交换）</td>
+</tr>
+<tr>
+<td>弱</td>
+<td>3</td>
+<td>2</td>
+<td>3 = 三态/三代结构</td>
+<td>2 = 双分量旋量</td>
+<td>三代卷绕模 n=1,2,3【原文 249】</td>
+</tr>
+<tr>
+<td>强</td>
+<td>6</td>
+<td>3</td>
+<td><strong>6 = 2×3</strong>（电荷 2 × 色 3）</td>
+<td>3 = 三色</td>
+<td><strong>复合阶数 = 二元 × 三元</strong>【原文 955】</td>
+</tr>
+</tbody>
+</table>
+<p><strong>转换规则</strong>（两套编号的对应）：
+- 电磁：P=2 是"±电荷二元性"，R=1 是 U(1) 表示维数——<strong>P = 2R</strong>（电荷对称因子 2）；
+- 弱：P=3 是"三代/手性三态"，R=2 是 SU(2) 旋量维数——<strong>P = R+1</strong>（三代多出的"代"维度）；
+- 强：P=6 = 2×3，R=3——<strong>P = 2R</strong>（每色带 ±电荷）。</p>
+<p><strong>关键洞察</strong>：强力的 P=6=2×3 是<strong>唯一非素数的配对阶数</strong>——它是"二元×三元"的复合，恰好对应夸克<strong>同时携带电荷（2 的二元性）与色荷（3 的三元性）</strong>这一物理事实【原文 955："夸克同时具有电荷（2）和色荷（3 种颜色）"】。<strong>复合配对阶数 ⟹ 复合荷</strong>。</p>
+<hr />
+<h2>3 "为什么 n=3"：五层论证链</h2>
+<h3>层 1：数论基础【原文，严格】</h3>
+<p><strong>"2 和 3 是唯一连续素数"【原文 935–945】</strong>——任何整数要么被 2 或 3 整除（投影数），要么是破缺数（≡1 或 5 mod 6）。二元（2）与三元（3）是<strong>仅有的两个独立原初结构</strong>；所有其他力结构都是它们的组合。这是数论事实（2、3 是唯一差为 1 的连续素数，严格）。</p>
+<h3>层 2：费马可解性【原文 237 + 引理 A–D（批6 严格）】</h3>
+<table>
+<thead>
+<tr>
+<th>配对阶数</th>
+<th>费马方程 xⁿ+yⁿ=zⁿ</th>
+<th>可解性</th>
+<th>物理后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>n=1</td>
+<td>平凡</td>
+<td>平凡解</td>
+<td>单位元（引力本体）</td>
+</tr>
+<tr>
+<td>n=2</td>
+<td>勾股数</td>
+<td><strong>有解</strong></td>
+<td>可完美配对 → 电磁长程/弱力短程</td>
+</tr>
+<tr>
+<td>n=3</td>
+<td>立方</td>
+<td><strong>无解</strong>（费马大定理）</td>
+<td>三体配对（qqq）不可完美分解 → <strong>色禁闭</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>引理 D（批6 已严格）</strong>：SU(3) 色单态需三体（qqq）或 qq̄（介子）——"立方不可分解"的群论表述。</p>
+<h3>层 3：表示类型三分法【引理 A–B（批6 严格）】</h3>
+<p>Frobenius–Schur 三分法：<strong>实（+1）/ 伪实（−1）/ 复（0）</strong>：
+- U(1) → 实（可交换，长程无质量光子）；
+- SU(2) → 伪实（双分量，手性配对）；
+- SU(3) → <strong>复</strong>（唯一的"禁闭性色荷"载体——复表示允许不可分解的三体束缚）。</p>
+<h3>层 4：排除论证【批6，半严格】</h3>
+<ul>
+<li><strong>n≥4 排除</strong>：费马 n≥3 均无解（全禁闭）——为什么不是 SU(4)？批6 论证：手性不可合并（SU(4) 的大表示无正确手性结构）+ 无第四代费米子（涡卷绕模只有 n=1,2,3 稳定，n=4 早期宇宙衰变）；</li>
+<li><strong>三代费米子 = 涡卷绕模 n=1,2,3</strong>【原文 249】——"三"同时出现在色数（SU(3)）与代数（三代），同一涡结构的两面。</li>
+</ul>
+<h3>层 5：框架结构支撑【推导，半严格】</h3>
+<ul>
+<li><strong>Clifford 内空间 4 分量 = 2×2</strong>（时间双向 × 手性双向）→ 方向簇 k=4（定理 1 严格，引力侧）——内空间"2×2"与外空间配对"2 和 3"共享"2"因子（二元性）——<strong>二元性是框架的第一原则（正反物质对），三元性是其不可分解复合</strong>（深层连接，标注开放）；</li>
+<li>规范群选择由<strong>配对阶数</strong>决定（非由方向簇 k）：P=1/2/3/6 → 引力/电磁/弱/强——数轴分类是规范群选择的"数论指纹"。</li>
+</ul>
+<hr />
+<h2>4 与引力侧 k=4 的对照【推导】</h2>
+<table>
+<thead>
+<tr>
+<th>侧</th>
+<th>关键数字</th>
+<th>来源</th>
+<th>严格性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>引力侧（§4.10）</td>
+<td><strong>k=4</strong></td>
+<td>Clifford 内空间 2×2（时间双向×手性双向）→ S² 方向簇（定理 1）</td>
+<td>严格（k≥4 下界）</td>
+</tr>
+<tr>
+<td>规范侧（本报告）</td>
+<td><strong>n=3</strong></td>
+<td>配对阶数（2 和 3 唯一连续素数）→ SU(3) 复表示</td>
+<td>各层严格/半严格，无 Tammes 式唯一性</td>
+</tr>
+</tbody>
+</table>
+<p><strong>对称性</strong>：引力侧"4"来自内空间 2×2；规范侧"3"来自外空间配对结构。<strong>"2"是两个侧面的公共因子</strong>（正反物质二元性）——引力侧的 2×2 与规范侧的 2×3 共享"2"。这是框架统一性的潜在深层证据（图像性对应，非证明）。</p>
+<hr />
+<h2>5 诚实标注</h2>
+<table>
+<thead>
+<tr>
+<th>层次</th>
+<th>严格性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>层 1 数论（2、3 唯一连续素数）</td>
+<td>✅ 严格</td>
+<td>数论事实</td>
+</tr>
+<tr>
+<td>层 2 费马（n=3 无解）</td>
+<td>✅ 严格</td>
+<td>费马大定理（已证）</td>
+</tr>
+<tr>
+<td>层 3 表示类型（FS 三分法）</td>
+<td>✅ 严格</td>
+<td>表示论定理</td>
+</tr>
+<tr>
+<td>层 4 排除（n≥4、三代）</td>
+<td>⚠️ 半严格</td>
+<td>手性论证是物理启发式；无第四代是预言非定理</td>
+</tr>
+<tr>
+<td>层 5 框架支撑（二元性共享）</td>
+<td>⚠️ 半严格</td>
+<td>"2 的公共性"是结构观察，非推导</td>
+</tr>
+<tr>
+<td><strong>"恰好 SU(3) 而非 SU(4)"的数学唯一性</strong></td>
+<td>❌ 无</td>
+<td>无 Tammes 式唯一性定理（A6 开放，诚实保留）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>与引力侧对比</strong>：引力侧 k=4 有"k≥4 下界 + Tammes 唯一构型"的严格支撑；规范侧 n=3 无对应唯一性定理——<strong>这是两侧重构性的关键不对称</strong>，也是 A6 的开放核心。</p>
+<hr />
+<h2>6 蓝图影响与下一步</h2>
+<ul>
+<li><strong>P1-4（为什么 n=3）</strong>：✅ 论证链完成（编号统一 + 五层链）——可整合进论文 §5.2（筛选论证后）；</li>
+<li><strong>数轴/群论编号错位</strong>：✅ 消除（P vs R 双维度映射表）；</li>
+<li><strong>遗留</strong>：① "恰好 SU(3) 而非 SU(4)"的严格唯一性（需新数学工具）；② "2 的公共性"（内空间 2×2 vs 外空间 2×3）动力学证明；</li>
+<li><strong>下一步候选</strong>：A 整合进论文 §5；B 攻 B1（非阿贝尔完全涌现，用本论证链作为 SU(3) 选择依据）；C 回蓝图 P0-3（κ_c 标度）。</li>
+</ul>
+<hr />
+<p><em>材料来源：批2 报告（954–956 页数轴映射）、批6 报告（245–250 页群论引理链）、原文 237 页（费马对应）、原文 935–945 页（2/3 唯一连续素数）。</em></p>
+
+<div class="footer">B6：为什么 n=3——数轴/群论编号错位统一与规范侧论证链 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 B6_为什么n等于3.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

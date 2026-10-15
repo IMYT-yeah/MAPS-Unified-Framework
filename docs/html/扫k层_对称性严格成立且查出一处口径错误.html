@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>扫 k 层：h(k) = h(N−k) 严格成立、0.25 在小 N 上够不到 —— 附一处**口径错误**的更正</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>扫 k 层：h(k) = h(N−k) 严格成立、0.25 在小 N 上够不到 —— 附一处**口径错误**的更正</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 50 轮 ｜ 2026-09-23 ｜ 脚本 <code>_layer_scan_50.py</code>（精确全层，<strong>12 项通过 / 2 项失败 —— 两项失败是我的预判被否证</strong>）
+＋ <code>_layer_gap_50.py</code>（GAP，4 项 0 失败）／ <code>_layer_gap_50b.py</code>（2 项 0 失败）／ <code>_layer_gap_50c.py</code>（3 项 0 失败）
+＋ <code>_diag_sigma_50.py</code>（生成元基准判定）／ <code>_caliber_50.py</code>（口径审查）</p>
+</blockquote>
+<h2>一句话结论</h2>
+<p><strong>把跨点从 N 重新参数化到占据数层 k 是可行的，但它不能把跨点从 N 上"移走"</strong> ——
+因为在物理相关的那一层（k = N/2）上，结论与第 49 轮完全相同（夹在 N ∈ (32, 48)）；
+而 <code>k_c(N)/N</code> 本身<strong>随 N 下降</strong>（0.377 → 0.289），说明 k 不提供独立自由度。
+<strong>本轮更大的收获是查出一处口径错误</strong>：第 48 轮对 (2,2,6) 的"更正"（0.4330 → 0.4510）
+<strong>混入了平均口径的改变</strong>，正确值是 <strong>0.4334</strong>（生成元错误的真实影响只有 <strong>0.0004</strong>）。</p>
+<hr />
+<h2>一、口径：先想清楚"哪个平均"（本轮的核心）</h2>
+<p>第 40 轮的权威定义（<code>_observer_resolution.py::part_entropy</code>，原文注释）是：</p>
+<pre><code>H = ln M − Σ_o (|O_o| / M)·ln|O_o|          M = 该层构型总数
+</code></pre>
+<p>即<strong>对构型加权</strong>（等分账下均匀分布在所有构型上 ⟹ 构型 |O| 越大权重越大），
+写成 H/N ≈ ln2 − ⟨ln|O|⟩_cfg/N。</p>
+<p>而第 46 / 48 轮的 Python 全层脚本写的是：</p>
+<pre><code class="language-python">avg = sum(math.log(s) for s in sizes) / len(sizes)      # ← 轨道等权
+</code></pre>
+<p><strong>这两种量不同，而且差得不少。</strong> 本轮对三层格点同时算两种（<code>_caliber_50.py</code>）：</p>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th>k=N/2</th>
+<th>h_cfg（= 第 40 轮定义）</th>
+<th>h_orb（轨道等权）</th>
+<th>差</th>
+<th>相对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td>4</td>
+<td><strong>0.4679</strong></td>
+<td>0.5199</td>
+<td><strong>−0.0520</strong></td>
+<td>−11.1%</td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>16</td>
+<td>8</td>
+<td><strong>0.4335</strong></td>
+<td>0.4652</td>
+<td><strong>−0.0318</strong></td>
+<td>−7.3%</td>
+</tr>
+<tr>
+<td>(2,2,6)</td>
+<td>24</td>
+<td>12</td>
+<td><strong>0.4334</strong></td>
+<td><strong>0.4510</strong></td>
+<td><strong>−0.0176</strong></td>
+<td>−4.1%</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>第 48 轮报的 0.4510 就是 h_orb 那一列</strong>（逐位相同）。
+而它同一张表里的 (2,2,2)=0.4679 / (2,2,4)=0.4335 <strong>是 h_cfg</strong>（引自第 46 轮）
+⟹ <strong>第 48 轮的对照表内部混了两种口径</strong>。</p>
+<h3>独立复核（GAP，随机构型采样 = 构型等权）</h3>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>k</th>
+<th>精确值（构型等权）</th>
+<th>GAP 采样（S=40）</th>
+<th>1σ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>4</td>
+<td>0.4679</td>
+<td>0.4679</td>
+<td>±0.0111</td>
+</tr>
+<tr>
+<td><strong>(2,2,6)</strong></td>
+<td><strong>12</strong></td>
+<td><strong>0.4334</strong></td>
+<td><strong>0.4314</strong></td>
+<td>±0.0032</td>
+</tr>
+<tr>
+<td>(2,2,8)</td>
+<td>16</td>
+<td>0.4617</td>
+<td>0.4635</td>
+<td>±0.0035</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ (2,2,6) 的两种独立方法都给 <strong>≈ 0.433</strong>，<strong>远离 0.4510</strong>。</p>
+<h3>更正表</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>第 48 轮报</th>
+<th>本轮更正</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,6) k=12 的 H/N</td>
+<td>0.4510</td>
+<td><strong>0.4334</strong></td>
+<td>第 48 轮用了轨道等权</td>
+</tr>
+<tr>
+<td>「0.4330 → 0.4510」这次更正</td>
+<td>差值 0.0176 归因于生成元错误</td>
+<td><strong>差值 0.0004</strong></td>
+<td>那 0.0176 <strong>全部来自口径</strong>；生成元错误对该层数值影响极小</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>未受影响</strong>：第 47/48/49 轮的<strong>全部 GAP 结果</strong>（(2,4,L)、(4,4,L)、(6,6,6)）
+—— 它们是"随机抽构型 → 各自算 |O| → 平均 ln|O|"，<strong>本身就是构型等权</strong> ✓。
+第 46 轮的 Python 结果也是构型等权 ✓。<strong>只有第 48 轮这一个脚本错了口径。</strong></p>
+<hr />
+<h2>二、h(k) 的结构（精确扫描，N = 8 / 16 / 24）</h2>
+<h3>Q1 对称性 h(k) = h(N−k)：<strong>严格成立</strong></h3>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>验证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2) N=8</td>
+<td>全部 <strong>5 对</strong>逐位相等（差 = 0）</td>
+</tr>
+<tr>
+<td>(2,2,4) N=16</td>
+<td>全部 <strong>9 对</strong>逐位相等（差 = 0）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>机制</strong>（结构论证）：构型 c ↦ ~c（补集）与每个置换群元素对易
+（置换保持"是集合"的结构，作用在补集上等价）⟹ |O(~c)| = |O(c)| ⟹
+⟨ln|O|⟩(N−k) = ⟨ln|O|⟩(k) ⟹ h(N−k) = h(k)。<strong>本轮由数值证实。</strong></p>
+<p>⟹ 只需扫 k ≤ N/2（本轮的扫描范围）。</p>
+<h3>k=1 的解析值（唯一<strong>可解析</strong>的一层）</h3>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>实测 H/N</th>
+<th>ln2 − lnN/N</th>
+<th>差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>0.4332</td>
+<td>0.4332</td>
+<td>&lt; 1e−15</td>
+</tr>
+<tr>
+<td>16</td>
+<td>0.5199</td>
+<td>0.5199</td>
+<td>&lt; 1e−15</td>
+</tr>
+<tr>
+<td>24</td>
+<td>0.5607</td>
+<td>0.5607</td>
+<td>&lt; 1e−15</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>群在单点上可迁</strong>（|O| = N，只有一个轨道）⟹ 这一层的 H/N <strong>显式依赖 N</strong>
+（H/N = ln2 − lnN/N）⟹ 这是"h 不能只依赖 k/N"的直接原因。</p>
+<h3>❌ 我的两条预判都被脚本否证（如实记录）</h3>
+<table>
+<thead>
+<tr>
+<th>预判</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①「H/N 随 k 单调递减（k ≤ N/2）」</td>
+<td><strong>否证</strong>。N=16：k=1 的 0.5199 → k=2 的 <strong>0.5285</strong>（上升）；N=24：k=11 的 0.4328 → k=12 的 <strong>0.4334</strong>。精确值，非噪声。</td>
+</tr>
+<tr>
+<td>②「0.25 在每个固定 N 上都被某个 k 穿过」</td>
+<td><strong>否证</strong>。N=8/16/24 的 <strong>min_k H/N = 0.4332 / 0.4292 / 0.4328</strong>，全都 <strong>&gt; 0.25</strong> ⟹ 小 N 上<strong>任何层都够不到</strong>。</td>
+</tr>
+</tbody>
+</table>
+<p>①的机制：k=1 层是<strong>可迁饱和</strong>的（|O|=N，占该层构型数的 100%），而 k ≥ 2 层被
+(Z₂)³ 奇偶差类等不变量切碎 ⟹ 典型轨道<strong>反而变小</strong>。
+②的后果：<strong>「扫 k 能收窄跨点」只在 N ≥ 48 一侧成立</strong>（见下）。</p>
+<h3>min_k h 的位置</h3>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>argmin_k</th>
+<th>min</th>
+<th>h(N/2)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>1</td>
+<td>0.4332</td>
+<td>0.4679</td>
+</tr>
+<tr>
+<td>16</td>
+<td>7</td>
+<td>0.4292</td>
+<td>0.4335</td>
+</tr>
+<tr>
+<td>24</td>
+<td>11</td>
+<td>0.4328</td>
+<td>0.4334</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 最小值<strong>不严格在 k = N/2</strong>，但在 N=16/24 上只差 0.0006（N=24：0.4328 vs 0.4334）
+—— 属于"非单调的浅涨落"，量级极小。</p>
+<h3>Q2 h(k, N) 是否只依赖 k/N：<strong>否</strong></h3>
+<p>把三条曲线按 x = k/N 叠在一起：</p>
+<table>
+<thead>
+<tr>
+<th>x = k/N</th>
+<th>h(N=8)</th>
+<th>h(N=16)</th>
+<th>h(N=24)</th>
+<th>跨 N 最大差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0.6931</td>
+<td>0.6931</td>
+<td>0.6931</td>
+<td>0.0000</td>
+</tr>
+<tr>
+<td>1/8</td>
+<td><strong>0.4332</strong></td>
+<td><strong>0.5285</strong></td>
+<td><strong>0.4974</strong></td>
+<td><strong>0.0953</strong></td>
+</tr>
+<tr>
+<td>1/4</td>
+<td>0.5199</td>
+<td>0.4599</td>
+<td>0.4539</td>
+<td>0.0659</td>
+</tr>
+<tr>
+<td>3/8</td>
+<td>0.4332</td>
+<td>0.4401</td>
+<td>0.4355</td>
+<td>0.0069</td>
+</tr>
+<tr>
+<td>1/2</td>
+<td>0.4679</td>
+<td>0.4335</td>
+<td>0.4334</td>
+<td>0.0344</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>最大差 0.0953（x=1/8）</strong> ⟹ <strong>h 不依赖 k/N</strong>，<strong>N 仍是独立变量</strong>。
+（差异的来源就是 k=1 层的 ln2 − lnN/N 项。）</p>
+<hr />
+<h2>三、Q3：0.25 在层上的位置</h2>
+<h3>N ≤ 24：<strong>任何层都够不到 0.25</strong></h3>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>min_k H/N</th>
+<th>与 0.25 的距离</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>0.4332</td>
+<td>+0.1832</td>
+</tr>
+<tr>
+<td>16</td>
+<td>0.4292</td>
+<td>+0.1792</td>
+</tr>
+<tr>
+<td>24</td>
+<td>0.4328</td>
+<td>+0.1828</td>
+</tr>
+</tbody>
+</table>
+<h3>N ≥ 48：某个层 k_c 穿过 0.25</h3>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>格点</th>
+<th>k_c</th>
+<th><strong>k_c/N</strong></th>
+<th>数据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>48</strong></td>
+<td>(2,4,6)</td>
+<td><strong>18.10</strong></td>
+<td><strong>0.3771</strong></td>
+<td>GAP，S=30</td>
+</tr>
+<tr>
+<td><strong>64</strong></td>
+<td>(2,4,8)</td>
+<td><strong>18.48</strong></td>
+<td><strong>0.2888</strong></td>
+<td>GAP，S=10</td>
+</tr>
+</tbody>
+</table>
+<p>（第 48 轮 S=8 时给 k_c(48) = 16.82 ⟹ 与 S=30 的 18.10 差 1.28 ⟹ 采样噪声）</p>
+<p>⟹ <strong>k_c/N 从 0.377 降到 0.289</strong>（N 从 48 到 64）⟹ <strong>在 k 上也不固定</strong>。
+原因很直白：<code>h(k,N)</code> 整条曲线随 N <strong>整体下移</strong>，所以它与 0.25 的交点自然往小 k 移。
+⟹ <strong>扫 k 只是把"曲线下移"重新表述了一遍，没有提供新的自由度。</strong></p>
+<h3>⚠️ 物理口径（诚实边界）</h3>
+<p>k 在框架里的物理相关值应当是 <strong>k = N/2</strong>（等分账 ⟹ 均匀分布 ⟹ 典型构型是半满）。
+若接受这一点，则 <strong>k 不是可调参数</strong> ⟹ 本轮的「扫 k」只提供<strong>结构信息</strong>
+（对称性、层依赖、小 k 端的解析行为），<strong>不能</strong>为 0.25 提供一个可调的自由度。
+⟹ <strong>第 49 轮的跨点结论（N ∈ (32, 48)）保持不变，且被本轮加强</strong>
+（N ≤ 24 上连"作弊扫 k"都够不到 0.25）。</p>
+<hr />
+<h2>四、Q4：h_min(N) 的标度律</h2>
+<p>用<strong>全部来自 GAP（构型等权，不受口径问题影响）</strong>的 9 个半满层数据点：</p>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>32</th>
+<th>48</th>
+<th>64</th>
+<th>72</th>
+<th>80</th>
+<th>96</th>
+<th>216</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⟨H/N⟩</td>
+<td>0.2834</td>
+<td>0.2208</td>
+<td>0.1820</td>
+<td>0.1652</td>
+<td>0.1571</td>
+<td>0.1411</td>
+<td>0.0779</td>
+</tr>
+</tbody>
+</table>
+<p><strong>最小二乘拟合</strong> <code>h_min = C·N^p</code>：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C</td>
+<td><strong>3.0101</strong></td>
+</tr>
+<tr>
+<td>p</td>
+<td><strong>−0.6762</strong>（与 <strong>−2/3 = −0.6667</strong> 差 −0.0096）</td>
+</tr>
+<tr>
+<td>最大残差</td>
+<td><strong>2.6%</strong>（N ∈ [32, 216]，跨 6.75 倍）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>留一外推</strong>（只用 N ≤ 96 拟合：C = 2.6572、p = −0.6452）：
+预测 N = 216 ⟹ <strong>0.0828</strong>，实测 <strong>0.0779</strong> ⟹ 误差 <strong>+6.3%</strong> ✓</p>
+<p>⚠️ <strong>纪律声明</strong>：这是<strong>拟合</strong>，不是推导。C ≈ 2.89（≈3）只是数值，
+<strong>按本项目铁律不得当作证据、不得写进正文</strong>；此处仅登记为
+「h_min(N)·N^{2/3} ≈ 2.9，无机制」（进候选池）。
+p 与 −2/3 的接近可能在 N → ∞ 时消失，<strong>不得外推到 N = 10⁶⁰</strong>。</p>
+<hr />
+<h2>五、两个方法学副产品</h2>
+<ol>
+<li><strong>大 N 上 H/N(k) 是「单调下降 + 采样噪声」，没有真振荡</strong>：
+   LB-2 用 S=30 重扫 N=48 的 k = 12…24，相邻层跳变<strong>全部落在 2σ 内</strong>（0 处超过 2σ）。
+   ⟹ 第 48 轮 S=8 时看到的 0.2211/0.2434/0.2175/0.2256 起伏是<strong>噪声</strong>。</li>
+<li><strong>非自平均性持续存在</strong>：k=N/2 处 ⟨ln|O|⟩ 的采样 sd = 1.13–2.36（N=48/64），
+   相对散布 <strong>5–11%</strong> ⟹ 所有 GAP 采样的 H/N 有 <strong>±0.005 – 0.01</strong> 的不确定度。
+   ⟹ 第 49 轮的跨点区间 (32, 48) 与此相容（0.2834 vs 0.2208，差 0.06 ≫ 0.01）。</li>
+</ol>
+<hr />
+<h2>六、对第 49 轮结论的影响</h2>
+<p>第 49 轮的"两条反向曲线"中，「≥2 个退化方向」族的<strong>起点段要更正</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>8</th>
+<th>16</th>
+<th>24</th>
+<th>32</th>
+<th>40</th>
+<th>48</th>
+<th>56</th>
+<th>64</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 49 轮</td>
+<td>0.4679</td>
+<td>0.4335</td>
+<td>~~0.4510~~</td>
+<td>0.4617</td>
+<td>0.4802</td>
+<td>0.5041</td>
+<td>0.5170</td>
+<td>0.5307</td>
+</tr>
+<tr>
+<td><strong>更正后</strong></td>
+<td>0.4679</td>
+<td>0.4335</td>
+<td><strong>0.4334</strong></td>
+<td>0.4617</td>
+<td>0.4802</td>
+<td>0.5041</td>
+<td>0.5170</td>
+<td>0.5307</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 该族<strong>不是</strong>"从 N=16 起单调上升"，而是
+<strong>0.4679(8) → 0.4335(16) → 0.4334(24) 一段平台/浅谷 → 从 N ≥ 24 起单调上升</strong>。
+「≥2 个退化方向：升 / ≤1 个：降」的<strong>结论方向不变</strong>，但起点段的形状要改。
+「≤1 个退化方向」族全部来自 GAP ⟹ <strong>不受影响</strong>。</p>
+<hr />
+<h2>七、诚实边界（哪些是推导、哪些是判定、哪些没做）</h2>
+<p><strong>推导 / 严格结果</strong>
+- h(k) = h(N−k)：<strong>结构论证 + 两组完整算例逐位验证</strong>（N=8、16）⟹ 可视为严格。
+- k=1 的 H/N = ln2 − lnN/N：三层精确相等 ⟹ 群在单点上可迁（严格）。
+- 口径判定：第 40 轮定义 = 构型等权；第 48 轮脚本 = 轨道等权 ⟹ <strong>客观事实</strong>。</p>
+<p><strong>判定（有数值支撑，非严格证明）</strong>
+- 0.25 在 N ≤ 24 上不可达（<strong>该三层的全部层都精确枚举过</strong> ⟹ 对这三层是严格的）。
+- k_c(48)=18.10 / k_c(64)=18.48 ⟹ 依赖 GAP 采样（S=30/10），1σ 约 ±0.3–0.5（k 单位）。
+- 标度律 p ≈ −2/3：<strong>拟合</strong>，残差 2.6%，<strong>无机制</strong>。</p>
+<p><strong>未做 / 做不到</strong>
+- <strong>k_c/N → ? 的极限</strong>：只有两个点（48、64），且都在"能否算得动"的边界上。
+- <strong>N = 128 及以上</strong>：GAP 的（对 (4,4,8)：degree 128 未试；(8,8,8) degree 512 超上限 ≈216）。
+- <strong>0.25 在 k = N/2 上的跨点</strong>：仍只能给区间 N ∈ (32, 48)（第 49 轮），本轮<strong>没能收窄</strong>。
+- <strong>C = 2.89 的来源</strong>：完全没有。</p>
+<hr />
+<h2>八、判决与下一步</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q1 对称性</td>
+<td>✅ <strong>严格成立</strong>（本轮确证）</td>
+</tr>
+<tr>
+<td>Q2 h ∝ f(k/N)</td>
+<td>❌ <strong>否证</strong>（N 仍是独立变量）</td>
+</tr>
+<tr>
+<td>Q3 扫 k 收窄跨点</td>
+<td>❌ <strong>不能</strong>（k_c/N 随 N 移动；且小 N 上够不到 0.25）</td>
+</tr>
+<tr>
+<td>Q4 h_min 标度律</td>
+<td>⚖️ <strong>拟合可用</strong>（N^{−2/3}，残差 2.6%），<strong>无机制</strong></td>
+</tr>
+<tr>
+<td>第 48 轮的口径错误</td>
+<td>✅ <strong>已查出并更正</strong>（0.4510 → 0.4334）</td>
+</tr>
+<tr>
+<td>0.25 的跨点</td>
+<td>⏳ 仍为 <strong>N ∈ (32, 48)</strong>；需要<strong>钉住 N 或形状的机制</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>下一步（按价值）</strong>
+1. <strong>不再在"扫参数"上花力气</strong> —— N、k、形状三个方向都已扫过，0.25 的命中都只是曲线穿过，
+   没有一处给出机制。<strong>该转向"机制"一侧</strong>。
+2. 机制候选：<strong>B5 的"每 4l_P² 取 1 纳特"是否隐含一个特定的 N 或 k？</strong>
+   （若无，则 0.25 与本框架的衬底之间<strong>根本不存在定量联系</strong> —— 这是一个可以写清的负面结论。）
+3. 便宜的结构项：<strong>h(k) 在 k = 1 附近的解析行为</strong>（可迁饱和）能否推广，给出小 k 端的闭式。</p>
+
+<div class="footer">扫 k 层：h(k) = h(N−k) 严格成立、0.25 在小 N 上够不到 —— 附一处**口径错误**的更正 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 扫k层_对称性严格成立且查出一处口径错误.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

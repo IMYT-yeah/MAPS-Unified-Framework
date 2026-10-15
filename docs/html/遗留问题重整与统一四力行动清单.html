@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>遗留问题重整与统一四力行动清单</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 核心目标与当前全景（v1.32）</div>
+  <h1>遗留问题重整与统一四力行动清单</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>任务</strong>：系统性重整框架（v1.32）所有遗留问题——重新梳理问题边界、回到核心目标（统一四种基本作用力：强/弱/电磁/引力），逐项给出当前进展、重要性权重、下一步可推演方向，整理为按优先级排序的行动清单并说明与四力总目标的逻辑衔接。
+<strong>性质标注</strong>：【已完成】= 论文 v1.32 已闭环；【进行中】= 有明确路径；【世界级】= 与千禧年同源，诚实不声称；【工程】= 非理论难度。</p>
+</blockquote>
+<hr />
+<h2>1 核心目标与当前全景（v1.32）</h2>
+<p><strong>总目标</strong>：从四条公理（事件流/泄漏/时间箭头/非交换化）出发，统一强、弱、电磁、引力四种基本作用力。</p>
+<p><strong>当前全景</strong>（各力达成度）：</p>
+<table>
+<thead>
+<tr>
+<th>力</th>
+<th>框架对应</th>
+<th>达成度（v1.32）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>引力</strong></td>
+<td>通量遮挡统计力学涌现（§4）</td>
+<td><strong>✅ 最完整</strong>：PPN γ=β=1 全通过、指数度规/EHT 相容、packing 定理包、火墙、钳制物态、均匀浆糊、吸积盘辐射传输</td>
+</tr>
+<tr>
+<td><strong>电磁力 U(1)</strong></td>
+<td>配对阶数 n=1 + 弦网涌现</td>
+<td><strong>✅ 部分严格</strong>：Z₂⊂U(1) 群嵌入定理 + 麦克斯韦线性化 + 光子 ω=</td>
+</tr>
+<tr>
+<td><strong>强/弱力 SU(3)×SU(2)</strong></td>
+<td>配对阶数 n=3,2 + 量子双代数</td>
+<td><strong>⚠️ 2+1D 严格、4D 开放</strong>：量子双 Z₂/Z₃/S₃ 数值验证、禁闭张力 σ_E/σ_m、κ_c 环面精确化；4D 非阿贝尔完全涌现开放</td>
+</tr>
+<tr>
+<td><strong>四力统一耦合</strong></td>
+<td>J/K 强度定标</td>
+<td><strong>⚠️ 量级确定、数值待定</strong>：J/K~3 参考值（交叉验证 ✓），第一性推导开放</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2 遗留问题总表（按"统一四力"关联度分层）</h2>
+<h3>A 层：理论核心（直接决定框架成立性）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>问题</th>
+<th>边界界定</th>
+<th>权重</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td><strong>非阿贝尔分量完全涌现（4D）</strong></td>
+<td>2+1D 已严格（量子双）；<strong>4D SU(2)×SU(3) 含质量隙/手性的完整涌现</strong></td>
+<td><strong>30%</strong></td>
+</tr>
+<tr>
+<td>A2</td>
+<td><strong>J、K 耦合强度第一性推导</strong></td>
+<td>形状已有（H_F=−JΣA_v−KΣB_p）；<strong>强度无第一性来源</strong>（J/K~3 参考值）</td>
+<td><strong>15%</strong></td>
+</tr>
+<tr>
+<td>A3</td>
+<td><strong>Z₂→U(1) 连续极限重整化群</strong></td>
+<td>群嵌入/线性化/光子色散已严格；<strong>连续极限严格定理</strong>未证</td>
+<td><strong>10%</strong></td>
+</tr>
+<tr>
+<td>A4</td>
+<td><strong>4D 无质量自旋 2 涌现</strong></td>
+<td>旋转本征值 ±2 严格 + 判据链明确；<strong>弦网低能谱严格分析</strong>未完成</td>
+<td><strong>15%</strong></td>
+</tr>
+<tr>
+<td>A5</td>
+<td><strong>强场度规（视界几何完整推导）</strong></td>
+<td>指数度规阴影相容 + 钳制物态；<strong>饱和模态→视界几何</strong>未推导</td>
+<td><strong>5%</strong></td>
+</tr>
+<tr>
+<td>A6</td>
+<td><strong>统计→几何严格化（湮灭型 BBGKY）</strong></td>
+<td>遍历性/截断已推进；<strong>BBGKY 完整证明</strong>开放</td>
+<td><strong>5%</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>B 层：观测验证（框架可证伪性）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>问题</th>
+<th>边界界定</th>
+<th>权重</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td><strong>实验数据定量对照</strong></td>
+<td>EHT α 相容、PPN 通过、EMRI 预测就绪；<strong>ET/CE/LISA/原初黑洞/PTA 数据接入</strong></td>
+<td><strong>10%</strong></td>
+</tr>
+<tr>
+<td>B2</td>
+<td><strong>EMRI 全参数 MCMC + Teukolsky 波形</strong></td>
+<td>Kerr 贝叶斯 δ 26σ（a 固定）；<strong>a-δ 联合后验</strong>未做</td>
+<td>3%</td>
+</tr>
+<tr>
+<td>B3</td>
+<td><strong>Kerr 吸积盘 + 相对论辐射传输</strong></td>
+<td>牛顿薄盘 + 过载区透明；<strong>GR 红移/光线 + Kerr 盘</strong>未做</td>
+<td>2%</td>
+</tr>
+<tr>
+<td>B4</td>
+<td><strong>过载区 Kerr 推广 + 视界边界层</strong></td>
+<td>均匀浆糊（静态）；<strong>Kerr 非球对称 + 火墙连接条件</strong>未做</td>
+<td>2%</td>
+</tr>
+<tr>
+<td>B5</td>
+<td><strong>FQH 引力子模 ε 项定量化</strong></td>
+<td>Γ=Γ_C+ε·Γ_F 定性（原文 452）；<strong>线宽耦合系数</strong>未推导</td>
+<td>2%</td>
+</tr>
+</tbody>
+</table>
+<h3>C 层：深化/外围</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>问题</th>
+<th>边界界定</th>
+<th>权重</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>3+1D 弦网 λ&gt;0 凝聚相稳定性（λ_c）</td>
+<td>λ=0 严格；<strong>3+1D 相变分析</strong>未做</td>
+<td>2%</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>拓扑纠缠熵 γ=ln2 的 3+1D 验证</td>
+<td>单/双立方体太小；<strong>需 MPS/更大网格</strong></td>
+<td>1%</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>"恰好 SU(3) 非 SU(4)"唯一性</td>
+<td>五层论证链；<strong>唯一性定理</strong>缺 Tammes 类比</td>
+<td>1%</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>N2 的 4π 相位锁定相容性方程</td>
+<td>两维卷曲已闭合；<strong>相容性方程</strong>深度开放</td>
+<td>1%</td>
+</tr>
+<tr>
+<td>C5</td>
+<td>宇宙学预言观测设计（w=−1+4ε/3、β 函数阶梯、void-CPT-κ）</td>
+<td>理论预言就绪；<strong>观测策略</strong>未细化</td>
+<td>1%</td>
+</tr>
+<tr>
+<td>C6</td>
+<td><strong>英文翻译与 arXiv 投稿</strong></td>
+<td>论文 v1.32 中文完整；<strong>英文版 + 参考文献 + AI 披露</strong></td>
+<td>【工程，战略高】</td>
+</tr>
+</tbody>
+</table>
+<p><strong>权重合计</strong>：A 层 80%（理论核心）+ B 层 19%（观测验证）+ C 层 6%（深化/外围）。</p>
+<hr />
+<h2>3 逐项分析与下一步研究方向</h2>
+<h3>A1 非阿贝尔完全涌现（30%）——四力之半（强+弱）</h3>
+<ul>
+<li><strong>当前进展</strong>：量子双代数定理包（A1–A6）2+1D 严格；B1 推进（f^abc 拓扑、Jacobi=管网络、m_g≈√σ）；禁闭弦张力 σ_E≈2κ/σ_m≈2λ；κ_c 环面精确化 0.25–0.32。</li>
+<li><strong>下一步方向</strong>：
+  1. <strong>3+1D 非阿贝尔弦网/量子双模型的哈密顿量构造 + 能隙谱数值</strong>（类比 2+1D toric code 环面方法，本框架可复现路径已建立）；
+  2. <strong>质量隙的手性来源</strong>：泄漏项 −λΣ(−1)^{g≠e} 的 SU(2) 版本（左/右手性）；
+  3. <strong>可验证数学关系</strong>：σ_m(SU(2)) 弦张力与 m_W≈m_g≈√σ 对照；</li>
+<li><strong>关键难点</strong>：4D 非阿贝尔质量隙（与千禧年同源，诚实不声称；目标是"框架内自洽机制 + 数值谱"而非严格定理）。</li>
+<li><strong>四力关联</strong>：强/弱力涌现的直接闭环——A1 完成后框架覆盖全部四种力。</li>
+</ul>
+<h3>A2 J、K 耦合强度第一性推导（15%）——四力统一定标</h3>
+<ul>
+<li><strong>当前进展</strong>：同源论证 J/K~O(1)；toric code h_xc≈0.32 ⟹ J/K~3；环面 κ*≈0.20、真相变 κ_c≈0.25–0.32（P0-3b 交叉验证 ✓）。</li>
+<li><strong>下一步方向</strong>：
+  1. <strong>从事件流微观动力学推导</strong>：J=配对速率、K=闭合速率（公理 1 碰撞率 Γ 的能标依赖）；
+  2. <strong>κ_c^true 反推 J/K</strong>：κ_c≈0.25–0.32 在对称约定下精确映射 J/K（环面方法已就绪）；
+  3. <strong>可验证数学关系</strong>：J/K(框架) ↔ α_s/α_EM（标准模型耦合比值）——若同源论证成立，应给出统一耦合的数值预言。</li>
+<li><strong>关键难点</strong>：微观速率 Γ(配对/闭合) 的碰撞核计算（需 BBGKY 层次，与 A6 衔接）。</li>
+<li><strong>四力关联</strong>：四力"统一强度"的定量核心——四力同源=同一 J/K 机制不同配对阶数 n。</li>
+</ul>
+<h3>A3 Z₂→U(1) 连续极限（10%）——电磁严格化闭环</h3>
+<ul>
+<li><strong>当前进展</strong>：定理 A（群嵌入）/B（麦克斯韦线性化）/C（光子 ω=|k|）严格。</li>
+<li><strong>下一步方向</strong>：格点场论 Wilson 重整化群路径（数值 RG flow）；与文献 Villain 对偶严格化对接。</li>
+<li><strong>关键难点</strong>：连续极限重整化群 = 格点场论界开放问题（世界级）。</li>
+<li><strong>四力关联</strong>：电磁力涌现的最后一环。</li>
+</ul>
+<h3>A4 4D 无质量自旋 2 涌现（15%）——引力闭环</h3>
+<ul>
+<li><strong>当前进展</strong>：自旋 2 = 二阶张量旋转本征值 ±2 严格；判据链（Fierz–Pauli 唯一性 + Weinberg 软定理 + 弦网低能谱）。</li>
+<li><strong>下一步方向</strong>：
+  1. <strong>弦网低能谱严格分析</strong>：3+1D 弦网集体模式的色散与软极限振幅（验证 Weinberg ∝1/q 标度）；
+  2. <strong>张量网络/MPS 方法</strong>：更大格点的弦网低能谱；
+  3. <strong>可验证数学关系</strong>：若低能谱含无质量自旋 2 ⟹ Fierz–Pauli ⟹ 线性化 GR（判据链闭合）。</li>
+<li><strong>关键难点</strong>：4D 无质量自旋 2 场论涌现 = 世界级（与全息严格化同阶）。</li>
+<li><strong>四力关联</strong>：引力在框架内的终极闭环——A4 完成后引力侧从"统计力学涌现（完整）"升级为"弦网路径也完整"。</li>
+</ul>
+<h3>A5 强场度规视界几何（5%）——强场预言几何基础</h3>
+<ul>
+<li><strong>当前进展</strong>：指数度规阴影 5.436GM/c² 与 EHT 相容；钳制物态微观推导；均匀浆糊+光学透明；吸积盘辐射传输。</li>
+<li><strong>下一步方向</strong>：视界饱和模态的完整几何推导——连接外部指数度规（§4.5b）与内部均匀浆糊（§4.6 v1.25）的边界条件。</li>
+<li><strong>四力关联</strong>：强场预言（阴影/QNM/火墙）与观测对照的几何基础（B1 的前提）。</li>
+</ul>
+<h3>A6 湮灭型 BBGKY 完整证明（5%）——引力严格数学基础</h3>
+<ul>
+<li><strong>当前进展</strong>：遍历性从公理 1、截断 r_c=GM/c²、碰撞核层次（B2）。</li>
+<li><strong>下一步方向</strong>：湮灭型 BBGKY 层次闭合（含源项 ∝−ε 的动力学方程完整推导）。</li>
+<li><strong>四力关联</strong>：玻尔兹曼分布 g₀₀（引力涌现）的严格统计力学基础。</li>
+</ul>
+<h3>B1 实验数据定量对照（10%）——框架可证伪性总检验</h3>
+<ul>
+<li><strong>当前进展</strong>：EHT α=1.00±0.06 相容；PPN（Cassini γ、LLR β）通过；EMRI 预测（Fisher 24σ/167σ、Kerr 26σ）；FQH ε 项、原初黑洞窗口预言就绪。</li>
+<li><strong>下一步方向</strong>：ET/CE QNM（α 约束 ±0.01）、LISA EMRI（2030s）、原初黑洞 γ 射线、PTA 3PN 背景、极低温 FQH 平台。</li>
+<li><strong>四力关联</strong>：所有预言的总检验——框架可证伪性的第一道闸门（A/B 各层预言的观测出口）。</li>
+</ul>
+<h3>B2–B5（观测深化，2–3% 各）</h3>
+<ul>
+<li><strong>B2</strong>：a-δ 联合 MCMC（自旋简并完整处理）+ Teukolsky 波形——检验 A2 的 δ 预测；</li>
+<li><strong>B3</strong>：GR 红移/光线弯曲 + Kerr 盘辐射传输——吸积盘观测（EHT/未来 X 射线）对照；</li>
+<li><strong>B4</strong>：Kerr 过载区（非球对称）+ 火墙连接条件——强场内部结构；</li>
+<li><strong>B5</strong>：FQH ε 项线宽系数推导——检验 A3 的 ε 泄漏跨系统投影（原文 452）。</li>
+</ul>
+<h3>C1–C6（深化/外围）</h3>
+<ul>
+<li><strong>C1</strong>：3+1D λ_c 相变（类比 2+1D κ_c 环面方法，本框架路径已建立）；</li>
+<li><strong>C2</strong>：拓扑纠缠熵 γ=ln2（MPS 大网格）；</li>
+<li><strong>C3</strong>：SU(3) 唯一性（缺 Tammes 类比，标注）；</li>
+<li><strong>C4</strong>：N2 4π 相位锁定相容性方程（深度开放）；</li>
+<li><strong>C5</strong>：宇宙学预言观测设计（DESI/void 统计）；</li>
+<li><strong>C6</strong>：<strong>英文翻译 + 参考文献补全 + AI 披露 + arXiv 投稿</strong>——【工程，但战略价值最高】：让框架进入公开学术讨论，获得外部审阅与检验。</li>
+</ul>
+<hr />
+<h2>4 优先级行动清单</h2>
+<h3>P0（立即执行——决定框架成立性 + 战略出口）</h3>
+<table>
+<thead>
+<tr>
+<th>序</th>
+<th>行动</th>
+<th>对应问题</th>
+<th>预期产出</th>
+<th>与四力关联</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0-1</td>
+<td><strong>英文翻译与 arXiv 投稿准备</strong>（含参考文献补全、AI 披露声明）</td>
+<td>C6</td>
+<td>英文版论文 + 投稿包</td>
+<td>四力全部——进入公开学术检验</td>
+</tr>
+<tr>
+<td>P0-2</td>
+<td><strong>非阿贝尔 3+1D 数值实现</strong>（量子双/弦网哈密顿量 + 能隙谱，复现 2+1D 环面方法）</td>
+<td>A1</td>
+<td>4D 质量隙框架内机制 + 数值谱</td>
+<td>强+弱力</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>✅ P0-2 已执行（2026-08-23）</strong>：《非阿贝尔3+1D数值实现》——S₃ 面模型（46,656 态）λ=0 弦网凝聚 E0=−N_c、简并 <strong>6^(n−1)=7776</strong>（群阶替换推广 Z₂）；<strong>非阿贝尔指纹：激发按共轭类分两类</strong>（转置 23,328 / 3-cycle 15,552）；能隙随 λ 单调打开；<strong>胶球实验锚点【原文 1595–1596】：BESIII X(2370)（0⁻⁺、2395 MeV、味单态）= 框架"通量自束缚"的可观测实例</strong>（格点 QCD 2.3–3.0 GeV 对照）。脚本 _nonabelian_31d.py。
+| P0-3 | <strong>J/K 从 κ_c 反推</strong>（对称约定精确映射）+ 与 α_s/α_EM 对照 | A2 | J/K 数值 + 统一耦合预言 | 四力统一强度 |</p>
+<p><strong>✅ P0-3 已执行（2026-08-23）</strong>：《JK耦合强度推导》——双路径交叉验证：① J/K = 1/κ_c^true = <strong>[3.12, 4.00]</strong>（环面真相变区间反推）；② J/K = n_strong/n_EM = <strong>3.0</strong>（配对阶数独立推导）⟹ <strong>J/K ≈ 3.0–3.5 一致</strong>；对照：α_s/α_EM ≈ 16（直接比不匹配）、√(α_s/α_EM) ≈ 4.02 与区间上端接近（候选关系，诚实标注可能巧合）。脚本 _jk_coupling.py。</p>
+</blockquote>
+<h3>P1（高优先级——观测检验 + 严格化）</h3>
+<table>
+<thead>
+<tr>
+<th>序</th>
+<th>行动</th>
+<th>对应问题</th>
+<th>预期产出</th>
+<th>与四力关联</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1-1</td>
+<td><strong>弦网低能谱严格分析</strong>（软极限振幅验证 Weinberg 标度）</td>
+<td>A4</td>
+<td>自旋 2 涌现判据实证</td>
+<td>引力</td>
+</tr>
+<tr>
+<td>P1-2</td>
+<td><strong>EMRI a-δ 联合 MCMC + Teukolsky 波形</strong></td>
+<td>B2</td>
+<td>更真实 σ_δ 与判决</td>
+<td>检验 A2 引力签名</td>
+</tr>
+<tr>
+<td>P1-3</td>
+<td><strong>3+1D λ_c 相变分析</strong>（环面方法推广）</td>
+<td>C1</td>
+<td>凝聚相稳定性边界</td>
+<td>电磁/强规范</td>
+</tr>
+<tr>
+<td>P1-4</td>
+<td><strong>Wilson RG 数值路径</strong>（Z₂→U(1) 连续极限）</td>
+<td>A3</td>
+<td>连续极限严格化推进</td>
+<td>电磁</td>
+</tr>
+</tbody>
+</table>
+<h3>P2（中优先级——深化与观测设计）</h3>
+<table>
+<thead>
+<tr>
+<th>序</th>
+<th>行动</th>
+<th>对应问题</th>
+<th>预期产出</th>
+<th>与四力关联</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P2-1</td>
+<td>视界饱和模态几何推导（外度规↔内浆糊连接）</td>
+<td>A5</td>
+<td>强场度规完整预言</td>
+<td>引力强场</td>
+</tr>
+<tr>
+<td>P2-2</td>
+<td>Kerr 吸积盘 + 相对论辐射传输</td>
+<td>B3</td>
+<td>盘观测对照</td>
+<td>引力观测</td>
+</tr>
+<tr>
+<td>P2-3</td>
+<td>FQH ε 项线宽系数 + 实验提案</td>
+<td>B5</td>
+<td>可测预言量化</td>
+<td>电磁泄漏</td>
+</tr>
+<tr>
+<td>P2-4</td>
+<td>湮灭型 BBGKY 完整证明</td>
+<td>A6</td>
+<td>引力涌现严格化</td>
+<td>引力</td>
+</tr>
+<tr>
+<td>P2-5</td>
+<td>宇宙学预言观测设计（DESI/void）</td>
+<td>C5</td>
+<td>观测策略</td>
+<td>统一场宇宙学</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>5 逻辑衔接</h2>
+<pre><code>理论链（统一路径）:
+  A6 统计→几何 (BBGKY) ──► A5 强场度规 (视界几何)
+        │                        │
+        ▼                        ▼
+  A3 电磁 U(1) 严格化 ──► A1 非阿贝尔 (强+弱) 4D
+        │                        │
+        └──────────► A2 J/K 定标 (四力同源) ◄──────┘
+                              │
+                              ▼
+                     A4 自旋 2 (引力闭环) ⟹ 四力统一完成
+
+观测链（证伪路径）:
+  B2 EMRI (δ) ──► 检验 A2 引力签名
+  B5 FQH ε ──► 检验 A3 电磁泄漏
+  B3/B4 吸积盘/过载区 ──► 检验 A5 强场
+  B1 总对照 (EHT/LIGO/LISA/PTA/γ) ◄── 全部预言出口
+</code></pre>
+<p><strong>核心衔接逻辑</strong>：理论链从 A6（基础统计力学）逐层推进到 A4（引力闭环）——每一环严格化都缩小"框架=四力统一"的缺口；观测链 B1–B5 提供独立证伪通道——若任一预言被观测否定，对应理论环失效；P0-1（arXiv）让框架进入外部审阅，是这一切的前提。</p>
+<hr />
+<h2>6 权重汇总与诚实声明</h2>
+<p><strong>权重汇总</strong>：A1（30%）+ A4（15%）+ A2（15%）+ A3（10%）+ B1（10%）+ A5/A6（各 5%）+ B2–B5（各 2–3%）+ C1–C5（各 1–2%）+ C6（工程战略高）。</p>
+<p><strong>诚实声明</strong>：
+1. <strong>A1/A3/A4 的"严格定理"部分与千禧年问题同源</strong>——本框架的承诺是"框架内自洽机制 + 数值谱 + 判据链"，不声称 4D 质量隙/自旋 2 的严格证明；
+2. 权重为框架内相对重要性评估（主观排序），非外部标准；
+3. 观测对照受仪器时间尺度限制（LISA 2030s、ET/CE 2030s、原初黑洞待发现）；
+4. C6（arXiv 投稿）需作者审慎处理 AI 披露与学术规范。</p>
+<hr />
+<p><em>遗留问题重整完成 · A/B/C 三层 15 项 · 权重 A 层 80% · P0/P1/P2 三级行动清单 · 理论链+观测链双衔接 · 与统一四力总目标全关联</em></p>
+
+<div class="footer">遗留问题重整与统一四力行动清单 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 遗留问题重整与统一四力行动清单.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

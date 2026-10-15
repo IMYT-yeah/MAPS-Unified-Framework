@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NS 奇点对框架的启发与对照（外部注记 · 结果待复核）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、事件摘要（据 OpenAI 官方博客与公开报道）</div>
+  <h1>NS 奇点对框架的启发与对照（外部注记 · 结果待复核）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>状态</strong>：外部注记，非论文正文证据。记录日期 2026-09-09。
+<strong>事件</strong>：2026-09-08 OpenAI 官宣，其内部多智能体系统给出 Navier–Stokes 存在性与光滑性（千禧年问题）的<strong>否证</strong>。
+<strong>可信度</strong>：克雷数学研究所截至 2026-09-09 仍将问题标注"未解决"；学界复核中，存在抢先质疑与评审争议。本备忘录仅取其概念与方法的启发，不以其结论作为框架的任何物理依据。</p>
+</blockquote>
+<h2>一、事件摘要（据 OpenAI 官方博客与公开报道）</h2>
+<ul>
+<li>结果方向：<strong>否证</strong>。构造出满足光滑初值 + 光滑外力的三维不可压缩流体，其动力学在<strong>有限时间内发展出奇点</strong>（局部速度无界），但<strong>总能量始终保持有限</strong>——对应克雷问题表述的 C/D 两项。OpenAI 声明不申领千禧年奖。</li>
+<li>解的几何：一团<strong>螺旋向内、轴向拉伸的涡旋</strong>（"意大利面"式）。加速度、压力梯度、动量传递、黏性各项同时变大、又以精确方式相互抵消，留下光滑外力。</li>
+<li>过程：2026-09-01 启动；约 10,000 并发智能体，88 小时（09-05）得出；Lean 形式化验证（GPT-6 Astra）另用 17 小时；全任务约 4.9M 消息 / 300B token，其中 NS 占 2.7M 消息 / 130B token。</li>
+<li>并行动态：Anthropic 的 Alpöge 与 NYU 的 Buckmaster 于 09-07 先行发布<strong>受迫欧拉方程</strong>的正则性结果；OpenAI 承认其优先级、否认看过其工作。巴克马斯特公开质疑 OpenAI"抢跑"，陶哲轩警告"AI 抢跑数学，好问题成稀缺资源"。</li>
+<li>方法论含义（OpenAI 原话转述）：奇点一旦出现，<strong>连续介质模型失效，要继续建模就必须逐个追踪粒子</strong>。</li>
+</ul>
+<h2>二、对照表：NS 奇点叙事 ↔ 框架叙事</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>层面</th>
+<th>Navier–Stokes 侧（OpenAI 否证）</th>
+<th>框架侧（正反物质对风暴 / MAPS）</th>
+<th>关系类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>描述对象</td>
+<td>连续介质 PDE（把流体当连续场，不追踪单分子）</td>
+<td>度规/场/时空 = 湮灭-再生事件流的玻尔兹曼统计平均（公理 1；A2 BBGKY）</td>
+<td>概念同构：两者都把"场"当涌现的粗粒化描述</td>
+</tr>
+<tr>
+<td>2</td>
+<td>失效点</td>
+<td>有限时间奇点：从完全光滑初值被<strong>证明</strong>会自我失效</td>
+<td>强场/过载点：黑洞中心、通量过载区、MAPS P2"脱离光锥→溶解"（设定为统计失效处）</td>
+<td>NS 给"统计粗粒化会失效"提供了第一个<strong>数学证明的实例</strong>（最强启发）</td>
+</tr>
+<tr>
+<td>3</td>
+<td>失效后的语言</td>
+<td>"必须回到逐粒子描述"（OpenAI 原话）</td>
+<td>回到湮灭-再生事件流本征层（公理 1 的立场：个体事件才是本体）</td>
+<td>概念同构，可直接引用为框架立场的旁证</td>
+</tr>
+<tr>
+<td>4</td>
+<td>大项精细抵消</td>
+<td>加速度/压力/黏性项发散却精确抵消，能量有限</td>
+<td>事件流 50:50 巨大平衡 + ε₀(M_Pl/E)^β 微小剩余主导一切不对称</td>
+<td>机制镜像：同一"平衡 + 剩余"母题的数学极限翻版</td>
+</tr>
+<tr>
+<td>5</td>
+<td>结构去向</td>
+<td>级联到越来越小的尺度（涡旋拉伸、能量预算有限）</td>
+<td>结构溶解回空间背景（MAPS P2/P3）</td>
+<td>叙事同构（勿当作物理等同）</td>
+</tr>
+<tr>
+<td>6</td>
+<td>旋转结构</td>
+<td>涡旋（旋转+轴向拉伸）= 奇点引擎</td>
+<td>涡卷绕模数（4 分量内空间与之同层级的设定项）</td>
+<td>纯共鸣，勿过度解读</td>
+</tr>
+<tr>
+<td>7</td>
+<td>顶点结构</td>
+<td>奇点级联由对流项 u·∇u 的<strong>三体顶点</strong>（三波相互作用）驱动</td>
+<td>A2 层级自洽性断言湮灭通道<strong>无三体顶点</strong>（2PN g_rr 分叉 +33% 正来源于此）</td>
+<td><strong>开放对照</strong>：若引力通道确无三体顶点，则天然免疫 NS 式爆裂——可作思想实验，勿下结论</td>
+</tr>
+<tr>
+<td>8</td>
+<td>时间反演</td>
+<td>（未涉及）</td>
+<td>P2/P3 溶解-涌现互为时间反演（融合备忘录 T6）</td>
+<td>无对照，仅登记</td>
+</tr>
+</tbody>
+</table>
+<h2>三、启发（按可靠度排序）</h2>
+<ol>
+<li><strong>L1 概念层（最硬）</strong>：NS 是数学史上首次严格证明"一个物理上普遍使用的连续模型从光滑初值有限时间自毁"。这为框架"场/时空非本体、离散事件流为本征"的立场提供了一个<strong>外部概念背书</strong>——连续极限失效不是哲学选项，是 PDE 层面被证明的事件。注意：是背书框架的<strong>哲学结构</strong>，不是验证其物理内容。</li>
+<li><strong>L2 机制层（镜像）</strong>：奇点构造中"发散项精确抵消 + 总能量有限"正是框架 ε 力学（巨大平衡 + 微小剩余）在极限处的翻版。叙事资源，可用于科普与直觉沟通。</li>
+<li><strong>L3 方法层（可操作）</strong>：本次证明是<strong>分析/偏微分方程导向 + Lean 机器验证</strong>，与框架的推导密集型工作（A2 命题 L、C1 谱因子 κ_E=7/6、PPN 分叉系数）类型相近。仓库可借此启动"关键定理 Lean 化"（首个 PoC 见 <code>verification/lean/</code>，若已完成）。</li>
+<li><strong>对论文正文的建议</strong>：不进正文；若要提及，只能以脚注形式标注为"外部事件/概念旁证，未定案"。仓库中本备忘录即为落点。</li>
+</ol>
+<h2>四、诚实边界（勿越界使用）</h2>
+<ul>
+<li>结果<strong>未定案</strong>：克雷仍标未解决，存在抢先与复核争议 → 不可当证据。</li>
+<li><strong>领域不同构</strong>：经典不可压缩流体的 PDE 正则性，不触及量子引力/度规涌现的物理推导；L1/L2 是概念同构，不是物理同构。</li>
+<li><strong>三体顶点对照（#7）未展开</strong>：NS 爆裂依赖对流三体顶点，框架 A2 断言湮灭通道无三体顶点。这个对照既可读为"框架天然免疫爆裂"，也可能掩盖框架在其它通道（如流体极限、通量场）的顶点结构——登记为开放问题，不结论化。</li>
+<li>涡卷绕关联（#6）属巧合级共鸣，不进入论证链。</li>
+</ul>
+<h2>五、Lean PoC 计划（对应 L3）</h2>
+<p>目标链（由易到难，按真实可行性推进）：</p>
+<ol>
+<li>泊松矩恒等式锚点：<code>e^{2x} = Σₙ (2x)ⁿ/n!</code>（C1 通道 A：成对独立累积 ⟹ 指数度规 e^{±2x} 的机器核验起点）。</li>
+<li>麦克斯韦矩 <code>⟨s²⟩_M = 3/2</code>（κ_E 分母，单高斯积分）。</li>
+<li>完整 <code>κ_E = ⟨s²Φ⟩/(⟨s²⟩⟨Φ⟩) = 7/6</code>（需 erf 与高斯积分库，工作量最大，列为远期目标）。</li>
+</ol>
+<p>每完成一项，把 .lean 源文件放入仓库 <code>verification/lean/</code>，并在本备忘录追加结果小节。</p>
+<h2>六、PoC 交付状态（2026-09-09）</h2>
+<ul>
+<li><strong>已完成</strong>：GA1/GA2/T1/T2 的 Lean 源文件与 lake 工程，入仓库 <code>verification/lean/</code>（<code>StormPoC.lean</code> + <code>lakefile.lean</code> + <code>lean-toolchain</code> + <code>README.md</code>），并配置 GitHub Actions（<code>.github/workflows/lean-poc.yml</code>）在 push 时自动核验。</li>
+<li><strong>验证通道</strong>：GA1/GA2 基于 mathlib 现成定理 <code>integral_gaussian</code>（可靠）；T1/T2 依赖 mathlib 中 exp 级数恒等式的当前名字，若编译报错只需 grep 修正（文件头有注释）。</li>
+<li><strong>本地限制（诚实标注）</strong>：本机网络对 github / lean 发行站下载速度极慢（mathlib olean 缓存 ~1GB 预估需数小时），故本次未能在本机跑通 <code>lake build</code>；已将完整验证交给 CI。CI 跑通后应在本节回填徽章/日志。</li>
+<li><strong>远期</strong>：T4（完整 κ_E = 7/6）需 erf 积分理论，未列入本 PoC。</li>
+</ul>
+<h2>七、本地核验完成（2026-09-09 晚间，替换 §六 的"仅 CI"表述）</h2>
+<p>在等待 CI 之前，本地已把整条工具链跑通并完成核验：</p>
+<ul>
+<li><strong>工具链</strong>：Lean 4.34.0-rc2（elan 托管，18377 文件 3.1GB）+ mathlib 全量 olean 缓存
+  （.ltar 451MB → leantar 解压 8483 模块）。</li>
+<li><strong><code>lake build StormPoC</code> = <code>Build completed successfully (8909 jobs)</code></strong>——
+  GA1 / GA2 / T1 / T2 四定理全部经 Lean elaborator + kernel 机器核验通过。</li>
+<li>关键 API 修正（实测 v4.34.0-rc2）：<code>Real.exp_eq_tsum</code> 已删除 → 改用
+  <code>Real.exp_eq_exp_ℝ</code> 桥接 + <code>NormedSpace.exp_eq_tsum_div (𝔸 := ℝ)</code>；
+  λ 是 Lean binder 保留字不能作变量名（T2 改用 l）；T2 陈述改为等价形式
+  <code>e^{-λ}·Σλ^k/k! = 1</code>（e^{-λ} 与 k 无关，免去在求和内提因子）。</li>
+<li>坑位记录：① mathlib cache 服务器已迁至 Azure Blob
+  （<code>lakecache.blob.core.windows.net/mathlib4</code>，旧域 NXDOMAIN）；② leantar"拒绝访问"
+  与编译期 "failed to read ...olean.private" 均为 Windows 瞬时文件锁，重跑即愈；
+  ③ 纯 olean 库构建（lean_lib）不需要 C 编译器，缺 cc 不影响 <code>lake build</code>。</li>
+<li>验证文件：<code>verification/lean/StormPoC.lean</code>（定理源码）+ <code>lakefile.lean</code> + <code>lean-toolchain</code></li>
+<li><code>README.md</code>（已更新为本地+CI 双通道状态）。</li>
+</ul>
+
+<div class="footer">NS 奇点对框架的启发与对照（外部注记 · 结果待复核） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 NS奇点启发与框架对照.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

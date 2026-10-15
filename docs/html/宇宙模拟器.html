@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>宇宙模拟器 · MAPS 格点模拟器</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#131720; --panel2:#1a1f2b; --line:#252c3a;
+    --fg:#e6edf3; --dim:#8b98a9; --e:#ff6b6b; --m:#4dabf7;
+    --z:#ffd43b; --x:#4dd4ac; --accent:#7c8cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:14px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+  header{padding:18px 22px 12px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#151a25,#0b0e14)}
+  h1{margin:0;font-size:19px;letter-spacing:.5px}
+  h1 small{color:var(--dim);font-weight:400;font-size:12px;margin-left:8px}
+  .sub{color:var(--dim);font-size:12px;margin-top:4px}
+  nav{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--line);background:#0e121a}
+  nav button{background:none;border:none;color:var(--dim);padding:11px 16px;
+    font-size:13px;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit}
+  nav button:hover{color:var(--fg)}
+  nav button.on{color:var(--fg);border-bottom-color:var(--accent)}
+  main{padding:20px 22px 40px;max-width:1180px}
+  section{display:none}
+  section.on{display:block}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+  canvas{display:block;width:100%;background:#080b11;border-radius:8px;border:1px solid var(--line)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  button.b{background:var(--panel2);border:1px solid var(--line);color:var(--fg);
+    padding:7px 13px;border-radius:7px;cursor:pointer;font-size:13px;font-family:inherit}
+  button.b:hover{border-color:var(--accent)}
+  button.b.pri{background:#22306b;border-color:#3b4fa8}
+  label.sl{display:block;margin:12px 0 4px;color:var(--dim);font-size:12px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .kv{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;
+    border-bottom:1px dashed #1e2531}
+  .kv:last-child{border:none}
+  .kv b{font-variant-numeric:tabular-nums;font-weight:600}
+  .hint{color:var(--dim);font-size:12px;margin-top:10px;line-height:1.7}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--dim);font-weight:600;font-size:12px}
+  code{background:#1b2130;padding:1px 5px;border-radius:4px;font-size:12px}
+  .tag{display:inline-block;padding:1px 7px;border-radius:20px;font-size:11px;margin-right:5px}
+  .t-ok{background:#12331f;color:#5ee08a}
+  .t-no{background:#3a1a1a;color:#ff8080}
+  .warn{background:#2b2110;border:1px solid #5c4410;color:#ffd98a;
+    padding:12px 14px;border-radius:8px;margin:14px 0;font-size:13px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:10px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;
+    margin-right:5px;vertical-align:-1px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>宇宙模拟器 <small>MAPS Lattice Simulator</small></h1>
+  <div class="sub">按《正反物质对风暴统一框架 v2.9》的<strong>底层规则</strong>运行的格点模拟 ——
+    只模拟框架里<strong>规则完整</strong>的两层：衬底层（§8.6.7）与弦网层（§5.7）。</div>
+</header>
+
+<nav>
+  <button class="on" data-t="p1">① 衬底层 · tick 置换</button>
+  <button data-t="p2">② 弦网层 · 弦与粒子</button>
+  <button data-t="p3">③ 规则清单与诚实边界</button>
+  <button data-t="p4">④ 雪花屏对照 ★</button>
+  <button data-t="p5">⑤ 孤子的诞生 ★</button>
+</nav>
+
+<main>
+
+<!-- ══════════════ 面板 1 ══════════════ -->
+<section id="p1" class="on">
+  <div class="grid">
+    <div class="card">
+      <canvas id="c1" width="720" height="560"></canvas>
+      <div class="legend">
+        <span><i style="background:#2b3550"></i>空</span>
+        <span><i style="background:#7c8cff"></i>占据</span>
+        <span>显示：3D 格点的中心 XY 切片</span>
+      </div>
+      <div class="row">
+        <button class="b pri" id="b1play">▶ 播放</button>
+        <button class="b" id="b1step">单步 tick</button>
+        <button class="b" id="b1reset">↺ 重置</button>
+      </div>
+      <div class="hint">
+        <b>规则（§8.6.7）</b>：一 tick = ① 随机选一个轴；② 该轴上<strong>每条线独立</strong>抽一个
+        odd–even 相位；③ 按该相位沿轴做完美匹配，<strong>同时</strong>交换每对格点的占据态。<br>
+        ⟹ tick 是<strong>置换</strong> ⟹ 底层<strong>双射、可逆、零熵产生</strong>；占据数 k <strong>严格守恒</strong>。
+      </div>
+    </div>
+    <div class="card">
+      <div class="kv"><span>tick 计数</span><b id="s1tick">0</b></div>
+      <div class="kv"><span>格点 L³</span><b id="s1N">12³ = 1728</b></div>
+      <div class="kv"><span>占据数 k</span><b id="s1k">864</b></div>
+      <div class="kv"><span>轨迹访问的不同构型</span><b id="s1seen">1</b></div>
+      <div class="kv"><span>本次运行最大值</span><b id="s1max">—</b></div>
+      <label class="sl">格点边长 L = <span id="v1L">12</span></label>
+      <input type="range" id="r1L" min="6" max="22" step="2" value="12">
+      <label class="sl">速度（tick/帧）= <span id="v1sp">4</span></label>
+      <input type="range" id="r1sp" min="1" max="40" step="1" value="4">
+      <div class="hint">
+        ⭐ <b>盯住「轨迹访问的不同构型」这个数</b>：它会<strong>很快饱和</strong>，
+        然后在那一小块里永远打转 —— 这就是 tick 群<strong>非遍历</strong>。
+        第 57 轮量过：一条轨迹只能访问它那条轨道（覆盖全部可能构型的极小一部分）。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 面板 2 ══════════════ -->
+<section id="p2">
+  <div class="grid">
+    <div class="card">
+      <canvas id="c2" width="720" height="560"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--z)"></i>Z 弦（受 Z 操作）</span>
+        <span><i style="background:var(--x)"></i>X 弦（受 X 操作）</span>
+        <span><i style="background:var(--m);border-radius:50%"></i>m 粒子（面 B<sub>p</sub>=−1）</span>
+        <span><i style="background:var(--e);border-radius:50%"></i>e 粒子（顶点 A<sub>v</sub>=−1）</span>
+      </div>
+      <div class="row">
+        <button class="b pri" id="b2play">▶ 播放</button>
+        <button class="b" id="b2z">施加一条 Z 弦</button>
+        <button class="b" id="b2x">施加一条 X 弦</button>
+        <button class="b" id="b2pair">产生一对 e 粒子</button>
+        <button class="b" id="b2reset">↺ 重置</button>
+      </div>
+      <div class="hint">
+        <b>规则（§5.7）</b>：面变量 Z<sub>e</sub>；<code>A_v = Π_{e∈v} X_e</code>（顶点）、
+        <code>B_p = Π_{e∈∂p} Z_e</code>（面）。<br>
+        · 施加 <b>X<sub>e</sub></b> ⟹ 翻转 e <strong>两端顶点</strong>的 A<sub>v</sub> ⟹ 产生一对 <b>e 粒子</b>；<br>
+        · 施加 <b>Z<sub>e</sub></b> ⟹ 翻转 e <strong>两侧面</strong>的 B<sub>p</sub> ⟹ 产生一对 <b>m 粒子</b>；<br>
+        · <strong>闭合弦 ⟹ 无激发</strong>（两端抵消）—— 这就是「弦张力 / 禁闭」的图像。
+      </div>
+    </div>
+    <div class="card">
+      <div class="kv"><span>步数</span><b id="s2step">0</b></div>
+      <div class="kv"><span>e 粒子数（顶点）</span><b id="s2e" style="color:var(--e)">0</b></div>
+      <div class="kv"><span>m 粒子数（面）</span><b id="s2m" style="color:var(--m)">0</b></div>
+      <div class="kv"><span>Z 弦长 / X 弦长</span><b id="s2len">0 / 0</b></div>
+      <div class="kv"><span>拓扑判别量 N<sub>e</sub>+N<sub>m</sub></span><b id="s2sum">0</b></div>
+      <label class="sl">格点 L = <span id="v2L">10</span></label>
+      <input type="range" id="r2L" min="6" max="18" step="2" value="10">
+      <label class="sl">活动强度（操作/帧）= <span id="v2sp">6</span></label>
+      <input type="range" id="r2sp" min="0" max="40" step="1" value="6">
+      <div class="hint">
+        粒子<strong>永远成对出现</strong>（环面上不能只产生一个），弦把两个粒子连起来。
+        粒子数 + 弦长这两个数，就是第 60 轮算过的<strong>弦势</strong>的直观版本：
+        <strong>把粒子拉远 ⟹ 弦变长 ⟹ 能量线性增加 ⟹ 没有极小 ⟹ 没有束缚态</strong>。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 面板 3 ══════════════ -->
+<section id="p3">
+  <div class="card">
+    <h3 style="margin:0 0 4px;font-size:15px">模拟器实现了哪些规则</h3>
+    <table>
+      <tr><th>规则</th><th>出处</th><th>状态</th></tr>
+      <tr><td>衬底 = 3D 格点，每格点二值（占据 / 空）</td><td>§8.6</td>
+          <td><span class="tag t-ok">已实现</span></td></tr>
+      <tr><td>一 tick = 选轴 + 每条线独立相位 + 沿轴完美匹配（同时交换）</td><td>§8.6.7 ＋ 第 26 轮</td>
+          <td><span class="tag t-ok">已实现</span></td></tr>
+      <tr><td>tick 是置换 ⟹ 双射、可逆、k 守恒（面板①的 k 永远不变）</td><td>§8.6 ＋ 第 57 轮</td>
+          <td><span class="tag t-ok">已实现</span></td></tr>
+      <tr><td>tick 群<strong>非遍历</strong>（轨迹出不了自己的轨道）</td><td>第 57 轮</td>
+          <td><span class="tag t-ok">可观察</span></td></tr>
+      <tr><td>弦网：<code>A_v = Π_{e∈v}X_e</code>、<code>B_p = Π_{e∈∂p}Z_e</code>、<code>H_F = −JΣA_v − KΣB_p</code></td>
+          <td>§5.7</td><td><span class="tag t-ok">已实现</span></td></tr>
+      <tr><td>激发成对、弦连接激发、闭合弦无激发（禁闭图像）</td><td>§5.7 ＋ 第 60 轮</td>
+          <td><span class="tag t-ok">已实现</span></td></tr>
+      <tr><td>相变点 λ_c ∈ [0.21, 0.23]（3+1D）／κ_c ∈ [0.25, 0.32]（2D）</td><td>第 47 / 50 轮 ＋ v2.9 A1</td>
+          <td><span class="tag t-no">本模拟器不含</span>（需要量子多体求解器）</td></tr>
+      <tr><td>事件层 <code>H_event = Σp²/2m + ΣV_contact</code></td><td>§4.2</td>
+          <td><span class="tag t-no">无法实现</span>：<code>V_contact</code> 无数函数形式</td></tr>
+      <tr><td>引力侧（通量扩散 / 度规 / PPN）</td><td>§4.2–4.6</td>
+          <td><span class="tag t-no">不在本模拟器内</span>：那是连续场 PDE</td></tr>
+    </table>
+  </div>
+
+  <div class="warn">
+    <b>⚠️ 这个模拟器<u>能</u>做什么、<u>不</u>能做什么</b><br>
+    <b>能</b>：把 62 轮纸面推演的底层规则变成<strong>可以看见、可以玩</strong>的东西 ——
+    看到置换、看到 k 守恒、看到轨迹困在自己那条轨道里、看到弦和粒子成对出现。<br>
+    <b>不 能</b>：<strong>验证框架</strong>。它模拟的是框架<strong>内部定义</strong>的东西，
+    不是与观测的比较；它也<strong>不产生新物理</strong>。<br>
+    ⟹ 本项目第 61 轮算过：框架「<strong>独有 + 可测 + 已有数字</strong>」的预言<strong>只有 1 个</strong>（EMRI 进动差），
+    而那个要等 <strong>LISA（约 10–15 年）</strong>。这个模拟器改变不了这件事。
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin:0 0 4px;font-size:15px">它真正有用在哪</h3>
+    <div class="hint" style="margin-top:4px">
+      ① <b>自查</b>：规则里任何一处笔误（比如相位搞错、配对搞错），画面会立刻不对劲 ——
+      这比读 1500 行论文快；<br>
+      ② <b>教学 / 传播</b>：一个能玩的东西，比一份 PDF 更容易让人明白"这套框架到底在说什么"；<br>
+      ③ <b>底线</b>：它把"框架的底层是可计算的"这件事<strong>坐实了</strong> ——
+      而这一点本身是有价值的（很多"统一理论"连这一步都做不到）。
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 面板 4：雪花屏对照 ══════════════ -->
+
+<section id="p4">
+  <div class="grid">
+    <div class="card">
+      <canvas id="c4" width="920" height="430"></canvas>
+      <div class="legend">
+        <span><i style="background:#7c8cff"></i>左：tick 置换（框架 §8.6.7 的底层）</span>
+        <span><i style="background:#ffd43b"></i>右：真随机白噪声（每帧重新抽）</span>
+      </div>
+      <div class="row">
+        <button class="b pri" id="b4play">▶ 播放</button>
+        <button class="b" id="b4step">单步</button>
+        <button class="b" id="b4ord">⚑ 有序初态</button>
+        <button class="b" id="b4reset">↺ 重置</button>
+      </div>
+      <label class="sl">速度（tick/帧）= <span id="v4sp">2</span></label>
+      <input type="range" id="r4sp" min="1" max="20" step="1" value="2">
+      <div class="hint">
+        两边的<strong>单帧图像统计上无法区分</strong>（点密度、两点关联、块密度方差都相同）——
+        这就是「看起来一模一样」的原因。区别全在<strong>时间与守恒量</strong>里：
+        盯住右侧「k 的极差」，左边会一直是 <code>0</code>，右边会不断变大。
+      </div>
+    </div>
+    <div class="card">
+      <div class="kv"><span>帧数</span><b id="s4frame">0</b></div>
+      <div class="kv"><span>亮点数 k（左 / 右）</span><b id="s4k">0 / 0</b></div>
+      <div class="kv"><span>★ k 的极差（自开始）</span><b id="s4kr">0 / 0</b></div>
+      <div class="kv"><span>帧间逐位变化量</span><b id="s4d">—</b></div>
+      <div class="kv"><span>★ 轴对齐线级重排</span><b id="s4r">—</b></div>
+      <div class="hint" style="margin-top:12px">
+        <strong>怎么读这两行 ★</strong><br>
+        · <code>k 的极差</code>：tick 是<strong>置换</strong> ⟹ 亮点数严格不变；真雪花屏每帧重抽
+          ⟹ 按 √(N/4) 跳动（本面板 N = 1728 ⟹ ±21）。<br>
+        · <code>轴对齐线级重排</code>：tick 只沿<strong>一个轴</strong>、在<strong>每条线内部</strong>
+          交换 ⟹ 每条线的亮点数一定不变（恒为 1.00）；白噪声只有概率巧合（≈0.18）。<br>
+        · <code>帧间逐位变化量</code>两边都是 0.50 —— <strong>这个看似显然的判据其实分不开</strong>
+          （开发时我在这里预测错了，见核验脚本 SN-4）。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 面板 5：孤子的诞生 ══════════════ -->
+
+<section id="p5">
+  <div class="grid">
+    <div class="card">
+      <canvas id="c5" width="900" height="560"></canvas>
+      <div class="legend">
+        <span><i style="background:#7c8cff"></i>指数 +1：max / min（涡心）</span>
+        <span><i style="background:#ff6b6b"></i>指数 −1：saddle（反涡心）</span>
+        <span><i style="background:#c25a3a"></i>背景色 = 场 f 的高低</span>
+      </div>
+      <div class="row">
+        <button class="b pri" id="b5new">⟳ 重新随机</button>
+        <button class="b" id="b5ann">⚡ 湮灭一对</button>
+        <button class="b" id="b5reset">↺ 全部复原</button>
+        <button class="b" id="b5play">▶ 自动随机</button>
+        <button class="b pri" id="b5step">⚡ 演化一步</button>
+        <button class="b" id="b5run">▶ 动力学</button>
+      </div>
+      <label class="sl">耦合 α = <span id="v5a">0.3</span></label>
+      <input type="range" id="r5a" min="0.05" max="0.6" step="0.05" value="0.3">
+      <div class="hint">
+        <strong>怎么读</strong>：球面（方向空间 S²）上撒一个随机平滑场，
+        数它的三种临界点 —— 局部最大、局部最小（各算 <code>指数 +1</code>），
+        以及鞍点（<code>指数 −1</code>）。<br>
+        <strong>关键</strong>：<code>Σ = #max − #saddle + #min</code> **永远是 2**，
+        不管你怎么随机；而 <code>#max / #min / #saddle</code> 每次都不同。<br>
+        点「⚡ 湮灭一对」让一个 +1 和一个 −1 配对消失 —— <strong>Σ 岿然不动</strong>，
+        最后必然会剩下 2 个 +1，一个也去不掉。这就是「无法湮灭的稳定点」。<br>
+        <br>
+        <strong>动力学（点「⚡ 演化一步 / ▶ 动力学」）</strong>：
+        <strong>动力学</strong> = 把邻居的切向量平行移动过来做加权平均（<strong>协变扩散</strong>，
+        即 Dirichlet 能量的梯度流）——
+        涡心像点粒子一样<strong>异号相吸、同号相斥，相遇即湮灭</strong>；
+        <strong>但净荷 Σ w 是拓扑守恒量，怎么演都不变</strong>（S² 上它 = χ = 2）。
+        <em>（「热流 / 梯度流 / 平行移动 / 联络」这套语言在论文 P 里<strong>一处都没有</strong> ⟹
+        这是<strong>本轮新增</strong>的模拟机制，不是「框架原有的涡动力学」。）</em><br>
+        ⚠️ 两条<strong>诚实边界</strong>：<br>
+        ① 初态必须先<strong>粗粒化</strong>（§2.3「孤子化」）—— 逐点独立的随机方向
+        处处落在「绕数 ≠ 0」的退化区，那时光滑层还不存在，绕数判据不适用。<br>
+        ② 格点上的<strong>裸</strong>绕数和是 <strong>Σ w = 3χ = 6</strong>，不是 χ：
+        多出的 2χ 恰好是<strong>总曲率</strong> ΣK<sub>i</sub>/π（K<sub>i</sub> = 顶点角度亏损）。
+        扣掉它之后 <code>Σ(w<sub>i</sub> − 2K<sub>i</sub>/(2π)) = χ = 2</code>
+        <strong>精确成立</strong>（`_vortex_67.py` VX-1b：12 个解析场 × 3 个分辨率全中）。
+        <strong>不变量本身（「怎么演都不变」）对裸值也成立</strong>；
+        但该式只对<strong>零点不落在格点上</strong>的场成立（见右栏说明）。
+      </div>
+    </div>
+    <div class="card">
+      <div class="kv"><span>场序号</span><b id="s5n">1</b></div>
+      <div class="kv"><span>#max / #min</span><b id="s5mm">—</b></div>
+      <div class="kv"><span>#saddle</span><b id="s5sd">—</b></div>
+      <div class="kv"><span>★ Σ = #max − #saddle + #min</span><b id="s5sig">—</b></div>
+      <div class="kv"><span>存活：+1 / −1</span><b id="s5alive">—</b></div>
+      <div class="kv"><span>已湮灭对数</span><b id="s5ann">0</b></div>
+      <div class="kv"><span>演化步数</span><b id="s5t">0</b></div>
+      <div class="kv"><span>★ 涡心 +1 / −1</span><b id="s5wc">—</b></div>
+      <div class="kv"><span>★ 净荷 Σ w（裸绕数）</span><b id="s5sig2">—</b></div>
+      <div class="kv"><span>★ 净荷（曲率修正）Σ(w−2K/2π)</span><b id="s5sig3">—</b></div>
+      <div class="hint" style="margin-top:12px">
+        <strong>净荷 ⟹ 演化中恒定</strong><br>
+        涡心在演化中会来回跑、<strong>异号相遇即双双湮灭</strong>，但净荷
+        <strong>是拓扑不变量</strong>：湮灭总是 <strong>+1 与 −1 成对</strong>发生。<br>
+        · <code>Σ w</code>（裸绕数和）在本网格上是 <strong>3χ = 6</strong>；
+        <strong>扣掉总曲率</strong> ΣK<sub>i</sub>/π = 2χ 之后
+        <code>Σ(w<sub>i</sub> − 2K<sub>i</sub>/(2π)) = χ = 2</code> <strong>精确成立</strong>
+        （第 67 轮参考脚本 `_vortex_67.py` VX-1b 实测，12 个解析场 × 3 个分辨率全中）。<br>
+        ⚠️ <strong>判据的适用范围</strong>：上面这条只对<strong>零点不落在格点上</strong>的平滑场成立；
+        零点若恰好落在<strong>顶点</strong>上，指数归属要由几个面分摊，<strong>绕数与指数无良定义</strong>
+        （实测 <code>∇p_z</code> 修正后 −2、<code>x̂×p</code> 修正后 0）——
+        该情形请用 <strong>Morse 谱</strong>（第 66 轮，`_soliton_66.py` 行 1105 记的同一类方法学教训）计数。<br>
+        ⚠️ 离散实现下 <code>Σ w</code> 是<strong>整数</strong>；涡心在相邻格点间
+        「跳」的一瞬间可能读到一个<strong>单步 ±1 的抖动</strong>，下一步即复原 ——
+        这不是漂移，是格点离散化在涡心落到<strong>棱上</strong>时的瞬时读数。
+      </div>
+      <div class="hint" style="margin-top:12px">
+        <strong>为什么 Σ 一定是 2</strong><br>
+        这是 <strong>Poincaré–Hopf / 毛球定理</strong>：球面上**任何**连续切向量场
+        的零点指数和 = <code>χ(S²) = 2</code>。换个曲面就变：<br>
+        · 环面 <code>χ = 0</code> ⟹ 可以有**处处非零**的场，一个涡心都不剩；<br>
+        · <code>S³: χ = 0</code> 且可平行化 ⟹ 毛球定理不适用（框架 §8.2 已澄清）。<br>
+        <strong>所以「无法湮灭」不是概率问题，是几何恒等式。</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   面板 ①  衬底层 —— §8.6.7 的 tick
+   一 tick = 选轴 + 每条线独立相位 + 沿轴完美匹配（同时交换）
+   ⚠️ 实现要点：配对必须用「两个相位的匹配表」，不能只做 roll
+      （roll + 配对交换不是完美匹配 —— 开发时踩过这个坑，见核验脚本 US-1）
+   ════════════════════════════════════════════════════════════════ */
+const S1 = { L:12, a:null, tick:0, seen:new Set(), max:0, playing:false, sp:4 };
+
+function init1(){
+  const L = S1.L, N = L*L*L;
+  S1.a = new Uint8Array(N);
+  // 随机初始化，占据数 k ≈ N/2
+  const k = N >> 1;
+  const idx = [...Array(N).keys()];
+  for(let i=N-1;i>0;i--){ const j = (Math.random()*(i+1))|0; [idx[i],idx[j]]=[idx[j],idx[i]]; }
+  for(let i=0;i<k;i++) S1.a[idx[i]] = 1;
+  S1.tick = 0; S1.seen = new Set([hash1()]); S1.max = 1;
+  draw1(); stats1();
+}
+const at = (x,y,z) => ((x%S1.L)+S1.L)%S1.L + S1.L*(((y%S1.L)+S1.L)%S1.L) + S1.L*S1.L*(((z%S1.L)+S1.L)%S1.L);
+
+/* 一 tick：选轴 + 每条线独立相位 + 沿轴完美匹配（同时交换） */
+function tick1(){
+  const L = S1.L, a = S1.a, b = new Uint8Array(a.length);
+  const axis = (Math.random()*3)|0;
+  for(let i=0;i<L;i++) for(let j=0;j<L;j++){
+    const phi = Math.random()<0.5 ? 0 : 1;      // ← 每条线**独立**相位（§8.6.7(f)）
+    for(let k=0;k<L;k+=2){
+      const p = (k + phi) % L, q = (k + 1 + phi) % L;
+      let i1,j1,k1, i2,j2,k2;
+      if(axis===0){ i1=p; j1=i; k1=j; i2=q; j2=i; k2=j; }
+      else if(axis===1){ i1=i; j1=p; k1=j; i2=i; j2=q; k2=j; }
+      else { i1=i; j1=j; k1=p; i2=i; j2=j; k2=q; }
+      b[at(i1,j1,k1)] = a[at(i2,j2,k2)];
+      b[at(i2,j2,k2)] = a[at(i1,j1,k1)];
+    }
+  }
+  S1.a = b; S1.tick++;
+  const h = hash1();
+  if(!S1.seen.has(h)){ S1.seen.add(h); if(S1.seen.size>S1.max) S1.max = S1.seen.size; }
+}
+function hash1(){
+  // 简化的构型指纹（FNV-1a over the slice-sampled array）
+  let h = 2166136261;
+  const a = S1.a, step = Math.max(1, (a.length/4096)|0);
+  for(let i=0;i<a.length;i+=step){ h ^= a[i]; h = Math.imul(h, 16777619); }
+  return h + ':' + a.length;
+}
+function draw1(){
+  const cv = document.getElementById('c1'), g = cv.getContext('2d');
+  const W = cv.width, H = cv.height, L = S1.L;
+  const cell = Math.floor(Math.min(W,H)/L), ox = (W-cell*L)/2, oy = (H-cell*L)/2;
+  g.fillStyle = '#080b11'; g.fillRect(0,0,W,H);
+  const z = L >> 1;
+  for(let y=0;y<L;y++) for(let x=0;x<L;x++){
+    const occ = S1.a[at(x,y,z)];
+    g.fillStyle = occ ? '#7c8cff' : '#2b3550';
+    g.fillRect(ox+x*cell, oy+y*cell, cell-1, cell-1);
+  }
+  g.fillStyle = '#8b98a9'; g.font = '12px monospace';
+  g.fillText('中心切片  z = '+z, ox, oy-8);
+}
+function stats1(){
+  let k = 0; for(const v of S1.a) k += v;
+  document.getElementById('s1tick').textContent = S1.tick;
+  document.getElementById('s1N').textContent = S1.L+'³ = '+(S1.L**3);
+  document.getElementById('s1k').textContent = k;
+  document.getElementById('s1seen').textContent = S1.seen.size;
+  document.getElementById('s1max').textContent = S1.max;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   面板 ②  弦网层 —— §5.7 的 toric code
+   维护两条**互相独立**的弦：
+     sZ[e] ∈{0,1}  —— 施加过 Z_e 的奇偶   ⟹ 决定 B_p = Π_{e∈∂p}(−1)^{sZ}
+     sX[e] ∈{0,1}  —— 施加过 X_e 的奇偶   ⟹ 决定 A_v = Π_{e∈v}(−1)^{sX}
+   规则：Z_e ⟹ 翻转 e 两侧面的 B_p（m 粒子）
+         X_e ⟹ 翻转 e 两端顶点的 A_v（e 粒子）
+   ════════════════════════════════════════════════════════════════ */
+const S2 = { L:10, sZ:null, sX:null, step:0, playing:false, sp:6 };
+
+/* ⚠️ 必须用 mod() 而不是 % —— JS 的 % 对负数返回负数（Python 不是）！
+   开发时踩过：eH(-1,2) 用 % 会算成索引 11（= h(5,1)），于是一圈闭合弦不闭合
+   ⟹ 测试 ST-4 / ST-5 直接报错。 */
+const mod = (n,m) => ((n % m) + m) % m;
+function eH(x,y){ return mod(y,S2.L)*S2.L + mod(x,S2.L); }              // 水平边 (x,y)-(x+1,y)
+function eV(x,y){ return S2.L*S2.L + mod(x,S2.L)*S2.L + mod(y,S2.L); }  // 垂直边 (x,y)-(x,y+1)
+
+function init2(){
+  S2.sZ = new Uint8Array(2*S2.L*S2.L);
+  S2.sX = new Uint8Array(2*S2.L*S2.L);
+  S2.step = 0; draw2(); stats2();
+}
+/* 计算 A_v（顶点）与 B_p（面） */
+function computeAvBp(){
+  const L = S2.L, Nv = L*L, Np = L*L;
+  const Av = new Int8Array(Nv).fill(1), Bp = new Int8Array(Np).fill(1);
+  for(let x=0;x<L;x++) for(let y=0;y<L;y++){
+    // 顶点 (x,y) 的 4 条边
+    const star = [eH(x,y), eH(x-1,y), eV(x,y), eV(x,y-1)];
+    let s = 1; for(const e of star) if(S2.sX[e]) s = -s;
+    Av[y*L+x] = s;
+    // 面 (x,y) 的 4 条边
+    const plaq = [eH(x,y), eH(x,y+1), eV(x,y), eV(x+1,y)];
+    let t = 1; for(const e of plaq) if(S2.sZ[e]) t = -t;
+    Bp[y*L+x] = t;
+  }
+  return {Av, Bp};
+}
+/* 施加一条 Z 弦：从 (x0,y0) 沿随机路径走 len 步，翻转沿途 sZ */
+function applyZ(x0,y0,len){
+  let x = x0, y = y0;
+  for(let s=0;s<len;s++){
+    const dir = (Math.random()*4)|0;
+    let e;
+    if(dir===0){ e = eH(x,y); x = (x+1)%S2.L; }
+    else if(dir===1){ e = eH(x-1,y); x = (x-1+S2.L)%S2.L; }
+    else if(dir===2){ e = eV(x,y); y = (y+1)%S2.L; }
+    else { e = eV(x,y-1); y = (y-1+S2.L)%S2.L; }
+    S2.sZ[e] ^= 1;
+  }
+}
+function applyX(x0,y0,len){
+  let x = x0, y = y0;
+  for(let s=0;s<len;s++){
+    const dir = (Math.random()*4)|0;
+    let e;
+    if(dir===0){ e = eH(x,y); x = (x+1)%S2.L; }
+    else if(dir===1){ e = eH(x-1,y); x = (x-1+S2.L)%S2.L; }
+    else if(dir===2){ e = eV(x,y); y = (y+1)%S2.L; }
+    else { e = eV(x,y-1); y = (y-1+S2.L)%S2.L; }
+    S2.sX[e] ^= 1;
+  }
+}
+function step2(){
+  const L = S2.L;
+  const x = (Math.random()*L)|0, y = (Math.random()*L)|0;
+  const len = 1 + ((Math.random()*3)|0);
+  if(Math.random() < 0.5) applyZ(x,y,len); else applyX(x,y,len);
+  S2.step++;
+}
+function paintEdges(g, ox, oy, cs, L, which){
+  const arr = which==='Z' ? S2.sZ : S2.sX;
+  const col = which==='Z' ? '#ffd43b' : '#4dd4ac';
+  g.strokeStyle = col; g.lineWidth = Math.max(2, cs*0.18); g.lineCap = 'round';
+  for(let x=0;x<L;x++) for(let y=0;y<L;y++){
+    if(arr[eH(x,y)]){ g.beginPath(); g.moveTo(ox+x*cs, oy+y*cs+cs/2); g.lineTo(ox+(x+1)*cs, oy+y*cs+cs/2); g.stroke(); }
+    if(arr[eV(x,y)]){ g.beginPath(); g.moveTo(ox+x*cs+cs/2, oy+y*cs); g.lineTo(ox+x*cs+cs/2, oy+(y+1)*cs); g.stroke(); }
+  }
+}
+function draw2(){
+  const cv = document.getElementById('c2'), g = cv.getContext('2d');
+  const W = cv.width, H = cv.height, L = S2.L;
+  const cs = Math.floor(Math.min(W,H)/(L+1)), ox = (W-cs*L)/2, oy = (H-cs*L)/2;
+  g.fillStyle = '#080b11'; g.fillRect(0,0,W,H);
+  // 网格
+  g.strokeStyle = '#1b2331'; g.lineWidth = 1;
+  for(let i=0;i<=L;i++){
+    g.beginPath(); g.moveTo(ox+i*cs, oy); g.lineTo(ox+i*cs, oy+L*cs); g.stroke();
+    g.beginPath(); g.moveTo(ox, oy+i*cs); g.lineTo(ox+L*cs, oy+i*cs); g.stroke();
+  }
+  const {Av, Bp} = computeAvBp();
+  // m 粒子（面）
+  for(let x=0;x<L;x++) for(let y=0;y<L;y++){
+    if(Bp[y*L+x] === -1){
+      g.fillStyle = 'rgba(77,171,247,0.42)';
+      g.beginPath(); g.arc(ox+(x+0.5)*cs, oy+(y+0.5)*cs, cs*0.26, 0, 6.2832); g.fill();
+    }
+  }
+  // 弦
+  paintEdges(g, ox, oy, cs, L, 'Z');
+  paintEdges(g, ox, oy, cs, L, 'X');
+  // e 粒子（顶点）
+  for(let x=0;x<L;x++) for(let y=0;y<L;y++){
+    if(Av[y*L+x] === -1){
+      g.fillStyle = '#ff6b6b';
+      g.beginPath(); g.arc(ox+x*cs, oy+y*cs, Math.max(3.2, cs*0.19), 0, 6.2832); g.fill();
+      g.strokeStyle = 'rgba(255,107,107,0.5)'; g.lineWidth = 1.5; g.stroke();
+    }
+  }
+  g.fillStyle = '#8b98a9'; g.font = '12px monospace';
+  g.fillText('L = '+L+' × '+L+'  环面（上下、左右相连）', ox, oy-8);
+}
+function stats2(){
+  const {Av, Bp} = computeAvBp();
+  let ne=0, nm=0;
+  for(let i=0;i<Av.length;i++) if(Av[i]===-1) ne++;
+  for(let i=0;i<Bp.length;i++) if(Bp[i]===-1) nm++;
+  let zl=0, xl=0;
+  for(let i=0;i<S2.sZ.length;i++){ if(S2.sZ[i]) zl++; if(S2.sX[i]) xl++; }
+  document.getElementById('s2step').textContent = S2.step;
+  document.getElementById('s2e').textContent = ne;
+  document.getElementById('s2m').textContent = nm;
+  document.getElementById('s2len').textContent = zl+' / '+xl;
+  document.getElementById('s2sum').textContent = ne+nm;
+}
+
+/* ══════════════ UI 绑定 ══════════════ */
+document.querySelectorAll('nav button').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById(b.dataset.t).classList.add('on');
+  };
+});
+// 面板 1
+document.getElementById('b1step').onclick = ()=>{ tick1(); draw1(); stats1(); };
+document.getElementById('b1reset').onclick = ()=>{ init1(); };
+document.getElementById('b1play').onclick = (e)=>{
+  S1.playing = !S1.playing;
+  e.target.textContent = S1.playing ? '⏸ 暂停' : '▶ 播放';
+  if(S1.playing) loop1();
+};
+document.getElementById('r1L').oninput = (e)=>{
+  S1.L = +e.target.value; document.getElementById('v1L').textContent = S1.L; init1();
+};
+document.getElementById('r1sp').oninput = (e)=>{
+  S1.sp = +e.target.value; document.getElementById('v1sp').textContent = S1.sp;
+};
+function loop1(){
+  if(!S1.playing) return;
+  for(let i=0;i<S1.sp;i++) tick1();
+  draw1(); stats1();
+  requestAnimationFrame(loop1);
+}
+// 面板 2
+document.getElementById('b2z').onclick = ()=>{ applyZ((Math.random()*S2.L)|0, (Math.random()*S2.L)|0, 4); draw2(); stats2(); };
+document.getElementById('b2x').onclick = ()=>{ applyX((Math.random()*S2.L)|0, (Math.random()*S2.L)|0, 4); draw2(); stats2(); };
+document.getElementById('b2pair').onclick = ()=>{
+  const L = S2.L, x = (Math.random()*L)|0, y = (Math.random()*L)|0;
+  S2.sX[eH(x,y)] ^= 1;                    // 单条 X_e ⟹ 两端顶点各得一个 e 粒子
+  draw2(); stats2();
+};
+document.getElementById('b2reset').onclick = ()=>{ init2(); };
+document.getElementById('b2play').onclick = (e)=>{
+  S2.playing = !S2.playing;
+  e.target.textContent = S2.playing ? '⏸ 暂停' : '▶ 播放';
+  if(S2.playing) loop2();
+};
+document.getElementById('r2L').oninput = (e)=>{
+  S2.L = +e.target.value; document.getElementById('v2L').textContent = S2.L; init2();
+};
+document.getElementById('r2sp').oninput = (e)=>{
+  S2.sp = +e.target.value; document.getElementById('v2sp').textContent = S2.sp;
+};
+function loop2(){
+  if(!S2.playing) return;
+  for(let i=0;i<S2.sp;i++) step2();
+  draw2(); stats2();
+  requestAnimationFrame(loop2);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   面板 ④  雪花屏对照 —— 同一个「像」，两种机制
+   左：tick 置换（框架底层）      右：i.i.d. 白噪声（每帧重抽）
+   目的：让「单帧分不开、时间维度分得开」这件事**看得见**。
+   判据来源：核验脚本 `_snow_65.py`（SN-1 … SN-9，11 项 0 失败）
+   ════════════════════════════════════════════════════════════════ */
+const S4 = { L:12, A:null, W:null, kA:0, kW:0,
+             kAmin:1e9, kAmax:-1, kWmin:1e9, kWmax:-1,
+             dA:0, dW:0, rA:1, rW:0, frame:0, playing:false, sp:2 };
+
+const m4 = (n,m)=> ((n%m)+m)%m;                     // ⚠️ JS 的 % 对负数返回负数
+const at4 = (x,y,z)=>{ const L=S4.L; return m4(x,L) + L*m4(y,L) + L*L*m4(z,L); };
+
+function countK(a){ let k=0; for(let i=0;i<a.length;i++) k+=a[i]; return k; }
+
+function init4(){
+  const L = S4.L, N = L*L*L, k = N>>1;
+  S4.A = new Uint8Array(N);
+  const idx = new Int32Array(N);
+  for(let i=0;i<N;i++) idx[i] = i;
+  for(let i=N-1;i>0;i--){ const j=(Math.random()*(i+1))|0; const t0=idx[i]; idx[i]=idx[j]; idx[j]=t0; }
+  for(let i=0;i<k;i++) S4.A[idx[i]] = 1;
+  S4.W = new Uint8Array(N);
+  for(let i=0;i<N;i++) S4.W[i] = Math.random()<0.5 ? 1 : 0;
+  S4.dA = 0; S4.dW = 0; S4.rA = 1; S4.rW = 0; S4.frame = 0;
+  S4.kAmin = S4.kAmax = countK(S4.A);
+  S4.kWmin = S4.kWmax = countK(S4.W);
+  draw4(); stats4();
+}
+
+/* 有序初态：两侧都设成「轴 0 的左半全满」—— 然后看它们各自多快变成雪花 */
+function ordered4(){
+  const L = S4.L, N = L*L*L;
+  S4.A = new Uint8Array(N); S4.W = new Uint8Array(N);
+  for(let z=0;z<L;z++) for(let y=0;y<L;y++) for(let x=0;x<L;x++){
+    const v = (x < L/2) ? 1 : 0;
+    S4.A[at4(x,y,z)] = v; S4.W[at4(x,y,z)] = v;
+  }
+  S4.dA = 0; S4.dW = 0; S4.rA = 1; S4.rW = 0; S4.frame = 0;
+  S4.kAmin = S4.kAmax = countK(S4.A);
+  S4.kWmin = S4.kWmax = countK(S4.W);
+  draw4(); stats4();
+}
+
+/* 一 tick：选轴 + 每条线独立相位 + 沿轴完美匹配（与面板 ① 同一规则） */
+function step4(){
+  const L = S4.L, a = S4.A, b = new Uint8Array(a.length);
+  const axis = (Math.random()*3)|0;
+  for(let i=0;i<L;i++) for(let j=0;j<L;j++){
+    const phi = Math.random()<0.5 ? 0 : 1;
+    for(let k=0;k<L;k+=2){
+      const p = (k+phi)%L, q = (k+1+phi)%L;
+      let i1,j1,k1, i2,j2,k2;
+      if(axis===0){ i1=p; j1=i; k1=j; i2=q; j2=i; k2=j; }
+      else if(axis===1){ i1=i; j1=p; k1=j; i2=i; j2=q; k2=j; }
+      else { i1=i; j1=j; k1=p; i2=i; j2=j; k2=q; }
+      b[at4(i1,j1,k1)] = a[at4(i2,j2,k2)];
+      b[at4(i2,j2,k2)] = a[at4(i1,j1,k1)];
+    }
+  }
+  // 右：真随机白噪声 —— 每帧逐位重抽
+  const w = S4.W, w2 = new Uint8Array(w.length);
+  for(let i=0;i<w.length;i++) w2[i] = Math.random()<0.5 ? 1 : 0;
+
+  S4.dA = diffFrac(a, b);   S4.dW = diffFrac(w, w2);
+  S4.rA = maxLineKeep(a, b, L);   S4.rW = maxLineKeep(w, w2, L);
+
+  const kA = countK(b), kW = countK(w2);
+  if(kA < S4.kAmin) S4.kAmin = kA;
+  if(kA > S4.kAmax) S4.kAmax = kA;
+  if(kW < S4.kWmin) S4.kWmin = kW;
+  if(kW > S4.kWmax) S4.kWmax = kW;
+
+  S4.A = b; S4.W = w2; S4.frame++;
+  draw4(); stats4();
+}
+
+function diffFrac(a, b){
+  let d = 0; for(let i=0;i<a.length;i++) if(a[i]!==b[i]) d++;
+  return d/a.length;
+}
+
+/* 沿轴 ax：每条线上的亮点数是否不变（比例） */
+function lineKeep(a, b, ax, L){
+  const nl = L*L, sa = new Int32Array(nl), sb = new Int32Array(nl);
+  for(let z=0;z<L;z++) for(let y=0;y<L;y++) for(let x=0;x<L;x++){
+    let li;
+    if(ax===0) li = y*L + z;
+    else if(ax===1) li = x*L + z;
+    else li = x*L + y;
+    const p = x + L*y + L*L*z;
+    sa[li] += a[p]; sb[li] += b[p];
+  }
+  let same = 0;
+  for(let i=0;i<nl;i++) if(sa[i]===sb[i]) same++;
+  return same/nl;
+}
+
+function maxLineKeep(a, b, L){
+  let best = 0;
+  for(let ax=0; ax<3; ax++){ const v = lineKeep(a,b,ax,L); if(v>best) best = v; }
+  return best;
+}
+
+function draw4(){
+  const cv = document.getElementById('c4'), g = cv.getContext('2d');
+  const W = cv.width, H = cv.height, L = S4.L;
+  g.fillStyle = '#080b11'; g.fillRect(0,0,W,H);
+  const cell = 30, oy = 46, z = L>>1;
+  const blocks = [['左 · tick 置换', S4.A, 40, '#7c8cff', '#2b3550'],
+                  ['右 · 真随机白噪声（每帧重抽）', S4.W, 520, '#ffd43b', '#3a3418']];
+  for(const [label, arr, ox, cOn, cOff] of blocks){
+    g.fillStyle = '#8b98a9'; g.font = '13px monospace';
+    g.fillText(label, ox, oy-12);
+    for(let y=0;y<L;y++) for(let x=0;x<L;x++){
+      g.fillStyle = arr[at4(x,y,z)] ? cOn : cOff;
+      g.fillRect(ox+x*cell, oy+y*cell, cell-1, cell-1);
+    }
+    g.strokeStyle = '#252c3a'; g.lineWidth = 1;
+    g.strokeRect(ox-0.5, oy-0.5, cell*L+1, cell*L+1);
+  }
+  g.fillStyle = '#8b98a9'; g.font = '12px monospace';
+  g.fillText('中心切片  z = '+z+'　（每格 = 一个格点）', 40, oy+cell*L+22);
+}
+
+function stats4(){
+  const kA = countK(S4.A), kW = countK(S4.W);
+  const gA = S4.kAmax - S4.kAmin, gW = S4.kWmax - S4.kWmin;
+  document.getElementById('s4frame').textContent = S4.frame;
+  document.getElementById('s4k').innerHTML =
+    '<span style="color:#7c8cff">'+kA+'</span> / <span style="color:#ffd43b">'+kW+'</span>';
+  document.getElementById('s4kr').innerHTML =
+    '<span style="color:#5ee08a">'+gA+'</span> / <span style="color:#ff8080">'+gW+'</span>';
+  document.getElementById('s4d').textContent = S4.dA.toFixed(3)+' / '+S4.dW.toFixed(3);
+  document.getElementById('s4r').innerHTML =
+    '<span style="color:#5ee08a">'+S4.rA.toFixed(2)+'</span> / '
+    + '<span style="color:#ff8080">'+S4.rW.toFixed(2)+'</span>';
+}
+
+document.getElementById('b4step').onclick = ()=>{ step4(); };
+document.getElementById('b4reset').onclick = ()=>{ init4(); };
+document.getElementById('b4ord').onclick = ()=>{ ordered4(); };
+document.getElementById('b4play').onclick = (e)=>{
+  S4.playing = !S4.playing;
+  e.target.textContent = S4.playing ? '⏸ 暂停' : '▶ 播放';
+  if(S4.playing) loop4();
+};
+document.getElementById('r4sp').oninput = (e)=>{
+  S4.sp = +e.target.value; document.getElementById('v4sp').textContent = S4.sp;
+};
+function loop4(){
+  if(!S4.playing) return;
+  for(let i=0;i<S4.sp;i++) step4();
+  requestAnimationFrame(loop4);
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   面板 ⑤  孤子的诞生 —— 随机湮灭中的拓扑残余
+   球面（方向空间）上撒随机平滑场 ⟹ 数临界点 ⟹ Σ = #max − #saddle + #min ≡ χ = 2
+   核验来源：`_soliton_66.py`（SO-1 … SO-9，9 项 0 失败）
+   ⚠️ 算法要点（脚本里踩过的坑）：
+     · 网格必须用 **icosphere**，经纬网格的极点会把 1-ring 弄退化
+     · 计数必须用 **Morse 谱**（数 max/min/saddle），
+       **不能**用「单位化 ∇f 沿 1-ring 的绕数」—— 那会在 |∇f| 小的非零点造假涡心
+     · 场必须**平滑** —— 逐点独立的随机场处处都是极值，判据不适用
+       （这正是框架 §2.3「孤子化」那一步：先粗粒化，才谈得上拓扑缺陷）
+   ════════════════════════════════════════════════════════════════ */
+const S5 = { verts:null, faces:null, rings:null, f:null, crit:null, alive:null,
+             n:1, playing:false, ann:0,
+             /* ── 第 67 轮新增：动力学层（单位切向量场）── */
+             V:null, run:false, alpha:0.3, t:0, mode:'morse', vw:null, relax:30 };
+
+function norm3(v){ const n = Math.hypot(v[0],v[1],v[2]); return [v[0]/n, v[1]/n, v[2]/n]; }
+
+function icosphere(subdiv){
+  const ph = (1 + Math.sqrt(5)) / 2;
+  let V = [[-1,ph,0],[1,ph,0],[-1,-ph,0],[1,-ph,0],[0,-1,ph],[0,1,ph],
+           [0,-1,-ph],[0,1,-ph],[ph,0,-1],[ph,0,1],[-ph,0,-1],[-ph,0,1]].map(norm3);
+  let F = [[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],
+           [10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],
+           [2,4,11],[6,2,10],[8,6,7],[9,8,1]];
+  for(let s=0; s<subdiv; s++){
+    const cache = new Map(), NF = [];
+    const mid = (i,j)=>{
+      const k = i<j ? i+'_'+j : j+'_'+i;
+      if(cache.has(k)) return cache.get(k);
+      const m = norm3([(V[i][0]+V[j][0])/2, (V[i][1]+V[j][1])/2, (V[i][2]+V[j][2])/2]);
+      V.push(m); cache.set(k, V.length-1); return V.length-1;
+    };
+    for(const [a,b,c] of F){
+      const ab=mid(a,b), bc=mid(b,c), ca=mid(c,a);
+      NF.push([a,ab,ca],[b,bc,ab],[c,ca,bc],[ab,bc,ca]);
+    }
+    F = NF;
+  }
+  return {V, F};
+}
+
+function buildRings(nv, F){
+  const nxt = new Map();
+  for(const [a,b,c] of F){ nxt.set(a+','+b, c); nxt.set(b+','+c, a); nxt.set(c+','+a, b); }
+  const out = [];
+  for(let v=0; v<nv; v++){
+    let start = null;
+    for(const k of nxt.keys()){ const p = k.split(','); if(+p[0]===v){ start = +p[1]; break; } }
+    const ring = []; let cur = start;
+    while(cur !== null && cur !== undefined){
+      ring.push(cur);
+      const nx = nxt.get(v+','+cur);
+      if(nx === undefined || nx === start) break;
+      cur = nx;
+    }
+    out.push(ring);
+  }
+  return out;
+}
+
+function morseSpectrum(f, rings){
+  let mx=0, mn=0, sd=0;
+  const tol = 1e-12;
+  for(let i=0;i<rings.length;i++){
+    const ring = rings[i];
+    let hi=0, lo=0;
+    const seq = [];
+    for(const j of ring){
+      const d = f[i] - f[j];
+      if(d > tol){ lo++; seq.push(1); }
+      else if(d < -tol){ hi++; seq.push(-1); }
+    }
+    if(lo === ring.length){ mx++; }
+    else if(hi === ring.length){ mn++; }
+    else if(seq.length >= 2){
+      let chg = 0;
+      for(let k=0;k<seq.length;k++) if(seq[k] !== seq[(k+1)%seq.length]) chg++;
+      if(chg >= 4) sd++;
+    }
+  }
+  return {mx, mn, sd};
+}
+
+function randField(){
+  const V = S5.verts, nv = V.length, nk = 12, sg = 0.55;
+  const cs = [], as = [];
+  for(let k=0;k<nk;k++){
+    cs.push(norm3([gauss(), gauss(), gauss()]));
+    as.push(gauss());
+  }
+  const f = new Float64Array(nv);
+  for(let i=0;i<nv;i++){
+    let s = 0;
+    for(let k=0;k<nk;k++){
+      const dx=V[i][0]-cs[k][0], dy=V[i][1]-cs[k][1], dz=V[i][2]-cs[k][2];
+      s += as[k] * Math.exp(-(dx*dx+dy*dy+dz*dz) / (2*sg*sg));
+    }
+    f[i] = s;
+  }
+  return f;
+}
+let _g2 = null;
+function gauss(){
+  if(_g2 !== null){ const v = _g2; _g2 = null; return v; }
+  let u = 0, v = 0;
+  while(u === 0) u = Math.random();
+  while(v === 0) v = Math.random();
+  const r = Math.sqrt(-2*Math.log(u));
+  _g2 = r*Math.sin(2*Math.PI*v);
+  return r*Math.cos(2*Math.PI*v);
+}
+
+function init5(){
+  if(!S5.verts){
+    const {V, F} = icosphere(3);
+    S5.verts = V; S5.faces = F; S5.rings = buildRings(V.length, F);
+  }
+  S5.n = 1; S5.ann = 0;
+  newField5();
+}
+
+function newField5(){
+  S5.f = randField();
+  const sp = morseSpectrum(S5.f, S5.rings);
+  const crit = [];
+  const tol = 1e-12;
+  for(let i=0;i<S5.rings.length;i++){
+    const ring = S5.rings[i];
+    let hi=0, lo=0;
+    const seq = [];
+    for(const j of ring){
+      const d = S5.f[i] - S5.f[j];
+      if(d > tol){ lo++; seq.push(1); }
+      else if(d < -tol){ hi++; seq.push(-1); }
+    }
+    if(lo === ring.length) crit.push({vi:i, s:+1});
+    else if(hi === ring.length) crit.push({vi:i, s:+1});
+    else if(seq.length >= 2){
+      let chg = 0;
+      for(let k=0;k<seq.length;k++) if(seq[k] !== seq[(k+1)%seq.length]) chg++;
+      if(chg >= 4) crit.push({vi:i, s:-1});
+    }
+  }
+  S5.crit = crit;
+  S5.alive = crit.map(()=>true);
+  S5.ann = 0;
+  S5.sp = sp;
+  S5.mode = 'morse';          // 回到「数临界点」视图（切向量场状态保留，不丢）
+  draw5(); stats5();
+}
+
+function annihilate5(){
+  const c = S5.crit, a = S5.alive;
+  const pos = [], neg = [];
+  for(let i=0;i<c.length;i++) if(a[i]){ if(c[i].s > 0) pos.push(i); else neg.push(i); }
+  if(pos.length <= 2 || neg.length === 0) return;
+  a[pos[(Math.random()*pos.length)|0]] = false;
+  a[neg[(Math.random()*neg.length)|0]] = false;
+  S5.ann++;
+  draw5(); stats5();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   面板 ⑤ 动力学层（第 67 轮新增）—— 从「静态数临界点」到「看着涡心动起来」
+     · 状态量从一个**标量场** f 换成一个**单位切向量场** V（每顶点一个方向）
+     · 一步演化 = 把 1-ring 邻居的切向量**平行移动**到本顶点再加权平均
+       ⟹ 协变扩散（向量场的调和映照流）
+     · 涡心 = 切向量场沿 1-ring 的**绕数** w（|w| > 0.5），符号 = sign(w)
+   ⚠️ 诚实边界（`_soliton_66.py` SO-3 已写死）：绕数判据**只在平滑层上有意义**
+      （§2.3「孤子化」）—— 逐点独立的随机方向会让「绕数 ≠ 0」退化成
+      「相邻格点不连续」，Σ w 变成随机量。所以初态必须先粗粒化。
+   ⚠️ 且离散实现下 Σ w 会**在涡心跳到棱上时出现单步 ±1 抖动**（见 stats 提示）。
+   ════════════════════════════════════════════════════════════════ */
+
+/* 把 v 从 T_{pFrom} 平行移动到 T_{pTo}（沿测地线的 Rodrigues 旋转） */
+function parallelTo(v, pFrom, pTo){
+  const ax = pFrom[1]*pTo[2] - pFrom[2]*pTo[1];
+  const ay = pFrom[2]*pTo[0] - pFrom[0]*pTo[2];
+  const az = pFrom[0]*pTo[1] - pFrom[1]*pTo[0];
+  const na = Math.hypot(ax, ay, az);
+  if(na < 1e-15) return [v[0], v[1], v[2]];              // 重合 / 对径 ⟹ 不旋转
+  const ca = Math.max(-1, Math.min(1,
+             pFrom[0]*pTo[0] + pFrom[1]*pTo[1] + pFrom[2]*pTo[2]));
+  const sa = Math.sqrt(Math.max(0, 1 - ca*ca));          // = sin(acos(ca)) ≥ 0
+  const n0 = ax/na, n1 = ay/na, n2 = az/na;
+  const cx = n1*v[2] - n2*v[1], cy = n2*v[0] - n0*v[2], cz = n0*v[1] - n1*v[0];
+  const k = (n0*v[0] + n1*v[1] + n2*v[2]) * (1 - ca);
+  return [v[0]*ca + cx*sa + n0*k, v[1]*ca + cy*sa + n1*k, v[2]*ca + cz*sa + n2*k];
+}
+
+/* 一步协变扩散（纯函数，不重绘）：v_new[i] = (1−α)·v[i] + α·⟨平行移动过来的邻居⟩ */
+function diffuse5(T, alpha){
+  const V = S5.verts, rings = S5.rings, nv = V.length;
+  const a = (alpha === undefined || alpha === null) ? S5.alpha : alpha;
+  const N = new Float64Array(3*nv);
+  for(let i=0;i<nv;i++){
+    // ⚠️ 所有顶点都只读**同一时刻的旧值** T（Jacobi 更新，不能就地改）
+    const p = V[i], ring = rings[i], k = ring.length;
+    let mx = 0, my = 0, mz = 0;
+    for(let m=0;m<k;m++){
+      const j = ring[m], q = V[j];
+      const t = parallelTo([T[3*j], T[3*j+1], T[3*j+2]], q, p);
+      mx += t[0]; my += t[1]; mz += t[2];
+    }
+    mx /= k; my /= k; mz /= k;
+    let x = (1 - a)*T[3*i]     + a*mx;
+    let y = (1 - a)*T[3*i + 1] + a*my;
+    let z = (1 - a)*T[3*i + 2] + a*mz;
+    const dp = x*p[0] + y*p[1] + z*p[2];                 // 投影回切平面 T_i
+    x -= dp*p[0]; y -= dp*p[1]; z -= dp*p[2];
+    const n = Math.hypot(x, y, z) || 1;                  // 再归一化（保持单位切向量）
+    N[3*i] = x/n; N[3*i+1] = y/n; N[3*i+2] = z/n;
+  }
+  return N;
+}
+
+/* 顶点角度亏损 K_i = 2π − Σ 面角（Descartes / 离散 Gauss–Bonnet：Σ K_i = 2πχ）
+   ⚠️ 为什么需要它（第 67 轮参考脚本 `_vortex_67.py` 的实测）：icosphere 上裸绕数和
+      满足 **Σ w_i = 3χ**（本网格 6），多出的 2χ 恰好是**总曲率** Σ K_i/π。
+      扣掉它，离散 Poincaré–Hopf 才精确成立：Σ (w_i − 2K_i/2π) = χ = 2。
+   ⚠️ 适用范围：只对**零点不落在格点上**的平滑场成立。零点若恰落在顶点上，
+      指数归属由若干面分摊，w_i 本身无良定义（实测 ∇p_z → 修正后 −2、
+      x̂×p → 修正后 0），该情形请用 Morse 谱（第 66 轮，P 行 1105 同一类教训）。 */
+function angleDefect5(){
+  const V = S5.verts, F = S5.faces, nv = V.length;
+  const K = new Float64Array(nv);
+  for(let i=0;i<nv;i++) K[i] = 2*Math.PI;
+  for(let t=0;t<F.length;t++){
+    const fc = F[t];
+    for(let s=0;s<3;s++){
+      const i = fc[s], j = fc[(s+1)%3], k = fc[(s+2)%3];
+      const p = V[i], q = V[j], r = V[k];
+      const ux = q[0]-p[0], uy = q[1]-p[1], uz = q[2]-p[2];
+      const wx = r[0]-p[0], wy = r[1]-p[1], wz = r[2]-p[2];
+      const nu = Math.sqrt(ux*ux+uy*uy+uz*uz), nw = Math.sqrt(wx*wx+wy*wy+wz*wz);
+      let cs = (ux*wx + uy*wy + uz*wz) / (nu*nw);
+      cs = Math.max(-1, Math.min(1, cs));
+      K[i] -= Math.acos(cs);
+    }
+  }
+  return K;
+}
+
+/* 涡心检测：对**切向量场**数 1-ring 的绕数（这才是绕数的正确用法） */
+function vortex5(){
+  const V = S5.verts, rings = S5.rings, T = S5.V, nv = V.length;
+  const w = new Float64Array(nv), pos = [];
+  let sigma = 0;
+  for(let i=0;i<nv;i++){
+    const p = V[i];
+    // 切基：e1 = normalize(p × ẑ)；退化（|p×ẑ| < 1e-9）时改用 p × x̂；e2 = p × e1
+    let e1x = p[1], e1y = -p[0], e1z = 0;
+    let n1 = Math.hypot(e1x, e1y, e1z);
+    if(n1 < 1e-9){ e1x = 0; e1y = p[2]; e1z = -p[1];
+                   n1 = Math.hypot(e1x, e1y, e1z) || 1; }
+    e1x /= n1; e1y /= n1; e1z /= n1;
+    const e2x = p[1]*e1z - p[2]*e1y;
+    const e2y = p[2]*e1x - p[0]*e1z;
+    const e2z = p[0]*e1y - p[1]*e1x;
+    const ring = rings[i], k = ring.length;
+    const angs = new Float64Array(k);
+    for(let m=0;m<k;m++){
+      const j = ring[m], q = V[j];
+      let t = parallelTo([T[3*j], T[3*j+1], T[3*j+2]], q, p);
+      const dt = t[0]*p[0] + t[1]*p[1] + t[2]*p[2];      // 再投到切平面（数值清洁）
+      t = [t[0] - dt*p[0], t[1] - dt*p[1], t[2] - dt*p[2]];
+      angs[m] = Math.atan2(t[0]*e2x + t[1]*e2y + t[2]*e2z,
+                           t[0]*e1x + t[1]*e1y + t[2]*e1z);
+    }
+    let tot = 0;
+    for(let m=0;m<k;m++){
+      let d = angs[(m+1)%k] - angs[m];
+      while(d >  Math.PI) d -= 2*Math.PI;                // wrap 到 (−π, π]
+      while(d <= -Math.PI) d += 2*Math.PI;
+      tot += d;
+    }
+    const wi = tot / (2*Math.PI);                        // ⟹ 恒为整数（拓扑量子）
+    w[i] = wi; sigma += wi;
+    if(Math.abs(wi) > 0.5) pos.push({vi:i, s: wi > 0 ? 1 : -1});
+  }
+  if(!S5.K) S5.K = angleDefect5();                       // 网格曲率（只算一次）
+  let sigmaC = 0;                                        // 曲率修正后的指数和 ≡ χ
+  for(let i=0;i<nv;i++) sigmaC += w[i] - S5.K[i]/Math.PI;
+  return {w, pos, sigma, sigmaC};
+}
+
+/* 演化一步：扩散 + 重数涡心 + 重绘 */
+function stepVortex5(){
+  if(!S5.V){ initVortex5(); return; }
+  S5.V = diffuse5(S5.V, S5.alpha);
+  S5.t++;
+  S5.vw = vortex5();
+  S5.mode = 'vortex';
+  draw5(); stats5();
+}
+
+/* 切向量初态：每顶点一个随机单位切向量（随机 3D 向量减去法向分量再归一化），
+   然后**粗粒化** `S5.relax` 步 —— 这一步是框架 §2.3 的「孤子化」：
+   绕数判据只对平滑层有定义，逐点独立的方向必须先用协变扩散磨平。 */
+function initVortex5(){
+  if(!S5.verts){
+    const {V, F} = icosphere(3);
+    S5.verts = V; S5.faces = F; S5.rings = buildRings(V.length, F);
+  }
+  if(!S5.f) S5.f = randField();                          // 背景着色仍用标量场 f
+  const V = S5.verts, nv = V.length;
+  let T = new Float64Array(3*nv);
+  for(let i=0;i<nv;i++){
+    const p = V[i];                                      // 法向 = 该顶点的单位位置向量
+    let x = gauss(), y = gauss(), z = gauss();
+    const d = x*p[0] + y*p[1] + z*p[2];                  // 减去法向分量 ⟹ 落到 T_i
+    x -= d*p[0]; y -= d*p[1]; z -= d*p[2];
+    const n = Math.hypot(x, y, z) || 1;
+    T[3*i] = x/n; T[3*i+1] = y/n; T[3*i+2] = z/n;
+  }
+  for(let r=0;r<S5.relax;r++) T = diffuse5(T, 0.5);      // 粗粒化（§2.3 孤子化）
+  S5.V = T; S5.t = 0; S5.mode = 'vortex';
+  S5.vw = vortex5();
+  draw5(); stats5();
+}
+
+function fcol(v, lo, hi){
+  const u = (v - lo) / Math.max(hi - lo, 1e-9);
+  const r = Math.round(37 + u * (194 - 37));
+  const g = Math.round(64 + u * (90 - 64));
+  const b = Math.round(107 + u * (58 - 107));
+  return 'rgb('+r+','+g+','+b+')';
+}
+
+function draw5(){
+  if(S5.mode === 'vortex' && S5.V) return drawVortex5();
+  const cv = document.getElementById('c5'), g = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  g.fillStyle = '#080b11'; g.fillRect(0,0,W,H);
+  const cx = W/2, cy = H/2 + 8, R = Math.min(W,H)/2 - 60;
+  const V = S5.verts, f = S5.f;
+  let lo = Infinity, hi = -Infinity;
+  for(let i=0;i<f.length;i++){ if(f[i]<lo) lo=f[i]; if(f[i]>hi) hi=f[i]; }
+  const faces = S5.faces.map(fc => ({fc, z: (V[fc[0]][2]+V[fc[1]][2]+V[fc[2]][2])/3}));
+  faces.sort((p,q)=> p.z - q.z);
+  for(const {fc, z} of faces){
+    const fv = (f[fc[0]]+f[fc[1]]+f[fc[2]])/3;
+    const col = fcol(fv, lo, hi);
+    const sh = z > 0 ? 1.0 : 0.45;
+    g.fillStyle = col;
+    g.globalAlpha = sh;
+    g.beginPath();
+    g.moveTo(cx + R*V[fc[0]][0], cy - R*V[fc[0]][1]);
+    g.lineTo(cx + R*V[fc[1]][0], cy - R*V[fc[1]][1]);
+    g.lineTo(cx + R*V[fc[2]][0], cy - R*V[fc[2]][1]);
+    g.closePath(); g.fill();
+  }
+  g.globalAlpha = 1;
+  g.strokeStyle = 'rgba(139,152,169,0.35)'; g.lineWidth = 1;
+  g.beginPath(); g.arc(cx, cy, R, 0, 6.2832); g.stroke();
+  const c = S5.crit, a = S5.alive;
+  let npos=0, nneg=0;
+  for(let i=0;i<c.length;i++){
+    if(!a[i]) continue;
+    const v = V[c[i].vi];
+    const X = cx + R*v[0], Y = cy - R*v[1];
+    const front = v[2] > 0;
+    g.globalAlpha = front ? 1 : 0.55;
+    g.beginPath();
+    g.arc(X, Y, front ? 6 : 4.5, 0, 6.2832);
+    g.fillStyle = c[i].s > 0 ? '#7c8cff' : '#ff6b6b';
+    g.fill();
+    g.strokeStyle = '#0b0e14'; g.lineWidth = 1.5; g.stroke();
+    if(c[i].s > 0) npos++; else nneg++;
+  }
+  g.globalAlpha = 1;
+  g.fillStyle = '#8b98a9'; g.font = '12px monospace';
+  g.fillText('S² 方向空间（icosphere，'+V.length+' 顶点）｜前面亮、背面暗', 24, 26);
+  g.fillText('存活涡心 +1 × '+npos+'　反涡心 −1 × '+nneg, 24, H-16);
+}
+
+/* 演化视图：背景仍是球面 f 色块（暗侧压暗），前景画**涡心圆点** */
+function drawVortex5(){
+  const cv = document.getElementById('c5'), g = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  g.fillStyle = '#080b11'; g.fillRect(0,0,W,H);
+  const cx = W/2, cy = H/2 + 8, R = Math.min(W,H)/2 - 60;
+  const V = S5.verts, f = S5.f;
+  let lo = Infinity, hi = -Infinity;
+  for(let i=0;i<f.length;i++){ if(f[i]<lo) lo=f[i]; if(f[i]>hi) hi=f[i]; }
+  const faces = S5.faces.map(fc => ({fc, z: (V[fc[0]][2]+V[fc[1]][2]+V[fc[2]][2])/3}));
+  faces.sort((p,q)=> p.z - q.z);
+  for(const {fc, z} of faces){
+    const fv = (f[fc[0]]+f[fc[1]]+f[fc[2]])/3;
+    g.fillStyle = fcol(fv, lo, hi);
+    g.globalAlpha = z > 0 ? 1.0 : 0.45;
+    g.beginPath();
+    g.moveTo(cx + R*V[fc[0]][0], cy - R*V[fc[0]][1]);
+    g.lineTo(cx + R*V[fc[1]][0], cy - R*V[fc[1]][1]);
+    g.lineTo(cx + R*V[fc[2]][0], cy - R*V[fc[2]][1]);
+    g.closePath(); g.fill();
+  }
+  g.globalAlpha = 1;
+  g.strokeStyle = 'rgba(139,152,169,0.35)'; g.lineWidth = 1;
+  g.beginPath(); g.arc(cx, cy, R, 0, 6.2832); g.stroke();
+  const pos = (S5.vw && S5.vw.pos) ? S5.vw.pos : [];
+  let npos = 0, nneg = 0;
+  for(const p of pos){
+    const v = V[p.vi];
+    const X = cx + R*v[0], Y = cy - R*v[1];
+    const front = v[2] > 0;                              // 前面亮、背面暗
+    g.globalAlpha = front ? 1 : 0.55;
+    g.beginPath();
+    g.arc(X, Y, front ? 6 : 4.5, 0, 6.2832);
+    g.fillStyle = p.s > 0 ? '#7c8cff' : '#ff6b6b';
+    g.fill();
+    g.strokeStyle = '#0b0e14'; g.lineWidth = 1.5; g.stroke();
+    if(p.s > 0) npos++; else nneg++;
+  }
+  g.globalAlpha = 1;
+  const sig = S5.vw ? Math.round(S5.vw.sigma) : '—';
+  const sigC = S5.vw ? S5.vw.sigmaC.toFixed(3) : '—';
+  g.fillStyle = '#8b98a9'; g.font = '12px monospace';
+  g.fillText('S² 方向空间（icosphere，'+V.length+' 顶点）｜切向量场 · 协变扩散', 24, 26);
+  g.fillText('演化步数 t = ' + S5.t, 24, 44);
+  g.fillText('涡心 +1 × '+npos+'　反涡心 −1 × '+nneg+
+             '　净荷 Σ w = '+sig+'（曲率修正 '+sigC+' = χ）', 24, H-16);
+}
+
+function stats5(){
+  const sp = S5.sp || {mx:0, mn:0, sd:0};
+  let npos=0, nneg=0;
+  for(let i=0;i<S5.crit.length;i++){
+    if(!S5.alive[i]) continue;
+    if(S5.crit[i].s > 0) npos++; else nneg++;
+  }
+  document.getElementById('s5n').textContent = S5.n;
+  document.getElementById('s5mm').textContent = sp.mx + ' / ' + sp.mn;
+  document.getElementById('s5sd').textContent = sp.sd;
+  const sig = sp.mx - sp.sd + sp.mn;
+  document.getElementById('s5sig').innerHTML =
+    '<span style="color:#5ee08a;font-size:15px">' + sig + '</span>';
+  document.getElementById('s5alive').innerHTML =
+    '<span style="color:#7c8cff">' + npos + '</span> / <span style="color:#ff6b6b">' + nneg + '</span>';
+  document.getElementById('s5ann').textContent = S5.ann;
+  // ── 第 67 轮新增三行（动力学层）──
+  document.getElementById('s5t').textContent = S5.t || 0;
+  if(S5.mode === 'vortex' && S5.vw){
+    let wp = 0, wn = 0;
+    for(const p of S5.vw.pos){ if(p.s > 0) wp++; else wn++; }
+    document.getElementById('s5wc').innerHTML =
+      '<span style="color:#7c8cff">' + wp + '</span> / <span style="color:#ff6b6b">' + wn + '</span>';
+    document.getElementById('s5sig2').innerHTML =
+      '<span style="color:#5ee08a;font-size:15px">' + Math.round(S5.vw.sigma) + '</span>';
+    document.getElementById('s5sig3').innerHTML =
+      '<span style="color:#ffd43b;font-size:15px">' + S5.vw.sigmaC.toFixed(3) + '</span>';
+  } else {
+    document.getElementById('s5wc').textContent = '—';
+    document.getElementById('s5sig2').textContent = '—';
+    document.getElementById('s5sig3').textContent = '—';
+  }
+}
+
+document.getElementById('b5new').onclick = ()=>{ S5.n++; newField5(); };
+document.getElementById('b5ann').onclick = ()=>{ annihilate5(); };
+document.getElementById('b5reset').onclick = ()=>{ newField5(); };
+document.getElementById('b5play').onclick = (e)=>{
+  S5.playing = !S5.playing;
+  e.target.textContent = S5.playing ? '⏸ 暂停' : '▶ 自动随机';
+  if(S5.playing) loop5();
+};
+// 面板 5 · 动力学（第 67 轮新增）
+document.getElementById('b5step').onclick = ()=>{ stepVortex5(); };
+document.getElementById('b5run').onclick = (e)=>{
+  if(!S5.V) initVortex5();
+  S5.run = !S5.run;
+  e.target.textContent = S5.run ? '⏸ 暂停' : '▶ 动力学';
+  if(S5.run) loopVortex5();
+};
+document.getElementById('r5a').oninput = (e)=>{
+  S5.alpha = +e.target.value;
+  document.getElementById('v5a').textContent = S5.alpha.toFixed(2);
+};
+function loopVortex5(){
+  if(!S5.run) return;
+  stepVortex5();
+  requestAnimationFrame(loopVortex5);
+}
+function loop5(){
+  if(!S5.playing) return;
+  S5.n++; newField5();
+  setTimeout(loop5, 900);
+}
+
+// 启动
+init1(); init2(); init4(); init5();
+</script>
+</body>
+</html>

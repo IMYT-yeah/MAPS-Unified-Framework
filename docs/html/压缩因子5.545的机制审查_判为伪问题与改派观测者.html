@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>压缩因子 5.545 的机制审查：判为**伪问题**，并改派给观测者模型</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、问题回顾</div>
+  <h1>压缩因子 5.545 的机制审查：判为**伪问题**，并改派给观测者模型</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-20（第 39 轮）
+<strong>脚本</strong>：<code>outputs/_compression_545.py</code>（检查项 CF-1 … CF-9，<strong>23 项 0 失败</strong>）
+<strong>一句话结论</strong>：自第 19 轮挂到现在的「剩余压缩 5.545 = 8 ln2 无机制」，经四路审查判为<strong>伪问题</strong>——
+它不是等待机制的物理因子，而是<strong>两个不同口径的计数之比</strong>：分子是衬底的槽位数（<strong>以比特计</strong>），
+分母是 BH 的热力学熵（<strong>以纳特计</strong>）。可机制化的部分（因子 2，键共享）已于第 35 轮完成；
+其余部分<strong>既无枚举机制（no-go）、也无几何机制（no-go）、且不受任何观测约束</strong>。
+真正该问的是「观测者为何只取 1 纳特/4l_P²」——那是 <strong>B5 观测者模型的分辨率公设</strong>，不属衬底层。</p>
+</blockquote>
+<hr />
+<h2>一、问题回顾</h2>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 19 轮</td>
+<td>原始熵/块 = 4 ln16 = <strong>11.0904 纳特</strong>，观测 1 纳特 ⟹ 压缩因子 <strong>16 ln2 = 11.0904</strong>；⚠️「11.0904 非整数，自然性未解释」</td>
+</tr>
+<tr>
+<td>第 25 轮</td>
+<td>三处硬修正落地，但<strong>同一条开放项原样保留</strong></td>
+</tr>
+<tr>
+<td>第 35 轮</td>
+<td>压缩因子第一次有部分机制：<strong><code>16 ln2 = 2</code>（键共享，有机制）<code>× 5.545</code>（无机制）</strong></td>
+</tr>
+<tr>
+<td>第 36 轮</td>
+<td>进入候选池第 10 项：「一旦解决，直接进 I 类增量」</td>
+</tr>
+<tr>
+<td>第 38 轮</td>
+<td>明确写为「<strong>现在唯一卡住的数</strong>」，并警告「勿数值占卜」</td>
+</tr>
+</tbody>
+</table>
+<p>本轮不再去找机制，而是先问：<strong>它该不该有机制。</strong></p>
+<hr />
+<h2>二、五条判据</h2>
+<h3>2.1 CF-1　恒等式与分解（先把数写清楚）</h3>
+<pre><code>4 槽位/面元 × ln2 = 2.772588722 nat   （= ln 16，每面元原始熵）
+4 面元/块 × ln16  = 11.090354889 nat  （= 16 ln2 = 压缩因子，除以观测端 1 nat）
+残余 ÷ 2          =  5.545177444 nat  （= 8 ln2）
+</code></pre>
+<p>第 35 轮的因子 2 来自键共享，已显式复算：L=8 平面上<strong>面元 64 / 槽位 256 / 不同键 128 = 2×64</strong>，
+每条键的共享重数取值集合<strong>恰为 {2}</strong> ⟹ 独立自由度 2 bits/面元。</p>
+<p>⚠️ <strong>本轮新增提示（口径依赖）</strong>：同一个「因子 2」在<strong>相干块尺度上不成立</strong>——
+2×2 块只有 4 个面元却触及 <strong>12</strong> 条不同键（含 8 条与外部共享的边界键）⟹ <strong>3.00 键/面元</strong>，
+而体内渐近值是 <strong>2.00 键/面元</strong>。⟹ <strong>「因子 2」不是强度量</strong>；把一个 2×2 块当作「相干块」直接
+做相减去数，会得到 4 bits 而不是 8 bits，分解随之改变（见 §四第 2 条）。</p>
+<h3>2.2 CF-2　次二元引理（本轮最硬的一条）</h3>
+<div class="formula">S<sub>rm req</sub> = <span class="frac"><span class="num">1</span><span class="den">4</span></span> <span class="txt">nat</span>/l<sub>P</sub><sup>2</sup> = 0.360674 <span class="txt">bit</span>/l<sub>P</sub><sup>2</sup>  <  1 <span class="txt">bit</span></div>
+
+<p>一个二元自由度的最大熵是 ln2 = 0.693147 nat。<strong>BH 要求的熵密度连一个比特都不到</strong>，
+等效态数 <code>e^{0.25} = 1.2840254</code>（非整数）。</p>
+<blockquote>
+<p><strong>推论</strong>：<code>1/4 纳特/面元</code> 不是「一个二元选择的熵」，<strong>它从一开始就不是计数</strong>。
+任何「每普朗克面积一个比特」的读法都必须被压缩，而这个压缩<strong>至少是 ln16 = 2.7726 倍</strong>。</p>
+</blockquote>
+<h3>2.3 CF-3 / CF-4　枚举 no-go（两张表）</h3>
+<p><strong>（a）面元级</strong>：若观测熵被当成 <code>m</code> 个态的对数，温度比为 <code>T_m/T_BH = 0.25/ln m</code>：</p>
+<table>
+<thead>
+<tr>
+<th>m</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>…</th>
+<th>12</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>温度偏差</td>
+<td><strong>−63.93%</strong></td>
+<td>−77.24%</td>
+<td>−81.97%</td>
+<td>−84.47%</td>
+<td>−86.05%</td>
+<td>…</td>
+<td>−89.94%</td>
+</tr>
+</tbody>
+</table>
+<p>最近者 m = 2 仍偏 <strong>63.93%</strong>（m = 1 给 S = 0，温度发散）⟹ <strong>无整数态数给出 0.25 纳特。</strong></p>
+<p><strong>（b）相干块级</strong>（即「1 纳特/块」本身）：</p>
+<table>
+<thead>
+<tr>
+<th>m（态数/块）</th>
+<th>2</th>
+<th><strong>3</strong></th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>温度偏差</td>
+<td>+44.27%</td>
+<td><strong>−8.98%</strong></td>
+<td>−27.87%</td>
+<td>−37.87%</td>
+<td>−44.19%</td>
+<td>−48.61%</td>
+<td>−51.91%</td>
+</tr>
+</tbody>
+</table>
+<p>最近者 <strong>m = 3 仍偏 −8.98%</strong>；m = 2 正是原稿「1 bit/块」的情形，<strong>+44.27% 与第 15 轮的裁决数逐位相同</strong>
+（交叉验证）。⟹ <strong><code>1 纳特/块</code> 也不可能来自枚举</strong>（e 非整数）。</p>
+<p>⟹ <strong>结论</strong>：压缩因子若被理解为「态数之比」，则<strong>必须含非整数（统计性）成分</strong>。
+第 19 轮已觉察这一点（「相干约束是统计性的，不是精确枚举」），本轮把它<strong>从"奇怪"升级为 no-go</strong>。</p>
+<h3>2.4 CF-5　几何审查：供给是充足的，缺口在「怎么数」</h3>
+<p>立方格（间距 l_P）穿越键密度：轴向面 ⊥x <strong>1.000 条/l_P²</strong>（L=8 数值 64 键 / 64 l_P²）；
+各向同性平均 <code>Σ_a⟨|n_a|⟩ = 3 × 1/2 = 1.500 条/l_P²</code>。四种自然读法：</p>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>可用熵（nat/l_P²）</th>
+<th>超出倍数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1 原始槽位（4 槽/面元）</td>
+<td>2.772589</td>
+<td><strong>11.0904</strong></td>
+</tr>
+<tr>
+<td>R2 键共享后（2 独立键/面元）</td>
+<td>1.386294</td>
+<td><strong>5.5452</strong></td>
+</tr>
+<tr>
+<td>R3 穿越键·各向同性平均（1.5 条/l_P²）</td>
+<td>1.039721</td>
+<td>4.1589</td>
+</tr>
+<tr>
+<td><strong>R4 穿越键·轴对齐最保守（1 条/l_P²）</strong></td>
+<td>0.693147</td>
+<td><strong>2.7726 = ln16</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>最保守的读法仍超出 ln16 = 2.7726 倍。</strong> 而所有可用的自然几何因子（1/2、3/4、3/2、2、4/3…）
+都是 O(1)，<strong>弥合不了 ≥ 2.77 倍</strong>。</p>
+<blockquote>
+<p>⟹ <strong>衬底供给充足</strong>（不是「信息不够」），缺口既不来自「数量不足」也不来自「几何失配」，
+而来自<strong>「谁算进熵」这个归属约定</strong>。</p>
+</blockquote>
+<h3>2.5 CF-6　残余 5.545 的双重身份（问题本身有歧义）</h3>
+<p>键共享后块内有 <strong>8 个独立比特</strong>；BH 要求 <strong>1 nat = 1.442695 bit</strong>。于是：</p>
+<pre><code>(a) 8 bits 写成纳特      = 5.545177444   ← 这是&lt;strong&gt;单位换算&lt;/strong&gt;（比特→纳特）
+(b) 8 bits ÷ 1.442695 bit = 5.545177444   ← 这是&lt;strong&gt;真实收缩&lt;/strong&gt;（8 → 1.4427 bit）
+</code></pre>
+<p>两者逐位同值。⟹ 「5.545 是什么」<strong>本身有歧义</strong>：它一半是单位制（bits/nats 的 ln2 因子），
+一半是真实收缩。想给「5.545」找一个机制，等于在问一个<strong>混了单位制的比值</strong>为什么是那个数。</p>
+<h3>2.6 CF-7　动力学零熵产生（压缩不可能由动力学产生）</h3>
+<ul>
+<li>L=2 立方（8 位点、<strong>256 个构型全部穷举</strong>）× 3 个轴：tick 映射的<strong>像集大小恒为 256</strong>
+  ⟹ 映射是构型空间上的<strong>双射</strong>；</li>
+<li>L=6、512 位点、500 tick 后<strong>全局标记多重集完全守恒</strong>；</li>
+<li>固定 2×2×2 块的<strong>读数熵随时间涨落</strong>（均值 0.624262 nat、极差 0.693147 nat）——
+  它不是动力学的守恒量。</li>
+</ul>
+<p>⟹ <strong>压缩不可能由衬底动力学产生</strong>：底层是置换（可逆、零熵产生，第 21 轮），
+而块读数熵不守恒 ⟹ 它只能是<strong>粗粒化映射</strong>的性质。这与「等分账必须是结构性的」（第 21/26 轮）一致。</p>
+<h3>2.7 CF-8　压缩因子不受任何观测约束</h3>
+<p>Hawking 温度检验 <code>T = ℏc³/(8πGMk_B)</code> 复算得 <strong>6.168678×10⁻⁸ K</strong>（框架值 6.16868×10⁻⁸ K）。
+<strong>该式不含压缩因子，也不含任何衬底计数</strong>：把原始计数取 16 bits、8 bits 还是 4 bits，温度都是同一个数。</p>
+<blockquote>
+<p>⟹ <strong>观测只约束分母（1 纳特/4l_P²），完全不约束分子。</strong> 压缩因子<strong>不是可观测量</strong>，
+它是两个独立量的比值。要求一个比值「有自然机制」，是把比值当成了独立物理量。</p>
+</blockquote>
+<hr />
+<h2>三、判决</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>因子 <strong>2</strong>（键共享）</td>
+<td>✅ <strong>有机制</strong>（第 35 轮，本轮复算确认；但见 §二 2.1 的口径警告）</td>
+</tr>
+<tr>
+<td>残余 <strong>5.545</strong></td>
+<td>❌ <strong>无枚举机制</strong>（CF-3/4）、❌ <strong>无几何机制</strong>（CF-5）、❌ <strong>不受观测约束</strong>（CF-8）</td>
+</tr>
+<tr>
+<td>「11.0904 的自然性」</td>
+<td>❌ <strong>伪问题</strong>：它是「以比特计的离散计数」÷「以纳特计的热力学熵」，必然含 ln2</td>
+</tr>
+<tr>
+<td>真正开放的问题</td>
+<td><strong>观测者为何只取 1 纳特/4l_P²</strong> —— 属 <strong>B5 观测者模型的分辨率公设</strong>，不属衬底层</td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么五轮都没找到</strong>：因为它不在衬底层。第 19 轮把它登记为「一个需要解释的数」，
+从此每一轮都在衬底计数里找它的机制——但<strong>分母是 BH 归一化</strong>，分子是衬底计数，
+比值不对应任何衬底过程。</p>
+<hr />
+<h2>四、连带影响</h2>
+<ol>
+<li><strong>论文状态要改（比数值更重要）</strong>：§4.8 的链条「原始 16 bits/块 → 压缩 11.0904 → 观测 1 纳特/块」
+   中，<strong>压缩因子是由 BH 反解出来的</strong>（第 19 轮原文：「它由 16 态与 1 纳特/块两个已知数逼出」）。
+   ⟹ <strong>这条链条对 <code>S = A/4</code> 没有预言力</strong>：B5 的微态计数应表述为<strong>与 <code>S = A/4</code> 一致
+   （在分辨率取 1 纳特/4l_P² 时）<strong>，即</strong>一致性构造</strong>，不宜写成「推出 S = A/4」。
+   ⚠️ <strong>边界要说清</strong>：<code>S = A/4</code> 本身的<strong>其它路径</strong>（F3 形式、§4.10 的 packing/下界定理）
+   <strong>不受本轮影响</strong>——它们不经过压缩因子。本轮否定的只是<strong>压缩因子这一环的推论地位</strong>。</li>
+<li><strong>「因子 2」需标注口径</strong>：2×2 块给 3.00 键/面元、体内给 2.00 键/面元 ⟹ 因子 2 是<strong>渐近值</strong>，
+   在相干块尺度上不成立。论文里「<code>16 ln2 = 2 × 8 ln2</code>」这个分解<strong>依赖取体内口径</strong>，
+   须补注。</li>
+<li><strong>不改动的部分</strong>：16 态、4 bits/面元、0.25 nat/面元、Hawking 温度 6.16868×10⁻⁸ K 全部不变。
+   本轮<strong>不修改任何数值</strong>，只改<strong>状态标注</strong>。</li>
+</ol>
+<hr />
+<h2>五、诚实边界（本轮<strong>没有</strong>做什么）</h2>
+<ul>
+<li>❌ <strong>没有解决</strong>观测者分辨率从何而来：本轮只把它<strong>指认</strong>为 B5 的分辨率公设，未给任何机制。
+  三个候选方向（观测者自身质量/相干时标；读数在 tick 下不变；C-2 的「绝对位置不泄漏」）
+  本轮<strong>一个都没算</strong>。</li>
+<li>⚠️ <strong>R3/R4 是更换归属的读法</strong>（把熵归给「穿越面积元的键」而非「面元上的槽位」），
+  用它作「供给充足」的论证，前提是<strong>两种归属都合法</strong>——这一点<strong>未独立论证</strong>。
+  若只承认面元槽位归属，则可用熵就是 R1/R2，缺口的「不可避免部分」不再是 ln16。</li>
+<li>⚠️ <strong>CF-7c 是数值演示，不是定理</strong>：有限格点、随机初值；「块读数熵不守恒」由
+  「置换双射 + 读数取固定块」直接构成论证，但本轮只做了统计演示。</li>
+<li>⚠️ <strong>CF-9 是记录项</strong>：<code>e^{0.25} = 1.2840254</code> 的连分数逼近 9/7 = 1.285714（+0.132%）、
+  <code>0.25 = 1/log2(16)</code> 的数值巧合等，<strong>全部无机制</strong>，按项目规约<strong>不得写入正文、不得用作证据</strong>。</li>
+<li>本轮<strong>未触碰</strong>：两种读法的动力学等价性（键 vs 边的 tick 规则）；§4.10 覆盖半径与
+  第 29 轮标注错位（已在论文补丁里顺带清掉，见 §六）。</li>
+</ul>
+<hr />
+<h2>六、论文已改（中英同步，五段补丁共 <strong>20 项 0 失败</strong>）</h2>
+<p><code>outputs/_patch_compression_39.py</code> / <code>_39b.py</code> / <code>_39c.py</code>：§4.8 追加<strong>【v2.9 补充（第 39 轮：压缩因子的机制审查）】</strong>块
+（次二元引理、两类 no-go 表、几何四读法表、双重身份、动力学零熵产生、不受观测约束、
+状态改判为一致性构造、口径补注）；同时清掉<strong>排队 5 轮以上的两处积压</strong>，并在收口核查中
+<strong>又查出两处单位漏网</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>原</th>
+<th>改</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§4.9「六处 4 同源」</td>
+<td>每 4 面元 <strong>1 比特</strong>（并在括号里标【本框架设定】）</td>
+<td><strong>1 纳特</strong>（v2.9 单位更正；<strong>该处此前漏改</strong>）</td>
+</tr>
+<tr>
+<td>§4.9 分级注 / 分层判定（两处复述）</td>
+<td>每 4 面元 <strong>1 比特</strong></td>
+<td><strong>1 纳特</strong>（<strong>第 39 轮单位更正</strong>）</td>
+</tr>
+<tr>
+<td>§4.9「标注错位」条目</td>
+<td>只写「建议修正」</td>
+<td>标记为<strong>第 39 轮已修正</strong>，并注明 ④ 还带单位错误</td>
+</tr>
+<tr>
+<td>§4.10 定理 1 证明末</td>
+<td>数值：k=3 覆盖半径 = <strong>90.05°</strong>、k=4 = <strong>70.291°</strong></td>
+<td><strong>90.0000°</strong> / <strong>arccos(1/3) = 70.5288°</strong>（解析值；旧值系随机搜索未穷尽）</td>
+</tr>
+<tr>
+<td><strong>§4.10 命题 5（1/4 系数）</strong></td>
+<td>每单元 <strong>1 比特</strong> ⟹ <code>S = (A/4l_P²)·ln2</code></td>
+<td>每单元 <strong>1 纳特</strong> ⟹ <code>S/k_B = A/(4l_P²)</code>（<strong>第 39 轮单位更正</strong>；此处是第 25 轮「12 处更正」的<strong>漏网之鱼</strong>）</td>
+</tr>
+<tr>
+<td><strong>§4.8「诚实的开放项」①</strong></td>
+<td>「11.0904 非整数，其自然性仍未解释」</td>
+<td><strong>划掉并指向第 39 轮结项</strong>（判为伪问题），避免读者在第 39 轮块之后仍读到过期开放项</td>
+</tr>
+<tr>
+<td><strong>§10 结论</strong></td>
+<td>把「S = A/4 微态计数」列为成就（<strong>无条件</strong>）</td>
+<td>补上限定：<strong>该链条是与 S = A/4 一致的一致性构造，不是对 S = A/4 的独立推导</strong>（摘要/结论同步完成）</td>
+</tr>
+</tbody>
+</table>
+<p>📌 <strong>第 25 轮的教训再次应验</strong>：同一处 ln2 的写法在论文里有<strong>至少四代残留</strong>（摘要/§4.8/§4.9/§4.10/§4.11/§10.2）。
+第 25 轮改了 12 处，本轮又查出 <strong>3 处</strong>（§4.9 复述 2 处 + §4.10 命题 5）。
+⟹ <strong>凡改单位，必须做全文「比特 / 纳特」对账</strong>，不能只查主段落。
+原 v2.9 已备份至 <code>MAPS-Unified-Framework/paper/history/*_备份_2026-09-20第39轮前.md</code>。</p>
+<hr />
+<h2>七、工程期望（本轮标识，按第 36 轮规则）</h2>
+<h3>增量</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>问题</th>
+<th>类型</th>
+<th>框架给出什么</th>
+<th>成熟度</th>
+<th>诚判</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>I-4</strong></td>
+<td><strong>「观测者读数分辨率」这一问该问谁</strong></td>
+<td>难题</td>
+<td>本轮：把「11.0904 的机制」从衬底层<strong>改派</strong>到观测者模型（B5）；并明确 BH 熵律在此框架中为<strong>输入 / 半拟合</strong>，B5 的微态计数是一致性构造</td>
+<td>★</td>
+<td>⚠️ 只做了<strong>问题定位</strong>，未给机制；三个候选方向一个都没算</td>
+</tr>
+<tr>
+<td><strong>N-1</strong></td>
+<td><strong>在衬底里找 5.545 的机制</strong></td>
+<td><strong>负面</strong></td>
+<td>四路 no-go：无枚举（最佳整数偏 8.98%）、无几何（最保守仍超 2.77 倍）、不受观测约束、动力学零熵产生</td>
+<td>—</td>
+<td>✅ <strong>明确排除：不必再投入</strong>（省下的工作量即本条目价值）</td>
+</tr>
+</tbody>
+</table>
+<h3>存量降调</h3>
+<ul>
+<li><strong>S-11（黑洞信息悖论）</strong>：其中「11.0904 = 粗粒化 / 不可分辨性的度量」一句应<strong>降调</strong>——
+  本轮表明该数是两个计数之比，不宜作为独立结论使用。</li>
+</ul>
+<hr />
+<h2>八、下一步（按价值排序）</h2>
+<ol>
+<li><strong>观测者分辨率</strong>（本轮改派后的真正问题）：先做<strong>最便宜的一次判别</strong>——B5 的观测者读数
+   在 tick 下是否可能不变？若不可能（置换把诸元搬过视界），则「结构性等分」只能靠<strong>时间尺分离</strong>
+   支撑，与第 16 轮的「同一批块」论证合流。</li>
+<li><strong>两种读法的动力学等价性</strong>（第 38 轮遗留）：键 vs 边的置换 tick 规则是否给出同一扩散统计。</li>
+<li>✅ ~~§4.8 / §10 的状态标注收口~~ —— <strong>本轮已做完</strong>：§4.8 块内、§4.8「诚实的开放项」①、
+   以及 §10 结论处的「S = A/4 微态计数」都补上了「<strong>一致性构造，非独立推导</strong>」的限定
+   （补丁 d、e 段，中英同步）。摘要那条（第 18 行的 v2.9 修订清单）只陈述熵密度，无需改。</li>
+<li>候选池其余项（η、暗能量能标、Nelson、η/s、PPN C-2、规范群、EMRI、void-CPT-κ、动力学）。</li>
+</ol>
+
+<div class="footer">压缩因子 5.545 的机制审查：判为**伪问题**，并改派给观测者模型 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 压缩因子5.545的机制审查_判为伪问题与改派观测者.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>暗能量：A2 解决了宇宙学常数问题的 122.9 个数量级，还剩 1.4 个</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、CR-1：换个尺子看同一个数字</div>
+  <h1>暗能量：A2 解决了宇宙学常数问题的 122.9 个数量级，还剩 1.4 个</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-09-17 ｜ 核验脚本：<code>_cc_reduction.py</code>（CR-1…CR-5，纯标准库）
+<strong>一句话：上一轮我把 ① 判成"失败"，判重了。放到宇宙学常数问题的尺度上看，
+A2 的饱和机制把 ρ_Λ 从普朗克密度压低了 10^124.3，而观测只需要 10^122.9——
+它多压了 1.38 个数量级（24 倍），但<strong>解决了 98.89%</strong>（按对数计）。</strong></p>
+</blockquote>
+<hr />
+<h2>一、CR-1：换个尺子看同一个数字</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ρ_P（普朗克密度，朴素期望）</td>
+<td>4.63295×10¹¹³ J/m³</td>
+</tr>
+<tr>
+<td>ρ_Λ（观测）</td>
+<td>5.32398×10⁻¹⁰ J/m³</td>
+</tr>
+<tr>
+<td>ρ_Λ（框架 = E_c⁴/(ℏc)³）</td>
+<td>2.24053×10⁻¹¹ J/m³</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>观测需要压低：<strong>10^122.94</strong></li>
+<li>框架给出压低：<strong>10^124.32</strong>（<strong>多压了 10^1.38 = 23.76 倍</strong>）</li>
+<li>按对数计解释掉的比例：<strong>122.94 / 124.32 = 98.89%</strong></li>
+</ul>
+<p><strong>同一个"23.76 倍"，在绝对尺子上只是 1.38 个数量级。</strong></p>
+<p>这是整个框架目前<strong>最成功的定量结果</strong>：把 10¹²³ 压到 24 倍。
+相比之下，此前记的"暗能量绝对量级未解决（10¹⁶⁵）"指的是另一件事
+（不做全息稀释、直接用 ε₀ 的朴素估计），两者别混：
+<strong>有 E_c 饱和机制 → 差 24 倍；没有 → 差 10^165。</strong></p>
+<h2>二、CR-2：一个 0.1% 的巧合（登记备查，勿当结论）</h2>
+<p>在"饱和（ε=1）"与"半饱和（ε=1/2）"之间插值，找出给出正确 Ω_Λ 的能标：</p>
+<table>
+<thead>
+<tr>
+<th>ε</th>
+<th>E</th>
+<th>Ω_Λ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0000</td>
+<td>1.018 meV</td>
+<td>0.0290</td>
+</tr>
+<tr>
+<td>0.7500</td>
+<td>1.625 meV</td>
+<td>0.1883</td>
+</tr>
+<tr>
+<td><strong>0.6145</strong></td>
+<td><strong>2.247 meV</strong></td>
+<td><strong>0.6882</strong> ✓</td>
+</tr>
+<tr>
+<td>0.5000</td>
+<td>3.143 meV</td>
+<td>2.6314</td>
+</tr>
+<tr>
+<td>0.2500</td>
+<td>9.700 meV</td>
+<td>238.84</td>
+</tr>
+</tbody>
+</table>
+<p><strong>匹配观测的那一处，ε(E_Λ) = 0.614409，而 β = 0.615000 —— 相差 0.096%。</strong></p>
+<p>⚠️ <strong>极可能是巧合</strong>，我找不到任何机制支撑它（ε = β 意味着什么？没有答案）。
+但巧合到 0.1% 以内，值得登记备查——万一将来找到机制，这就是线索。
+<strong>在找到机制之前，不要写进论文正文。</strong></p>
+<h2>三、CR-3：ρ_Λ = H²/(4πG) ⟹ Ω_Λ = 2/3（差 3.2%）</h2>
+<div class="formula">ρ<sub>Λ</sub> = <span class="frac"><span class="num">H<sup>2</sup></span><span class="den">4π G</span></span> ⟹ 
+Ω<sub>Λ</sub> = <span class="frac"><span class="num">H<sup>2</sup>/4π G</span><span class="den">3H<sup>2</sup>/8π G</span></span> = <span class="frac"><span class="num">8</span><span class="den">12</span></span> = <span class="frac"><span class="num">2</span><span class="den">3</span></span> = 0.6667</div>
+
+<p>观测 0.6889，<strong>差 3.23%</strong>。等价写法：<code>ρ_Λ = (ρ_P/N)/(4π) = ρ_micro/(4π)</code>。</p>
+<p>⚠️ 4π 从哪来没有机制（F3 里的 4 方向不对——这里需要的是<strong>除以</strong> 4π）。</p>
+<h2>四、CR-4：候选扫描</h2>
+<table>
+<thead>
+<tr>
+<th>构造</th>
+<th>Ω_Λ</th>
+<th>与观测比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>E_c⁴/(ℏc)³</code></td>
+<td>0.0290</td>
+<td>0.042</td>
+</tr>
+<tr>
+<td><code>× 4! = 24</code></td>
+<td>0.6958</td>
+<td><strong>1.010</strong></td>
+</tr>
+<tr>
+<td><code>× 8π</code></td>
+<td>0.7286</td>
+<td>1.058</td>
+</tr>
+<tr>
+<td><code>(ρ_P/N)/(4π)</code></td>
+<td>0.6667</td>
+<td><strong>0.968</strong></td>
+</tr>
+<tr>
+<td><code>ρ_P/N</code>（微观）</td>
+<td>8.3776</td>
+<td>12.16</td>
+</tr>
+</tbody>
+</table>
+<p><code>×4!</code> 差 1.0%、<code>÷4π</code> 差 3.2%，都是<strong>数值凑合，无机制</strong>。
+在没有机制之前，不该用它们。</p>
+<h2>五、判决（修正上一轮的"放弃"）</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>上一轮判决</th>
+<th>修正后</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ρ_Λ = E_c⁴/(ℏc)³</code></td>
+<td>❌ 放弃</td>
+<td>⚠️ <strong>作为量级机制保留，作为定量预言放弃</strong></td>
+</tr>
+</tbody>
+</table>
+<p>具体说：
+- ✅ <strong>保留</strong>：<code>E_c = M_Pl c² ε₀^{1/β} = 1.018 meV</code> 这个能标结论，以及
+  "饱和机制把 ρ_Λ 压低 10^124.3" 这个机制结论。<strong>这是框架最硬的定量成果之一。</strong>
+- ❌ <strong>不保留</strong>：把它当成 Ω_Λ 的定量预言（差 24 倍）。
+- 📌 <strong>登记</strong>：剩余因子 23.76 记为开放问题 <strong>O-Λ</strong>。</p>
+<h2>六、建议写进论文的表述</h2>
+<blockquote>
+<p>A2 的泄漏饱和机制将暗能量密度从普朗克密度压低 <strong>10^124.3</strong>，
+观测要求压低 10^122.9 —— 本机制<strong>解释了其中 98.89%</strong>，
+剩余 1.38 个数量级（因子 23.76）目前无框架内解释，记为开放问题 O-Λ。
+注：若不使用饱和能标而直接用 ε₀ 作朴素估计，偏差为 10^165；
+饱和机制是压低量级的关键。</p>
+</blockquote>
+<p><strong>这比硬凑一个 4! 或 e^π 有说服力得多，也更诚实。</strong></p>
+<h2>七、下一步</h2>
+<ol>
+<li>攻 O-Λ（剩余 23.76 倍）：候选是镜像支贡献或方向性 50:50，
+   但两者最多给 O(2) 的因子，够不上 24。⟹ <strong>可能需要别的结构</strong>。</li>
+<li>复核 CR-2 的 0.1% 巧合：找机制，或确认是巧合。</li>
+<li>若以上无解，接受 O-Λ 作为<strong>第四个不可约参数</strong>，在论文诚实声明。</li>
+</ol>
+
+<div class="footer">暗能量：A2 解决了宇宙学常数问题的 122.9 个数量级，还剩 1.4 个 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 暗能量_压低123个数量级中的122.9个.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

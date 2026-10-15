@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B 类判定与可算性清盘 —— 临界放大 × 预言表审计</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、A 类状态确认：**已清空**（非本轮新做）</div>
+  <h1>B 类判定与可算性清盘 —— 临界放大 × 预言表审计</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-10 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<p><strong>轮次</strong>：第 155 轮（元任务 · B 类判定 ＋ 可算性清盘）
+<strong>核验</strong>：<code>_b155.py</code>（A–E 五组，<strong>23 项 0 失败</strong>）＋ <code>_b155f.py</code>（多值符号清点）
+<strong>论文正文</strong>：<strong>零改动</strong>（正式稿仍 99,725 字符）</p>
+<hr />
+<h2>一、A 类状态确认：<strong>已清空</strong>（非本轮新做）</h2>
+<p>用户指令「继续 A 类剩余」——先核实，结论是 <strong>A 类已在第 154 轮清空</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>A 类条目</th>
+<th>处理轮次</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① <code>λ_c</code> 的失效标注是否到位</td>
+<td>153</td>
+<td>❌ <strong>C-96</strong>（未达 §1 摘要与附录 C）</td>
+</tr>
+<tr>
+<td>② <code>κ_c</code> 两个值</td>
+<td>153</td>
+<td>✅ <strong>合法</strong>（开边界 FSS 中间值）</td>
+</tr>
+<tr>
+<td>③ <code>h_c</code> 的 C-64 覆盖</td>
+<td>153</td>
+<td>❌ <strong>C-97</strong>（C-64 自身算错）</td>
+</tr>
+<tr>
+<td>④ 引理 1 能否从定理 1 推出</td>
+<td>153</td>
+<td>❌ <strong>不能</strong>（S¹ 只需 3 方向；并查出 <strong>C-98</strong> 成环）</td>
+</tr>
+<tr>
+<td>⑤ 外部常数声明检查</td>
+<td>153</td>
+<td>❌ <strong>整层未声明</strong>（H₀／M_Pl／t_P 各 0 处）</td>
+</tr>
+<tr>
+<td>⑥ <code>ΔlnL</code> 四值</td>
+<td>154</td>
+<td>✅ <strong>全部无问题</strong>（<code>ΔlnL=σ²/2</code> 交叉验证：24σ→288 精确）</td>
+</tr>
+<tr>
+<td>⑦ <code>f_space</code>（0.014→1/32）</td>
+<td>154</td>
+<td>✅ <strong>修正做完整了</strong></td>
+</tr>
+<tr>
+<td>⑧ <code>Δ±2≈0.49</code></td>
+<td>154</td>
+<td>✅ <strong>一致</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ A 类 8 条全清，本轮不再重复。</strong> 以下为 B 类及新扫。</p>
+<hr />
+<h2>二、B 类：相变 <code>λ_c</code> 能否作「临界放大」的载体 ⟹ <strong>判否（N-53）</strong></h2>
+<h3>2.1 问题的物理要害</h3>
+<p>第 151 轮留了一句话：「<strong>相变（λ_c）能不能作为『临界放大』的载体？—— 相变点附近敏感度发散</strong>」。</p>
+<p><strong>这个转向的要害在于</strong>：临界放大的物理基础是 <strong>敏感度／关联长度在临界点的幂律发散</strong>。而<strong>能否发散，取决于相变的「阶」</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>相变阶</th>
+<th>关联长度 ξ</th>
+<th>敏感度 χ</th>
+<th>能否放大</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>连续（二级）</strong></td>
+<td>ξ ~ |t|^{−ν} <strong>发散</strong></td>
+<td>χ_max ∝ <strong>L^{γ/ν}（正幂，增长）</strong></td>
+<td>✅ <strong>可以</strong></td>
+</tr>
+<tr>
+<td><strong>一阶</strong></td>
+<td><strong>有限</strong>（无发散）</td>
+<td><strong>不增长</strong>（∝ L^0 或更弱）</td>
+<td>❌ <strong>不可以</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>所以第一问不是「框架有没有相变」，而是「框架的相变是几阶」。</strong></p>
+<h3>2.2 框架自己的数据（决定性）</h3>
+<p><strong>关键事实一</strong>：论文<strong>从未讨论相变阶数</strong> —— 「连续相变」「二级相变」「临界指数」「对称破缺」「临界发散」<strong>各 0 处</strong>。</p>
+<p><strong>关键事实二</strong>：但论文<strong>实际测过</strong>敏感度型判据 —— <code>χ = −d⟨A⟩/dλ</code>（序参量对耦合的导数）。</p>
+<p><strong>关键事实三（本轮核心）</strong>：论文对<strong>两个不同维数</strong>的模型各测了一次 <code>χ_max</code> 的<strong>有限尺寸标度指数</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>实测 <code>χ_max ∝ L^{?}</code></th>
+<th>出处</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>2+1D toric code</strong>（<code>κ_c</code>）</td>
+<td><strong>L^{+1.12}</strong></td>
+<td>§10.1b（L1379）</td>
+<td><strong>正指数 ⟹ 有临界发散</strong></td>
+</tr>
+<tr>
+<td><strong>3+1D Z₂ 弦网</strong>（<code>λ_c</code>）</td>
+<td><strong>L^{−0.04}</strong></td>
+<td>§10.1b（L1381）</td>
+<td><strong>≈0 ⟹ 无临界发散</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>独立基准（标准标度理论，不依赖论文）</strong>：连续相变的 <code>χ_max</code> <strong>必须增长</strong> ——</p>
+<div class="formula">χ<sub><span class="fn">max</span></sub>∝ L<sup>1/ν</sup> (<span class="txt">序参量导数</span>) <span class="txt">或</span>  L<sup>γ/ν</sup> (<span class="txt">标准磁化率</span>)</div>
+
+<table>
+<thead>
+<tr>
+<th>普适类</th>
+<th>1/ν</th>
+<th>γ/ν</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3D Ising</strong>（ν=0.630, γ=1.237）</td>
+<td><strong>1.587</strong></td>
+<td><strong>1.964</strong></td>
+</tr>
+<tr>
+<td>2D Ising（ν=1.0, γ=1.75）</td>
+<td>1.000</td>
+<td>1.750</td>
+</tr>
+</tbody>
+</table>
+<p><strong>对照结果</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>实测指数</th>
+<th>连续相变要求</th>
+<th>差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3D 弦网</strong></td>
+<td><strong>−0.04</strong></td>
+<td>1.587 ／ 1.964</td>
+<td><strong>39.7 倍 ／ 49.1 倍</strong></td>
+</tr>
+<tr>
+<td>2D toric code</td>
+<td>+1.12</td>
+<td>1.00 ／ 1.75（落在区间内 ✓）</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>L: 2→4 的增长倍数演示</strong>：</p>
+<pre><code>连续相变应增长：L^{1/ν}=1.5873 → 3.00 倍
+                L^{γ/ν}=1.9638 → 3.90 倍
+3D 实测：        L^{−0.04}     → 0.97 倍（持平，略降）
+2D 实测：        L^{+1.12}     → 2.17 倍（在增长 ✓）
+</code></pre>
+<blockquote>
+<h3>⭐ <strong>框架自己的数据说：它的 3D 相变没有临界发散。</strong></h3>
+</blockquote>
+<h3>2.3 外部对照（与框架数据一致）</h3>
+<p><strong>3D toric code 的相变是一阶</strong> —— 这是凝聚态文献的既有结论：</p>
+<ul>
+<li>Mühlhauser, Schmidt, Vidal, Walther, <em>Competing topological orders in three dimensions</em>, <strong>SciPost Phys. 12, 069 (2022)</strong>：「<strong>All phase transitions are found to be first order</strong>」。</li>
+<li>Li, von Keyserlingk, Zhu, Jochym-O'Connor, <em>Phase diagram of the three-dimensional subsystem toric code</em>, <strong>Phys. Rev. Research 6, 043007 (2024)</strong>：「all separated by <strong>first-order</strong> transitions」。</li>
+<li>（唯一连续的特例是 <code>h_x=0</code> 极限，此时模型精确映射到立方格子上的 TFIM，属 3+1D Ising 普适类 —— 但这不是框架扫的那条 <code>λ</code> 轴。）</li>
+</ul>
+<p><strong>⟹ 框架实测的 <code>χ_max ∝ L^{−0.04}</code>（无发散）与文献「3D 一阶相变」完全一致。</strong></p>
+<h3>2.4 判定</h3>
+<p><strong>两条路都指向同一个结论：</strong></p>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>若 <code>L^{−0.04}</code> 为真</td>
+<td><strong>相变一阶 ⟹ 无临界发散 ⟹ 无放大载体</strong></td>
+</tr>
+<tr>
+<td>若 <code>L^{−0.04}</code> 是分辨率不足产物</td>
+<td><strong><code>λ_c(∞)</code> 未定位（C-61/62/63）⟹ 连相变点在哪都不知道 ⟹ 同样无载体</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ N-53 判否</strong>：临界放大在框架的 3D 相变上<strong>没有物理载体</strong>。</p>
+<p><strong>⚠️ 与第 151 轮（N-52）的区别</strong>（这一条要紧）：
+- <strong>N-52</strong>：放大机制的<strong>终态</strong>三难（亚临界＝没加／饱和＝O(1)／增益自由）
+- <strong>N-53</strong>：<strong>连放大的物理载体都不存在</strong> —— 比 N-52 更根本</p>
+<p><strong>失效条件</strong>（自动重开，与 N-52 同格）：① 若未来用更好的序参量与算法（'t Hooft/Wilson 环 ＋ PEPS/QMC）crossover 出<strong>正幂标度</strong>；② 或在框架的 3D 模型里找到<strong>另一条连续相变轴</strong>。</p>
+<hr />
+<h2>三、§9 可检验预言表逐行审计</h2>
+<h3>3.1 规模与状态分布</h3>
+<p><strong>23 个数据行</strong>。状态分布：</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>行数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>已判降调／结项（第 8、S-E5）</td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td>判别中（第 3，<code>wa=0</code>）</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>「理论可算，数值待推导」（第 4）</strong></td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td>与观测有张力（第 5）</td>
+<td>1</td>
+</tr>
+<tr>
+<td>其他「可检验／理论可检验／定性预言」</td>
+<td>18</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 唯一标「可算未算」的那一行 —— 前提已被判失败 ⟹ <strong>C-99</strong></h3>
+<p>§9 <strong>第 4 行</strong>：「<strong>SU(3) β 函数阶梯跳跃</strong>（第四代阈值）｜FCC-hh、LHAASO/CTA｜<strong>理论可算，数值待推导</strong>」。</p>
+<p><strong>独立重算（标准场论，可随时复现）</strong>：</p>
+<div class="formula">b<sub>0</sub> = 11 - <span class="frac"><span class="num">2n<sub>f</sub></span><span class="den">3</span></span>:  n<sub>f</sub>=6 → 7.0000;  n<sub>f</sub>=8 (+<span class="txt">第四代</span>) → 5.6667</div>
+<div class="formula">Δ b<sub>0</sub> = 7 - 17/3 = 4/3 ≈ 1.3333</div>
+
+<p><strong>α_s 跑动的可观测差异</strong>（用 α_s(m_Z)=0.1179，阈值 1 TeV）：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>α_s(10 TeV)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>n_f = 6（标准）</td>
+<td>0.07291</td>
+</tr>
+<tr>
+<td>n_f = 8（+第四代）</td>
+<td>0.07561</td>
+</tr>
+<tr>
+<td><strong>相对差</strong></td>
+<td><strong>3.69%</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 数学上完全可算，且差异在 FCC-hh 量级可见。</strong></p>
+<p><strong>⚠️ 但它不能算 —— 因为前提已被判失败：</strong></p>
+<table>
+<thead>
+<tr>
+<th>出处</th>
+<th>原文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>§5.3</strong></td>
+<td>〔⚠️ <strong>四类判定注</strong>：<strong>本条 = 失败</strong> —— §9 表第 5 行对<strong>同一命题</strong>写的是「<strong>与 LHC 未发现存在张力</strong>」〕</td>
+</tr>
+<tr>
+<td><strong>§9 第 5 行</strong></td>
+<td>第四代费米子（&gt;1 TeV）痕迹 ｜ LHC、宇宙线、CMB-S4 ｜ <strong>与 LHC 未发现存在张力</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<h3><strong>C-99</strong>：§9 第 4 行标「<strong>理论可算，数值待推导</strong>」，但它的前提（第四代费米子）在同一张表的第 5 行已被记「与 LHC 张力」、在 §5.3 已被直接判「<strong>失败</strong>」。</h3>
+<p><strong>状态栏未反映前提的判决</strong> ⟹ 读者会以为「这是个还能算的活」，实际<strong>算了也没有检验价值</strong>。</p>
+</blockquote>
+<p><strong>性质</strong>：同 <strong>C-92</strong> 族（措辞与判决不同步），但这里是 <strong>§9 表内部行间不同步</strong>（第 4 行 ← 第 5 行 ＋ §5.3）。
+<strong>修法</strong>：第 4 行状态栏应改为「<strong>前提（第四代）已判失败（§5.3），本条作废</strong>」或至少加同一指针。</p>
+<p><strong>📌 方法论要点（值得记住）</strong>：</p>
+<blockquote>
+<p><strong>「可算」不等于「值得算」。</strong> 一个预言的数学形式可算，但<strong>若前提已被实验排除，算出来也没有检验价值</strong> —— 这是第 138 轮「完成度 ≠ 可验证度」的一个新实例。</p>
+</blockquote>
+<hr />
+<h2>四、多值符号清盘（承接第 152 轮）</h2>
+<p>第 152 轮扫出「同一符号 ≥2 个数值」共 30 组，当时只逐一判定了 8 组。<strong>本轮把剩余项判完。</strong></p>
+<p>清点结果：14 组（值数 2–8，含小数／科学记数），其中 12 组相对差 &gt; 5%。<strong>逐一判定</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>各值</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>δ_hat</code></td>
+<td>−0.00000 ／ 0.02000</td>
+<td>✅ <strong>合法</strong> —— 前者是 <strong>GR 对照</strong>（无假阳性），后者是框架真值</td>
+</tr>
+<tr>
+<td><code>ΔH</code></td>
+<td>−2.38／−2.27／−2.266／−0.66</td>
+<td>✅ <strong>合法</strong> —— 不同实验段（确定性硬球 vs DSMC vs 不同 N）</td>
+</tr>
+<tr>
+<td><code>ρ_avg</code></td>
+<td>0.03 ／ 1.8（×10¹⁹）</td>
+<td>✅ <strong>合法</strong> —— 不同天体（普朗克质量黑洞 vs 太阳）</td>
+</tr>
+<tr>
+<td><code>l_P</code></td>
+<td>1.62（×10⁻³⁵ m）／ 6.5</td>
+<td>✅ <strong>合法</strong> —— 6.5 = 「≈4 l_P」</td>
+</tr>
+<tr>
+<td><code>t_P</code></td>
+<td>1.85／1.85486／2.2／3.387420／5.4（×10⁻⁴⁴ s）</td>
+<td>✅ <strong>合法</strong> —— 全是 t_P 的<strong>倒数／倍数</strong>（1/t_P、4t_P、2πt_P）</td>
+</tr>
+<tr>
+<td><code>e₀</code></td>
+<td>0.3 ／ 0.7</td>
+<td>✅ <strong>合法</strong> —— 两个不同代表源的偏心率</td>
+</tr>
+<tr>
+<td><code>E_c</code></td>
+<td>1.01／1.0181／2.068</td>
+<td>✅ <strong>合法</strong> —— 2.068 是「β +1%」的<strong>敏感度演示</strong>；1.01 是已知旧精度（L1520 明写升级）</td>
+</tr>
+<tr>
+<td><code>v0</code></td>
+<td>1.0 ／ 2.0</td>
+<td>✅ <strong>合法</strong> —— 两次不同参数设置</td>
+</tr>
+<tr>
+<td><code>β_c</code></td>
+<td>0.2217 ／ 0.44</td>
+<td>✅ <strong>合法</strong> —— <strong>3D Ising vs 2D Ising</strong>（不同维数）</td>
+</tr>
+<tr>
+<td><code>λ_c</code></td>
+<td>0.12 ／ 0.14</td>
+<td>✅ <strong>合法</strong> —— L773 明写早期值「<strong>已撤销</strong>」</td>
+</tr>
+<tr>
+<td><code>κ_c</code></td>
+<td>0.2255 ／ 0.25</td>
+<td>✅ <strong>合法</strong> —— 第 153 轮已判（开边界 FSS 中间值）</td>
+</tr>
+<tr>
+<td><code>h_c</code></td>
+<td>0.31／0.328／0.328474／0.3285</td>
+<td>⚠️ <strong>C-97 族</strong> —— 第 153 轮已查（C-64 覆盖问题）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<h3><strong>结论：14 组全部合法（或已在 C-97 族内），无新 C 类问题。</strong></h3>
+</blockquote>
+<p>🧭 <strong>对论文数值卫生的公平评价</strong>：<strong>被查到的「多值」全部合法。</strong> 这与第 154 轮的判据一致 ——</p>
+<blockquote>
+<p><strong>「多值」本身不是问题；「变更后未扫下游」才是。</strong>（12 组问题全部不是多值造成的）</p>
+</blockquote>
+<hr />
+<h2>五、「还有什么能计算的」—— 分级答案</h2>
+<h3>5.1 已清空的</h3>
+<table>
+<thead>
+<tr>
+<th>类</th>
+<th>内容</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A 类</strong>（纯数学）</td>
+<td>8 条</td>
+<td>✅ <strong>已清空</strong>（152–154 轮）</td>
+</tr>
+<tr>
+<td><strong>B 类</strong>（需温和新输入）</td>
+<td>相变临界放大（1 条）</td>
+<td>❌ <strong>本轮判否</strong>（N-53）</td>
+</tr>
+<tr>
+<td><strong>§9 表内「可算未算」</strong></td>
+<td>第 4 行</td>
+<td>❌ <strong>前提已判失败</strong>（C-99）</td>
+</tr>
+<tr>
+<td><strong>多值符号</strong></td>
+<td>14 组</td>
+<td>✅ <strong>全部合法</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>5.2 还剩的（<strong>没有「算」的活了</strong>）</h3>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>性质</th>
+<th>障碍</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C-94~C-99 的待改稿</strong></td>
+<td>编辑</td>
+<td>⚠️ <strong>正式稿余量仅 275 字符</strong> —— 动稿得先腾空间（<strong>待用户示意</strong>）</td>
+</tr>
+<tr>
+<td><strong>送材料包／私审</strong></td>
+<td>对外</td>
+<td><strong>唯一 0 工作量</strong>的动作（材料包已备好）</td>
+</tr>
+<tr>
+<td>等 Du 投影（I-27）／等 LISA</td>
+<td>对外</td>
+<td>不在自己手上</td>
+</tr>
+<tr>
+<td>少量噪声项的残余核查</td>
+<td>清洁</td>
+<td>低价值（本轮已覆盖主要组）</td>
+</tr>
+</tbody>
+</table>
+<h3>5.3 诚实结论</h3>
+<blockquote>
+<p><strong>能算的，基本已经算完了。</strong></p>
+</blockquote>
+<p>依据（三条独立证据）：
+1. <strong>A 类 8 条全清</strong>（152–154 轮）；B 类 1 条本轮判否；
+2. <strong>§9 表 23 行审计 → 表内无「可算未算」的真活</strong>（唯一标"待推导"的那条，前提已被判失败）；
+3. <strong>多值符号 14 组全判完，全部合法</strong> → 无新数值卫生问题。</p>
+<p><strong>剩下的不是「算」的问题，是「要不要改稿」和「要不要对外」的问题。</strong></p>
+<hr />
+<h2>六、核验与登记</h2>
+<ul>
+<li><strong>核验</strong>：<code>_b155.py</code>（A–E 五组）<strong>23 项 0 失败</strong>；<code>_b155f.py</code>（多值清点）</li>
+<li><strong>判否</strong>：<strong>N-53</strong>（临界放大无载体）—— 负面判定总账 <strong>52 → 53 条</strong></li>
+<li><strong>更正</strong>：<strong>C-99</strong>（§9 第 4 行状态栏未同步前提判决）—— 更正总账 <strong>97 → 98 条</strong></li>
+<li><strong>论文正文</strong>：<strong>零改动</strong>（99,725 字符；余量 275）</li>
+<li><strong>下一个可选</strong>：C-94~C-99 待改稿清单（需用户定「腾字符 vs 放宽字数」）</li>
+</ul>
+
+<div class="footer">B 类判定与可算性清盘 —— 临界放大 × 预言表审计 · 2026-10-10 · 由 _md2html_generic.py 生成 · 源文件 B类判定与可算性清盘_临界放大与预言表审计.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

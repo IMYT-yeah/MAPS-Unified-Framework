@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>判定：量子纠缠态 = 湮灭的「特殊结构状态」？＋ 叠加态 = 稳定态的「前置结构」？</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>判定：量子纠缠态 = 湮灭的「特殊结构状态」？＋ 叠加态 = 稳定态的「前置结构」？</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-06 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 135 轮</strong> ｜ 2026-10-06 ｜ 核验 <code>_ent135.py</code>（<strong>EN-1…EN-22，25 项断言 0 失败</strong>）
+主题来源：用户本轮提议（<strong>非</strong>起点对话候选库）｜ 判定编号 <strong>N-50</strong>；随带更正 <strong>C-89</strong></p>
+</blockquote>
+<h2>一、一句话结论</h2>
+<p><strong>不能算 —— 判否（N-50）。</strong> 三条子主张逐条落空：<strong>(A) 身份主张</strong>在框架内<strong>没有载体</strong>（纠缠是<strong>非局域两体关联</strong>，而框架的底层对象全是<strong>局域构型</strong>）；<strong>(B) 「观测 → 稳定」</strong>在框架里<strong>没有动力学</strong>（量子测量理论词条全 0：塌缩／波函数／测量问题／量子测量／密度矩阵／退相干／幺正 各 0 处）；<strong>(C) 「叠加态 = 稳定态的前置结构」</strong>所依赖的 §7.2「叠加态几何起源（全局等价）」<strong>第 76 轮已判定为「等式」（零内容）</strong>，而整条 §7.2 已判<strong>失败（零内容）</strong>。<strong>干细胞类比不构成判据</strong>（4 项结构对应里 3 项不符，且核心映射「多能性 ↔ 叠加」是<strong>范畴错误</strong>，见 §六）。</p>
+<p>⚠️ <strong>但本轮有两条正面产出</strong>：⭐ <strong>C-89</strong>（§9 表 #8 与 §4.8 的结项<strong>直接矛盾</strong> —— 「更正未扫下游」）＋ 一条<strong>口径加固</strong>（框架的面积律是<strong>经典观测者互信息</strong> <code>I(R;Σ)</code>，<strong>不是</strong>量子纠缠熵 <code>S_A</code>）。</p>
+<h2>二、提议的三段拆解</h2>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>主张</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A</strong></td>
+<td>量子<strong>纠缠态</strong> = 底层事件的<strong>湮灭</strong>产生的一种<strong>特殊结构状态</strong></td>
+<td><strong>身份主张</strong>（X 是什么）</td>
+</tr>
+<tr>
+<td><strong>B</strong></td>
+<td><strong>外部观测者观测</strong>这一行为，使它产生某种<strong>稳定状态</strong></td>
+<td><strong>动力学主张</strong>（谁让谁稳定）</td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td>量子<strong>叠加态</strong>是「某种稳定状态」的<strong>前置结构</strong>（类比：干细胞 = 任何组织的前置结构）</td>
+<td><strong>前驱关系主张</strong> ＋ 类比论证</td>
+</tr>
+</tbody>
+</table>
+<h2>三、判据与取证</h2>
+<h3>3.1 A 组：对象存在性 —— 框架里有没有「量子态层」？</h3>
+<table>
+<thead>
+<tr>
+<th>词条</th>
+<th>正式稿全文</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>塌缩 / 波函数 / 测量问题 / 量子测量 / 投影假设</td>
+<td><strong>各 0</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>密度矩阵 / 退相干 / 幺正 / 酉演化 / 多世界 / 纯态 / 混合态 / 冯·诺依曼</td>
+<td><strong>各 0</strong></td>
+<td>与第 57 轮清点一致</td>
+</tr>
+<tr>
+<td>坍缩</td>
+<td>3</td>
+<td><strong>全部为「无引力坍缩」</strong>（对比 GR 奇点），<strong>无一处</strong>指波函数塌缩</td>
+</tr>
+</tbody>
+</table>
+<p><strong>「纠缠」12 处逐条归类</strong>：霍金辐射-落入物质纠缠 <strong>7</strong>（B3 预言，标准 QM 概念）／纠缠熵面积律 <strong>2</strong>／拓扑纠缠熵 <strong>1</strong>／CHSH 纠缠对 <strong>1</strong>／弦网子区域熵 <strong>1</strong> —— <strong>「其他」= 0</strong> ⟹ <strong>没有一处给出框架特异的「纠缠」定义</strong>，全部是标准 QM 用法。</p>
+<p><strong>「叠加」8 处逐条归类</strong>：暗物质叠加模型 <strong>5</strong>（两个分量相加，不同义）／通量饱和截断叠加 <strong>1</strong>（不同义）／弦网基态叠加 <strong>1</strong>（不同义）／<strong>「叠加态几何起源」1</strong>。
+⟹ 「叠加<strong>态</strong>」在框架内<strong>只出现这 1 次</strong>，且是<strong>列举式断言</strong>（列在「框架已有非交换元素」4 条里），<strong>无推导</strong>。</p>
+<p><strong>§7.4 自认</strong>：「一旦非交换化，框架的量子部分与标准 QM <strong>数学上重合</strong>」⟹ 纠缠／叠加在框架里<strong>没有独立内容</strong>，只有「本体论动机」。</p>
+<h3>3.2 B 组：第 76 轮的既有判决（必须继承，不得重复主张）</h3>
+<p>第 76 轮做过 <strong>§7 量子力学基础审计</strong>（<code>_qm_audit_76.py</code>，QM-1…QM-12，12 项 0 失败），结论<strong>逐条覆盖本提议</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>第 76 轮结论</th>
+<th>对本提议的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>非交换化是「外加」的</strong>（§7.2 的动作 = 「把经典概率分布<strong>升级</strong>为算子代数」）</td>
+<td><strong>A 段</strong>的前提是外加公设，不是框架推导</td>
+</tr>
+<tr>
+<td><strong>「框架已有非交换元素」4 条逐条判定</strong>：只有 <strong>Clifford 投影</strong>真非交换（且是 §5.2 的<strong>表示论记号</strong>，非动力学）；<code>(−1)^N_exchange</code> 是<strong>阿贝尔相位</strong>；<strong>「叠加态几何起源（全局等价）」是「等式」</strong>；「量子直线」是<strong>通道</strong></td>
+<td><strong>C 段</strong>的原点 = 一个<strong>恒等式</strong>（零内容）</td>
+</tr>
+<tr>
+<td><strong>§7.2 的命题是条件命题（零内容）</strong> —— 「结论是 Tsirelson 定理，前提已把结论塞进去」；四类判定 = <strong>失败（零内容）</strong></td>
+<td>任何以 §7.2 为地基的延伸<strong>继承零内容</strong></td>
+</tr>
+<tr>
+<td><strong>判别力 = 0</strong>（§7.4 自认）；§7 全部物理数值 = {2√2, ½, −2.8284}，<strong>全为教科书常数</strong></td>
+<td>与 <strong>N-29</strong>（宇宙学 <code>ΛCDM ⊂ 框架</code>）<strong>同族</strong>：<strong>解释力 ≠ 判别力</strong>（第 61 轮）</td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 C 组：载体类型不匹配（身份主张的第一次检验）</h3>
+<table>
+<thead>
+<tr>
+<th>词条</th>
+<th>计数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>格点 <strong>42</strong> ／ 置换 <strong>12</strong> ／ 局域 <strong>11</strong> ／ 构型 <strong>4</strong> ／ 占位+占据 <strong>3</strong></td>
+<td>框架的底层对象<strong>全是局域</strong>的</td>
+</tr>
+<tr>
+<td><strong>非局域 0 ／ 两体 0</strong></td>
+<td><strong>没有任何</strong>非局域或两体结构的承载对象</td>
+</tr>
+</tbody>
+</table>
+<p>框架的「关联」15 处里，明确的两点关联／关联函数 <strong>3</strong>（经典统计量，T-7 那条链），<strong>没有</strong>一处是量子纠缠。</p>
+<p>⟹ <strong>载体类型错配</strong>：<strong>纠缠</strong>的定义性特征是<strong>非局域两体关联</strong>；框架的底层是<strong>局域占位构型 ＋ 置换群</strong>。要把「某处的湮灭事件」变成「甲乙两处的关联」，需要一个<strong>跨格点的映射</strong>——而框架仅有的跨格点通道是<strong>量子直线／跨支 ER 通道</strong>，它在<strong>第 55 轮已判「只能载信息、不能载能量」</strong>（<code>EN-12</code> 通过），且它是<strong>通道</strong>（第 76 轮判），<strong>不是关联生成器</strong>。</p>
+<h3>3.4 ⭐ D 组：新发现 —— <strong>C-89：§9 表 #8 与 §4.8 的结项直接矛盾</strong>（更正未扫下游，铁律 41/55）</h3>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>原文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>§9 可检验预言表 #8</strong></td>
+<td>「纠缠熵面积律系数（框架含 ln 2 因子）｜量子模拟/多体系统｜<strong>理论可检验</strong>」</td>
+</tr>
+<tr>
+<td><strong>§4.8 诚实开放项 ①</strong></td>
+<td>「~~11.0904 非整数，其「自然性」仍未解释~~ —— <strong>已结项：判为伪问题</strong>（它是「以比特计的槽位数 ÷ 以纳特计的熵」，<strong>必然含 ln2</strong>；<strong>既无枚举机制、也无几何机制、且不受观测约束</strong>）」</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>同一个量，§4.8 判「伪问题、不受观测约束」，§9 仍列为「理论可检验」</strong>。这是<strong>铁律 41（判决下游同步四维）／55（更正扫三层）</strong>的又一次失守。</p>
+<p><strong>数值复核（<code>EN-18</code>）</strong>：<code>16·ln2 = 11.0903548890</code> ✓；<code>1 纳特 = 1/ln2 = 1.442695 比特</code>。「<strong>框架含 ln 2 因子</strong>」这句话的全部内容是 <strong>bit ↔ nat 的单位换算</strong>：
+<code>S/k_B = A/(4l_P²)</code>（<strong>纳特</strong>）<code>= A/(4l_P²·ln2)</code>（<strong>比特</strong>）。<strong>换算不是预言</strong> —— 第 103 轮的 <strong>C-67</strong> 同型（把恒等式／单位换算当数值验证）。</p>
+<h3>3.5 ⭐ E 组：口径加固 —— 框架的「面积律」是<strong>经典互信息</strong>，不是<strong>量子纠缠熵</strong></h3>
+<ul>
+<li>框架的面积律 = <strong>观测者互信息</strong> <code>I(R;Σ)</code>（§4.9 B5）：由「<strong>体 = 表面投影</strong>【本框架设定】⟹ <code>H(R|Σ)=0</code>」得 <code>I(R;Σ) ∝ A</code>；toy 模型 <code>M = 4/8/16/32 ⟹ I = M</code> ✓（<code>EN-21</code> 复算通过）。</li>
+<li>论文全文 <strong>无 <code>S_A</code>、无约化密度矩阵</strong>（<code>EN-20b</code> 通过）⟹ 框架<strong>从未</strong>把该量与量子纠缠熵等同。<strong>但 §9 #8 的表述</strong>（「纠缠熵面积律系数」）<strong>容易被读成</strong>「框架推出了量子纠缠熵面积律」——<strong>这正是本提议极易被误当有依据的原因</strong>。</li>
+<li>两者<strong>不同对象</strong>：<code>I(R;Σ)</code> 是<strong>经典</strong>量（对经典系统也定义），<code>S_A</code> 需要<strong>密度矩阵</strong>（框架无）。形式上都是 <code>∝ A</code>，但<strong>不是同一个量</strong>。</li>
+<li>📌 <strong>措辞收紧（新）</strong>：<code>H(R|Σ)=0</code> <strong>单独</strong>给出 <code>I = H(R)</code>，<strong>不是</strong> <code>I = H(Σ)</code>；要得到 <code>I = H(Σ)</code> 还需<strong>反向</strong>的条件熵为零（<code>H(Σ|R)=0</code>，即 <code>Σ ↔ R</code> 双射）。论文原文只写了单向（<code>EN-21b</code>）。toy 里双向都成立，故数值无误，但<strong>推理链少一步</strong> —— 建议写法收紧为「<strong>体↔面双射</strong> ⟹ <code>I(R;Σ)=H(R)=H(Σ)</code>」。</li>
+</ul>
+<h3>3.6 F 组：量纲检查（若要给「湮灭 → 纠缠」一个耦合）</h3>
+<p>湮灭率量纲 = <code>L⁻³T⁻¹</code>；纠缠（关联）<strong>无量纲</strong> ⟹ 需要的桥接因子量纲 = <strong><code>L³T¹</code></strong>（<code>EN-22</code>）。
+<code>l_P³·t_P = 2.276×10⁻¹⁴⁸</code>。⚠️ 若用「每面元每 <code>t_P</code> 一次事件」去凑，得到的恰是 <code>O(1)</code> 的<strong>恒等式</strong>（不产生预言）。
+⟹ <strong>量纲不闭合 ⟹ 身份主张必然引入新参数</strong>（第 123 轮 <strong>N-43</strong>：「<strong>失效条件 = 新增公理级输入</strong>」）。</p>
+<h3>3.7 G 组：四类判定</h3>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>四类判定</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(A) 纠缠 = 湮灭的「特殊结构状态」</td>
+<td><strong>失败</strong></td>
+<td>载体类型不匹配（局域构型 ↔ 非局域关联）；需新参数</td>
+</tr>
+<tr>
+<td>(B) 观测 → 使其成为稳定态</td>
+<td><strong>失败</strong></td>
+<td>框架无量子测量理论（测量词条全 0）</td>
+</tr>
+<tr>
+<td>(C) 叠加态 = 稳定态的「前置结构」</td>
+<td><strong>失败</strong></td>
+<td>原点（§7.2「几何起源」）第 76 轮已判<strong>等式／零内容</strong></td>
+</tr>
+<tr>
+<td>干细胞类比</td>
+<td><strong>不构成判据</strong></td>
+<td>见 §六</td>
+</tr>
+</tbody>
+</table>
+<p><strong>真预言 0 ／ postdiction 0 ／ 半拟合 0 ／ 失败 3。</strong></p>
+<h2>四、框架内「最接近」的三条对应物（逐条说明为何不构成载体）</h2>
+<p>诚实地说，本提议<strong>不是空想</strong> —— 它确实指向框架里三条真实存在的东西。逐条对照：</p>
+<table>
+<thead>
+<tr>
+<th>框架内的对应物</th>
+<th>提议想映射的</th>
+<th>为什么<strong>不成立</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>自旋对称破缺</strong>（§6.4 Φ⁴ 热相变；§4.9「现在平面选择」的闭合机制之一）</td>
+<td>「叠加态 →（外因）→ 选定一支」</td>
+<td><strong>系综 vs 单系统</strong>：自发破缺是<strong>热力学/系综</strong>选择（真空期望值），而「叠加 → 稳定态」是<strong>单系统</strong>过程；框架的破缺发生在<strong>场空间 <code>V(Φ)</code></strong>，不在<strong>量子态空间</strong>（<strong>C-8</strong>：有场空间势，无构型空间势）</td>
+</tr>
+<tr>
+<td><strong>观测者 = 现在平面孤子</strong>（§4.9，O1–O4／N1–N4）</td>
+<td>「观测者做了一件事」</td>
+<td>框架的观测者是<strong>经典粗粒化</strong>（互信息 <code>I(R;Σ)</code>），<strong>不是</strong>测量装置；它<strong>不改变</strong>被观测系统的态（无塌缩、无信道）</td>
+</tr>
+<tr>
+<td><strong>量子直线 / 跨支 ER 通道</strong>（§4.6；第 55 轮）</td>
+<td>「纠缠的载体」</td>
+<td>① 第 55 轮已判<strong>只能载信息、不能载能量</strong>；② 第 76 轮判它是<strong>通道</strong>，<strong>不是关联生成器</strong>；③ 它是<strong>单条通道</strong>，而纠缠是<strong>两体关联的不可分解性</strong>（不是一个通道）</td>
+</tr>
+</tbody>
+</table>
+<p>📌 <strong>结论</strong>：三条对应物都在<strong>本体层</strong>（构型／场／通道），而提议需要的是<strong>量子态层</strong>——<strong>框架没有这一层</strong>（第 57／76 轮）。</p>
+<h2>五、与既有判决的族属（不得重复计为「新发现」）</h2>
+<table>
+<thead>
+<tr>
+<th>轮</th>
+<th>编号</th>
+<th>内容</th>
+<th>与本轮关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>76</td>
+<td><strong>I-21 / N-31 / N-32</strong></td>
+<td>§7 非交换化 = 外加；候选池 3 结项</td>
+<td><strong>本轮的前提判决</strong>（继承）</td>
+</tr>
+<tr>
+<td>130</td>
+<td><strong>N-47</strong></td>
+<td>「纠缠保真度 ∝ 物质分布」判否（对话自撤／对象消失／双向失控 27.05 dex）</td>
+<td><strong>同族第 1 次</strong>（同为「纠缠 ← 底层事件」构想）</td>
+</tr>
+<tr>
+<td>131</td>
+<td><strong>N-48</strong></td>
+<td>三态 P/N/B 不采纳</td>
+<td>同族（底层事件结构主张）</td>
+</tr>
+<tr>
+<td>55</td>
+<td>—</td>
+<td>跨支通道只载信息</td>
+<td><strong>本轮 EN-12 的依据</strong></td>
+</tr>
+<tr>
+<td><strong>135</strong></td>
+<td><strong>N-50</strong></td>
+<td><strong>本轮</strong>：纠缠 = 湮灭结构状态（＋观测稳定＋叠加前置）</td>
+<td><strong>同族第 2 次</strong>（换措辞，载体不同论据，故须独立判定 —— 依铁律 38/39，<strong>不能因「认不出」而拒绝，也不能因「像」而合并</strong>）</td>
+</tr>
+</tbody>
+</table>
+<h2>六、干细胞类比为什么不构成判据</h2>
+<p><strong>先立一条铁律</strong>：<strong>类比不是判据</strong>（铁律 38–39 族）—— 类比的<strong>形式相似</strong>不产生可判定后果。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>干细胞</th>
+<th>量子叠加态</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>多能性</strong>：可分化成多种细胞类型</td>
+<td>「含多个本征分量」</td>
+<td>⚠️ <strong>范畴错误</strong>（见下）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>分化由<strong>环境/信号</strong>触发</td>
+<td>「观测」触发</td>
+<td>⚠️ 部分对应，但框架的「观测」= 粗粒化，非信号</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>不可逆</strong>（终末分化）</td>
+<td>测量是否不可逆<strong>本身有争议</strong></td>
+<td>✗ 框架无塌缩，无可逆性可言</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>有标记物</strong>（Oct4/Sox2/Nanog，可测）</td>
+<td>需新增可观测量</td>
+<td>✗ 框架未给出</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>谱系树</strong>（~200 种终态，有层级）</td>
+<td>本征谱（无层级树）</td>
+<td>✗ 不成立</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>致命的一条（第 1 项）</strong>：<strong>「多能性」是内禀属性</strong>（自发随机分化 ＋ 环境选择）；而<strong>「是叠加」不是态的内禀属性，而是相对于所选基的表述</strong> —— 同一个态在不同的基下写成不同的叠加，<strong>态本身没变</strong>。</p>
+<blockquote>
+<p>把「多能性」映射到「叠加」，等于把<strong>表述的相对性</strong>（基选择）当成了<strong>内禀的能力</strong>（能分化成多种）。
+而且「能分化成什么」由<strong>观测者选的测量基</strong>决定（<strong>外向决定</strong>），干细胞的分化方向是<strong>内向自发＋环境选择</strong> —— 方向相反。</p>
+</blockquote>
+<p>⟹ <strong>类比在结构上不成立</strong>，且它<strong>不提供任何新的可观测量</strong>（第 4 项）。</p>
+<h2>七、📌 直接回答「这个可以算吗？」</h2>
+<p>按第 123 轮 <strong>N-43</strong> 的三档：</p>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>本提议是否落在这一档</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>内部推导</strong></td>
+<td>❌ <strong>不落</strong>（判否 N-50）</td>
+<td>三条子主张全部落空；对象缺失</td>
+</tr>
+<tr>
+<td><strong>条件构造</strong></td>
+<td>✅ <strong>可做，但需明说</strong>（<strong>新增 2 条公理</strong>）</td>
+<td>① 一个把<strong>局域湮灭率</strong>映为<strong>非局域关联</strong>的映射（含新参数 <code>L³T</code>）；② 一条<strong>测量公理</strong>（「观测 = 稳定化算子」）。加上这两条，可以构造出「叠加 → 观测 → 本征态」的形式；但<strong>框架全部对外产出都出自这一档</strong>（度规 B3／Φ 第五力／A2 动能），<strong>新公理 = 失效条件</strong></td>
+</tr>
+<tr>
+<td><strong>外部输入</strong></td>
+<td>⚠️ 可选</td>
+<td>若要正面对待，需<strong>从文献引入</strong>量子测量理论（如退相干／量子达尔文主义），而那<strong>不是框架的贡献</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>所以：能做，但做出来的是「条件构造」不是「框架推导」。</strong> 若把它写进论文，必须<strong>显式声明新增公理级输入</strong>，并标明<strong>真预言 0 条</strong>——那就是<strong>把内容外包给假设</strong>。</p>
+<h2>八、诚实边界</h2>
+<ol>
+<li><strong>「对象缺失」是结构性的，不是「没时间算」</strong> —— 判否的理由是<strong>框架没有量子态层</strong>，而不是数值没算出来。</li>
+<li><strong>本轮不改 §7.1–§7.4 的正文措辞</strong>（承第 76 轮惯例），只加<strong>口径注</strong>（C-89）。</li>
+<li><strong>零新参数、零新物理</strong>；<code>_ent135.py</code> 无自由调参。</li>
+<li><strong>「载体类型不匹配」是本文档的论证</strong>，非外部定理；但「纠缠 = 非局域两体关联」是标准定义。</li>
+<li><strong>本判定不涉及</strong>「同源沟壑／模态互锁」这类<strong>本体层重命名</strong>（与第 130 轮同一纪律）：本提议只涉及其<strong>身份与可检验推论</strong>。</li>
+</ol>
+<h2>九、判决与下一步</h2>
+<ul>
+<li><strong>判决：判否（N-50）</strong>；随带 <strong>C-89</strong>（§9 #8 ↔ §4.8 矛盾 ＋ 面积律口径加固）。</li>
+<li><strong>落地动作</strong>：论文加 1 处口径注（中英同步）；§9 #8 的「理论可检验」需降调。</li>
+<li><strong>下一步不变</strong>：① 送材料包/私审；② 等 Du 投影（I-27）；③ 等 LISA。</li>
+</ul>
+
+<div class="footer">判定：量子纠缠态 = 湮灭的「特殊结构状态」？＋ 叠加态 = 稳定态的「前置结构」？ · 2026-10-06 · 由 _md2html_generic.py 生成 · 源文件 量子纠缠态与叠加前置结构_判定与边界.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

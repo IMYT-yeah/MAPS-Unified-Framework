@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>w 与 f 的同一性：B2 闭环完成（附：独立泊松衬底的第二次独立排除）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、关系式：w = 1 − f²，不是 w = 1 − f</div>
+  <h1>w 与 f 的同一性：B2 闭环完成（附：独立泊松衬底的第二次独立排除）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-20（第 34 轮）
+<strong>脚本</strong>：<code>outputs/_wf_identity.py</code>（检查项 WF-1 … WF-6，<strong>失败项：无</strong>）
+<strong>一句话结论</strong>：第 33 轮留下的软肋是「空槽率 w 与衬底占位率 f 是否为同一个量」。答案是<strong>两者不是同一个量，关系为 w = 1 − f²</strong>（第 33 轮默认 w = 1 − f 少了一个平方，是错的，但 f = 1 ⟹ w = 0，结论不变）；而且<strong>这个同一性假设根本不需要</strong>——置换动力学是双射 ⟹ f ≡ 1 <strong>逐 tick 恒等</strong> ⟹ w ≡ 0 <strong>逐 tick 恒等</strong>，不是概率。⟹ <strong>B2 闭环</strong>。顺带：独立泊松衬底（f* = 1/2）被 BH 熵第二次独立排除（温度偏差 −5.77%，与第 20 轮的 Δc/c = 26% 互不相干）。</p>
+</blockquote>
+<hr />
+<h2>一、关系式：w = 1 − f²，不是 w = 1 − f</h2>
+<p>面元的「平面内连接」是格点间的<strong>键</strong>；一条键承载通量 ⟺ <strong>两端格点都被占</strong>。占位独立时 P(键存活) = f² ⟹</p>
+<pre><code>w = 1 − f²
+</code></pre>
+<p>Monte-Carlo 直接检验（L=20，N=8000，沿 x 的键，周期边界）：</p>
+<table>
+<thead>
+<tr>
+<th>f</th>
+<th>实测 P(键存活)</th>
+<th>f² 预测</th>
+<th>相对误差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.90</td>
+<td>0.809125</td>
+<td>0.810000</td>
+<td>−0.108%</td>
+</tr>
+<tr>
+<td>0.80</td>
+<td>0.641375</td>
+<td>0.640000</td>
+<td>+0.215%</td>
+</tr>
+<tr>
+<td>0.60</td>
+<td>0.352250</td>
+<td>0.360000</td>
+<td>−2.153%</td>
+</tr>
+<tr>
+<td>0.50</td>
+<td>0.244375</td>
+<td>0.250000</td>
+<td>−2.250%</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 关系式确认。<strong>第 33 轮默认的 w = 1 − f 少了一个平方，是错的</strong>；但因 f = 1 时两式同给 w = 0，第 33 轮的结论不受影响（已按正确关系式重算）。</p>
+<hr />
+<h2>二、同一性假设并不需要：置换是双射</h2>
+<p>数值（简单立方 L=6，N=216，1000 tick，每线独立相位）：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>非置换的 tick 数</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td>每格点占据数的最小值</td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td>每格点占据数的最大值</td>
+<td><strong>1</strong></td>
+</tr>
+</tbody>
+</table>
+<p>置换是<strong>双射</strong> ⟹ 每个格点<strong>恒有且仅有 1 个诸元</strong> ⟹ <strong>f ≡ 1 逐 tick 恒等</strong>，不是统计平均值 ⟹ 每条键两端恒被占 ⟹ <strong>w ≡ 0 逐 tick 恒等</strong>，也不是概率。</p>
+<p>⟹ B2 的「无空槽」：
+- ❌ 不是从衬底搬运来的假设；
+- ❌ 不依赖格点间的独立性；
+- ✅ <strong>是置换双射的直接后果。</strong></p>
+<p>第 32、33 轮连着担心的两个软肋（跨层搬运、同一性）因此都以「不需要该假设」的方式解除。</p>
+<hr />
+<h2>三、独立泊松衬底的第二次独立排除</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>独立泊松稳态占位率 f*</td>
+<td>0.5000</td>
+</tr>
+<tr>
+<td>⟹ w = 1 − f*²</td>
+<td><strong>0.750000</strong></td>
+</tr>
+<tr>
+<td>H_S(w)</td>
+<td>2.942488 nats/面元</td>
+</tr>
+<tr>
+<td>S / S_req</td>
+<td>1.061278</td>
+</tr>
+<tr>
+<td><strong>Hawking 温度偏差</strong></td>
+<td><strong>−5.7740%</strong>（T = 5.812499×10⁻⁸ K）</td>
+</tr>
+</tbody>
+</table>
+<p>第 20 轮已用 <strong>Δc/c = 26%</strong> 排除独立泊松衬底；本轮用 <strong>BH 熵定标</strong>给出第二条依据。<strong>两者互不相干，构成交叉验证。</strong></p>
+<hr />
+<h2>四、双约束反解</h2>
+<p>解 <code>H_S(1 − f²) = ln 16</code>：</p>
+<table>
+<thead>
+<tr>
+<th>f</th>
+<th>w = 1 − f²</th>
+<th>H_S</th>
+<th>温度偏差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1.0000</strong></td>
+<td><strong>0.000000</strong></td>
+<td><strong>2.772589</strong></td>
+<td><strong>+0.0000%</strong> ✅</td>
+</tr>
+<tr>
+<td>0.9500</td>
+<td>0.097500</td>
+<td>3.780481</td>
+<td>−26.6604%</td>
+</tr>
+<tr>
+<td>0.8000</td>
+<td>0.360000</td>
+<td>4.388130</td>
+<td>−36.8162%</td>
+</tr>
+<tr>
+<td>0.5000</td>
+<td>0.750000</td>
+<td>2.942488</td>
+<td>−5.7740%</td>
+</tr>
+<tr>
+<td>0.4765</td>
+<td>0.772909</td>
+<td>2.772582</td>
+<td>+0.0002%（第二根）</td>
+</tr>
+<tr>
+<td>0.4000</td>
+<td>0.840000</td>
+<td>2.202294</td>
+<td>+25.8955%</td>
+</tr>
+</tbody>
+</table>
+<p>第二根 <strong>f₂ = 0.476542</strong> 意味着 <strong>52.3% 的格点是空的</strong>，与 C-1（满占位，Δc/c = 26% 论证）直接冲突 ⟹ 排除。<strong>只剩 f = 1。</strong></p>
+<hr />
+<h2>五、B2 闭环</h2>
+<pre><code>满占位（置换双射）⟹ 每键承载通量 ⟹ 4 条平面内连接全活
+                  ⟹ A1 的 50:50 分配正 / 负支 ⟹ 2^4 = 16
+                  ⟹ BH 定标成立 ⟹ Hawking 温度精确
+</code></pre>
+<p>这条链现在每一环都有出处：满占位来自置换双射（第 21/26 轮），4 条连接来自 §4.9 引理 1（第 31 轮），50:50 来自 A1，2⁴ = 16 与压缩因子 16 ln2 = 11.0904 由 BH 定标唯一确定。</p>
+<hr />
+<h2>六、诚实边界</h2>
+<p><strong>✅ 属于推导的</strong>：
+- w = 1 − f² 的 Monte-Carlo 验证（4 个占位率，偏差 ≤ 2.3%）；
+- 置换双射 ⟹ f ≡ 1（数值：1000 tick，非置换 tick = 0，占据数恒为 1）；
+- 独立泊松的 −5.77% 偏差；双约束反解的两个根。</p>
+<p><strong>⚠️ 属于判定 / 假设的</strong>：
+- <strong>「面元连接」被当作格点间的「键」来用</strong>——面元层面的「连接」与格点层面的「键」是否严格对应，<strong>未独立论证</strong>。这是本轮唯一的新软肋。
+- WF-1 的 f² 依赖格点占位的独立性——但 WF-2 的 f ≡ 1 绕过了它，故在框架实际动力学下不需要独立性。
+- f = 1 依赖压缩因子 11.0904 不变；若压缩因子被重新导出，该约束会移动。</p>
+<p><strong>❗ 仍未解决</strong>：11.0904 的自然性；「面元连接 ↔ 格点键」的对应；B1（连接 / 不连接）仍未彻底排除（只因 C-e 落选）。</p>
+<hr />
+<h2>七、论文已改（中英同步，2 项 0 失败）</h2>
+<p>§4.8 在第 33 轮块之后追加<strong>【v2.9 补充（第 34 轮：w 与 f 的同一性 —— B2 闭环）】</strong>：关系式 w = 1 − f² 与 MC 验证、第 33 轮 w = 1 − f 的更正、置换双射 ⟹ f ≡ 1 的数值、独立泊松的第二次排除、双约束反解、闭环链条与剩余软肋。</p>
+<p>原 v2.9 已备份至 <code>paper/history/*_备份_2026-09-20第34轮前.md</code>。</p>
+<hr />
+<h2>八、下一步</h2>
+<ol>
+<li><strong>「面元连接 ↔ 格点键」的严格对应</strong>（本轮唯一新软肋）：面元是面积元（l_P²），格点是体位点；需说明一个面元的 4 条平面内「连接」如何对应到格点键上。入口：在简单立方上显式构造「面元—键」对应表并计数。</li>
+<li>论文收口待办（已挂四轮）：§4.10 覆盖半径改解析值（k=3 → 90.0000°、k=4 → 70.5288°）；第 29 轮两处标注错位。</li>
+<li>之后回主链：载流子两类型收口。</li>
+</ol>
+
+<div class="footer">w 与 f 的同一性：B2 闭环完成（附：独立泊松衬底的第二次独立排除） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 w与f的同一性_B2闭环完成.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

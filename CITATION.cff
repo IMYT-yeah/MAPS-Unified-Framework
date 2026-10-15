@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "正反物质对风暴（MAPS）统一框架 —— 论文 + 备忘录 + 可复现数值全集"
+title: "正反物质对风暴统一框架 (Matter-Antimatter Pair Storm Unified Framework)"
+type: software
+authors:
+  - name: "IMYT-yeah"
+    alias: "IMYT-yeah"
+    website: "https://github.com/IMYT-yeah"
+date-released: "2026-09-07"
+keywords: [physics, emergence, gravity, dark-energy, entropy, unified-framework]
+license: MIT (code) / CC-BY-4.0 (docs)

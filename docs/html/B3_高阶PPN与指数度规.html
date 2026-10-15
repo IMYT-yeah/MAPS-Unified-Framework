@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B3：高阶 PPN 参数与后牛顿修正——框架度规 = 各向同性指数度规</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 核心识别：框架弱场度规 = 各向同性指数度规（Exponential Metric）【推导】</div>
+  <h1>B3：高阶 PPN 参数与后牛顿修正——框架度规 = 各向同性指数度规</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>任务</strong>：蓝图 B 分支（数学严格化）P2 项——完整 PPN 参数集推导 + 2PN/3PN 可观测修正 + 观测约束对照。
+<strong>前置</strong>：P0（γ=1）、强场分叉裁决（β=1，玻尔兹曼路径胜出）、P1-A（微变权守恒 g_rr=−1/g₀₀）、剩余问题 #6（初步展开）。
+<strong>方法</strong>：识别框架弱场度规的精确坐标形式 → 推导完整 PPN 参数集 → 测地线数值积分（进动/偏折）验证高阶分叉 → 光子球/阴影与 EHT 对照 → 观测约束评估。
+<strong>性质标注</strong>：【定理】= 已确立数学/物理；【推导】= 本框架内完成；【数值】= 本次数值验证；【待验证】= 需进一步验证。</p>
+</blockquote>
+<hr />
+<h2>1 核心识别：框架弱场度规 = 各向同性指数度规（Exponential Metric）【推导】</h2>
+<p>框架引力侧三条独立推导在此收敛为<strong>唯一的坐标形式</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>玻尔兹曼分布【遗留②】</td>
+<td>g₀₀ = −e^{−2Φ/c²}（热平衡 ⟹ 通量密度按 e^{−Φ/c²} 衰减）</td>
+</tr>
+<tr>
+<td>微变权守恒【P1-A】</td>
+<td>g_rr = −1/g₀₀ = e^{2Φ/c²}（时间权 × 径向权 = 1）</td>
+</tr>
+<tr>
+<td>公理 1（各向同性）【公理】</td>
+<td>空间弯曲各向同性 ⟹ g_ij = δ_ij·e^{2Φ/c²}（无特殊径向方向）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>合成为各向同性指数度规</strong>（GM=c=1 时 x=GM/(c²r)）：</p>
+<div class="formula">g<sub>μν</sub> = <span class="rm">diag</span>(-e<sup>-2x</sup>, e<sup>2x</sup>, r<sup>2</sup> e<sup>2x</sup>, r<sup>2</sup><span class="fn">sin</span><sup>2</sup>θ  e<sup>2x</sup>)</div>
+
+<p><strong>关键检验</strong>：微变权守恒 g_rr·(−g₀₀) = e^{2x}·e^{−2x} = <strong>1 精确成立</strong>——三条推导互洽，无坐标矛盾。</p>
+<blockquote>
+<p><strong>文献对接【引用】</strong>:该度规是文献中已知的"指数度规"（exponential metric），曾作为弦论/有效场论中的试探度规被研究（Edery 2005 等）。框架从公理独立导出它，且其 1PN 行为与 Schwarzschild 完全相同——这是框架与主流文献可对接的落点。</p>
+</blockquote>
+<hr />
+<h2>2 完整 PPN 参数集【推导】</h2>
+<p>将 e^{−2U}（U=Φ）按 PPN 标准形式展开：</p>
+<div class="formula">g<sub>00</sub> = -1 + 2U - 2β U<sup>2</sup> + O(U<sup>3</sup>),   g<sub>ij</sub> = δ<sub>ij</sub>(1+2γ U)</div>
+
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>框架值</th>
+<th>GR 值</th>
+<th>识别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>γ</strong></td>
+<td><strong>1</strong></td>
+<td>1</td>
+<td>e^{2U} 的 U 系数 2 = 2γ</td>
+</tr>
+<tr>
+<td><strong>β</strong></td>
+<td><strong>1</strong></td>
+<td>1</td>
+<td>e^{−2U} 的 U² 系数 −2 = −2β</td>
+</tr>
+<tr>
+<td>ξ, α₁, α₂, α₃, ζ₁–ζ₄, ζ_W</td>
+<td><strong>0</strong></td>
+<td>0</td>
+<td>度规静态、各向同性、纯对角（无 g₀ᵢ、无速度/自旋依赖）⟹ 自动为 GR 值</td>
+</tr>
+</tbody>
+</table>
+<p><strong>结论</strong>：<strong>完整 PPN 参数集与 GR 完全一致（1PN 不可区分）</strong>——γ=β=1 已由 P0/强场分叉裁决确认，本批补全其余参数全部 = 0 的论证（静态各向同性纯对角结构 ⟹ 无 Preferred-frame 效应、无 Whitehead 项、无守恒律破坏）。</p>
+<blockquote>
+<p>⚠️ <strong>【第 93 轮注（C-48）】</strong> 上句「补全其余参数全部 = 0 的<strong>论证</strong>」名不符实：依据是<strong>静态 ansatz 本身</strong>（「无 g₀ᵢ、无速度/自旋依赖」），而 <code>ξ, α₁, α₂, α₃, ζ</code> 系的定义域是<strong>运动 / 优越系</strong> —— <strong>静态 ansatz 对它们是盲区</strong>，既不能给 0、也不能给非 0。「= 0」是<strong>框架的要求</strong>（由 <strong>C-2</strong> 承担，§8.6.7(e)），<strong>不是本批所得</strong>；引用时须同时引 C-2。详见第 93 轮备忘录《PPN优越系结项》。</p>
+</blockquote>
+<hr />
+<h2>3 泰勒展开：1PN 一致、2PN/3PN 分叉点【推导+数值】</h2>
+<table>
+<thead>
+<tr>
+<th>阶</th>
+<th>框架 g₀₀ e^{−2x}</th>
+<th>GR 各向同性 g₀₀</th>
+<th>框架 g_rr e^{2x}</th>
+<th>GR 各向同性 g_rr</th>
+<th>分叉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x¹</td>
+<td>−2</td>
+<td>−2</td>
+<td>+2</td>
+<td>+2</td>
+<td><strong>无（1PN）</strong></td>
+</tr>
+<tr>
+<td>x²</td>
+<td>+2</td>
+<td>+2</td>
+<td>+2</td>
+<td>+1.5</td>
+<td>g_rr 分叉 33%（2PN）</td>
+</tr>
+<tr>
+<td>x³</td>
+<td>−4/3</td>
+<td>−3/2</td>
+<td>+4/3</td>
+<td>+0.5</td>
+<td>g₀₀ 分叉 11%（3PN）</td>
+</tr>
+<tr>
+<td>x⁴</td>
+<td>+2/3</td>
+<td>+2/3</td>
+<td>+2/3</td>
+<td>+1/16</td>
+<td>g_rr 分叉显著</td>
+</tr>
+<tr>
+<td>x⁵</td>
+<td>−4/15</td>
+<td>−1/3</td>
+<td>+4/15</td>
+<td>0</td>
+<td>g₀₀ 分叉 20%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>分叉结构</strong>：
+- <strong>1PN（x¹）</strong>：g₀₀、g_rr 全部一致 ⟹ γ=β=1（观测不可区分）；
+- <strong>2PN（x²）</strong>：g₀₀ 一致（−2U²，与 GR 2PN 相同）、<strong>g_rr 分叉 33%</strong>（2 vs 3/2）——空间曲率的第一个分叉点；
+- <strong>3PN（x³）</strong>：<strong>g₀₀ 分叉 11%</strong>（−4/3 vs −3/2）——时间分量的第一个分叉点。</p>
+<hr />
+<h2>4 数值验证：进动与偏折【数值】</h2>
+<p>测地线数值积分（RK4，GM=c=1），框架指数度规 vs 各向同性 Schwarzschild，同一设置。</p>
+<h3>4.1 近日点进动（每圈 rad）</h3>
+<table>
+<thead>
+<tr>
+<th>轨道 (r_ap, r_p)</th>
+<th>x_p</th>
+<th>框架</th>
+<th>GR</th>
+<th>1PN 理论</th>
+<th>GR−1PN（2PN 修正）</th>
+<th><strong>框架−GR</strong>（相对 1PN）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(100, 50)</td>
+<td>0.020</td>
+<td>0.2998</td>
+<td>0.2982</td>
+<td>0.2827</td>
+<td>+1.5e-2</td>
+<td><strong>+1.6e-3（0.57%）</strong></td>
+</tr>
+<tr>
+<td>(60, 30)</td>
+<td>0.033</td>
+<td>0.5209</td>
+<td>0.5161</td>
+<td>0.4712</td>
+<td>+4.5e-2</td>
+<td><strong>+4.8e-3（1.02%）</strong></td>
+</tr>
+<tr>
+<td>(40, 22)</td>
+<td>0.045</td>
+<td>0.7683</td>
+<td>0.7579</td>
+<td>0.6640</td>
+<td>+9.4e-2</td>
+<td><strong>+1.0e-2（1.55%）</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>解读</strong>：
+- GR 数值进动 = 1PN 理论 + 正的 2PN 修正（随 x_p 增大）——数值方法正确性确认；
+- <strong>框架进动比 GR 大，相对差 ~30×x_p（线性）</strong>——2PN 分叉的量化确认（框架 g_rr 2PN 系数大 → 2PN 进动修正略大）；
+- 1PN 项完全一致（观测级不可区分），2PN 分叉在 x_p~0.02–0.05 下为 0.6–1.6%（模型参数下的可分辨尺度）。</p>
+<h3>4.2 光子偏折（rad）</h3>
+<table>
+<thead>
+<tr>
+<th>b</th>
+<th>框架</th>
+<th>GR</th>
+<th>1PN (4/b)</th>
+<th>框架−GR（相对 1PN）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>20</td>
+<td>0.2190</td>
+<td>0.2161</td>
+<td>0.2000</td>
+<td>+1.4%</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0.6004</td>
+<td>0.5804</td>
+<td>0.4000</td>
+<td>+5.0%</td>
+</tr>
+<tr>
+<td>6.0</td>
+<td>1.9937</td>
+<td>1.7134</td>
+<td>0.6667</td>
+<td>+42%（强场，接近 b_min）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>解读</strong>：偏折 1PN 一致；2PN 及高阶修正框架 &gt; GR，随冲击参数减小（场增强）分叉增大——与进动方向一致的独立确认。</p>
+<hr />
+<h2>5 重大发现：光子球/阴影与 EHT 相容【数值+推导】</h2>
+<p>坐标不变最小冲击参数 b_min = √(g_φφ/|g₀₀|) 的极小值（阴影半径）：</p>
+<table>
+<thead>
+<tr>
+<th>度规</th>
+<th>光子球 r_ph</th>
+<th>阴影 b_min</th>
+<th>与 EHT（5.2±0.3）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>框架各向同性指数度规</strong></td>
+<td><strong>2.00 GM/c²</strong></td>
+<td><strong>5.436 GM/c²</strong>（=2e）</td>
+<td><strong>✓ 相容（+4.55% &lt; 5.8% 误差）</strong></td>
+</tr>
+<tr>
+<td>GR Schwarzschild</td>
+<td>3.00 GM/c²</td>
+<td>5.196 GM/c²（=3√3）</td>
+<td>✓（基准）</td>
+</tr>
+<tr>
+<td>[对比] 标准坐标版本 g_θθ=r²</td>
+<td>1.00 GM/c²</td>
+<td>2.718 GM/c²（=e）</td>
+<td>✗ 冲突（v1.14 结论）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键结论——坐标约定的裁决</strong>：
+- v1.14 的"玻尔兹曼光子球 1GM 与 EHT 冲突"源于<strong>标准坐标约定</strong>（g_θθ=r²、角向不弯曲），其阴影 2.718GM/c² 确实与 EHT 冲突；
+- 但<strong>各向同性约定（公理 1 各向同性的自然选择）下，框架阴影 5.436GM/c² 与 EHT 观测 5.2±0.3 GM/c² 相容（4.6% 偏差在 5.8% 误差内）</strong>；
+- <strong>框架强场几何从"无度规承诺（v1.14）"升级为"有与观测相容的几何预言（B3）"</strong>——无需饱和修正即与 EHT 相容，风暴过载仍是内部机制叙事。</p>
+<p><strong>附带一致性</strong>：指数度规光子球 r_ph = 2GM/c² 恰与框架视界（通量抽零面，v1.16 熵一致性 α=1 给出 r_h=2GM/c²）重合——几何侧与机制侧自洽。</p>
+<hr />
+<h2>6 观测约束对照汇总【推导】</h2>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>框架 vs GR</th>
+<th>最佳观测约束</th>
+<th>判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1PN（γ, β）</strong></td>
+<td>完全一致</td>
+<td>Cassini γ: (2.1±2.3)e-5；LLR β: ±4.4e-4</td>
+<td>✅ 通过</td>
+</tr>
+<tr>
+<td>2PN g₀₀</td>
+<td>一致</td>
+<td>双脉冲星轨道高阶（PSR J0737-3039）</td>
+<td>✅ 一致</td>
+</tr>
+<tr>
+<td>2PN g_ij</td>
+<td>分叉 33%</td>
+<td>2PN 可观测效应 ∝ U²（太阳系 ~10⁻¹⁶），当前不可分辨</td>
+<td>⚠️ 存活</td>
+</tr>
+<tr>
+<td>3PN g₀₀</td>
+<td>分叉 11%</td>
+<td>需 LISA EMRI / 脉冲星计时阵列（未来）</td>
+<td>🔭 未来可检验（<strong>提案已出（2026-08-23）</strong>：《LISA_EMRI_3PN检验提案》——2PN 进动差 δ=0.30·x_p 在 EMRI 中相位累积 10²–10³ rad、6 源全可检验）</td>
+</tr>
+<tr>
+<td>强场（阴影）</td>
+<td>+4.6%</td>
+<td>EHT 5.2±0.3 GM/c²</td>
+<td>✅ 相容</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>7 诚实标注</h2>
+<ol>
+<li><strong>坐标约定是关键假设【待验证】</strong>：各向同性坐标由公理 1 支持，但"角向弯曲 = 径向弯曲"（g_θθ=r²e^{2x}）是假设——若未来推导给出 g_θθ 的其他形式，强场预言随之改变；</li>
+<li><strong>指数度规文献关系【引用】</strong>：框架独立导出文献中已知的 exponential metric——既是优势（有文献锚点）也是警示（该度规的 2PN 偏离已被部分研究，需核对是否与既有约束冲突——本报告初步显示 2PN 可观测效应低于当前精度）；</li>
+<li><strong>强场边界【推导】</strong>：指数度规的光子球/阴影在 x~0.5 处，超出 PPN 适用域（热平衡截断 r_c=GM/c²，B2）；阴影计算是弱场度规向强场几何的解析延拓（风暴过载机制仍独立存在，两者互补而非竞争）；</li>
+<li><strong>数值误差【数值】</strong>：进动/偏折为 RK4 积分（h=0.02–0.1），2PN 差异 ~10⁻³–10⁻² rad 量级可靠；强场偏折（b=6）数值敏感，仅作定性。</li>
+</ol>
+<hr />
+<h2>8 框架意义与下一步</h2>
+<p><strong>B3 的核心贡献</strong>：
+1. 框架引力侧获得<strong>完整 PPN 参数集</strong>（γ=β=1 其余 0，1PN 不可区分）——数学严格化的又一块拼图；
+2. <strong>2PN/3PN 分叉点精确定位</strong>（g_rr 2PN、g₀₀ 3PN）+ 数值量化（进动差 ~30x_p、偏折差随场增强）——框架与 GR 的第一个可观测分叉在 2PN 空间曲率，当前观测不可分辨、LISA 时代可检验；
+3. <strong>重大修正</strong>：v1.14"强场与 EHT 冲突"→ 各向同性约定下<strong>阴影 5.436 与 EHT 相容</strong>——框架强场从"回避"升级为"有预言"；
+4. 与文献 exponential metric 对接——框架弱场度规不再孤立。</p>
+<p><strong>下一步候选</strong>：
+- <strong>A</strong>：B3 成果整合进论文 §4（PPN 完整参数集 + 指数度规识别 + 阴影相容修正 §4.6）——论文升 v1.21；
+- <strong>B</strong>：攻 B4（方向离散化，B 分支 P1 剩余项）；
+- <strong>C</strong>：LISA EMRI 3PN 相位检验提案（框架 3PN 系数的观测设计）。</p>
+<hr />
+<p><em>B3 完成 · 蓝图 B 分支进度：B6 ✅ → B1 ✅ → B2 ✅ → B2-2 ✅ → B3 ✅（8 项中 5 项闭环）</em></p>
+
+<div class="footer">B3：高阶 PPN 参数与后牛顿修正——框架度规 = 各向同性指数度规 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 B3_高阶PPN与指数度规.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

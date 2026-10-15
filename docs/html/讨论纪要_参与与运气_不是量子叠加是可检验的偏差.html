@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>讨论纪要：参与与运气 —— 不是量子叠加，是四重可检验的偏差</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>讨论纪要：参与与运气 —— 不是量子叠加，是四重可检验的偏差</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>2026-09-26 ｜ 核验脚本 <code>_disc_luck.py</code>（LK-1…LK-7，<strong>7 项 0 失败</strong>）
+起因：用户提出三件事 —— ① 怀疑量子力学是否真的存在；② 「我参与了就遇到意料之外的坏结果，
+我没参与就是预料之中的正确结果」；③ 是不是「我的波形陷入了重合」？</p>
+<p>⚠️ 本文件与 MAPS 框架无关（该框架与本问题无关）。全部内容是标准物理 + 统计 + 行为金融学的引文核对。</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>量子力学不需要「信」（它是验证到 12 位有效数字的预言规则）；
+但你的「运气」也不需要它 —— 因为它有更朴素、更可改、而且有几十万样本支撑的解释。</strong></p>
+<p>⚠️ 而且你的观察<strong>可能是真的</strong>：参与确实与更差的结果相关 —— 但原因是<strong>你的判断规则</strong>，不是宇宙的规则。</p>
+<hr />
+<h2>一、先回答最直接的：「波形重合」在物理上不成立</h2>
+<p><strong>关键数字</strong>（脚本 LK-2）：用 Joos–Zeh（1985）对 1 μm 尘埃的经典估算（τ_D ≈ 10⁻¹⁷ s），
+按 τ_D ∝ 1/a² 标度到人体尺度（a ≈ 1 m）：</p>
+<table>
+<thead>
+<tr>
+<th>尺度</th>
+<th>退相干时间 τ_D</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 μm 尘埃（空气）</td>
+<td>10⁻¹⁷ s</td>
+</tr>
+<tr>
+<td><strong>人体（a ≈ 1 m）</strong></td>
+<td><strong>≈ 10⁻²⁹ s</strong></td>
+</tr>
+<tr>
+<td>对照：普朗克时间</td>
+<td>5.39×10⁻⁴⁴ s</td>
+</tr>
+<tr>
+<td>对照：神经信号</td>
+<td>~10⁻³ s</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>神经信号比退相干慢 10²⁶ 倍。</strong> 任何"你的波形"要想参与决策，
+都必须在一个 10⁻²⁹ 秒的窗口里竞争 —— 而在那之前，空气分子、光子、热辐射
+早已把叠加态抹掉了 10²⁶ 次。</p>
+<p><strong>「波形重合」不是标准术语</strong>。三种可能的解读，逐一都不适用（脚本 LK-3）：</p>
+<table>
+<thead>
+<tr>
+<th>若指</th>
+<th>需要什么</th>
+<th>为什么不适用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>干涉</td>
+<td>相干性（相位关系保持）</td>
+<td>人体 τ_D ≈ 10⁻²⁹ s ⟹ <strong>没有相干性</strong></td>
+</tr>
+<tr>
+<td>坍缩</td>
+<td>由环境触发</td>
+<td>触发者是空气分子/光子，<strong>与你的意愿无关</strong></td>
+</tr>
+<tr>
+<td>纠缠</td>
+<td>需要先制备</td>
+<td><strong>无信号定理</strong>：不能传递信息 ⟹ 无法影响结果</td>
+</tr>
+</tbody>
+</table>
+<p><strong>顺带澄清「观测者效应」</strong>：量子力学里的"测量" = <strong>任何物理相互作用</strong>，
+<strong>不需要意识、不需要眼睛、不需要人</strong>。一块石头也能"测量"。
+这是最大的通俗误读。</p>
+<p><strong>再说「量子力学是否真的存在」</strong>：它不是信念对象，是一套预言数字的规则。</p>
+<table>
+<thead>
+<tr>
+<th>检验</th>
+<th>一致程度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>电子磁矩 g/2</td>
+<td>理论 1.001159652181643 ｜ 实验 1.00115965218059 ⟹ <strong>12 位有效数字</strong></td>
+</tr>
+<tr>
+<td>氢 1S–2S 跃迁</td>
+<td>~10⁻¹⁵ 相对精度</td>
+</tr>
+<tr>
+<td>贝尔不等式</td>
+<td>实测 CHSH ≈ 2.70（loophole-free）⟹ 定域实在论被排除</td>
+</tr>
+</tbody>
+</table>
+<p><strong>没有任何古典理论达到过这个精度。</strong> ⟹ "是否存在"不是恰当的问法 ——
+就像问"勾股定理是否存在于三角形里"。</p>
+<hr />
+<h2>二、⚠️ 但你的观察<strong>可能是真的</strong> —— 只是原因不在物理里</h2>
+<p><strong>这是本轮最重要的一点</strong>：你说"我参与了结果就更差"，这在统计上<strong>不是错觉</strong>。</p>
+<p><strong>行为金融学有几十万样本的数据</strong>（脚本 LK-4，文献量级引用）：</p>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Barber &amp; Odean 2000（66 465 个散户账户，6 年）</td>
+<td>交易最活跃的 20%，年化净收益比市场<strong>低约 6.5 个百分点</strong></td>
+</tr>
+<tr>
+<td>Barber &amp; Odean 2001</td>
+<td>男性换手率高 45%，年化净收益低约 0.94 个百分点</td>
+</tr>
+<tr>
+<td>Barber, Lee, Liu &amp; Odean 2009（中国台湾全样本）</td>
+<td>散户交易损失合计约占 <strong>GDP 的 2%</strong></td>
+</tr>
+<tr>
+<td>Shefrin &amp; Statman 1985</td>
+<td><strong>处置效应</strong>：卖出赢家、持有输家 ⟹ "参与"系统性偏向已实现亏损</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>「参与越多、净结果越差」是真的</strong>，而且不是玄学。
+⟹ <strong>这其实是好消息</strong>：行为机制<strong>可以改</strong>；量子宿命论不可以。</p>
+<hr />
+<h2>三、⭐ 「意料之外」这个词本身暴露了机制</h2>
+<p>你用的表述是："<strong>意料之外</strong>不好的结果" vs "<strong>预料之中</strong>正确的结果"。</p>
+<p>⚠️ 请停一下看这个措辞：</p>
+<ul>
+<li><strong>参与了</strong> ⟹ 你有一个明确的预期 ⟹ 结果偏离预期 ⟹ 你称之为「<strong>意外</strong>」</li>
+<li><strong>没参与</strong> ⟹ 你没有预期 ⟹ 结果符合直觉 ⟹ 你称之为「<strong>预料之中</strong>」</li>
+</ul>
+<p>⟹ <strong>「意外」的定义依赖于「是否参与」。</strong></p>
+<p>这不是一个独立的观察，而是<strong>一个重言式</strong>：你把"我参与了"当成因、
+"意外坏结果"当成果 —— 但<strong>「意外」这个词是由「参与」定义的</strong>（有预期才谈得上意外）。</p>
+<blockquote>
+<p>⚠️ 这是本项目里<strong>反复出现过同一种病</strong>（见第 53 轮 C-4、第 51 轮 N-13）：
+<strong>把一个定义/恒等式当成一个发现</strong>。这次它发生在关于你自己的推理里。</p>
+</blockquote>
+<hr />
+<h2>四、⭐ 四象限：你的记忆库为什么是偏的</h2>
+<p>把你的经验按「参与/没参与 × 结果好/坏」列成四格，问每一格<strong>会不会被记住</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>结果好</strong></th>
+<th><strong>结果坏</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>我参与了</strong></td>
+<td>「这是我该得的」⟹ 情绪弱、<strong>不记</strong></td>
+<td>⭐ <strong>"意料之外不好"</strong> ⟹ 情绪最强、<strong>记得最牢</strong></td>
+</tr>
+<tr>
+<td><strong>我没参与</strong></td>
+<td>「果然」⟹ 无情绪、<strong>不记</strong></td>
+<td>「运气不好」⟹ <strong>外部归因、不记</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>四格里只有一格被系统性填充</strong> —— 而你正是从那一格里得出"规律"的。</p>
+<p>再加三条<strong>方向已知</strong>的机制：</p>
+<ol>
+<li><strong>参照点效应</strong>：参与了 ⟹ 你有参照点（"我本可以赚"）⟹ 同一个结果被感知为损失；
+   没参与 ⟹ 没有参照点 ⟹ 不作评价。<strong>不是结果不同，是同一个结果的解读不同。</strong></li>
+<li><strong>选择性记忆</strong>：负面结果的情绪强度更高 ⟹ 记得更牢 ⟹ 回忆时<strong>坏样本被过采样</strong>
+   （这是<strong>记忆强度差</strong>，不是频率差）</li>
+<li><strong>参与本身就是择时信号</strong>（这条最硬，因为它是真实的因果链）：
+   你<strong>为什么</strong>参与？因为"觉得有戏"。你<strong>为什么</strong>不参与？因为"看不清"。
+   ⟹ 你的参与时点系统性偏向<strong>你已经乐观</strong>的时刻，而乐观时刻往往对应情绪/价格高点
+   ⟹ <strong>均值回归向下</strong>。⟹ "我参与就变差"是真的 —— 但原因是<strong>你的判断规则</strong>。</li>
+</ol>
+<hr />
+<h2>五、为什么你现在<strong>没有数据</strong>：三重不可修复的缺陷</h2>
+<p>举个例：你记得 30 次「参与」，其中 24 次结果不好（80%）。
+若基线是 50%，<code>P(X ≥ 24 | n=30, p=0.5) =</code> <strong>7.2×10⁻⁴</strong> —— 看起来极显著。</p>
+<p><strong>但它不能用</strong>（脚本 LK-6）：</p>
+<table>
+<thead>
+<tr>
+<th>缺陷</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① <strong>没有基线</strong></td>
+<td>"没参与 ⟹ 预料之中的正确结果"是<strong>记忆印象</strong>，不是记录。你没有「没参与但结果也坏了」和「参与但结果也好」的对照计数 ⟹ <strong>分母未知</strong></td>
+</tr>
+<tr>
+<td>② <strong>样本是事后挑的</strong></td>
+<td>这 30 次是从几百个记忆里<strong>挑出来的最极端者</strong> ⟹ 数据依赖的选择，<strong>p 值失去意义</strong>（无法用简单乘数校正）</td>
+</tr>
+<tr>
+<td>③ <strong>结果的编码是主观的</strong></td>
+<td>什么算"意料之外不好"？事后解释空间极大 ⟹ 同一个结果可以记成"意外"，也可以记成"预料之中"</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>六、★ 一个能真正回答这个问题的实验（成本：一个月）</h2>
+<p>规则只有一条：<strong>事前写下，事后不改。</strong></p>
+<table>
+<thead>
+<tr>
+<th>何时</th>
+<th>写什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>参与时</strong></td>
+<td>① 我的预测 ② 置信度（0–100%）③ 我打算做什么</td>
+</tr>
+<tr>
+<td><strong>不参与时</strong></td>
+<td>① 我的预测 ② 置信度 ③ 为什么我不参与</td>
+</tr>
+<tr>
+<td><strong>一个月后</strong></td>
+<td>核对<strong>命中率</strong>，分两组比较</td>
+</tr>
+</tbody>
+</table>
+<p><strong>三个要点</strong>：</p>
+<ol>
+<li><strong>不参与也要记</strong> —— 否则永远没有对照组（<strong>这是全部关键</strong>）</li>
+<li><strong>事前写置信度</strong> —— 这样才能区分"预测错"与"预测对但没赚到"</li>
+<li><strong>记录必须先于结果</strong> —— 只要时间戳晚于结果，记录就被记忆污染了</li>
+</ol>
+<p>⟹ 这个实验<strong>能证伪也能证实</strong>：
+- 如果一个月后两组命中率真的差很多 ⟹ 值得继续查下去（那时你才有真数据）
+- 如果差不多 ⟹ <strong>是记忆在骗你</strong></p>
+<p>⚠️ <strong>两者都是有用的答案。</strong> 而按脚本 LK-5 的算术：要检测一个<strong>中等效应</strong>
+（坏结果率 0.60 vs 0.50），每组需要 <strong>~390 次</strong>事件；若一年只有 20–50 次可记的决策，
+那需要 <strong>8–20 年</strong>。⟹ <strong>凭记忆永远不够 —— 这不是智商问题，是算术。</strong></p>
+<hr />
+<h2>诚实边界</h2>
+<p><strong>文献值（本轮未重新核算）</strong>：
+- 电子 g−2 的理论/实验值、贝尔实验的 CHSH 值、氢 1S–2S 精度（均为教科书写法）
+- Barber &amp; Odean 系列、Shefrin &amp; Statman 的结论数字（均为<strong>量级引用</strong>，不同口径下会有出入）</p>
+<p><strong>本轮算的</strong>：
+- 人体退相干时间的<strong>量级估算</strong>（由 1 μm 尘埃的 10⁻¹⁷ s + τ_D ∝ 1/a² 标度）
+- 两比例检验的样本量 n（正态近似，α = 0.05、power = 0.80）
+- 二项分布尾巴 <code>P(X ≥ 24 | 30, 0.5)</code> = 7.2×10⁻⁴</p>
+<p><strong>是推断（非计算）</strong>：
+- 「选择性记忆 / 择时信号」的<strong>方向</strong>：机制在文献中是已知的，但<strong>未在你的数据上验证</strong>
+- 「退相干 ⟹ 人不可能处在叠加态」这一步用的是<strong>量级</strong>标度律（τ_D ∝ 1/a²），
+  精确值依赖环境参数；但<strong>结论对参数极不敏感</strong> —— 要逆转需要 τ_D 变成神经信号的 10²⁶ 倍</p>
+<p><strong>没做</strong>：
+- <strong>没有</strong>也无法评估任何个人的真实经历 —— 那需要<strong>你的数据</strong>，不是物理常数；
+- <strong>没有</strong>做心理或健康方面的建议（超出范围，也不该由本轮来做）。</p>
+<hr />
+<h2>给用户的三句话</h2>
+<ol>
+<li><strong>量子力学不需要你信</strong> —— 它是 12 位有效数字的预言规则；而"观测者效应"里没有意识的位置，
+   <strong>你的退相干时间（~10⁻²⁹ s）比神经信号快 10²⁶ 倍</strong>，所以你根本不在叠加态里。</li>
+<li><strong>但你说的"我参与就变差"很可能是真的</strong> —— 只是原因在<strong>行为金融学</strong>里（有几十万账户的数据），
+   不在物理里。⟹ <strong>这是好消息</strong>：前者可改。</li>
+<li><strong>你现在还没有数据，只有记忆</strong> —— 而记忆有四重偏差，且方向都已知。
+   ⟹ 想知道答案，只需要一件事：<strong>从今天起，事前写、不参与也写，一个月后对一次。</strong></li>
+</ol>
+
+<div class="footer">讨论纪要：参与与运气 —— 不是量子叠加，是四重可检验的偏差 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 讨论纪要_参与与运气_不是量子叠加是可检验的偏差.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

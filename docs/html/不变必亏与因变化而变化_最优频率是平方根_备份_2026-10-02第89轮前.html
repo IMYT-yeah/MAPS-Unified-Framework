@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「不变必亏」与「因变化而变化」—— 最优频率是**平方根**，不是越高越好</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>「不变必亏」与「因变化而变化」—— 最优频率是**平方根**，不是越高越好</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>讨论纪要 2026-09-26c ｜ 脚本 <code>_adaptation_59.py</code>（AD-1…AD-10，<strong>10 项 0 失败</strong>）
+起因：用户从熵的讨论中提炼出的行动原则 ——
+「不要奢望一个<strong>恒定的操作流程</strong>能适应一切混沌的变化，而是<strong>因变化而变化</strong>；
+机器一定会故障，但<strong>经常维护</strong>就可以长久维持；投资策略也不能一成不变，
+要经常维护和改变才能持续盈利；而一个<strong>不变的投资策略长久下去就是必亏</strong> ——
+这就是我口中所说的<strong>坏运气</strong>。」</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>「不要指望恒定」是对的（有定理支撑）；但「经常改」不是它的推论</strong> ——</p>
+<p><strong>最优更新频率有一个最优点（≈ <code>1/√λ</code>，随退化率走平方根），不是越高越好</strong>；
+而且必须<strong>分两个层次</strong>：<strong>元层（策略）低频更新，执行层高频纪律</strong> ——
+<strong>这两条方向相反</strong>，混在一起说会自我矛盾（上一轮的数据就反对"经常改"）。</p>
+<p>⚠️ 另外他说对了「<strong>坏运气</strong>」的感觉，但更准的词是「<strong>模型过期</strong>」——
+因为它<strong>可以校准</strong>，所以<strong>不是宿命</strong>。</p>
+<hr />
+<h2>一、逐条判定</h2>
+<table>
+<thead>
+<tr>
+<th>他的说法</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 「恒定的流程适应不了变化」</td>
+<td>✅ 前半对，<strong>后半过强</strong></td>
+<td>NFL 定理给「<strong>无普适最优</strong>」✓；但<strong>推不出</strong>「不变必亏」</td>
+</tr>
+<tr>
+<td>② 「<strong>经常</strong>维护就能长久维持」</td>
+<td>⚠️ <strong>方向对、强度错</strong></td>
+<td>耗散结构 ✓；但最优间隔 = <code>√(2C_m/(C_fλ))</code> ⟹ <strong>存在最优点，非越勤越好</strong></td>
+</tr>
+<tr>
+<td>③ 「投资策略要<strong>经常维护和改变</strong>」</td>
+<td>❌ <strong>与上一轮矛盾</strong></td>
+<td>交易最活跃的 20% 散户净收益<strong>低 6.5 pp/年</strong> ⟹ 必须<strong>分层</strong>（§三）</td>
+</tr>
+<tr>
+<td>④ 「<strong>不变</strong>的投资策略长久必亏」</td>
+<td>❌ <strong>过强</strong></td>
+<td>稳定环境下固定策略可长期有效（指数化就是反例）</td>
+</tr>
+<tr>
+<td>⑤ 「这就是坏运气」</td>
+<td>⚠️ <strong>换个词更准</strong></td>
+<td>是「<strong>模型过期</strong>」（§五）—— 可校准，故<strong>非宿命</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、三个精确的对应物</h2>
+<h3>2.1 「没有普适最优策略」有<strong>定理</strong>（支持他的前半句）</h3>
+<p><strong>No Free Lunch 定理</strong>（Wolpert &amp; Macready 1997）：
+在<strong>所有可能的目标函数上取平均</strong>，任意两个优化算法的期望性能<strong>完全相同</strong>。</p>
+<p>⟹ <strong>不存在一个对所有问题都最优的固定算法。</strong>
+⚠️ <strong>但它的前提必须记住</strong>：「对<strong>所有问题</strong>取平均」——
+它<strong>不</strong>蕴含「对<strong>你遇到的那个</strong>问题，固定策略也差」。</p>
+<h3>2.2 「维持有序要持续输入」是<strong>物理</strong></h3>
+<p><strong>耗散结构</strong>（Prigogine）：远离平衡的<strong>有序态</strong>要维持自身，必须<strong>持续耗散</strong>
+（能量/物质/信息），否则向平衡态松弛。⟹ 他的「机器要维护」<strong>完全正确</strong>。</p>
+<h3>2.3 「改变」这一次动作<strong>本身有代价</strong></h3>
+<p>每次「因变化而变化」要完成一个<strong>不可能再省的循环</strong>：
+<strong>① 测量现状 → ② 计算新策略 → ③ 擦除旧策略</strong>
+其中 ③ 的下界是 Landauer：擦除 1 比特 ≥ <code>k_B·ln2</code> = <strong>9.57×10⁻²⁴ J/K</strong>。</p>
+<p>⟹ <strong>改变不免费。</strong> 这就直接推出下一节。</p>
+<hr />
+<h2>三、⭐ 核心修正：最优频率不是「越高越好」</h2>
+<h3>3.1 最优维护间隔（AD-4）</h3>
+<p>简化模型（线性退化 + 完全恢复）：退化率 <code>λ</code>、每次维护成本 <code>C_m</code>、一次故障成本 <code>C_f</code>。
+每 <code>t</code> 维护一次 ⟹ 单位时间成本 <code>C(t) = C_m/t + C_f·λ·t/2</code>，求极值：</p>
+<pre><code>t* = √(2·C_m / (C_f · λ))          ← 平方根，不是线性
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>λ (/月)</th>
+<th>C_m</th>
+<th>C_f</th>
+<th><strong>最优间隔 t\</strong>*</th>
+<th>每月成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.01</td>
+<td>1</td>
+<td>100</td>
+<td><strong>1.414 月</strong></td>
+<td>1.414</td>
+</tr>
+<tr>
+<td>0.01</td>
+<td>1</td>
+<td>1000</td>
+<td><strong>0.447 月</strong></td>
+<td>4.472</td>
+</tr>
+<tr>
+<td>0.05</td>
+<td>1</td>
+<td>100</td>
+<td><strong>0.632 月</strong></td>
+<td>3.162</td>
+</tr>
+<tr>
+<td>0.2</td>
+<td>1</td>
+<td>100</td>
+<td><strong>0.316 月</strong></td>
+<td>6.325</td>
+</tr>
+</tbody>
+</table>
+<p><strong>三个结论</strong>：
+1. <strong>存在最优点</strong>——维护太勤 <code>C_m/t</code> 项爆炸（维护本身的开销），太疏故障成本爆炸。
+2. ⭐ <strong><code>t* ∝ 1/√λ</code><strong>：退化快就该更勤，</strong>但是平方根关系</strong> ——
+   <strong>退化率变 4 倍，维护频率只需变 2 倍。</strong>
+3. <code>t* ∝ √(C_m/C_f)</code>：故障代价相对越大，越该勤（也走 √）。</p>
+<p>⟹ 他的「因变化而变化」<strong>方向对，但强度被高估了</strong> —— 是 <strong>√</strong>，不是正比。</p>
+<h3>3.2 探索-利用：最优「改变量」也有界（AD-5）</h3>
+<p><strong>多臂老虎机</strong>（K 臂、T 轮）：任何策略的累积遗憾下界 <code>Ω(√(K·T))</code>，
+最优算法（UCB / Thompson）达 <code>O(√(K·T·log T))</code>。</p>
+<table>
+<thead>
+<tr>
+<th>K</th>
+<th>T</th>
+<th>最优遗憾 ~√(KT)</th>
+<th>纯探索代价 ~T</th>
+<th>比值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>10²</td>
+<td>31.6</td>
+<td>100</td>
+<td>3.2</td>
+</tr>
+<tr>
+<td>10</td>
+<td>10⁴</td>
+<td>316</td>
+<td>10 000</td>
+<td><strong>31.6</strong></td>
+</tr>
+<tr>
+<td>100</td>
+<td>10⁴</td>
+<td>1000</td>
+<td>10 000</td>
+<td><strong>10.0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>最优的「探索（改变）量」随 T 只按 <code>√T</code> 增长</strong>：
+- <strong>一次都不改</strong>（纯利用）⟹ 环境变了就失效（他担心的那个）
+- <strong>一直改</strong>（纯探索）⟹ 代价 ~T，<strong>比最优差 √T 倍</strong>（T = 10⁴ 时差 <strong>100 倍</strong>）
+- ⟹ 最优 ≈ <strong>「偶尔改变」</strong>，不是「频繁改变」</p>
+<h3>3.3 框架自己就用 <strong>√t</strong>（AD-6）</h3>
+<p>论文 §4.2：「衬底构型混合（慢）：<strong><code>R_mix = l_P·√(t/t_P)</code></strong>，一个哈勃时仅 ≈ 47 μm」</p>
+<p>⟹ 框架<strong>自己</strong>用的是 <strong>√t</strong> 扩散律 —— 与 3.1 的 <code>t* ∝ 1/√λ</code>、3.2 的 <code>√(KT)</code>
+<strong>是同一个数学结构</strong>。</p>
+<p>⭐ <strong>一个跨领域的会合</strong>：「不管它，混乱按 <strong>√t</strong> 扩散」⟹
+「<strong>想跟上它，你的采样/维护量也按 √ 律安排</strong>」。
+⚠️ 诚实标注：这三个 √ 的<strong>来源不同</strong>（扩散方程 / 更新理论 / 序贯决策），<strong>不是同一个定理</strong>；
+本轮只登记这个<strong>形式上的会合</strong>，不声称深层统一。</p>
+<hr />
+<h2>四、⚠️ 与上一轮的矛盾，以及调和</h2>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>说法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>上一轮</strong>（Barber &amp; Odean 等）</td>
+<td><strong>交易越频繁，净结果越差</strong>（最活跃 20% 低 6.5 pp/年）</td>
+</tr>
+<tr>
+<td><strong>本轮</strong>（用户的提炼）</td>
+<td><strong>不变必亏，要经常改变</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>两条方向相反</strong>。调和的关键是<strong>分清层次</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>层次</th>
+<th>该不该变</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>元层（策略本身）</strong></td>
+<td><strong>低频更新</strong> ✓</td>
+<td>环境/模型会过期（§五）</td>
+</tr>
+<tr>
+<td><strong>执行层（具体动作）</strong></td>
+<td><strong>高纪律地不变</strong> ✓</td>
+<td>频繁动作 = 交易成本 + 拟合噪声</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 正确说法不是「经常改变」，而是：</p>
+<blockquote>
+<p><strong>「低频地更新策略，高频地坚持执行。」</strong> —— 两者都要，<strong>方向相反</strong>。</p>
+</blockquote>
+<p>⚠️ 他的「经常维护和改变」把两个层次混在一起了，<strong>这正是需要修正的地方</strong>。</p>
+<hr />
+<h2>五、⭐ 「熵增 = 无知」⟹ 是「世界变了」还是「你的模型过期了」？</h2>
+<p>这是本轮与框架<strong>最深的一处连接</strong>（第 43 轮的口径改写）：</p>
+<table>
+<thead>
+<tr>
+<th>如果熵增来自…</th>
+<th>那么「因变化而变化」意味着…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>世界真的在变</strong></td>
+<td>重新<strong>测量</strong>（环境是新的）</td>
+</tr>
+<tr>
+<td><strong>你的模型在过期</strong></td>
+<td>重新<strong>校准</strong>（环境没变，是你的表旧了）</td>
+</tr>
+</tbody>
+</table>
+<p>框架（第 43 轮）说：<strong>是后者</strong>——「熵增源头 = <strong>无知</strong>（系综熵）」，而非「外生真随机」；
+且这个区别在框架内<strong>不可判定</strong>（T-7 已结项）。</p>
+<p>⭐ <strong>实践含义很实在</strong>：<strong>「校准」比「重新发明」便宜得多。</strong>
+框架的启示不是「不断推倒重来」，而是「<strong>定期对表</strong>」。
+⚠️ 这是<strong>类比层面</strong>的推论（物理的「无知」≠ 个人的信息劣势），只作参考。</p>
+<hr />
+<h2>六、⚠️ 必须标出的 gap：「是 → 应该」</h2>
+<p>物理说的是<strong>条件句</strong>：「<strong>如果</strong>你想要维持有序，<strong>那么</strong>必须付出代价。」
+而「所以我<strong>应该</strong>经常维护」是<strong>规范句</strong> —— 从描述到规范这一步，<strong>物理本身不给</strong>
+（休谟问题 / is-ought gap）。</p>
+<p>⟹ 补上缺失的前提才合法：</p>
+<blockquote>
+<p>「<strong>如果你把『长期维持』当作目标</strong>，那么按 §3.1 的频率维护。」</p>
+</blockquote>
+<p>⚠️ 这不是挑剔：<strong>目标一换，结论就反了</strong>——
+若目标是「省心」或「最小总成本」，最优频率与「最大化寿命」<strong>不同</strong>。</p>
+<hr />
+<h2>七、修正后的版本</h2>
+<p><strong>原版（用户）</strong>：</p>
+<blockquote>
+<p>「不要奢望恒定的流程能适应一切变化，而要因变化而变化；不变必亏。」</p>
+</blockquote>
+<p><strong>修正版（本轮）</strong>：</p>
+<blockquote>
+<p><strong>「环境退化的时间尺度</strong>决定<strong>你该多久更新一次</strong>；
+更新太慢 ⟹ 策略失效（你说的「坏运气」）；
+更新太快 ⟹ 你在拟合噪声（上一轮的「交易越频繁越差」）。
+⚠️ 最优频率随退化率按 <strong><code>1/√λ</code></strong> 走 —— <strong>不是越勤越好</strong>。
+⭐ 两个层次要分开：<strong>元层（策略）低频更新；执行层高频纪律。</strong>
+⭐ 并且先分清是「世界变了」还是「你的表旧了」——<strong>校准通常够用</strong>。」</p>
+</blockquote>
+<hr />
+<h2>诚实边界</h2>
+<p><strong>是定理</strong>：NFL（Wolpert–Macready 1997）；多臂老虎机 regret 下界 <code>Ω(√(KT))</code>。</p>
+<p><strong>是物理</strong>：耗散结构（Prigogine）；Landauer 界。</p>
+<p><strong>是简化模型（非普适定理）</strong>：<code>t* = √(2C_m/(C_fλ))</code> 依赖<strong>三个假设</strong>
+（线性退化 + 完全恢复 + 恒定 λ）。真实的<strong>浴盆曲线</strong>（早期失效 / 随机失效 / 磨损）
+不满足 ⟹ <strong>只作量级参考</strong>，不当定理用。</p>
+<p><strong>是框架引文</strong>：§4.2 的 <code>R_mix = l_P√(t/t_P)</code>（47 μm）；第 43 轮的「熵增 = 无知」。</p>
+<p><strong>是类比（非等价）</strong>：物理的「熵 / 无知」↔ 个人的「信息劣势」<strong>不是同一个量</strong>。</p>
+<p><strong>没做</strong>：未评估任何具体的投资策略、维护计划或人生决策。</p>
+<hr />
+<h2>判决</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>四类判定</strong></td>
+<td>AD-1/AD-5 = <strong>定理引用</strong>；AD-2/AD-3 = <strong>物理</strong>；AD-4 = <strong>简化模型（量级）</strong>；AD-6/AD-9 = <strong>框架引文合流</strong>；AD-7/AD-8 = <strong>逻辑修正</strong></td>
+</tr>
+<tr>
+<td><strong>净结论</strong></td>
+<td>他的原则<strong>方向对</strong>（两部分都有支撑），但<strong>三处需修</strong>：①「经常」→ 有最优点（√律）；② 需<strong>分层</strong>（否则与上一轮矛盾）；③「必亏」过强</td>
+</tr>
+<tr>
+<td><strong>最有价值的一句</strong></td>
+<td><strong>「坏运气」更准的名字是「模型过期」—— 而它可校准，所以不是宿命</strong></td>
+</tr>
+<tr>
+<td><strong>清单</strong></td>
+<td><strong>不新增条目</strong>（一次合流 + 一次逻辑修正）；在 1.1 讨论纪要节留痕</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>下一步</h2>
+<ol>
+<li><strong>主线不变</strong>：首选项仍是 <strong>裁决 T-12</strong>（§7.4 的措辞对齐，最便宜）；
+   其次 <strong>I-14（单谱量特征能否证成结构定理）</strong>、<strong>候选池 37（工程可达性重估）</strong>。</li>
+<li><strong>可并（便宜）</strong>：把本轮的「<strong>三个 √ 的会合</strong>」（AD-6）作为一行备注并入 <strong>I-15</strong>
+   （平均轨道大小的标度律）—— 它们都是"量与时间的平方根关系"，值得放在一起看。
+   ⚠️ 但<strong>不要</strong>因此声称深层统一（AD-6 已标注：来源不同）。</li>
+</ol>
+
+<div class="footer">「不变必亏」与「因变化而变化」—— 最优频率是**平方根**，不是越高越好 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 不变必亏与因变化而变化_最优频率是平方根_备份_2026-10-02第89轮前.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

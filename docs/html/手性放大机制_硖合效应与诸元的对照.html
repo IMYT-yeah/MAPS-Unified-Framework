@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>手性放大机制：「硖合效应」与诸元的对照</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、先澄清术语：「硖合」是**人名**，而且他两天前刚得诺奖</div>
+  <h1>手性放大机制：「硖合效应」与诸元的对照</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-09 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>轮次</strong>：第 150 轮 · 2026-10-09
+<strong>输入</strong>：「注意到分子手性当中的硖合效应，或许诸元本身也是这样吧」
+<strong>判定工具</strong>：术语澄清 → 机制对照 → 与已有判否对接；核验 <code>_chiral150.py</code>（<strong>A–D 四组 12 项 0 失败</strong>）
+<strong>本轮论文改动</strong>：<strong>无</strong>（正式稿仍 99,725）</p>
+</blockquote>
+<hr />
+<h2>一、先澄清术语：「硖合」是<strong>人名</strong>，而且他两天前刚得诺奖</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>「硖合」</strong></td>
+<td><strong>硖合宪三（Kenso Soai）</strong> —— 日本化学家（<strong>不是</strong>某个"效应"的名字）</td>
+</tr>
+<tr>
+<td><strong>2026 诺贝尔化学奖</strong></td>
+<td><strong>2026-10-07</strong>（<strong>两天前</strong>）授予 <strong>Henri B. Kagan 与硖合宪三</strong></td>
+</tr>
+<tr>
+<td><strong>表彰内容</strong></td>
+<td>「发现<strong>不对称有机合成中的非线性效应与自催化现象</strong>」</td>
+</tr>
+<tr>
+<td><strong>实测放大</strong></td>
+<td>从 <strong>0.00005%</strong> 手性偏差 → <strong>99.5%</strong> 光学纯度（<strong>约 65 万倍</strong>）</td>
+</tr>
+<tr>
+<td><strong>2003「硖合反应」</strong></td>
+<td>从<strong>非手性</strong>分子出发，仅凭<strong>随机涨落</strong> ⟹ 最终 <strong>99.99%</strong> 单一手性</td>
+</tr>
+<tr>
+<td><strong>科学意义</strong></td>
+<td>为「<strong>自然界同手性起源</strong>」（氨基酸皆左旋、糖皆右旋）提供化学机制</td>
+</tr>
+</tbody>
+</table>
+<p><em>来源：新华社／环球人物 2026-10-08；澎湃／科技日报；百度百科「对映异构体」</em></p>
+<p><strong>⟹ 您说的「硖合效应」= 两件东西的组合：Kagan 的「非线性效应」 ＋ Soai 的「不对称自催化」。合起来就是「手性放大」。</strong></p>
+<hr />
+<h2>二、⭐ 机制对照：框架<strong>有「初始偏差」，没有「放大」</strong></h2>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>Soai 机制</th>
+<th>本框架</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>起点：<strong>严格对称</strong></td>
+<td>非手性反应物（50:50）</td>
+<td>✅ <strong>公理 1</strong>（正反物质对 <strong>50:50 平衡</strong>）</td>
+</tr>
+<tr>
+<td>出现<strong>微小偏差</strong></td>
+<td>随机涨落（~10⁻⁵）</td>
+<td>✅ <strong>公理 2</strong>（「每次湮灭有极小概率 <strong>ε</strong> 绑定失败」）</td>
+</tr>
+<tr>
+<td><strong>放大机制</strong></td>
+<td>✅ <strong>非线性效应 ＋ 自催化</strong>（产物催化自身）</td>
+<td>❌ <strong>论文「自催化／手性放大／同手性／反馈／正反馈／指数增长」各 0 处</strong></td>
+</tr>
+<tr>
+<td>结果：<strong>单向不对称</strong></td>
+<td>99.99% 单一手性</td>
+<td>⚠️ η ≈ 6×10⁻¹⁰，但<strong>只能拟合</strong>（<strong>N-40</strong>：η 能标不可导出）</td>
+</tr>
+</tbody>
+</table>
+<p>📌 补充证据：论文里「放大」共 <strong>4 处</strong>，<strong>全部与手性／自催化无关</strong>（EMRI 相位累积、β 敏感性、串行归一化排除）。</p>
+<p>⭐⭐ <strong>⟹ 您的类比恰好指向框架缺的那一环：「放大」。</strong></p>
+<hr />
+<h2>三、⚠️ 但有一处术语必须分开：框架的「手性」<strong>不是</strong>分子手性</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>框架的「手性」（16 处）</th>
+<th>Soai 的分子手性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>对象</td>
+<td><strong>Weyl 旋量的 chirality</strong> —— 「Clifford Cl(1,3) 的 4 = <strong>时间双向 × 手性双向</strong>」；「SU(2)_L：2 伪实 → <strong>手性</strong>」</td>
+<td><strong>左右手分子</strong>（对映体）</td>
+</tr>
+<tr>
+<td>学科</td>
+<td>粒子物理 / 凝聚态</td>
+<td>有机化学</td>
+</tr>
+<tr>
+<td>共同语言</td>
+<td><strong>镜像不可重合</strong>（群论层面）</td>
+<td>同</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 类比在「镜像不可重合」这个数学骨架上成立，但物理对象不同。</strong>（框架的「弦网无手性」被列为 N-15 判否的理由之一，也是用的粒子物理口径。）</p>
+<hr />
+<h2>四、⭐⭐ 本轮真正的收获：这个类比把<strong>两条已有判否串起来了</strong></h2>
+<table>
+<thead>
+<tr>
+<th>判否</th>
+<th>原来的理由</th>
+<th>经本轮对照后的物理图像</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>N-43</strong>（动力学·耦合层）</td>
+<td>三条结构性障碍（I-16 三层表等）</td>
+<td><strong>「放大机制」本身就是动力学</strong> ⟹ 框架没有它，与"没有动力学层"是同一件事</td>
+</tr>
+<tr>
+<td><strong>N-40</strong>（η 能标不可导出）</td>
+<td>一维简并族（任意 E* 都能拟合两锚点）</td>
+<td><strong>因为没有放大机制，只能靠「拟合能标」凑出 η</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<h3><strong>两条判否是一个事实的两个面：框架有「偏差」参数，没有「放大」动力学。</strong></h3>
+</blockquote>
+<p>📌 <strong>这是本轮最有价值的产出</strong> —— 一个<strong>外部对照物（诺奖机制）</strong>，让两条本来抽象的判否<strong>长出了物理图像</strong>。</p>
+<hr />
+<h2>五、原文一侧</h2>
+<table>
+<thead>
+<tr>
+<th>词</th>
+<th>原文</th>
+<th>论文</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>手性</strong></td>
+<td><strong>266 次 / 41 轮</strong>（第 <strong>26–65</strong> 轮集中）</td>
+<td>16 处（均为 chirality）</td>
+</tr>
+<tr>
+<td><strong>同手性</strong></td>
+<td>4 次 / 4 轮（32、42、44、192）</td>
+<td><strong>0</strong></td>
+</tr>
+<tr>
+<td><strong>自催化／手性放大／对映</strong></td>
+<td><strong>各 0</strong></td>
+<td><strong>各 0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>⟹ 「放大机制」在原文里也从未提出</strong> —— 这与 <strong>C-93</strong> 不同：C-93 是「<strong>提出过又被静默移除</strong>」，这里是「<strong>从未提出</strong>」。<strong>契机的缺失是贯穿性的。</strong></p>
+<hr />
+<h2>六、一个可判定的问题</h2>
+<blockquote>
+<p><strong>框架能否借用 Soai 机制的形式，把 ε 的初始偏差放大到 η ≈ 6×10⁻¹⁰？</strong></p>
+</blockquote>
+<ul>
+<li>若<strong>能</strong> ⟹ 需要给 ε 配一套<strong>自催化型动力学</strong>。⚠️ 而这属于<strong>新增动力学层</strong> —— 第 123 轮已判：<strong>不可从现有公理内部推出（N-43）</strong>，只能走「<strong>条件构造</strong>」（须显式新增公理级输入）；</li>
+<li>若<strong>不能</strong> ⟹ 就<strong>解释了 N-40</strong>：η 之所以只能靠拟合能标得到，正因为<strong>没有放大部分</strong>。</li>
+</ul>
+<p>⭐ <strong>两条路都指向同一个结论</strong>：<strong>这是框架已知的缺口，不是新缺口</strong> —— 但<strong>您现在有了一个具体的外部参照物</strong>（Soai 反应）来说明这个缺口长什么样。</p>
+<hr />
+<h2>七、回答</h2>
+<table>
+<thead>
+<tr>
+<th>分句</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「硖合效应」</td>
+<td><strong>术语澄清</strong>：人名（硖合宪三，2026 诺奖）；机制 = <strong>非线性效应 ＋ 不对称自催化</strong></td>
+</tr>
+<tr>
+<td>「诸元本身也是这样吧」</td>
+<td>⭐ <strong>一半成立</strong>：<strong>类比的骨架成立</strong>（严格对称 → 微小偏差 → 放大 → 单向不对称，这个<strong>结构</strong>同构）；⚠️ <strong>但框架缺「放大」这一环</strong></td>
+</tr>
+<tr>
+<td>框架的「手性」</td>
+<td>⚠️ 是 <strong>chirality</strong>，不是分子手性 —— 两者不同</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>所以：您的直觉这次不是"框架已有"，而是"框架缺什么"—— 而且缺的正是 2026 年诺奖表彰的那个环节。</strong></p>
+</blockquote>
+<hr />
+<h2>八、系列索引（第 142–150 轮）</h2>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>命题</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>142–147</td>
+<td>棋盘／八类／扩大／1+1／正负枝／反物质</td>
+<td>判否（缺<strong>中间映射</strong>）</td>
+</tr>
+<tr>
+<td>148</td>
+<td>（元任务）判否依据复核</td>
+<td><strong>C-92</strong></td>
+</tr>
+<tr>
+<td>149</td>
+<td>湮灭化空间层</td>
+<td>❌ 判否 ＋ <strong>C-93</strong>（静默移除）</td>
+</tr>
+<tr>
+<td><strong>150</strong></td>
+<td><strong>手性放大（硖合效应）</strong></td>
+<td>⭐ <strong>类比骨架成立；缺口 = 「放大机制」（＝ N-43／N-40 的共同根源）</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>核验：<code>_chiral150.py</code>，<strong>A–D 四组 12 项 0 失败</strong>；诺奖来源见 §一；本轮无论文改动（99,725 字符）。</em></p>
+
+<div class="footer">手性放大机制：「硖合效应」与诸元的对照 · 2026-10-09 · 由 _md2html_generic.py 生成 · 源文件 手性放大机制_硖合效应与诸元的对照.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Φ 的耦合强度 —— 框架给不出「第五力」的另一半</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>Φ 的耦合强度 —— 框架给不出「第五力」的另一半</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 72 轮（2026-10-02）</strong> · 核验脚本 <code>_phi_coupling_72.py</code>（<strong>PC-1 … PC-9，9 项 0 失败</strong>）
+题源：<strong>I-17 的耦合侧</strong>（第 62 轮登记、第 70 轮只做了质量侧）</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p><strong>框架对 Φ 与物质的耦合强度 <code>g</code> 给出 0 条约束</strong> —— 它是 Φ 挂的第 <strong>4 个纯输入</strong>（Λ / μ / λ / g），
+而 §6.2 的「退化检验」把 <code>g = 0</code> 当成一个特例列入 ⟹ <strong>框架自己就按自由参数处理它</strong>。
+把 §4.5b 的 <code>Φ = KK 标量模（g₅₅）</code> 当真、补上标准 KK 的耦合值（α ~ O(1)）之后，
+<strong>两个「毫米档」（193.8 μm 与 47.1 μm）落在已被桌面实验测过的 40–350 μm 区间里</strong>；
+两个「普朗克档」则<strong>既未排除也不可观测</strong>。
+⟹ <strong>四个档位没有一档能活</strong>：<strong>不是「还没算」，是「算出来也不能用」。</strong></p>
+<hr />
+<h2>二、为什么做这一轮</h2>
+<p>第 62 轮把「第五力」的两个结构化位置封死后，留下一个口子：</p>
+<blockquote>
+<p>框架把一个自旋 0 分量写成 <strong><code>Φ = KK 标量模场（g₅₅）的低能投影</code></strong>（§4.5b，第 791 行），
+那在标准 KK 里正是 <strong>radion / dilaton</strong>，<strong>公认的第五力载体</strong>。框架对 Φ 只写了一句
+「<strong>VEV 决定耦合常数与质量</strong>」，<strong>未给质量、未给耦合</strong> ⟹ 登记 <strong>I-17</strong>。</p>
+</blockquote>
+<p>第 70 轮做了<strong>质量侧</strong>（三个候选 ⟹ 力程差 31.2 个数量级），并明确写下
+「<strong>耦合强度正是 I-17 未给的另一半</strong>」。本轮做另一半。</p>
+<hr />
+<h2>三、判据与数值表</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判据</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PC-1</strong></td>
+<td>耦合侧判据词（Yukawa / 汤川 / 逆平方 / chameleon / symmetron / Vainshtein / screening …）在<strong>论文正文</strong>里的处数</td>
+<td><strong>0 处</strong>（补丁前也是 0）⟹ 首次处理</td>
+</tr>
+<tr>
+<td><strong>PC-2</strong></td>
+<td>「含 <code>gΦ</code> 记号 ＋ 等号 ＋ 另一参数」的关系式处数；势内 μ–λ 关系处数</td>
+<td><strong>0 / 0</strong> ⟹ 无互相约束</td>
+</tr>
+<tr>
+<td><strong>PC-3</strong></td>
+<td><code>λ</code> 的义项数；§8.6 符号约定是否覆盖 §6.4；<code>g</code> 是否有约定</td>
+<td><code>λ</code> <strong>三义</strong>（§5 弦网 / §6.4 Φ⁴ / 密度比已改）；约定<strong>漏 §6.4</strong>；<code>g</code> <strong>零约定</strong> ⟹ <strong>C-15</strong></td>
+</tr>
+<tr>
+<td><strong>PC-4</strong></td>
+<td>专用屏蔽机制（chameleon / symmetron / Vainshtein / galileon / dilaton）处数</td>
+<td><strong>0 处</strong> ⟹ 无「把 O(1) 耦合藏起来」的机制</td>
+</tr>
+<tr>
+<td><strong>PC-5</strong></td>
+<td>Yukawa 压制 <code>e^(−r/λ)</code>（λ = 193.8 μm）</td>
+<td>50 μm：<strong>0.773</strong>（敏感）；1 AU：<strong>10^(−3.4×10¹⁴)</strong>（失明）</td>
+</tr>
+<tr>
+<td><strong>PC-6</strong></td>
+<td>四个 Φ 质量档的力程 vs 已测区间 40–350 μm</td>
+<td>(b) <strong>193.8 μm 在带内</strong>；(c) <strong>47.1 μm 在带内</strong>；(a)(d) ~1e−35 m</td>
+</tr>
+<tr>
+<td><strong>PC-7</strong></td>
+<td>三分支判决</td>
+<td>自由输入 / 被排除 / 不可观测 ⟹ <strong>三选一全是死路</strong></td>
+</tr>
+<tr>
+<td><strong>PC-8</strong></td>
+<td>第 70 轮两个数字独立复算</td>
+<td>0.813 l_P ✓、31.2 个数量级 ✓；<strong>新查出隐含取值 g = 1</strong></td>
+</tr>
+<tr>
+<td><strong>PC-9</strong></td>
+<td>格式卫生</td>
+<td>非表格行 <code>\|</code> <strong>0 处</strong>；ASCII 引号 77 处（历史遗留）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>四、核心发现 A：耦合 <code>g</code> 是 Φ 的<strong>第 4 个纯输入</strong></h2>
+<p>Φ 一个场挂的输入：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>出处</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Λ</strong></td>
+<td>§4.5b 谱作用截断 <code>S = Tr f(D²/Λ²)</code></td>
+<td><strong>纯输入</strong>（第 70 轮已认定）</td>
+</tr>
+<tr>
+<td><strong>μ</strong></td>
+<td>§6.4 <code>V(Φ) = −½μ²Φ² + ¼λΦ⁴</code> 的质量参数</td>
+<td><strong>纯输入</strong></td>
+</tr>
+<tr>
+<td><strong>λ</strong>（§6.4）</td>
+<td>同一势的四次耦合</td>
+<td><strong>纯输入</strong></td>
+</tr>
+<tr>
+<td><strong>g</strong></td>
+<td>§6.1 钉扎项 <code>gΦψ̄ψ</code>（§6.2 场方程 <code>□Φ = V'(Φ) + gψ̄ψ</code>）</td>
+<td><strong>纯输入 ← 本轮的对象</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>判定证据（这是本轮最干净的一条）</strong>：§6.2 的「<strong>退化检验</strong>」行（第 976 行）写</p>
+<blockquote>
+<p><code>g=0、V=½m²Φ² → 自由 Dirac+标量+GR</code></p>
+</blockquote>
+<p>—— 框架<strong>自己</strong>把 <code>g = 0</code> 列为一种<strong>退化情形</strong>。若 <code>g</code> 是由框架给定的量，就没有理由把它的零值
+单列出来 ⟹ <strong>框架是按自由参数在用 <code>g</code></strong>。</p>
+<p>⚠️ 而 §4.5b 那句「<strong>VEV 决定耦合常数与质量</strong>」有两种读法，且<strong>两种都缺</strong>：</p>
+<ul>
+<li>(a) 决定<strong>规范耦合</strong>（标准 KK 的含义：<code>g₄² = g₅²/(2πR)</code>）⟹ 与钉扎 <code>g</code> 无关；</li>
+<li>(b) 决定<strong>Φ–物质耦合</strong>本身 ⟹ 那就存在一条关系，但<strong>框架没有写出这个函数形式</strong>（0 处）。</li>
+</ul>
+<hr />
+<h2>五、核心发现 B：两处<strong>未声明</strong>的符号撞车 ⟹ <strong>C-15</strong></h2>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>义项 1</th>
+<th>义项 2</th>
+<th>声明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>λ</code></strong></td>
+<td>§5 弦网耦合常数（含 <code>λ_c ≈ 0.14</code>）</td>
+<td><strong>§6.4 的 Φ⁴ 四次耦合</strong></td>
+<td>§8.6 的「符号约定（重要）」<strong>只声明 §5</strong>，<strong>未提 §6.4</strong>；且它写的「全文 26 行」现已过期（实测 <strong>44 行</strong>）</td>
+</tr>
+<tr>
+<td><strong><code>g</code></strong></td>
+<td><strong>§6.1 钉扎耦合 <code>gΦψ̄ψ</code></strong></td>
+<td><strong>§5.7 弦网几何因子 <code>J = n_G·E_P·g</code></strong></td>
+<td><strong>0 处约定</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 与<strong>陷阱 45</strong>（同一字母两个含义）同族：<strong>第六种口径病</strong>。处理方式沿用 §8.6 对 <code>λ</code> 的做法 ——
+在首次密集使用处加一行「符号约定」，<strong>不删任何内容</strong>。</p>
+<hr />
+<h2>六、核心发现 C：§4.5b 的 <code>γ=β=1</code> 对这个耦合<strong>失明</strong></h2>
+<p>一个力程 λ = 0.194 mm 的标量，其 Yukawa 因子在太阳系尺度上是</p>
+<pre><code>e^(−r/λ) |_(r = 1 AU) = 10^(−3.35×10^14)
+</code></pre>
+<p>⟹ 太阳系 PPN（以及 EMRI 的强场检验）<strong>对这个耦合完全失明</strong>。
+所以 §4.5b 的「<code>γ = β = 1</code>，其余 0」<strong>既不是约束、也不是冲突</strong> ——
+它是一个<strong>无关的</strong>声明。<strong>约束只能来自桌面实验。</strong></p>
+<hr />
+<h2>七、核心发现 D：桌面实验对照 —— 四个档位没有一档能活</h2>
+<h3>7.1 外部锚点（引力强度 Yukawa 修正的排除边界）</h3>
+<table>
+<thead>
+<tr>
+<th>年份</th>
+<th>引力强度（α = 1）Yukawa 的排除边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2001</td>
+<td>197 μm</td>
+</tr>
+<tr>
+<td>2007</td>
+<td>56 μm</td>
+</tr>
+<tr>
+<td>2013</td>
+<td>42 μm</td>
+</tr>
+<tr>
+<td><strong>2020（Eöt-Wash）</strong></td>
+<td><strong>39 μm</strong></td>
+</tr>
+<tr>
+<td><strong>2020（Tan et al., PRL 124, 051301）</strong></td>
+<td>ISL 在 <strong>λ = 48 μm</strong> 处仍为 |α| ≤ 1；并在 <strong>40–350 μm</strong> 区间给出 α 的最强上界</td>
+</tr>
+</tbody>
+</table>
+<h3>7.2 逐档对照（第 70 轮的四个质量候选 × 本轮的外部边界）</h3>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>力程 λ</th>
+<th>落在已测区间？</th>
+<th>判决（若 α = O(1)）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(a) 弦网标量扇区 <code>Δ = 0.41 J</code></td>
+<td><strong>0.813 l_P</strong></td>
+<td>✗</td>
+<td>未排除，<strong>同时也不可观测</strong></td>
+</tr>
+<tr>
+<td><strong>(b) 粗粒化 @ <code>E_c</code> = 1.0181 meV</strong></td>
+<td><strong>193.8 μm</strong></td>
+<td><strong>✓</strong></td>
+<td><strong>已被排除</strong>（λ ≥ 48 μm，两种边界都排除）</td>
+</tr>
+<tr>
+<td><strong>(c) 粗粒化 @ <code>E(R_H)</code> = 4.1894 meV</strong></td>
+<td><strong>47.1 μm</strong></td>
+<td><strong>✓（前沿）</strong></td>
+<td>落在 <strong>39–48 μm 的缝隙</strong>里 ⟹ <strong>灵敏度前沿</strong></td>
+</tr>
+<tr>
+<td>(d) 普朗克（公理 1）</td>
+<td><strong>1.000 l_P</strong></td>
+<td>✗</td>
+<td>未排除，<strong>同时也不可观测</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>7.3 三分支判决</h3>
+<table>
+<thead>
+<tr>
+<th>分支</th>
+<th>耦合</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(i) 自由输入（= 框架现状）</strong></td>
+<td><code>g</code> 是第 4 个纯输入，无任何约束</td>
+<td>Φ 的相互作用 = <strong>4 参数族（Λ, μ, λ, g）</strong> ⟹ <strong>可识别性 = 0</strong>（铁律 5）⟹ <strong>零预言力</strong></td>
+</tr>
+<tr>
+<td><strong>(ii) 取 §4.5b 的 KK 读法 ＋ 毫米档</strong></td>
+<td>耦合 = 几何固定（普适，α ~ O(1)）</td>
+<td>力程 47–194 μm ⟹ <strong>落在 40–350 μm 已测区间</strong> ⟹ <strong>已被排除</strong></td>
+</tr>
+<tr>
+<td><strong>(iii) 同上 ＋ 普朗克档</strong></td>
+<td>同上</td>
+<td>力程 0.81 l_P ⟹ 实验够不着 ⟹ <strong>等价于不可观测</strong> ⟹ 不是预言</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>八、诚实边界（七条）</h2>
+<ol>
+<li><strong>外部锚点是引文，本轮未独立复算</strong> —— 39 μm / 48 μm / 40–350 μm 三个数取自
+   Eöt-Wash 组的公开边界与 Tan et al. (2020)；引用时<strong>必须</strong>同时给文献。</li>
+<li><strong>「耦合 = 引力强度（α ~ 1/3–1）」是标准 KK 的知识，不是框架的推导</strong> ——
+   框架<strong>从未</strong>写出 α 的值。第 (ii)/(iii) 分支是「<strong>若</strong>把 KK 读法当真<strong>且若</strong>耦合是标准值」的条件结论。</li>
+<li><strong>「Φ 的质量 = 该截断能标」是第 70 轮的假设</strong>（半拟合）⟹ (b)(c) 档是<strong>条件结论</strong>。</li>
+<li>⚠️ <strong>新查出：弦网档的 <code>0.813 l_P</code> 依赖第 70 轮的隐含取值 <code>g = 1</code></strong> ——
+   因为 <code>J = n_G·E_P·g</code>，而 <code>g</code> <strong>正是本轮要审的耦合</strong> ⟹ 第 70 轮的那个力程本身<strong>是 g 的函数</strong>。
+   （不推翻其结论，但把它从「无条件」降为「<strong>条件</strong>」。）</li>
+<li><strong>屏蔽机制的「0 处」是引文清点，不是「框架证明了不存在屏蔽」</strong> ——
+   框架有 <code>V(Φ)</code>，理论上可加环境耦合项；本轮只说<strong>论文里没有</strong>这样的机制。</li>
+<li><strong>本轮没有跑任何新数值</strong>（除力程复算与 Yukawa 压制因子）——
+   结论是<strong>结构审查 ＋ 引文取证 ＋ 外部数据对照</strong>。</li>
+<li>⚠️ <strong>元文本自指的执行细则要补</strong>：本轮发现<strong>轮次块不全是 <code>&gt;</code> 引用块</strong> ——
+   第 62 轮在 §5.5 的加注是<strong>正文段</strong>（<code>&lt;strong&gt;第五力的位置（第 62 轮加注）&lt;/strong&gt;</code>），且<strong>跨两个自然段</strong>
+   （805–808 与 810–820），第二段<strong>不带任何标记</strong>。
+   ⟹ 陷阱 47/20 的掩码必须覆盖「无 <code>&gt;</code> 前缀的 <code>&lt;strong&gt;【v2.9 补充（第…</code> 段」与「</strong>跨段**轮次注」
+   （本轮实现：从标记行起标记到<strong>下一个 <code>#</code> 标题</strong>，<strong>表格行永不标记</strong>）。</li>
+</ol>
+<hr />
+<h2>九、判决</h2>
+<p><strong>四类判定</strong>：本条既非<strong>真预言</strong>也非 <strong>postdiction</strong>，而是
+<strong>结构判定 ＋ 引文取证 ＋ 外部对照</strong>（与第 68 / 70 / 71 轮同类）。</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>I-17</strong></td>
+<td><strong>结项</strong>（质量侧第 70 轮 ＋ 耦合侧第 72 轮）：Φ 的<strong>质量</strong>挂在两个纯输入、<strong>耦合</strong>是第 4 个纯输入 ⟹ <strong>该位置的状态 = 「有场、有质量档位、无耦合」</strong></td>
+</tr>
+<tr>
+<td><strong>N-28（负面）</strong></td>
+<td>把「Φ 的耦合强度」当作<strong>框架能给出的量</strong> —— 判否：框架给 0 条约束；补上最自然的假设后毫米档<strong>已被排除</strong>、普朗克档<strong>不可观测</strong></td>
+</tr>
+<tr>
+<td><strong>C-15（更正）</strong></td>
+<td>两处未声明的符号撞车（<code>λ</code> 的第三义、<code>g</code> 的两义）</td>
+</tr>
+<tr>
+<td><strong>总账</strong></td>
+<td>难题 <strong>17 → 16</strong>（I-17 移出）；负面 <strong>27 → 28</strong>；更正 <strong>14 → 15</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>⭐ 与既有结论的合流</strong>：第 61 轮（<strong>工程出口 = 0</strong>）＋ 第 62 轮（<strong>四力位无空位</strong>）＋
+本轮（<strong>耦合给不出 / 给得出也被排除</strong>）⟹ <strong>「第五力」这条线在框架内彻底关死</strong>：
+它不是「还没算」，而是「<strong>算出来也不能用</strong>」。</p>
+<hr />
+<h2>十、下一步</h2>
+<ol>
+<li><strong>I-17 已结项</strong> ⟹ 剩余只剩一条：<strong>候选池 36</strong>（S-12 平坦性与 ΛCDM 的判别点 ——
+   找不出就登记「框架不覆盖宇宙学判别」）。</li>
+<li>⚠️ <strong>两项仍不建议</strong>：① 继续挑 <code>m_Φ</code> 的质量档位（挑能标，无判别力增量）；
+   ② 继续细化「1.73 还是 2.00 l_P」（取决于补写口径，属文档工作，不改变可观测后果）。</li>
+<li>📌 <strong>可顺手做</strong>（口径卫生）：把 §8.6 那句过期的「全文 26 行」改成实测值，并把 C-15 的两条撞车
+   写进符号约定 —— <strong>本轮已在论文里补注</strong>（见 §十一）。</li>
+<li>💡 <strong>观察</strong>：第 62 轮之后，第五力这条线<strong>只剩一种可能的活法</strong> ——
+   找一个<strong>既不是 Λ/μ/λ/g 的自由输入、又能把 g 钉住</strong>的独立约束。
+   若下一轮还想碰它，<strong>唯一值得问的是</strong>：「框架里有没有<strong>第二个可观测量</strong>与 g 同台出现？」
+   （可识别性判据，铁律 5。）<strong>若没有，就不要再碰第五力了。</strong></li>
+</ol>
+<hr />
+<h2>十一、本轮论文改动（中英同步）</h2>
+<ol>
+<li><strong>§5.5</strong> 第 62 轮注之后插【第 72 轮】块（耦合侧结项 ＋ C-15 ＋ 三分支判决）。</li>
+<li><strong>§6.1 / §6.4</strong> 加口径注：<code>g</code> 是第 4 个纯输入；<code>λ</code> 在 §6.4 的义项需声明。</li>
+<li><strong>§8.6 符号约定</strong> 补一行：<code>λ</code> 的第三义（§6.4）＋ <code>g</code> 的两义，并把「全文 26 行」更正为实测值。</li>
+</ol>
+<hr />
+<h2>十二、后续更正（第 120 轮 · C-83）</h2>
+<p>⚠️ <strong>§7.3 分支表的 (ii) 行应分档读</strong>：第 120 轮以 <strong>KK radion 值 <code>α_Y = 1/3</code></strong>（BD ω = 0；β = 1/√6 ⟹ α_Y = 2β²）重判（两锚点幂律插值族，4 组端点组合）：</p>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>λ</th>
+<th>α_max(λ)</th>
+<th>判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(b)</td>
+<td>193.8 μm</td>
+<td>0.017–0.075</td>
+<td><strong>排除</strong>（余量 4–20×）</td>
+</tr>
+<tr>
+<td>(c)</td>
+<td>47.1 μm</td>
+<td>0.66–1.06</td>
+<td>⭐ <strong>存活</strong>（余量 2.0–3.2×）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 「毫米档已被排除」应读作「<strong>193.8 μm 排除 ／ 47.1 μm 存活（骑前沿）</strong>」；<strong>Φ 的第五力窗口 = λ ≲ 65–90 μm</strong>。根因：本备忘录（第 72 轮）用「α ~ O(1)」代替了 KK 的具体耦合值。详见《I17第五力窗口_2025-26约束带与47微米档的存活.md》。</p>
+
+<div class="footer">Φ 的耦合强度 —— 框架给不出「第五力」的另一半 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 Φ的耦合强度_框架给不出第五力的另一半.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

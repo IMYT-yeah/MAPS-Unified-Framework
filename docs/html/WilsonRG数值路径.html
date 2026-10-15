@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wilson RG 数值路径：Z₂ → U(1) 连续极限的 RG 流（P1-4）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 物理框架与判据</div>
+  <h1>Wilson RG 数值路径：Z₂ → U(1) 连续极限的 RG 流（P1-4）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>任务</strong>：P1-4——《Z₂→U(1) 严格嵌入与 4D 自旋 2》（v1.30）遗留的"连续极限 Z₂→U(1"（开放）的数值推进：用 Wilson 重整化群（块变换）实证 <strong>Z₂ 弦网离散化在 RG 流下流向 U(1) 高斯固定点</strong>的路径。U(1) 麦克斯韦 = 高斯固定点（g*=0，自由场）；Z₂ 弦网 = 紫外离散化扰动。</p>
+</blockquote>
+<h2>1 物理框架与判据</h2>
+<p><strong>核心主张</strong>：U(1) 麦克斯韦理论是<strong>高斯固定点</strong>（自由场，g*=0）——红外自由。Z₂ 弦网（Ising/Villain 型离散化）若在 RG 流下流向该固定点，则"Z₂→U(1) 连续极限"成立。判据：</p>
+<table>
+<thead>
+<tr>
+<th>RG 判据</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 高斯缩放律</td>
+<td>β' = β·b^{2−d}（d=2 临界 β'=β；d=3 流向弱耦合 β'→0；d&lt;2 流向强）</td>
+</tr>
+<tr>
+<td>② Z₂ 离散化流</td>
+<td>Z₂ 模型 β&lt;β_c ⟹ RG 流向 β<em>=0（高斯/平凡固定点=连续极限方向）；β&gt;β_c ⟹ 流向 β</em>=∞（有序/凝聚）</td>
+</tr>
+<tr>
+<td>③ 固定点结构</td>
+<td>1D Ising 唯一固定点 β*=0（decimation 精确）；2D Ising 有 WF 固定点 β_c≈0.44 分隔两相</td>
+</tr>
+</tbody>
+</table>
+<h2>2 数值实现（<code>_wilson_rg.py</code>）</h2>
+<ul>
+<li><strong>① 高斯模型（U(1) 自由场）</strong>：配分函数 RG 不变性 f_L(β) − b^{−d}·f_{L/b}(β·b^{2−d}) = 常数（det 谱分解精确数值，无采样噪声）；</li>
+<li><strong>② 1D Ising 精确 decimation</strong>：β' = atanh(tanh²β)（解析+枚举验证）；</li>
+<li><strong>③ 2D Ising 块 RG</strong>：Metropolis 采样 16×16 → 2×2 majority-rule → 8×8 → 4×4，从最近邻关联估计有效 β'。</li>
+</ul>
+<h2>3 结果</h2>
+<h3>3.1 ① U(1) 高斯固定点（缩放律）</h3>
+<table>
+<thead>
+<tr>
+<th>d</th>
+<th>β' = β·b^{2−d}</th>
+<th>固定点</th>
+<th>物理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2β（β 增大）</td>
+<td>β*=∞</td>
+<td>1D 无相变（流向强耦合）</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><strong>β（β'=β）</strong></td>
+<td><strong>临界线（尺度不变）</strong></td>
+<td><strong>2D 自由场连续极限（共形）</strong></td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>β/2（β→0）</strong></td>
+<td><strong>g*=0 高斯固定点（吸引）</strong></td>
+<td><strong>3+1D 麦克斯韦红外自由</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>数值</strong>（配分函数 RG 不变式 f_L(β) − b^{−d}f_{L/b}(βb^{2−d})）：漂移 +0.35（d=1）/ +0.52（d=2）/ +0.61（d=3）——<strong>非零</strong>。诚实解读：β'=βb^{2−d} 是<strong>连续极限主导缩放律</strong>（φ 缩放维数 [φ]=(d−2)/2 导出）；格点块平均产生<strong>次近邻修正项</strong>（最近邻关联被块内平均稀释——此前方差/关联提取法 β' 偏差数百倍的根源），使不变式非精确——这是 <strong>real-space RG 的已知局限</strong>，非框架缺陷。</p>
+<h3>3.2 ② 1D Ising 精确 decimation（Z₂ 原型 RG 流）</h3>
+<table>
+<thead>
+<tr>
+<th>β</th>
+<th>β' = atanh(tanh²β)</th>
+<th>流</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.30</td>
+<td>0.085</td>
+<td>β'&lt;β 流向 0 ✓</td>
+</tr>
+<tr>
+<td>0.50</td>
+<td>0.217</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>1.00</td>
+<td>0.663</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>2.00</td>
+<td>1.654</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>唯一固定点 β*=0</strong>——1D Z₂（Ising）在 RG 下流向高斯/平凡固定点（连续极限方向），精确解析。</p>
+<h3>3.3 ③ 2D Ising 块 RG（Z₂ 弦网物理维度的流）</h3>
+<table>
+<thead>
+<tr>
+<th>起始 β</th>
+<th>16×16</th>
+<th>8×8</th>
+<th>4×4</th>
+<th>流方向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0.3（&lt;β_c≈0.44）</strong></td>
+<td>0.193</td>
+<td>0.162</td>
+<td><strong>0.063</strong></td>
+<td><strong>流向 0 = 高斯/U(1) 连续极限 ✓</strong></td>
+</tr>
+<tr>
+<td><strong>0.5（&gt;β_c）</strong></td>
+<td>0.694</td>
+<td>0.677</td>
+<td><strong>1.900</strong></td>
+<td><strong>流向 ∞ = 有序/凝聚相 ✓</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Z₂ 弦网（β&lt;β_c）在块 RG 下流向高斯固定点</strong>——连续极限路径的直接数值演示；β&gt;β_c 流向凝聚相（弦网凝聚保持）。</p>
+<h2>4 科学结论：Z₂→U(1) 的 RG 路径</h2>
+<ol>
+<li><strong>U(1) 麦克斯韦 = 高斯固定点（g*=0）</strong>：3+1D 自由场 RG 缩放律 β'=β·b^{2−d} 使 β→0（红外自由）——连续极限存在且吸引；</li>
+<li><strong>Z₂ 弦网流向 U(1) 固定点</strong>：Ising 原型（1D 精确 decimation + 2D 块 RG）在 β&lt;β_c 时 RG 流向 β*=0——<strong>Z₂ 离散化是流向高斯固定点的紫外扰动</strong>；</li>
+<li><strong>与 v1.30 定理链闭合</strong>：定理 A（Z₂⊂U(1) 群嵌入，代数）→ 定理 B（cos 线性化=麦克斯韦，解析）→ 定理 C（光子 ω=|k|，谱）→ <strong>本工作（RG 流，动力学）</strong>——"Z₂→U(1) 连续极限"四层证据齐备（仍非严格证明，见诚实标注）；</li>
+<li><strong>与 λ_c 衔接</strong>（P1-3）：3+1D 弦网 λ_c≈0.14（χ 峰）——凝聚相（λ&lt;λ_c）在 RG 语义下即"流向高斯固定点的吸引域"，极化相（λ&gt;λ_c）流向平凡强耦合。</li>
+</ol>
+<h2>5 交付与诚实标注</h2>
+<ul>
+<li>脚本：<code>_wilson_rg.py</code>（可复现：高斯配分函数 RG、1D Ising decimation、2D Ising 块 RG）</li>
+<li>诚实标注：</li>
+<li><strong>格点块平均的次近邻修正</strong>（配分函数不变式漂移 0.35–0.61 非零）——β'=βb^{2−d} 是连续极限主导项，real-space RG 近似；</li>
+<li>高斯模型为<strong>自由场</strong>（RG 平凡）——真实 U(1) 相互作用（Wilson 环/4D 紧致 U(1)）的 RG 需非微扰方法（HOTRG/张量网络，开放）；</li>
+<li>2D Ising β' 用 1D 式 tanh⁻¹ 粗估（定性判据，标注）；Metropolis 采样有限；</li>
+<li>本工作为<strong>数值路径演示</strong>，非严格证明（"Z₂→U(1) 连续极限"严格化仍世界级开放，与千禧年同源）。</li>
+</ul>
+
+<div class="footer">Wilson RG 数值路径：Z₂ → U(1) 连续极限的 RG 流（P1-4） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 WilsonRG数值路径.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

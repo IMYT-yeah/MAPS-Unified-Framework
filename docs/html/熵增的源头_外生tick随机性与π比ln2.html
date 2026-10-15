@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>熵增的源头：外生 tick 随机性，与 **π/ln2 = 4.53 tick**</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、问题</div>
+  <h1>熵增的源头：外生 tick 随机性，与 **π/ln2 = 4.53 tick**</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-21（第 42 轮）
+<strong>脚本</strong>：<code>outputs/_tick_randomness.py</code>（检查项 TS-1 … TS-7，<strong>7 项 0 失败</strong>）
+<strong>一句话结论</strong>：框架一直说「底层是置换 ⟹ 无信息丢失」，但<strong>熵是从哪来的</strong>没给源头。
+本轮给出：<strong>外生 tick 随机性</strong>（每 tick 随机选轴 + 每线独立随机相位）就是一个可算的熵源 ——
+每 tick 注入 <code>h = ln3 + L² ln2</code> 纳特的<strong>无知</strong>；在哈勃球上，系综熵
+<strong>只需 π/ln2 = 4.532 tick ≈ 2.44×10⁻⁴³ s 就达到视界的 BH 熵</strong>。
+⟹ 这同时解决了第 40 轮留下的缺口：<strong>「等分账为什么能瞬时成立」有了动力学理由</strong> ——
+统计混合（~4.5 tick）与空间输运（47 μm/哈勃时）相差 ~10⁶⁰，是<strong>两件事</strong>，不矛盾。
+附带：<strong>T-7 判否</strong> —— 外生随机（H1）与内生确定（H2）在可见衬底层面<strong>经验等价、不可判别</strong>。</p>
+</blockquote>
+<hr />
+<h2>一、问题</h2>
+<p>三条既有结论之间缺一环：</p>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 21 / 39 / 40 轮</td>
+<td>tick 是<strong>双射</strong> ⟹ 状态信息严格守恒、底层零熵产生</td>
+</tr>
+<tr>
+<td>第 26 轮 / §8.6.7</td>
+<td>tick = <strong>随机选轴 + 每线独立随机相位</strong>（标为【实现选择】）</td>
+</tr>
+<tr>
+<td>第 40 轮</td>
+<td>等分 = 唯一不变测度，但<strong>动力学保持轨道</strong> ⟹ 等分只能是"结构性 / 初值"的</td>
+</tr>
+</tbody>
+</table>
+<p>缺口：<strong>如果底层不产生熵，熵从哪来？为什么等分"瞬时"成立而不需要热化？</strong></p>
+<h2>二、结果 A：外生随机性是一个可算的熵源</h2>
+<p>一次 tick 的选择数 = <strong>3 轴 × 2^(线数)</strong>，线数 = L²（L = 格点边长）。
+⟹ 每 tick 注入的<strong>无知</strong>（系综熵的增量）：</p>
+<div class="formula">h  =  <span class="fn">ln</span> 3  +  L<sup>2</sup><span class="fn">ln</span> 2   [<span class="txt">nats/tick</span>]</div>
+
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L ≈ N_c = R_c/l_P</td>
+<td>8.4918×10⁶⁰</td>
+</tr>
+<tr>
+<td>h（每 tick）</td>
+<td><strong>4.998×10¹²¹ nats</strong></td>
+</tr>
+<tr>
+<td>ḣ = h/t_P</td>
+<td><strong>9.27×10¹⁶⁴ nats/s</strong></td>
+</tr>
+<tr>
+<td>视界 BH 熵 S_BH/k_B = πN_c²</td>
+<td>2.265×10¹²² nats</td>
+</tr>
+<tr>
+<td><strong>达到 S_BH 所需</strong></td>
+<td><strong><code>S_BH/h = π/ln2 = 4.532 tick ≈ 2.44×10⁻⁴³ s</code></strong></td>
+</tr>
+</tbody>
+</table>
+<p>最后一行是<strong>解析值</strong>：<code>πN_c² / (N_c² ln2) = π/ln2</code>（ln3 项可忽略）。</p>
+<p><strong>关键</strong>：这是<strong>系综（无知）熵</strong>，不是状态熵。单个 tick 仍是双射 ⟹ <strong>状态信息严格守恒</strong>。
+「无信息丢失」（第 21 轮）与「系综熵增长」（本轮）<strong>并存</strong>：前者说状态，后者说我们的无知。</p>
+<h2>三、结果 B：解释了第 40 轮 —— 两个速率差 10⁶⁰</h2>
+<table>
+<thead>
+<tr>
+<th>速率</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>统计饱和（无知饱和）</td>
+<td>2.44×10⁻⁴³ s ≈ 4.53 tick</td>
+</tr>
+<tr>
+<td>哈勃时（空间输运走到 47 μm）</td>
+<td>4.58×10¹⁷ s</td>
+</tr>
+<tr>
+<td>两者之比</td>
+<td><strong>1.87×10⁶⁰</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>统计混合比物质输运快约 60 个数量级</strong>。第 40 轮说「等分账瞬时成立、不需要热化」，
+第 21 轮说「一个哈勃时只混合 47 μm」—— 两者<strong>不矛盾</strong>：
+一个是<strong>信息的混合</strong>（外生随机注入，极快），一个是<strong>物质的输运</strong>（扩散，极慢）。
+⟹ 第 40 轮那个"结构性"的等号，现在有了动力学理由。</p>
+<p><strong>饱和值</strong>：系综熵饱和于 <code>ln|O|</code>，而 <code>ln|O| ≤ ln C(N,N/2) ≈ 4.24×10¹⁸² nats ≫ S_BH</code>
+（约 1.9×10⁶⁰ 倍）⟹ <strong>容量不是瓶颈，速率才是</strong>；饱和后不再增长。</p>
+<h2>四、结果 C：T-7 判否（结论是否定的）</h2>
+<table>
+<thead>
+<tr>
+<th>假设</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H1</td>
+<td>tick 的轴/相位是<strong>外生真随机</strong> ⟹ 未来不是当前状态的函数</td>
+</tr>
+<tr>
+<td>H2</td>
+<td>由更底层的 DOF <strong>确定</strong>（表观随机 = 粗粒化） ⟹ 未来原则上可预测（只是不可算）</td>
+</tr>
+</tbody>
+</table>
+<p>H2 需要把 tick 选择编码进衬底自身，开销 =（tick 选择的比特数 ≈ L²）/（格点数 L³）= <strong>1/L</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>L</th>
+<th>1/L（bits/格点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8</td>
+<td>1.25×10⁻¹</td>
+</tr>
+<tr>
+<td>64</td>
+<td>1.56×10⁻²</td>
+</tr>
+<tr>
+<td>10⁶</td>
+<td>1.00×10⁻⁶</td>
+</tr>
+<tr>
+<td>8.49×10⁶⁰</td>
+<td><strong>1.18×10⁻⁶¹</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 宏观下开销 → 0，<strong>不与「0.25 纳特/l_P² 次二元」的熵密度冲突</strong>
+⟹ <strong>H1 与 H2 在可见衬底层面经验等价 ⟹ 不可判别</strong>。</p>
+<p>⟹ 「未来是否原则上可预测」在本框架内<strong>不可判定</strong>；但在<strong>现行表述（H1）</strong>下答案明确：
+<strong>不可预测</strong>（信息根本不在当前状态里，不是算不动）。</p>
+<h2>五、与上一轮讨论的关系（用户提出）</h2>
+<p>上一轮的讨论问：「预测 + 干涉 ⟹ 自指 ⟹ 第三粒子承载不确定性 ⟹ 这就是熵增？」
+本轮把熵增的<strong>源头</strong>补齐了。框架里现在有两个<strong>分开</strong>的来源：</p>
+<ol>
+<li><strong>外生 tick 随机性的注入</strong>（本轮，可算、速率极快）—— 无知增长的<strong>源头</strong>；</li>
+<li><strong>粗粒化 / 关联扩散</strong>（第 21 / 39 轮）—— 信息被搬进关联、观测者读不到的<strong>去向</strong>。</li>
+</ol>
+<p>⟹ <strong>底层无损搬运（置换）+ 外生随机注入无知 + 关联扩散使其不可访问 = 表观熵增。</strong>
+用户的「第三粒子」对应第 2 条；本轮补的是第 1 条。</p>
+<h2>六、诚实边界</h2>
+<ul>
+<li>⚠️ <code>h = ln3 + L²ln2</code> 用的是<strong>并行 + 每线独立相位</strong>这一实现；另一实现
+  （「每对独立决定是否交换」）的选择数不同 ⟹ h 不同 ⟹ <strong>可用扩散系数交叉检验</strong>（§8.6.7 已给：
+  两种实现给不同扩散系数）—— 这是把本轮结果接上观测量的入口，<strong>本轮未做拟合</strong>。</li>
+<li>⚠️ L ≈ N_c 是把哈勃球当作边长 N_c 的立方格点（粗估数量级）；几何因子（球 vs 立方、4π/3）
+  只影响 O(1) 系数，<strong>不改 π/ln2 这个解析结构</strong>（分子分母的 N_c² 同时约掉）。</li>
+<li>⚠️ H1/H2 不可判别 ⟹ <strong>不要</strong>把「未来不可预测」写成框架的<strong>已证结论</strong>，只能写成
+  「现行表述下的性质」。</li>
+<li>⚠️ 未做：把注入速率与具体可观测量（扩散系数、黑洞蒸发光度等）做定量拟合。</li>
+</ul>
+<h2>七、论文已改（中英同步，2 项 0 失败）</h2>
+<p>§8.6.7「诚实边界」表之前插入【v2.9 补充（第 42 轮）】：注入速率表、π/ln2 = 4.532 tick、
+两个速率相差 10⁶⁰、饱和上界 ln|O|、T-7 判否、与第 21 轮并存。
+备份 <code>paper/history/*_备份_2026-09-21第42轮前.md</code>。</p>
+<h2>八、工程期望（第 42 轮增量）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>问题</th>
+<th>类型</th>
+<th>框架给出什么</th>
+<th>成熟度</th>
+<th>诚判</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>I-7</strong></td>
+<td><strong>熵增的动力学源头</strong></td>
+<td>难题</td>
+<td>外生 tick 随机性每 tick 注入 ln3 + L²ln2 纳特的无知；视界 BH 熵只需 <strong>π/ln2 = 4.53 tick</strong> ⟹ 统计混合瞬时、与空间输运差 10⁶⁰</td>
+<td>★★</td>
+<td>⚠️ 数量级粗估（球 vs 立方未精算）；<strong>未接上可观测量</strong>；H1/H2 不可判别 ⟹ 「不可预测」只是现行表述的性质</td>
+</tr>
+<tr>
+<td><strong>N-4</strong></td>
+<td><strong>用可观测量判别 tick 的随机结构</strong></td>
+<td><strong>负面</strong>（部分）</td>
+<td>H1/H2 <strong>经验等价</strong>（H2 开销 1/L → 0）⟹ 这条<strong>判不了</strong>；但<strong>两种实现的 h 不同</strong> ⟹ 扩散系数仍可区分<strong>实现</strong>，只是区分不了<strong>本体</strong></td>
+<td>—</td>
+<td>✅ 排除「用熵密度判 H1/H2」；⟹ 剩余可做的是用扩散系数区分<strong>实现</strong></td>
+</tr>
+</tbody>
+</table>
+<h2>九、下一步</h2>
+<ol>
+<li><strong>把 h 接上可观测量</strong>：两种 tick 实现给不同扩散系数（§8.6.7）⟹ 用扩散系数（或与之等价的
+   输运系数）定出是哪种实现 ⟹ 间接定出 h。这是本轮结果唯一的可观测出口。</li>
+<li><strong>几何精算</strong>：把「边长 N_c 的立方」换成球（4π/3 · N_c³ 个格点、L² 换成球截面的线数），
+   看 π/ln2 是否变成别的解析常数（例如含 4π/3）—— <strong>若仍是干净常数，就是一条有意思的线索</strong>。</li>
+<li>回到主线：观测者自身的周期 τ（§4.9 N1–N4）。</li>
+</ol>
+
+<div class="footer">熵增的源头：外生 tick 随机性，与 **π/ln2 = 4.53 tick** · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 熵增的源头_外生tick随机性与π比ln2.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

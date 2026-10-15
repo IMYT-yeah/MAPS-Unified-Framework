@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P0-3：κ_c 有限尺寸标度——拓扑序→禁闭真相变定位</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 方法与数据【数值】</div>
+  <h1>P0-3：κ_c 有限尺寸标度——拓扑序→禁闭真相变定位</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">P 系列行动报告</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>⚠️ 后续修正（P0-3b，2026-08-23）</strong>：本报告的文献对照 <strong>h_c≈0.328 系 σ^z 场（Z 场/磁通凝聚）版本的值，框架 X 场版本（σ^x 场/电荷凝聚）应对标 h_xc≈0.32</strong>；且 m=0.5 判据给出的是半极化点（环面精确值 κ*≈0.20±0.01），系统性低于真相变。完整修正见《P0-3b_环面kc精确化》：真相变 <strong>κ_c≈0.25–0.32</strong>。</p>
+<p><strong>任务</strong>：蓝图 P0 最后一项——用有限尺寸标度（FSS）定位框架 X 场版本（电荷禁闭）的拓扑序→禁闭真相变点 κ_c（早期"λ_c≈0.12–0.15"是判据阈值产物，P0-1 复核撤销，改为 FSS 定位）。
+<strong>方法</strong>：复用 <code>_scale_extrap3.py</code>（正确几何 X 场版本）——多尺寸格点（2×3/2×4/3×3/3×4）κ 扫描基态，序参量 m=⟨X⟩ 交叉点（m=0.5）定位 κ*(L)，1/L 外推 κ_c(∞)。
+<strong>性质标注</strong>：【推导】= 框架内完成；【数值】= 本次数值验证；【引用】= 文献结果；【开放】= 诚实标注。</p>
+</blockquote>
+<hr />
+<h2>1 方法与数据【数值】</h2>
+<p><strong>哈密顿量</strong>（X 场版本，正确几何）：H(κ) = −ΣA_v − ΣB_p − κΣX_e——κ 增大驱动拓扑序→极化/禁闭转变。</p>
+<p><strong>序参量</strong>：m(κ,L) = Σ_e⟨X_e⟩/E（基态 X 场平均：κ=0 时 toric code 基态 m=0，κ→∞ 时 m→1）。</p>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>边数</th>
+<th>态数</th>
+<th>L=√面积</th>
+<th><strong>κ*(m=0.5)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×3</td>
+<td>7</td>
+<td>128</td>
+<td>2.449</td>
+<td><strong>0.0907</strong></td>
+</tr>
+<tr>
+<td>2×4</td>
+<td>10</td>
+<td>1024</td>
+<td>2.828</td>
+<td><strong>0.0969</strong></td>
+</tr>
+<tr>
+<td>3×3</td>
+<td>12</td>
+<td>4096</td>
+<td>3.000</td>
+<td><strong>0.1147</strong></td>
+</tr>
+<tr>
+<td>3×4</td>
+<td>17</td>
+<td>131072</td>
+<td>3.464</td>
+<td><strong>0.1300</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>κ* 随 L 单调增大</strong>（0.0907 → 0.1300）——正确的 FSS 趋势（有限尺寸交叉点向无限格点相变点靠拢）。</p>
+<p><strong>基态验证</strong>：κ=0 时所有格点 E0 精确 = −(顶点数+面数)（2×3: −8、3×3: −13、3×4: −18 ✓），m≈0（toric code 精确 ⟨X⟩=0 ✓）——基态正确性确认。</p>
+<hr />
+<h2>2 有限尺寸标度外推【数值】</h2>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>数据点</th>
+<th>κ_c(∞)</th>
+<th>vs 文献 h_c≈0.328</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一阶 1/L（4 点）</td>
+<td>全部</td>
+<td><strong>0.2255</strong></td>
+<td>−31%</td>
+</tr>
+<tr>
+<td><strong>一阶（去最小格点 2×3）</strong></td>
+<td>2×4/3×3/3×4</td>
+<td><strong>0.2707</strong></td>
+<td><strong>−17%</strong></td>
+</tr>
+<tr>
+<td>一阶（去各向异性 2×4）</td>
+<td>2×3/3×3/3×4</td>
+<td>0.2243</td>
+<td>−32%</td>
+</tr>
+<tr>
+<td>二阶 1/L+1/L²（4 点）</td>
+<td>全部</td>
+<td>0.4553</td>
+<td>+39%（过冲）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键发现</strong>：<strong>去掉最小格点 2×3（2 行格点边界效应巨大）后，外推 κ_c=0.271（偏差降至 −17%）</strong>——小格点是外推污染的主要来源；二阶外推过冲（0.455）说明 1/L² 项由小格点主导。</p>
+<p><strong>合理估计</strong>：κ_c(∞) ≈ <strong>0.23–0.27</strong>（一阶 4 点 0.226 / 去小格点 0.271 之间）。</p>
+<hr />
+<h2>3 与文献对照【引用】</h2>
+<p>toric code + 均匀横向场（Z₂ 规范，与框架 X 场版本同构）的量子相变点：<strong>h_c ≈ 0.328</strong>（文献，环面/周期边界，如 Duclos-Cianci &amp; Poulin 2013 等）。</p>
+<ul>
+<li><strong>量级一致</strong>：框架 FSS 外推 0.23–0.27 vs 文献 0.328——同为 O(0.3)，框架的拓扑序→禁闭转变与标准 Z₂ 格点规范的相变点同量级；</li>
+<li><strong>偏差 17–31%</strong> 来源（诚实标注）：① <strong>开边界 vs 周期边界</strong>——文献用环面（周期边界消除边界效应，κ* 偏高）；② <strong>格点小</strong>——最大 3×4（4×4 尝试因 1677 万态幂迭代在拓扑序相收敛慢（40 次迭代不足）而放弃）；③ <strong>m=0.5 判据</strong>在有限尺寸下偏低（X 场涨落立即增强 ⟨X⟩）。</li>
+</ul>
+<hr />
+<h2>4 结论与意义【推导】</h2>
+<p><strong>框架 X 场版本的拓扑序→禁闭真相变位于 κ_c ≈ 0.25±0.05</strong>（FSS 外推，量级与 toric code 文献一致）：</p>
+<ul>
+<li><strong>P0-1 复核的正确图像获定量支撑</strong>：有限尺寸无相变点（λ/κ&gt;0 简并立即打破）是有限格点的表现，<strong>真相变存在于无限格点极限 κ_c≈0.25</strong>——框架"禁闭=通量管线性势"的哈密顿量模型在热力学极限下确实存在禁闭转变；</li>
+<li><strong>σ_E≈2κ 的适用域</strong>：κ &lt; κ_c 为 deconfined（拓扑序）、κ &gt; κ_c 为禁闭（极化）——弦张力数值（σ_E≈2κ，κ=0.5/1.0/2.0 全部 &gt; κ_c）处于禁闭相 ✓，自洽；</li>
+<li><strong>P0 收官</strong>：P0-1（数值复核）→ P0-2（论文 v1.20）→ <strong>P0-3（κ_c FSS）</strong>——蓝图 P0 阶段全部完成。</li>
+</ul>
+<hr />
+<h2>5 诚实标注【开放】</h2>
+<ol>
+<li><strong>精确值待周期边界</strong>：κ_c 的精确值（±0.01 级）需要周期边界（环面）实现——开边界 FSS 偏差 17–31% 主要源于此；</li>
+<li><strong>更大格点待更优方法</strong>：4×4+ 格点需 MPS/DMRG（1677 万态幂迭代在拓扑序相收敛慢）；</li>
+<li><strong>判据优化</strong>：m=0.5 交叉偏保守，能隙闭合点/拐点判据可能给出更接近 κ_c 的值；</li>
+<li>文献 h_c≈0.328 的精确值依实现细节（边界、耦合约定）略有差异——对照为量级级。</li>
+</ol>
+<hr />
+<h2>6 框架意义与下一步</h2>
+<p><strong>P0-3 完成</strong>：κ_c≈0.25±0.05（拓扑序→禁闭真相变，量级与 toric code 文献一致）——P0-1 复核的"无有限尺寸相变点"图像获得热力学极限定位，框架禁闭模型的相图完整。</p>
+<p><strong>蓝图进度</strong>：<strong>P0 全部收官</strong>（P0-1 ✅ 数值复核 → P0-2 ✅ 论文 v1.20 → P0-3 ✅ κ_c FSS）；B 分支全闭环 ✅；论文 v1.21 ✅。</p>
+<p><strong>下一步候选</strong>：
+- <strong>A ✅ 已完成（v1.22）</strong>：P0-3 结果已并入论文 §5.7（κ_c≈0.25 补相图完整性）——论文初稿升级至 v1.22（摘要/§5.7/§9 预言表/§10 开放问题同步更新）；
+- <strong>B</strong>：英文翻译 v1.21 论文（arXiv 投稿准备）；
+- <strong>C</strong>：周期边界实现（环面 toric code + 磁场，κ_c 精确化）。</p>
+<hr />
+<p><em>P0-3 完成 · κ_c ≈ 0.25±0.05 · 蓝图 P0 阶段全部收官</em></p>
+
+<div class="footer">P0-3：κ_c 有限尺寸标度——拓扑序→禁闭真相变定位 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 P0-3_kc有限尺寸标度.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

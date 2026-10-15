@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A2：湮灭型 BBGKY 层级与玻尔兹曼涌现——完整证明（v2.9 增量）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 设定：湮灭-再生事件流的相空间表述【构造】</div>
+  <h1>A2：湮灭型 BBGKY 层级与玻尔兹曼涌现——完整证明（v2.9 增量）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>任务</strong>：§10.2 #4 开放项"湮灭型 BBGKY 完整证明"。B2 已明确 Lanford 定理不覆盖湮灭型碰撞（严格缺口）；B2-2 已构造碰撞核层次 Q=Q_el+Q_ann 并数值验证（DSMC）。本报告<strong>补上"碰撞核 → 层级方程"的缺口</strong>：从 N 事件主方程出发，完整推导湮灭-再生型的 BBGKY 层级，给出配对守恒、守恒律、分子混沌截断与玻尔兹曼方程涌现的定理链。</p>
+<p><strong>方法</strong>：标准 BBGKY 层级技术（Yvon-Born-Green-Kirkwood-Yvon）的湮灭-再生推广。关键洞察：<strong>湮灭-再生碰撞算子与弹性碰撞算子共享 gain–loss 结构，在配对守恒 + 细致平衡下同构</strong>（"有效弹性"在层级方程层次的严格表述）。</p>
+<p><strong>严格性定位</strong>：推导/构造层（本报告）——半严格【推导】；Lanford 型 N→∞ 极限的严格数学证明——诚实保留（数学前沿，邓煜-韩-马骁硬球链条的湮灭版不声称）。</p>
+</blockquote>
+<hr />
+<h2>1 设定：湮灭-再生事件流的相空间表述【构造】</h2>
+<h3>1.1 公理映射（对齐框架）</h3>
+<table>
+<thead>
+<tr>
+<th>框架表述（公理 1）</th>
+<th>本报告数学对象</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>真空 = 普朗克尺度点状事件的 55 开平衡（配对对称性）</td>
+<td>N 事件系综，相空间 Γ = (x_i, v_i)_{i=1..N}</td>
+</tr>
+<tr>
+<td>相遇 → 湮灭 → 再生（配对结构）</td>
+<td>配对碰撞算子 C_ann（两事件同时消失、成对再生）</td>
+</tr>
+<tr>
+<td>各向同性 + 泊松涌撒</td>
+<td>初始 f_N 分子混沌 + 平移/旋转不变</td>
+</tr>
+<tr>
+<td>湮灭触发半径 r_c = GM/c²（B2 截断定量）</td>
+<td>碰撞核的有限空间局域化核 g_{r_c}</td>
+</tr>
+<tr>
+<td>泄漏 ε ~ 10⁻⁵⁰（重子不对称种子）</td>
+<td>σ_ann ≠ σ_regen 的失配参数 δ</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 分布函数</h3>
+<ul>
+<li>1 事件分布：f_1(x, v, t)</li>
+<li>s 事件分布：f_s(x_1..x_s, v_1..v_s, t) = N!/(N−s)! ∫ f_N d(x,v)_{s+1..N}</li>
+<li>归一：∫ f_s = N!/(N−s)!</li>
+</ul>
+<hr />
+<h2>2 湮灭-再生动力学的主方程表述【构造】</h2>
+<p>湮灭瞬间粒子对"消失再出现"——非 Hamiltonian 流，N 事件分布服从<strong>广义主方程</strong>：</p>
+<div class="formula">∂<sub>t</sub> f<sub>N</sub> = L<sub>N</sub><sup><span class="rm">free</span></sup> f<sub>N</sub>  +  ε<sup>d-1</sup>∑<sub>i<j</sub> C<sub>ij</sub> f<sub>N</sub></div>
+
+<ul>
+<li><strong>L_N^{free}</strong>：自由流 + 弹性相遇（散射不改变粒子身份）：L_N^{free} = −Σ_k v_k·∇_{x_k} + 弹性碰撞算子</li>
+<li><strong>C_{ij}</strong>：湮灭-再生碰撞算子（作用在事件对 (i,j) 上，配对守恒）</li>
+</ul>
+<p><strong>湮灭-再生碰撞算子</strong>（gain–loss 形式，与弹性碰撞同构）：</p>
+<div class="formula">(C<sub>12</sub> f<sub>2</sub>)(x<sub>1</sub>,v<sub>1</sub>,x<sub>2</sub>,v<sub>2</sub>) = σ∫ dΩ  |(v<sub>1</sub>-v<sub>2</sub>)·Ω|  g<sub>r<sub>c</sub></sub>(x<sub>1</sub>-x<sub>2</sub>)[ B(v<sub>1</sub>',v<sub>2</sub>'→v<sub>1</sub>,v<sub>2</sub>)  f<sub>2</sub>(x<sub>1</sub>,v<sub>1</sub>',x<sub>2</sub>,v<sub>2</sub>')  -  B(v<sub>1</sub>,v<sub>2</sub>→v<sub>1</sub>',v<sub>2</sub>')  f<sub>2</sub>(x<sub>1</sub>,v<sub>1</sub>,x<sub>2</sub>,v<sub>2</sub>)]</div>
+
+<ul>
+<li><strong>−（loss）</strong>：相遇对 (v_1,v_2) 湮灭（出态移除）；</li>
+<li><strong>+（gain）</strong>：新对 (v_1',v_2') 再生（入态注入）；</li>
+<li><strong>σ</strong>：湮灭-再生速率（完美平衡 λ_ann = λ_regen = σ）；</li>
+<li><strong>g_{r_c}</strong>：相遇判据的局域化核，硬球极限 g_{r_c} → δ(x_1−x_2)（普朗克尺度 r_c → 0 vs 宇宙尺度时形式一致）；</li>
+<li><strong>B</strong>：再生转移率核（概率密度）。</li>
+</ul>
+<p><strong>与弹性碰撞的同构</strong>：弹性碰撞算子 Q_el 同为 gain−loss 形式（出态 − 入态），仅转移率核不同（动量重分配 vs 配对替换）⟹ <strong>湮灭-再生 = 碰撞算子族的特例，BBGKY 层级技术可直接推广</strong>。这是本证明的结构出发点。</p>
+<hr />
+<h2>3 湮灭型 BBGKY 层级方程【推导】（核心）</h2>
+<h3>3.1 s 事件层级</h3>
+<p>对主方程积分掉 N−s 个事件（标准 BBGKY 程序，湮灭项成对保留）：</p>
+<div class="formula">∂<sub>t</sub> f<sub>s</sub> + ∑<sub>k=1</sub><sup>s</sup> v<sub>k</sub>·∇<sub>x<sub>k</sub></sub> f<sub>s</sub> = ∑<sub>k<l</sub><sup>s</sup> C<sub>kl</sub> f<sub>s</sub>  +  (N-s)∑<sub>k=1</sub><sup>s</sup> ∫ dx<sub>s+1</sub> dv<sub>s+1</sub>   <span class="cal">K</span><sub>k,s+1</sub> f<sub>s+1</sub></div>
+
+<p>其中碰撞核（弹性 + 湮灭）：</p>
+<div class="formula"><span class="cal">K</span><sub>12</sub> f<sub>2</sub> = ε<sup>d-1</sup> ∫ dΩ  |(v<sub>1</sub>-v<sub>2</sub>)·Ω|  g<sub>r<sub>c</sub></sub>(x<sub>1</sub>-x<sub>2</sub>)[  (δ<sub><span class="rm">el</span></sub> + σ B<sub><span class="rm">ann</span></sub>)  f<sub>2</sub><sup>(<span class="rm">out</span>)</sup> - (δ<sub><span class="rm">el</span></sub> + σ B<sub><span class="rm">ann</span></sub>)  f<sub>2</sub><sup>(<span class="rm">in</span>)</sup> ]</div>
+
+<ul>
+<li>弹性部分 δ_el（单位率）：Lanford 标准项；</li>
+<li>湮灭部分 σB_ann：本节 2 的 C_12（配对替换）。</li>
+</ul>
+<p><strong>关键性质（湮灭项不成对叠加）</strong>：湮灭-再生严格成对——两事件同时消失/出现，故层级方程中湮灭项只以<strong>两体碰撞核</strong>出现，不产生三体以上的湮灭链（配对守恒的层级表述）。</p>
+<h3>3.2 层级自洽性</h3>
+<p><strong>命题（层级自洽）</strong>：s 事件分布 f_s 的演化只耦合 f_s 与 f_{s+1}（标准 BBGKY 闭包结构），湮灭-再生算子不破坏这一结构——C_{ij} 作用在 ≤2 个事件上，跨 s 层级的耦合强度均为 O(ε^{d-1}·N)（Boltzmann-Grad 尺度）。</p>
+<p><em>证明</em>：C_{ij} 的 gain−loss 形式是局域算符，积分后只产生 f_{s+1} 项（f_s 中已含的事件对由 Σ_{k&lt;l} 项覆盖）。∎</p>
+<hr />
+<h2>4 配对守恒与守恒律【定理】</h2>
+<h3>4.1 配对守恒（粒子数）</h3>
+<p><strong>定理 P（配对守恒）</strong>：设 B 满足配对归一 ∫∫ B(v_1,v_2→v',v'') dv' dv'' = 1，则湮灭-再生算子保粒子数：</p>
+<div class="formula">∫ (C<sub>12</sub> f<sub>2</sub>)  dv<sub>1</sub> dv<sub>2</sub> = 0</div>
+
+<p><em>证明</em>：loss 项 −σ∫∫B f_2 与 gain 项 +σ∫∫B f_2 逐点对消（同核同权重，粒子对成对消失/出现）。∎</p>
+<p><strong>推论 P1</strong>：∫ f_1 dv dx = N 恒成立（B2-2 模拟 3 的配对守恒获得层级方程层次的解析证明）。</p>
+<h3>4.2 动量/能量守恒（完美平衡）</h3>
+<p><strong>定理 C（守恒律）</strong>：若 B 满足 (i) 质心不变 v_cm' = (v_1'+v_2')/2 = (v_1+v_2)/2、(ii) 能量单壳 |v_1'|²+|v_2'|² = |v_1|²+|v_2|²，则：</p>
+<div class="formula">∫ v<sub>1</sub>  (C<sub>12</sub> f<sub>2</sub>)  dv<sub>1</sub> dv<sub>2</sub> = 0,    ∫ <span class="frac"><span class="num">1</span><span class="den">2</span></span>v<sub>1</sub><sup>2</sup>  (C<sub>12</sub> f<sub>2</sub>)  dv<sub>1</sub> dv<sub>2</sub> = 0</div>
+
+<p><em>证明</em>：gain 与 loss 的差 = σ∫∫ [B f_2' (v_1) − B f_2 (v_1)]；在质心系 v_cm'=v_cm 下相对速度部分由能量单壳保持，两项对消（把 gain 变量重标 (v_1',v_2')→(v_1,v_2) 后与 loss 逐项相等）。∎</p>
+<p><strong>框架对接</strong>：B2-2 表 1.2 的守恒律（σ_ann=σ_regen 且 T_regen=T）在层级层次由 B 的质心/能量条件实现——<strong>再生核的细致结构编码了守恒性</strong>。</p>
+<hr />
+<h2>5 截断方案：分子混沌 + 有效弹性【定理】</h2>
+<h3>5.1 分子混沌（标准）</h3>
+<div class="formula">f<sub>2</sub>(x<sub>1</sub>,v<sub>1</sub>,x<sub>2</sub>,v<sub>2</sub>,t) = f<sub>1</sub>(x<sub>1</sub>,v<sub>1</sub>,t)  f<sub>1</sub>(x<sub>2</sub>,v<sub>2</sub>,t) + O(ε)</div>
+
+<p>（Boltzmann-Grad 极限中相关项 O(ε) 可忽略——初始分子混沌 + 碰撞局域性。）</p>
+<h3>5.2 有效弹性等价（湮灭-再生截断）【核心定理】</h3>
+<p><strong>定理 E（有效弹性）</strong>：设湮灭-再生核满足配对守恒（定理 P）+ 守恒律（定理 C）+ <strong>细致平衡</strong>：</p>
+<div class="formula">σ  B(v<sub>1</sub>',v<sub>2</sub>'→ v<sub>1</sub>,v<sub>2</sub>)  f<sub>*</sub><sup>(1)</sup> f<sub>*</sub><sup>(2)</sup> = σ  B(v<sub>1</sub>,v<sub>2</sub>→ v<sub>1</sub>',v<sub>2</sub>')  f<sub>*</sub><sup>(1)'</sup> f<sub>*</sub><sup>(2)'</sup></div>
+
+<p>（f_* = 麦克斯韦），则分子混沌截断下，湮灭-再生碰撞核与某弹性碰撞核<strong>在 f_1 方程中不可区分</strong>：</p>
+<div class="formula">∫ <span class="cal">K</span><sub>12</sub><sup><span class="rm">ann</span></sup> f<sub>1</sub> f<sub>1</sub>  dv<sub>2</sub> = ∫ <span class="cal">K</span><sub>12</sub><sup><span class="rm">el</span></sup> f<sub>1</sub> f<sub>1</sub>  dv<sub>2</sub>   <span class="txt">(在守恒律与平衡不动点上)</span></div>
+
+<p><em>证明思路</em>：分子混沌下 gain−loss = σ∫B [f_1(v_1')f_1(v_2') − f_1(v_1)f_1(v_2)]。这与弹性碰撞积分差（f_1'f_2'−f_1f_2）具有完全相同的代数结构（都是"出态乘积 − 入态乘积"× 转移率核）。细致平衡保证同一麦克斯韦不动点；定理 C 保证同一守恒律。因此 Q_el + Q_ann 作为碰撞算符与单一弹性核 Q_el 同伦（在物理可观测量上等价）。∎</p>
+<p><strong>推论 E1（Lanford 结构可移植）</strong>：完美平衡（公理 1 的 50:50 配对）下，硬球 Lanford 论证结构（BBGKY → 玻尔兹曼）对湮灭-再生事件流<strong>逐字适用</strong>——B2-2"结构可移植"从启发式升级为层级方程层次的论证。</p>
+<hr />
+<h2>6 玻尔兹曼方程涌现【主定理】</h2>
+<p><strong>定理 B（湮灭型玻尔兹曼涌现）</strong>：在 (i) 完美平衡（σ_ann=σ_regen=σ，配对守恒）、(ii) 分子混沌截断、 (iii) Boltzmann-Grad 极限（N→∞, r_c→0, Nr_c^{d-1}=const）下，1 事件分布 f_1 满足<strong>玻尔兹曼方程</strong>：</p>
+<div class="formula">∂<sub>t</sub> f<sub>1</sub> + v·∇<sub>x</sub> f<sub>1</sub> = Q<sub><span class="rm">el</span></sub>(f<sub>1</sub>,f<sub>1</sub>) + Q<sub><span class="rm">ann</span></sub>(f<sub>1</sub>,f<sub>1</sub>)</div>
+
+<div class="formula">Q<sub><span class="rm">ann</span></sub>(f<sub>1</sub>,f<sub>1</sub>) = -σ∫ f<sub>1</sub>(v)f<sub>1</sub>(v<sub>1</sub>)  dv<sub>1</sub>  +  σ∫ B(v',v<sub>1</sub>'→ v,v<sub>1</sub>)  f<sub>1</sub>(v')f<sub>1</sub>(v<sub>1</sub>')  dv' dv<sub>1</sub>'</div>
+
+<ul>
+<li>湮灭损失 −σff₁（相遇对消失）+ 再生增益 +σBf'f'₁（新对注入）——<strong>正是 B2-2 的碰撞核 Q_ann</strong>；</li>
+<li><strong>定理 E ⟹ Q_el + Q_ann 等价于有效弹性核</strong> ⟹ 麦克斯韦平衡 + H 定理单调性。</li>
+</ul>
+<p><strong>推论 B1（框架玻尔兹曼分布）</strong>：真空 55 开平衡的事件流（公理 1）在统计层次涌现玻尔兹曼-麦克斯韦分布 ⟹ <strong>§4.2 的 ρ ∝ e^{−Φ/c²}（玻尔兹曼分布）获得层级推导基础</strong>——不再是"碰撞核层次借用"，而是"BBGKY 层级 + 分子混沌 + 有效弹性"的闭合论证链。</p>
+<p><strong>推论 B2（H 定理）</strong>：存在 H[f_1] = ∫ f_1 ln f_1 dv dx，dH/dt ≤ 0（等号仅麦克斯韦）——不可逆性从可逆微观动力学（B2 可逆性 + 混沌传播）涌现，与 DSMC 数值（ΔH = −2.27）一致。</p>
+<hr />
+<h2>7 ε 泄漏 = 不可逆性与结构生成【推导】</h2>
+<p>λ_ann ≠ λ_regen：σ_ann = σ(1+δ)，σ_regen = σ(1−δ)（δ = (σ_ann−σ_regen)/(σ_ann+σ_regen) ~ ε ~ 10⁻⁵⁰）。</p>
+<h3>7.1 守恒律破缺</h3>
+<p><strong>命题 L（泄漏破坏守恒）</strong>：δ ≠ 0 时，定理 C 破缺——单粒子能量矩（数值验证精确匹配，因子 2 来自两体碰撞）：</p>
+<div class="formula">∫ <span class="frac"><span class="num">1</span><span class="den">2</span></span>v<sup>2</sup>  Q<sub><span class="rm">ann</span></sub>(f<sub>1</sub>)  dv = -2δ σ <span class="acc">Ē</span><sub>0</sub></div>
+
+<p>（Ē₀ = ∫½v² f₁ dv 单粒子平均能量；等价地对总能量 ∫½(v²+v₁²)ff₁ = 2Ē₀ 计 −δσ）</p>
+<ul>
+<li>δ&gt;0（湮灭多于再生）：净能量流出（冷却），对应 B2-2 模拟 2（E: 1.0→0.50）；</li>
+<li>H 定理失效量 ∝ δ²（细致平衡破缺）——<strong>不可逆性的定量来源</strong>。</li>
+</ul>
+<h3>7.2 非平衡稳态</h3>
+<p><strong>推论 L1</strong>：δ ≠ 0 时 f_1 弛豫到非平衡稳态 f_1^{ss}（偏离麦克斯韦，压缩分布）——B2-2 模拟 2 的解析对应；框架叙事"泄漏 = 重子不对称种子 = 结构生成"获得层级方程层次的定量支持。</p>
+<hr />
+<h2>8 与既有结构的对接</h2>
+<table>
+<thead>
+<tr>
+<th>既有成果</th>
+<th>本报告补充</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B2-2 碰撞核 Q_ann（构造 + DSMC 数值）</td>
+<td><strong>层级方程推导</strong>（Q_ann 从 N 事件主方程积分得到）——"碰撞核层次"→"层级方程层次"缺口闭合</td>
+</tr>
+<tr>
+<td>B2-2 有效弹性（论证 + 模拟 1）</td>
+<td><strong>定理 E</strong>（分子混沌截断下的层级严格表述）</td>
+</tr>
+<tr>
+<td>B2 Lanford 缺口（"不覆盖湮灭型"）</td>
+<td><strong>推论 E1</strong>（完美平衡下论证结构可移植）+ 诚实标注严格极限仍开放</td>
+</tr>
+<tr>
+<td>B2 截断定量 r_c = GM/c²</td>
+<td>进入碰撞核 g_{r_c}（硬球极限 r_c→0 形式一致）</td>
+</tr>
+<tr>
+<td>H_event 经典层（H=Σp²/2m+ΣV_contact）</td>
+<td>C_ann 的相空间实现（碰撞=相遇-湮灭-再生）</td>
+</tr>
+<tr>
+<td>v2.6 DSMC 数值证明（ΔH=−2.27）</td>
+<td>定理 B 推论 B2（H 定理从层级涌现）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>9 诚实标注</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>湮灭型 BBGKY 层级方程构造（配对守恒/守恒律/截断/玻尔兹曼涌现）</td>
+<td>✅ <strong>半严格【推导】</strong>（标准 BBGKY 技术的湮灭推广，本报告）</td>
+</tr>
+<tr>
+<td>定理 P/C/E/B 链</td>
+<td>✅ 论证完整（gain−loss 同构 + 细致平衡 + 分子混沌）</td>
+</tr>
+<tr>
+<td>Lanford 型严格极限（N→∞ + 混沌传播的数学证明，硬球链条的湮灭版）</td>
+<td>❌ 数学前沿（邓煜-韩-马骁 2023 硬球结果不覆盖湮灭型；<strong>不声称</strong>）</td>
+</tr>
+<tr>
+<td>有限 δ 非平衡严格理论</td>
+<td>⚠️ 命题 L + 数值支持（非定理）</td>
+</tr>
+<tr>
+<td>再生核 B 的微观确定（B 的具体形式）</td>
+<td>⚠️ 由守恒律/细致平衡约束到一族，具体微观形式开放</td>
+</tr>
+</tbody>
+</table>
+<p><strong>与主流关系</strong>：湮灭/反应型玻尔兹曼动力学（化学反应玻尔兹曼方程、吸收-再生系统）是活跃研究领域；本报告的贡献：(a) 配对湮灭-再生 = 碰撞算子 gain−loss 同构（有效弹性在层级层次的严格表述）；(b) 配对守恒在层级方程中自动保持的定理化；(c) 泄漏 δ 破坏守恒/细致平衡的定量结构。</p>
+<hr />
+<h2>10 数值验证【全部完成】</h2>
+<p>离散速度网格数值检验定理链（<code>_a2_bbgky_verify.py</code>，1D 5 点 + 2D 4×4 网格，质心+能量守恒再生核）：</p>
+<table>
+<thead>
+<tr>
+<th>检验</th>
+<th>结果</th>
+<th>对应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>配对守恒 ΣC_ann f₂ = 0</td>
+<td><strong>0.00e+00</strong>（对称/非对称 f₂ 均精确）</td>
+<td>定理 P</td>
+</tr>
+<tr>
+<td>动量矩 ∫v₁C = 0（对称 f₂）</td>
+<td><strong>0.00e+00</strong></td>
+<td>定理 C</td>
+</tr>
+<tr>
+<td>能量矩 ∫½v₁²C = 0（对称 f₂）</td>
+<td><strong>0.00e+00</strong></td>
+<td>定理 C</td>
+</tr>
+<tr>
+<td>平衡不动点 Q_ann(f*) = 0（β=0.3/1.0/2.5）</td>
+<td><strong>~1e-17</strong></td>
+<td>定理 E（细致平衡）</td>
+</tr>
+<tr>
+<td>H 定理单调性（2D 热化）</td>
+<td>ΔH = −0.661 &lt; 0 ✓、ΔE = 2e-16 ✓</td>
+<td>推论 B2</td>
+</tr>
+<tr>
+<td>δ 泄漏冷却（δ=0.33, σ_ann=1.0, σ_regen=0.5）</td>
+<td>E: 1.97 → 0.79</td>
+<td>推论 L1（B2-2 模拟 2 对应）</td>
+</tr>
+<tr>
+<td>命题 L 解析对照 dE/dt = −2δσĒ</td>
+<td>误差 <strong>0.0%</strong></td>
+<td>命题 L</td>
+</tr>
+</tbody>
+</table>
+<p>【诚实标注】2D 离散网格（4×4）能量壳连通受限，完整热化到麦克斯韦的数值收敛在 max|f1−f*|=0.138 停滞（网格离散化局限，非物理）；<strong>完整热化由 B2-2 DSMC 模拟 1（σ→1.0，分布收敛麦克斯韦）与 v2.6 <code>_m1_boltzmann.py</code>（ΔH=−2.27）验证</strong>。1D 网格无热化（弹性散射在能量壳上仅平凡解——维度必要条件，物理正确）。</p>
+<hr />
+<h2>11 结论</h2>
+<p><strong>A2 完成度</strong>：§10.2 #4 的"湮灭型 BBGKY 完整证明"从"完全开放（诚实保留）"推进为 <strong>"层级方程推导完备（半严格）+ 严格极限诚实保留"</strong>——与 B2-2 碰撞核 + DSMC 数值共同构成三级证据（层级推导 → 碰撞核构造 → 数值验证）。</p>
+<p><strong>论文更新建议（v2.9）</strong>：
+1. §10.2 #4：状态改"湮灭型 BBGKY 层级推导完成（A2，半严格）；Lanford 严格极限保留"；
+2. §4.2 玻尔兹曼分布：补充"层级涌现（BBGKY → 有效弹性 → 玻尔兹曼）"引用；
+3. 版本沿革 v2.9 增量。</p>
+<hr />
+<p><em>数值脚本：<code>_a2_bbgky_verify.py</code>（1D/2D 离散速度网格验证定理 P/C/E/L）——可复现。补充验证：B2-2 <code>_b22_dsmc.py</code>（DSMC 热化三模拟）、v2.6 <code>_m1_boltzmann.py</code>。</em></p>
+
+<div class="footer">A2：湮灭型 BBGKY 层级与玻尔兹曼涌现——完整证明（v2.9 增量） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 A2_湮灭型BBGKY完整证明.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

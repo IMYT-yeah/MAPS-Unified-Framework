@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3+1D 弦网 λ_c 相变：凝聚相稳定性边界（P1-3）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 方法与系统</div>
+  <h1>3+1D 弦网 λ_c 相变：凝聚相稳定性边界（P1-3）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>任务</strong>：P1-3——《3+1D 弦网严格化》（v1.28）遗留的"λ&gt;0 凝聚相稳定性未严格、<strong>3+1D λ_c 未算</strong>"落地：定位 Z₂ 弦网 H(λ)=−ΣA_c−λΣX_f 从弦网凝聚相（拓扑序，λ=0）到面极化相（平凡，λ→∞）的相变点。框架语言【原文 54–55】：<strong>相变/临界点 = 通量场从湍流态冷凝成各向同性稳态</strong>——λ_c 即弦网"冷凝点"。</p>
+</blockquote>
+<h2>1 方法与系统</h2>
+<p><strong>模型</strong>：H(λ) = −Σ_c A_c − λ Σ_f X_f，A_c = 立方体 6 面 Z 乘积（闭合法则）、X_f = 面翻转。序参量 = <strong>弦网凝聚序参量 ⟨A_c⟩(λ)</strong>（λ=0 时 =1，λ→∞ →0）；磁化率 χ = −d⟨A_c⟩/dλ（峰 → λ_c）。</p>
+<p><strong>系统</strong>（线性尺寸 L = 最小方向单位数，开边界，Lanczos/精确）：</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>面数</th>
+<th>态数</th>
+<th>L</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×1×1</td>
+<td>11</td>
+<td>2,048（精确）</td>
+<td>2</td>
+</tr>
+<tr>
+<td>3×1×1</td>
+<td>16</td>
+<td>65,536</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2×2×1 板</td>
+<td>20</td>
+<td>1,048,576</td>
+<td>2</td>
+</tr>
+<tr>
+<td>4×1×1</td>
+<td>21</td>
+<td>2,097,152</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>λ 扫描：粗 [0, 2.4] 步长 0.2 + 细 [0, 0.6] 步长 0.02（4×1×1 用 [0.02, 0.34] 步长 0.04 控制时间）。</p>
+<h2>2 结果</h2>
+<h3>2.1 序参量与 χ 峰（核心结果）</h3>
+<p>⟨A_c⟩(λ) 呈光滑 S 形（1 → 0），磁化率 χ 出现<strong>宽峰</strong>。细扫定位 χ 峰：</p>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>L</th>
+<th><strong>λ_χ</strong></th>
+<th>χ_max</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×1×1</td>
+<td>2</td>
+<td><strong>0.140</strong></td>
+<td>2.275</td>
+</tr>
+<tr>
+<td>3×1×1</td>
+<td>3</td>
+<td><strong>0.140</strong></td>
+<td>2.279</td>
+</tr>
+<tr>
+<td>2×2×1</td>
+<td>2</td>
+<td><strong>0.140</strong></td>
+<td>2.283</td>
+</tr>
+<tr>
+<td>4×1×1</td>
+<td>4</td>
+<td><strong>0.140</strong></td>
+<td>2.236</td>
+</tr>
+</tbody>
+</table>
+<p><strong>四尺寸 χ 峰完全锁定在 λ_χ = 0.140</strong>（χ_max 2.24–2.28 几乎不变）。粗扫（步长 0.2）时 χ 峰被 λ=0 截断是网格伪像；细扫揭示真实峰。</p>
+<p><strong>⟹ 3+1D Z₂ 弦网凝聚→极化相变点 λ_c ≈ 0.14</strong>（小系统伪临界值）。</p>
+<h3>2.2 支撑数据</h3>
+<ul>
+<li><strong>⟨A_c⟩ 尺寸无关性强</strong>：λ=0.14 处 2×1×1 与 4×1×1 分别为 0.787 与 0.799（仅差 1.5%）；λ=0.3 处 0.495/0.500。序参量曲线几乎完全重叠。</li>
+<li><strong>Δ(λ)=E1−E0 单调增</strong>（0.2 处 0.187 → 1.0 处 1.92）：这是基态流形分裂（λ=0 基态简并 2^(n−N_c) 拓扑序简并），非物理带隙——物理带隙判定需更大系统；</li>
+<li><strong>E0 曲率（X 磁化率，比热类比）</strong>：d²E0/dλ² 在 λ=0.06 处最大（−91.5，4×1×1）——第二个序参量判据峰位更低（&lt;0.1），两判据在小系统上不完全一致（有限尺寸伪临界）。</li>
+</ul>
+<h3>2.3 与既有结果的对比（关键标定）</h3>
+<table>
+<thead>
+<tr>
+<th>系统</th>
+<th>临界耦合</th>
+<th>普适类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>3+1D Z₂ 弦网（本工作）</strong></td>
+<td><strong>λ_c ≈ 0.14</strong></td>
+<td>3D Z₂ 规范/3D Ising 候选</td>
+</tr>
+<tr>
+<td>2+1D toric code + 横向场（P0-3b 环面）</td>
+<td>κ_c ≈ 0.25–0.32</td>
+<td>2D Ising</td>
+</tr>
+<tr>
+<td>2D Ising / 3D Ising</td>
+<td>β_c = 0.441 / 0.222</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>趋势自洽</strong>：维数升高 → 临界耦合变小（2D toric code 0.25–0.32 → 3D 弦网 0.14），与 Ising β_c 从 2D(0.44) 到 3D(0.22) 减半的规律一致（更高维涨落更强、更易退凝聚）。λ_c≈0.14 与 3D Ising β_c=0.2217 <strong>同量级</strong>（对偶映射下自洽，v1.28 的 3+1D 弦网↔3D Z₂ 格点规范对偶）。</p>
+<h2>3 科学结论</h2>
+<ol>
+<li><strong>3+1D Z₂ 弦网凝聚相在 λ &lt; λ_c ≈ 0.14 稳定</strong>——v1.28 的"λ=0 凝聚严格"扩展为"λ&lt;0.14 凝聚相（数值定位）"；λ&gt;λ_c 进入极化相（⟨A_c⟩→0）；</li>
+<li><strong>框架"冷凝点"机制落地</strong>【原文 54–55】：λ_c = 弦网从"湍流（极化）态"冷凝成"各向同性（凝聚）态"的临界点——与框架对 Higgs 相变（通量场锁定稳态临界点）的翻译同构；</li>
+<li><strong>σ_E≈2κ 适用域不受威胁</strong>：框架的弦张力数值（κ=0.5/1.0/2.0，P0-1）远在 κ_c 之上——3D 侧 λ_c≈0.14 同样远低于框架使用的耦合（&gt;0.5），禁闭相自洽 ✓；</li>
+<li><strong>与 2D toric code 的统一图像</strong>：2D（0.25–0.32）与 3D（0.14）的临界耦合递减谱系，支持"维数-涨落-临界耦合"的普适关联。</li>
+</ol>
+<h2>4 交付与诚实标注</h2>
+<ul>
+<li>脚本：<code>_stringnet_lc.py</code>（粗扫+构造）、<code>_stringnet_lc_fine.py</code>（细扫）——可复现</li>
+<li>诚实标注：</li>
+<li><strong>小系统伪临界</strong>：最薄方向=1 主导有限尺寸效应 ⟹ λ_χ 尺寸无关（λ_c(∞) 可能略偏移 0.14）；热力学极限需 L×L×L 盒子（面数 ~6L³ ⟹ 2×2×2 已 48 面 2.8×10¹⁴ 态，超全空间能力，需 MPS/DMRG）；</li>
+<li>两个序参量判据（⟨A_c⟩ 磁化率峰 0.14 vs E0 曲率峰 &lt;0.1）小系统上不完全一致；</li>
+<li>Δ(λ) 为基态流形分裂（非物理带隙）；开边界（环面更严格，3D 环面超能力范围）；</li>
+<li>λ_c≈0.14 为数值估计（伪临界），非严格解析值。</li>
+</ul>
+
+<div class="footer">3+1D 弦网 λ_c 相变：凝聚相稳定性边界（P1-3） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 3+1D弦网λc相变.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

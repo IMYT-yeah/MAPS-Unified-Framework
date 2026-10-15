@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+*.zip
+_tex_bin/
+python/stormetric/build/
+python/stormetric/dist/
+python/stormetric/*.egg-info/
+verification/data/*.npy
+verification/data/*.npz
+.lake/
+*.olean
+lake-manifest.json

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>候选②判定：质子衰变的环境依赖 —— 不可算 ＋ 量级关闭（附：该议题已是 2025 主流活跃区）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>候选②判定：质子衰变的环境依赖 —— 不可算 ＋ 量级关闭（附：该议题已是 2025 主流活跃区）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-06 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 128 轮</strong> ｜ 2026-10-05 ｜ 核验 <code>_pd128.py</code>（PD-1…PD-14，补丁后 0 失败）
+主题来源：起点对话检索台账「候选重看清单 ②」（第 126 轮登记）</p>
+</blockquote>
+<h2>一、一句话结论</h2>
+<p>「强场下质子衰变率微升」<strong>判否</strong>（<strong>N-46</strong>）：① <strong>不可算</strong>（框架无「模态边界厚度 → 衰变率」的定量对象；第 14 轮的「理论上可算」属过度声明）；② <strong>量级关闭</strong>：即使采最有利的框架内定标，环境增强因子 <code>K_fw ≤ e^0.5 ≈ 1.65</code>，而唯一存活的检验窗口（2025 天体约束允许增强 <code>K_allow ≈ 1.6×10¹⁶</code>）高出 <strong>~16 个数量级</strong>——要跨过需 <code>Γ ∝ ρ^n</code>、<code>n ≈ 75–373</code> 的幂律（无机制）；③ <strong>独有性被否</strong>：「变质子寿命」已是 2025 主流活跃议题（Davoudiasl &amp; Denton, PRD 111, 035026）；④ <strong>可检验性继承</strong>：命题的一切可观测性继承自「先看到质子衰变本身」。</p>
+<h2>二、取证（对话原文）</h2>
+<ul>
+<li><strong>第 14 轮</strong>（元宝）：「质子衰变 = 夸克被通量涨落『吹』过模态边界……在强引力场附近（中子星内部），通量场被扭曲，<strong>质子衰变率可能微升</strong>。这个效应极小，但<strong>理论上可算</strong>，是一个你这套<strong>独有的预言</strong>。」</li>
+<li><strong>第 17–18 轮</strong>：以「unique prediction」清单再提（「强引力场下的微升」）。</li>
+<li>第 19 轮之后此线未再推进（对话内部零跟进；论文/清单「质子衰变 / 衰变率」各 <strong>0 处</strong>）。</li>
+</ul>
+<h2>三、外部对照（2025 文献 —— 本轮新锚定）</h2>
+<p><strong>Davoudiasl &amp; Denton, "How fast can protons decay?", Phys. Rev. D 111, 035026 (2025)</strong>（Brookhaven；arXiv:2410.19045）：</p>
+<ul>
+<li>核心结论：质子寿命<strong>可以比实验室下限短 ~15 个数量级</strong>（「近期过去的地球」或「银河系别处」），不被现有地面＋天体约束排除；</li>
+<li>探针与约束：<strong>地球铁核热量 <code>τ &gt; 2×10¹⁸ yr</code></strong>（否则地核应已熔化）、<strong>中子星 PSR J2144−3933（最冷脉冲星）<code>τ &gt; 1.5×10¹⁸ yr</code></strong>（否则热异常）、CMB 关联 <code>τ &gt; 2×10¹⁷ yr</code>、天然气碳同位素 ~10¹⁹ yr；</li>
+<li>信号 = <strong>新的长程力</strong>；提案：「古探测器」（月球橄榄石、碳同位素等）。</li>
+</ul>
+<p>⟹ 两个后果：<strong>(a)</strong> 第 14 轮「你这套独有的预言」不成立——该议题已是主流活跃区（「独有性主张被文献稀释」最新一例，继第 119 轮 <code>2511.13471</code>、第 120 轮「2025–26 约束带」之后）；<strong>(b)</strong> 更要紧的是：<strong>框架的 O(1) 效应远在该文献约束体系的灵敏度之下</strong>（见 §四）。</p>
+<h2>四、判定依据（数字表，本轮核心）</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SK 实验室下限</td>
+<td><code>τ &gt; 2.4×10³⁴ yr</code>（p→e⁺π⁰，90% CL）</td>
+<td>450 kton·yr 暴露，零事件（PRD 111 引）</td>
+</tr>
+<tr>
+<td>天体允许窗口</td>
+<td><code>K_allow ≈ 1.6×10¹⁶</code></td>
+<td>SK 下限 ÷ 中子星约束（2.4×10³⁴ / 1.5×10¹⁸）</td>
+</tr>
+<tr>
+<td>框架最有利增强</td>
+<td><code>K_fw ≤ e^{0.5} ≈ 1.65</code></td>
+<td>Γ ∝ ρ_pair、ρ ∝ e^{−Φ/c²}（§4.2）；中子星致密度 C = GM/Rc² ∈ [0.1, 0.5]</td>
+</tr>
+<tr>
+<td><strong>缺口</strong></td>
+<td><strong>≈ 9.7×10¹⁵（约 16 个数量级）</strong></td>
+<td>K_allow / K_fw</td>
+</tr>
+<tr>
+<td>跨过窗口所需</td>
+<td><code>Γ ∝ ρ^n</code>，<strong>n ≈ 75–373</strong></td>
+<td>ln(1.6×10¹⁶)/C；<strong>无机制</strong></td>
+</tr>
+</tbody>
+</table>
+<p>补充：地球环境 <code>Φ/c² ~ 10⁻⁹</code>（K−1 ~ 10⁻⁹）、宇宙学历史变化 ≲10⁻⁵——「时间变化」版本同样被 O(1) 封死。</p>
+<h2>五、附带登记</h2>
+<ul>
+<li>第 17–18 轮的三条「钩子」去向核查：<strong>EHT 通量耗竭</strong> → 已入体系（§4.6 阴影/过载链，v1.21）；<strong>w 跑动</strong> → 已入（§8.4，<code>w = −1 + 4ε/3</code>）；<strong>质子衰变微升</strong> → 本轮判否。</li>
+<li>与 <strong>N-44</strong> 同构：文献约束框架在，<strong>框架没有可挂接的对象</strong>（不可入表）。</li>
+</ul>
+<h2>六、诚实边界</h2>
+<ul>
+<li>不动论文（论文/清单「质子衰变」0 处）；零新增参数；</li>
+<li>不判「变质子寿命」文献本身的正确性——只判框架原命题与其关系；</li>
+<li>⚠️ <code>K_fw</code> 的「最有利定标」（Γ ∝ ρ_pair）是<strong>假设的线性耦合</strong>——框架对「衰变率如何依赖通量密度」没有给出任何形式；该假设已是本轮对框架最宽容的读法。</li>
+<li><strong>失效条件</strong>：框架给出「夸克–轻子模态边界」的算子级定义、且允许强幂律增强（新公理级输入）。</li>
+</ul>
+<h2>七、判决与下一步</h2>
+<ul>
+<li><strong>候选② 处置：已判否（N-46）</strong>——从「候选重看清单」划去。</li>
+<li>剩余候选：③ 纠缠保真度 ∝ 物质分布 ｜ ④ 三态 P/N/B ｜ ⑤ 1/3 债务谱系 ｜ ⑥ 希尔伯特第六问题补强（已在清单 ★）。</li>
+</ul>
+
+<div class="footer">候选②判定：质子衰变的环境依赖 —— 不可算 ＋ 量级关闭（附：该议题已是 2025 主流活跃区） · 2026-10-06 · 由 _md2html_generic.py 生成 · 源文件 候选2判定_质子衰变的环境依赖_不可算与量级关闭_备份_2026-10-05第129轮前.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

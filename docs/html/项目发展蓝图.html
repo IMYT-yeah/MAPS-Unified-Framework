@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>项目发展蓝图：正反物质对风暴统一框架——整合、权重、分层与收尾</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">0 全局概览（先读这一节）</div>
+  <h1>项目发展蓝图：正反物质对风暴统一框架——整合、权重、分层与收尾</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>文档定位</strong>：对 2026-08-20 至 08-23 全部工作（113 份交付文件 + 论文初稿 v1.19）的系统性重构。
+<strong>目的</strong>：终止"树枝膨胀"——把分散的 40+ 分支讨论归并为统一主干，确立优先级与分层结构，识别核心难点与必答问题，给出可执行的收尾清单。
+<strong>更新</strong>：2026-08-23</p>
+</blockquote>
+<hr />
+<h2>0 全局概览（先读这一节）</h2>
+<h3>0.1 项目一句话</h3>
+<blockquote>
+<p>以"正反物质对风暴"为唯一底层机制（四条公理），为四种基本力统一构建<strong>涌现式统计力学框架</strong>——引力 = 通量场的统计力学涌现（已完成从公理到方程级的论证链），规范结构 = 量子双代数的涌现（已完成哈密顿量级证明），目标是达到可投 arXiv / 期刊的形式条件。</p>
+</blockquote>
+<h3>0.2 资产盘点（已完成量）</h3>
+<table>
+<thead>
+<tr>
+<th>资产类型</th>
+<th>数量</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>深挖报告（批 01–07）</td>
+<td>7 份</td>
+<td>✅ 完成（1693 页原文全开采）</td>
+</tr>
+<tr>
+<td>理论推演/框架构建</td>
+<td>2 套（MD+HTML）</td>
+<td>✅ 完成</td>
+</tr>
+<tr>
+<td>任务执行报告（P0–P3）</td>
+<td>8 份</td>
+<td>✅ 完成（路线图 P0–P3 收官）</td>
+</tr>
+<tr>
+<td>微观推导攻坚</td>
+<td>8 份（k/全息/热平衡/四遗留/饱和等）</td>
+<td>✅ 完成（含强场六部曲）</td>
+</tr>
+<tr>
+<td>YM 等价系列</td>
+<td>12 份（纲领/推进/σβ/阶段 A-C/ε/端点/热力学）</td>
+<td>⚠️ 完成主体，3 项数值待复核</td>
+</tr>
+<tr>
+<td>论文初稿</td>
+<td>v1.19（MD+HTML）</td>
+<td>⚠️ 需整合至 v1.20+</td>
+</tr>
+<tr>
+<td>数值脚本</td>
+<td>12 个（_p0/_p1b/_p2a/_p3/_scale_extrap3 等）</td>
+<td>✅ 保留可复现</td>
+</tr>
+</tbody>
+</table>
+<h3>0.3 三层架构总表（全文骨架）</h3>
+<pre><code>一级分支（5 个主干）── 权重 ── 二级分支（细分模块）── 三级分支（具体任务）
+├─ A 理论主干整合 ─── 25% ── A1 引力侧（✅闭环）· A2 宇宙学侧（⚠️半闭环）· A3 量子侧（✅闭环）
+│                          · A4 论文整合（进行中）
+├─ B 数学严格化 ──── 30% ── B1 非阿贝尔涌现 · B2 统计→几何 · B3 高阶PPN · B4 两维时间卷曲
+│                          · B5 涨落动力学 · B6 为什么n=3 · B7 J/K耦合 · B8 弦网严格化
+├─ C 规范侧（YM）─── 20% ── C1 哈密顿量（✅）· C2 ε项转变（⚠️复核）· C3 端点势/热力学极限（✅v2）
+│                          · C4 κ_c精扫 · C5 数值复核 · C6 5×4 MPS · C7 弦断裂模拟
+├─ D 实验预言 ───── 15% ── D1 void-CPT-κ（最强）· D2 强场B/S · D3 w(z) · D4 SU(3)β · D5 ln2因子
+└─ E 发表工程 ───── 10% ── E1 英文翻译 · E2 参考文献 · E3 arXiv流程 · E4 LaTeX骨架
+</code></pre>
+<p><strong>权重依据</strong>：B（数学严格化）权重最高，因为<strong>剩余未解决项几乎全部集中于数学化短板</strong>（非阿贝尔、统计→几何、n=3 等），是框架从"启发式"升级为"可检验理论"的唯一路径；A（整合）次之，因为论文是最终载体，不整合则成果无法沉淀；C（YM 侧）是当前进行中最活跃、用户投入最大的方向；D（预言）保证框架可证伪性（立身之本）；E（发表）是形式门槛但内容依赖前四项。</p>
+<hr />
+<h2>1 一级分支 A：理论主干整合（权重 25%）</h2>
+<h3>A1 引力侧闭环（✅ 已完成，维持即可）</h3>
+<table>
+<thead>
+<tr>
+<th>三级分支</th>
+<th>状态</th>
+<th>关键成果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1.1 弱场 PPN 判决</td>
+<td>✅</td>
+<td>γ=1（微变权守恒定理）、β=1（玻尔兹曼路径）双通过</td>
+</tr>
+<tr>
+<td>A1.2 熵论证链</td>
+<td>✅</td>
+<td>k=2^{1/4} 通量管相干块 + packing 定理包（定理 1–6）+ 全息集中 + 热平衡六定理</td>
+</tr>
+<tr>
+<td>A1.3 强场定位</td>
+<td>✅</td>
+<td>七环机制 + α=1（熵一致性 + M²/A 普朗克临界双重来源）+ 过载区流体</td>
+</tr>
+<tr>
+<td>A1.4 方向离散化动力学</td>
+<td>❌ 开放</td>
+<td>连续 S² → 有限方向簇的动力学（§4.10 假设，需补）</td>
+</tr>
+</tbody>
+</table>
+<h3>A2 宇宙学侧（⚠️ 半闭环）</h3>
+<table>
+<thead>
+<tr>
+<th>三级分支</th>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A2.1 ε_A/ε_B 分工</td>
+<td>✅</td>
+<td>事件级概率（重子不对称+暗能量）vs 系综级稀释（暗物质）</td>
+</tr>
+<tr>
+<td>A2.2 暗物质机制统一</td>
+<td>⚠️</td>
+<td>三候选（镜像支投影 / 真空刷新 / ε_B 统计残余）未完全统一；f_space 定量待定</td>
+</tr>
+<tr>
+<td>A2.3 w(z) 参数化</td>
+<td>✅</td>
+<td>w=−1+4ε/3，DESI 可检验；E_c=1.01 meV 截断</td>
+</tr>
+</tbody>
+</table>
+<h3>A3 量子侧（✅ 闭环）</h3>
+<table>
+<thead>
+<tr>
+<th>三级分支</th>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A3.1 非交换化</td>
+<td>✅</td>
+<td>CHSH=−2√2 数值验证，'t Hooft 式定位</td>
+</tr>
+<tr>
+<td>A3.2 互补性</td>
+<td>✅</td>
+<td>V²+I²≤1 闭环</td>
+</tr>
+</tbody>
+</table>
+<h3>A4 论文整合（⚠️ 进行中，最高优先级之一）</h3>
+<ul>
+<li><strong>现状</strong>：论文初稿 v1.19（§4 引力侧完整 + §5.6–5.8 规范侧三段式）</li>
+<li><strong>待做</strong>：v1.20 整合 ε 项 + 端点势 + 热力学极限 v2 三份 YM 成果进 §5.7；同步 §9 预言表、§10 开放问题、摘要、版本注记</li>
+</ul>
+<hr />
+<h2>2 一级分支 B：数学严格化（权重 30% —— 核心难点集中地）</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>三级分支</th>
+<th>状态</th>
+<th>难度</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td>非阿贝尔完全涌现（SU(2)×SU(3) 含质量隙、手性）</td>
+<td>❌</td>
+<td>★★★★★</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>统计→几何严格化（遍历性从框架推出、混沌传播适用性、截断定量）</td>
+<td>⚠️ 65%</td>
+<td>★★★★</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>B3</td>
+<td>更高阶 PPN（2PN/3PN，双脉冲星可检验）</td>
+<td>❌</td>
+<td>★★★</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>B4</td>
+<td>两维时间卷曲动力学</td>
+<td>⚠️ 部分</td>
+<td>★★★★</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>B5</td>
+<td>"涨落不可避免"动力学证明</td>
+<td>❌</td>
+<td>★★★</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>B6</td>
+<td>为什么 n=3（规范侧 A6，无 Tammes 式唯一性定理）</td>
+<td>❌</td>
+<td>★★★★★</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>B7</td>
+<td>J/K 耦合强度来源（哈密顿量微观推导）</td>
+<td>❌</td>
+<td>★★★★</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>B8</td>
+<td>3+1D 弦网严格化（含 4D YM 质量隙 = 千禧年，不声称）</td>
+<td>❌</td>
+<td>★★★★★</td>
+<td>P3</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>3 一级分支 C：规范侧 YM（权重 20% —— 当前最活跃）</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>三级分支</th>
+<th>状态</th>
+<th>下一步</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C1</td>
+<td>框架哈密顿量 H_F=−JΣA_v−KΣB_p</td>
+<td>✅</td>
+<td>环面简并 |G|²、能隙 Δ=1 数值验证</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>ε 项禁闭转变</td>
+<td>⚠️</td>
+<td><strong>数值需按修正几何复核</strong>（相变点 λ_c≈0.12–0.15 可能漂移）</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>端点势 + 热力学极限</td>
+<td>✅ v2</td>
+<td>σ_E≈2κ 三尺寸收敛 &lt;0.02%（修正后确认）</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>相变区 κ_c 精扫</td>
+<td>❌ 新</td>
+<td>修正几何下定位临界点，对照文献 h_c≈0.328</td>
+</tr>
+<tr>
+<td>C5</td>
+<td>数值复核（端点势/ε 项）</td>
+<td>❌ 新</td>
+<td>用 <code>_scale_extrap3.py</code> 正确几何重跑，替换旧数值</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>5×4 格点（MPS/DMRG）</td>
+<td>❌ 新</td>
+<td>31 边 21.5 亿态，numpy 不可行，需稀疏方法</td>
+</tr>
+<tr>
+<td>C7</td>
+<td>弦断裂动力学模拟</td>
+<td>❌ 新</td>
+<td>σL 达阈值 → 新对产生（实现原文 1252）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>4 一级分支 D：实验预言（权重 15% —— 框架可证伪性的立身之本）</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>三级分支</th>
+<th>观测窗口</th>
+<th>强度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td><strong>void-CPT-κ 异常</strong>（空洞弱透镜偏强 + 质量-光脱耦，10–30 Mpc/h）</td>
+<td>DESI/Euclid/LSST</td>
+<td>★★★★★ 最强</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>强场预言包 B1–B5 + S1–S5（极端 Kerr 角分布、火墙弥散、QNM α 约束）</td>
+<td>EHT/LIGO/ET/CE/原初黑洞</td>
+<td>★★★★</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>暗能量 w=−1+4ε/3 常数偏离</td>
+<td>DESI DR2</td>
+<td>★★★★</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>SU(3) β 函数阶梯跳跃 + 第四代费米子</td>
+<td>FCC-hh/LHAASO</td>
+<td>★★★</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>纠缠熵面积律 ln 2 因子（RT 公式不含）</td>
+<td>量子模拟</td>
+<td>★★★</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>5 一级分支 E：发表工程（权重 10%）</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>三级分支</th>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>英文翻译 v1.19+</td>
+<td>❌</td>
+<td>全英文硬门槛（2026-02-11 起 arXiv 要求）</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>参考文献/撞车清单</td>
+<td>⚠️</td>
+<td>原对话 125 页清单需全部正式引用（虚构文献=封禁）</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>arXiv 投稿流程</td>
+<td>⚠️</td>
+<td>endorsement 新规（2026-01-21 全站推荐制）、AI 零容忍（2026-05）</td>
+</tr>
+<tr>
+<td>E4</td>
+<td>LaTeX 骨架</td>
+<td>❌</td>
+<td>扁平 tarball + main.tex + .bbl</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6 核心难点（6 项，按挑战性排序）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>难点</th>
+<th>构成挑战的原因</th>
+<th>潜在解决思路</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>D1</strong></td>
+<td><strong>4D 非阿贝尔质量隙</strong>（B1/B8 终极形态）</td>
+<td>克雷千禧年问题，26 年无人证明；框架"配对阶数"是结构启发式非定理</td>
+<td>不正面攻击：用 2+1D 拓扑序严格结果（阶段 B 已完成）作为低维支撑 + 格点数值（C4–C6）作为证据链；4D 部分诚实标注"不声称"</td>
+</tr>
+<tr>
+<td><strong>D2</strong></td>
+<td><strong>"流形=统计平均"的严格化</strong>（B2）</td>
+<td>从离散事件流到光滑流形的涌现缺严格证明；遍历性/混沌传播适用性未从框架推出</td>
+<td>因果集 + Malament 恢复定理（已有章节）+ 邓煜/Hani/马骁硬球全链条（原文 555 页锚点）+ 通量场热平衡证明（已完成六定理）逐步闭合</td>
+</tr>
+<tr>
+<td><strong>D3</strong></td>
+<td><strong>强场度规形式</strong>（A1.3 遗留）</td>
+<td>玻尔兹曼度规被数学排除（光子球 1GM）；饱和修正全失败；无强场度规承诺</td>
+<td>已重构为"风暴过载物理机制"（七环链 + α=1 + 流体）；视界几何由饱和模态决定——从"过载区边界条件"推导，而非度规外推</td>
+</tr>
+<tr>
+<td><strong>D4</strong></td>
+<td><strong>为什么恰好 n=3</strong>（B6）</td>
+<td>无 Tammes 式唯一性定理可用；数轴分类与群论编号存在错位（批2 vs 批6）</td>
+<td>先统一数轴/群论编号错位（低难度可立即做）；Clifford 内空间 4 分量 → 方向簇 k=4（定理 1 严格）作为结构锚点；n=3 从"表示类型三分法"（引理 A–D 已严格）推断</td>
+</tr>
+<tr>
+<td><strong>D5</strong></td>
+<td><strong>方向离散化动力学</strong>（A1.4）</td>
+<td>连续 S² → 有限方向簇的动力学未推；是 k=4 结构证明的最后输入</td>
+<td>通量管相干长度 ~2l_P（Nyquist）+ 事件点状性（原文 108："两个方向的涡拖曳不能共存于同一微变"）作为起点</td>
+</tr>
+<tr>
+<td><strong>D6</strong></td>
+<td><strong>暗物质机制统一</strong>（A2.2）</td>
+<td>三候选机制并存；ε_B 差 ~70 倍；镜像支投影定量可行（κ_extra~0.5）</td>
+<td>以镜像支投影为主分量（有定量估计与可检验预言 D1），ε_B 降级为次分量；f_space 由 κ_extra 反推</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>7 必答问题（按紧急程度排序）</h2>
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>问题</th>
+<th>影响范围</th>
+<th>前置条件</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P0-1</strong></td>
+<td>端点势/ε 项数值复核（C5）</td>
+<td><strong>数据可靠性</strong>——YM 系列数值可能含几何 bug</td>
+<td><code>_scale_extrap3.py</code>（已完成）</td>
+<td>本批已发现并修正两个 bug；旧报告数值需替换</td>
+</tr>
+<tr>
+<td><strong>P0-2</strong></td>
+<td>论文整合 v1.20（A4）</td>
+<td>全部成果的载体——不整合则 YM 系列无法沉淀</td>
+<td>C5 复核完成</td>
+<td>ε 项 + 端点势 + 热力学极限 v2 并入 §5.7</td>
+</tr>
+<tr>
+<td><strong>P0-3</strong></td>
+<td>相变区 κ_c 精扫（C4）</td>
+<td>禁闭相图完整性；对照文献 h_c≈0.328</td>
+<td>C5 复核完成</td>
+<td>修正几何下 3×3/3×4 全对角化或幂迭代</td>
+</tr>
+<tr>
+<td><strong>P1-1</strong></td>
+<td>英文翻译 v1.19+（E1）</td>
+<td>arXiv 投稿硬门槛</td>
+<td>A4（v1.20 整合）</td>
+<td>机翻 + 人工校对；含公式/引用核对</td>
+</tr>
+<tr>
+<td><strong>P1-2</strong></td>
+<td>参考文献补全（E2）</td>
+<td>arXiv 封禁红线（虚构文献）</td>
+<td>任意时刻可做</td>
+<td>原对话 125 页撞车清单逐条正式引用</td>
+</tr>
+<tr>
+<td><strong>P1-3</strong></td>
+<td>非阿贝尔完全涌现推进（B1）</td>
+<td>框架规范侧最深缺口</td>
+<td>表示论引理链（已完成）</td>
+<td>分阶段：结构（✅）→ 2+1D 动力学（✅）→ 3+1D 候选（⚠️）→ 4D（标注不声称）</td>
+</tr>
+<tr>
+<td><strong>P1-4</strong></td>
+<td>为什么 n=3（B6）</td>
+<td>规范群结构完整性</td>
+<td>数轴/群论编号错位统一</td>
+<td>先做编号错位统一（可直接完成）</td>
+</tr>
+<tr>
+<td><strong>P2</strong></td>
+<td>统计→几何严格化（B2）、方向离散化（A1.4）、暗物质统一（A2.2）、高阶 PPN（B3）</td>
+<td>理论深化</td>
+<td>各自独立</td>
+<td>按 B 权重分配优先级</td>
+</tr>
+<tr>
+<td><strong>P3</strong></td>
+<td>5×4 MPS（C6）、弦断裂模拟（C7）、3+1D 弦网严格化（B8）</td>
+<td>扩展方向</td>
+<td>P0–P2 完成</td>
+<td>5×4 需新数值方法（DMRG）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>8 清扫残尾清单（可执行收尾）</h2>
+<blockquote>
+<p>每项：行动步骤 → 完成标准。按依赖顺序排列。</p>
+</blockquote>
+<h3>8.1 数据可靠性修复（P0，2 项）</h3>
+<ol>
+<li><strong>数值复核</strong>：用 <code>_scale_extrap3.py</code>（正确几何）重跑 端点势（Z 场版 σ_m≈2λ）与 ε 项相变（λ_c）→ <strong>完成标准</strong>：旧报告标注"数值已被 v2 修正版替换"，新数值入库；</li>
+<li><strong>热力学极限 v1 → v2 切换</strong>：<code>热力学极限有限尺寸标度.html/.md</code> 标注 superseded，主引用指向 v2 → <strong>完成标准</strong>：文档目录无歧义引用。</li>
+</ol>
+<h3>8.2 论文整合（P0，1 项）</h3>
+<ol start="3">
+<li><strong>论文 v1.20</strong>：§5.7 并入 ε 项相图 + 端点势 σ_m≈2λ + 热力学极限 σ_E≈2κ（v2 数值）；§9 预言表补拓扑序激发；§10 开放问题更新（#12 标记已落地）→ <strong>完成标准</strong>：MD 与 HTML 同步，版本注记完整。</li>
+</ol>
+<h3>8.3 必答问题执行（P1，4 项）</h3>
+<ol start="4">
+<li><strong>κ_c 精扫</strong>：3×3/3×4 修正几何全对角化，λ_c 定位 → <strong>完成标准</strong>：相变点数值 + 与文献 h_c≈0.328 对照表；</li>
+<li><strong>数轴/群论编号错位统一</strong>：批2（2→电磁、3→弱、6→强）vs 批6（U(1)n=1、SU(2)n=2、SU(3)n=3）→ <strong>完成标准</strong>：统一映射表写入论文 §5；</li>
+<li><strong>英文翻译 v1.20</strong> → <strong>完成标准</strong>：英文初稿（含摘要、公式、参考文献）可提交 arXiv 预检；</li>
+<li><strong>参考文献补全</strong> → <strong>完成标准</strong>：每章引用与撞车清单核对，无虚构文献。</li>
+</ol>
+<h3>8.4 理论深化（P2，可选）</h3>
+<ol start="8">
+<li><strong>方向离散化动力学</strong>（A1.4）→ <strong>完成标准</strong>：k=4 结构证明的输入闭合；</li>
+<li><strong>暗物质机制统一</strong>（A2.2）→ <strong>完成标准</strong>：以镜像支为主分量的定量模型 + D1 预言对接；</li>
+<li><strong>高阶 PPN</strong>（B3）→ <strong>完成标准</strong>：2PN 系数表（已有 e^{−2x} 展开基础）。</li>
+</ol>
+<h3>8.5 文档卫生（随时）</h3>
+<ol start="11">
+<li><strong>旧报告标注</strong>：所有含 bug 数值的报告（端点势/ε 项/热力学极限 v1）加 superseded 声明 → <strong>完成标准</strong>：无失效数值被误引；</li>
+<li><strong>数值脚本归档</strong>：<code>_scale_extrap3.py</code> 为 YM 系列标准脚本，其余诊断脚本清理 → <strong>完成标准</strong>：outputs 目录可复现且无冗余。</li>
+</ol>
+<hr />
+<h2>9 推进节奏建议（两周滚动）</h2>
+<table>
+<thead>
+<tr>
+<th>周</th>
+<th>焦点</th>
+<th>里程碑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 1 周</td>
+<td>P0 三项（数值复核 → 论文 v1.20 → κ_c 精扫）</td>
+<td>数据可靠性闭环 + 论文整合完成</td>
+</tr>
+<tr>
+<td>第 2 周</td>
+<td>P1 四项（翻译 → 参考文献 → n=3 编号统一 → 非阿贝尔推进）</td>
+<td>具备 arXiv 预检条件</td>
+</tr>
+<tr>
+<td>第 3 周起</td>
+<td>P2/P3（方向离散化、暗物质统一、5×4 MPS、弦断裂）</td>
+<td>理论深化 + 扩展方向</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>本蓝图将随执行滚动更新；每完成一项收尾，在对应清单勾销并同步记忆。</em></p>
+
+<div class="footer">项目发展蓝图：正反物质对风暴统一框架——整合、权重、分层与收尾 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 项目发展蓝图.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ω_Λ 的 23.76 倍缺口：不该补，该放弃</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、OM-1：这个公式对 β 病态敏感</div>
+  <h1>Ω_Λ 的 23.76 倍缺口：不该补，该放弃</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-09-17 ｜ 核验脚本：<code>_omega_lambda_gap.py</code>（OM-1…OM-6，纯标准库）
+<strong>一句话：这个缺口补不了。A2 面临一个干净的二选一 —— 要么保住 E_c = 1.018 meV 的
+一致性（放弃 Ω_Λ），要么配住 Ω_Λ（失去 E_c 的一致性）。二者不可兼得。</strong></p>
+</blockquote>
+<hr />
+<h2>一、OM-1：这个公式对 β 病态敏感</h2>
+<div class="formula">Ω<sub>Λ</sub> = <span class="frac"><span class="num">8π</span><span class="den">3</span></span>(<span class="frac"><span class="num">R<sub>H</sub></span><span class="den">l<sub>P</sub></span></span>)<sup>2</sup> ε<sub>0</sub><sup>4/β</sup>
+  ⟹  
+<span class="frac"><span class="num"><span class="rm">d</span><span class="fn">ln</span>Ω<sub>Λ</sub></span><span class="den"><span class="rm">d</span>β</span></span> = -<span class="frac"><span class="num">4<span class="fn">ln</span>ε<sub>0</sub></span><span class="den">β<sup>2</sup></span></span> = 465.4</div>
+
+<p><strong>β 每变 1%，Ω_Λ 变 10405%。</strong> 一个用来定能标的指数，不该有 465 的杠杆。
+要让 Ω_Λ 精度在 10% 内，β 必须精确到 <strong>0.021%</strong>。</p>
+<p>⟹ 要么 β 被微调到 0.02%，要么<strong>公式本身错了</strong>。后者可能性大得多。</p>
+<h2>二、OM-2：改 ε₀ 会破坏已经配好的 η</h2>
+<p>匹配 Ω_Λ 需 <code>ε₀ = 1.253×10⁻¹⁹</code>（放大 1.63 倍）。但连带检验：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>ε₀</th>
+<th>ε(1 TeV)</th>
+<th>观测 η</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>当前</td>
+<td>7.7e-20</td>
+<td>6.02e-10 ✓</td>
+<td>6.14e-10</td>
+</tr>
+<tr>
+<td>改后</td>
+<td>1.253e-19</td>
+<td><strong>9.80e-10</strong> ✗</td>
+<td>6.14e-10</td>
+</tr>
+</tbody>
+</table>
+<p><strong>按下葫芦浮起瓢</strong> —— ε₀ 一动，η 就废。</p>
+<h2>三、OM-3：天然前置因子——凑得上的不少，有机制的没有</h2>
+<p>需要放大的倍数：<strong>23.7622</strong></p>
+<table>
+<thead>
+<tr>
+<th>候选</th>
+<th>值</th>
+<th>偏差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4! = 24</td>
+<td>24.0000</td>
+<td>+1.00%</td>
+</tr>
+<tr>
+<td>e^π</td>
+<td>23.1407</td>
+<td>−2.62%</td>
+</tr>
+<tr>
+<td>π⁴/4</td>
+<td>24.3523</td>
+<td>+2.48%</td>
+</tr>
+<tr>
+<td>8π</td>
+<td>25.1327</td>
+<td>+5.77%</td>
+</tr>
+<tr>
+<td>6π</td>
+<td>18.8496</td>
+<td>−20.67%</td>
+</tr>
+<tr>
+<td>2π²</td>
+<td>19.7392</td>
+<td>−16.93%</td>
+</tr>
+</tbody>
+</table>
+<p>4! 和 e^π 都凑得很近，但<strong>没有任何一个能给出物理机制</strong>。数值占卜不是推导。</p>
+<h2>四、OM-6：两参数联立——能配住，但代价明确</h2>
+<p>把 η 与 Ω_Λ 作为两个约束，解 A2 的两个参数：</p>
+<pre><code>ln ε₀ = ln η − β·ln(M_Pl/1 TeV)          （η 约束）
+ln ε₀ = (β/4)(ln Ω_Λ − ln[(8π/3)N])      （Ω_Λ 约束）
+</code></pre>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>β</th>
+<th>ε₀</th>
+<th>检验</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>当前</td>
+<td>0.615</td>
+<td>7.7e-20</td>
+<td>ε(1TeV)=6.02e-10 ✓ ｜ Ω_Λ=0.0290 ✗</td>
+</tr>
+<tr>
+<td><strong>联立解</strong></td>
+<td><strong>0.62887</strong></td>
+<td><strong>4.696e-20</strong></td>
+<td>ε(1TeV)=6.14e-10 ✓ ｜ Ω_Λ=0.6889 ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>能配住。</strong> 但代价：β <strong>+2.26%</strong>，ε₀ <strong>−39.0%</strong>（要砍掉四成），
+而且仍是微调（β 需精确到 0.021%）。两个参数配两个观测量，本就没有预言力。</p>
+<h2>五、核心结论：一个干净的<strong>二选一</strong></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>ε₀</th>
+<th>β</th>
+<th><strong>E_c</strong></th>
+<th><strong>Ω_Λ</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>选项 A</strong>（当前参数）</td>
+<td>7.7e-20</td>
+<td>0.615</td>
+<td><strong>1.018 meV</strong> ✓ 与框架声称 1.01 meV 吻合</td>
+<td><strong>0.0290</strong> ✗ 差 23.8×</td>
+</tr>
+<tr>
+<td><strong>选项 B</strong>（联立解）</td>
+<td>4.696e-20</td>
+<td>0.62887</td>
+<td><strong>2.248 meV</strong> ✗ 与 1.01 meV 差 2.2×</td>
+<td><strong>0.6889</strong> ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A2 无法同时给出正确的暗能量能标和正确的暗能量密度。</strong></p>
+<p>这是一个<strong>可证伪的结构</strong>，比"差个 24 倍"有价值得多：它说明问题不在数值，
+而在 <code>ρ_Λ = E_c⁴/(ℏc)³</code> 这个<strong>识别本身</strong>。</p>
+<h2>六、判决</h2>
+<p>✅ <strong>保住</strong>：暗能量能标在 <strong>meV 量级</strong>（选项 A 给 1.02 meV，选项 B 给 2.25 meV，都是 meV）。
+   这个量级结论稳健，不依赖怎么选。</p>
+<p>❌ <strong>放弃</strong>：把 <code>ρ_Λ</code> 直接等同于 <code>E_c⁴/(ℏc)³</code>。
+   理由：① 对 β 敏感度 465（病态）；② 改 ε₀ 会破坏 η；③ 无机制的天然因子；
+   ④ 联立解要 ε₀ 砍四成且仍微调。</p>
+<h2>七、顺带看清的另一条路</h2>
+<table>
+<thead>
+<tr>
+<th>构造</th>
+<th>Ω</th>
+<th>与观测比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>E_c⁴/(ℏc)³</code></td>
+<td>0.0290</td>
+<td><strong>小 23.8×</strong></td>
+</tr>
+<tr>
+<td><code>ρ_P/N</code>（微观全息稀释）</td>
+<td>8.3776</td>
+<td><strong>大 12.2×</strong></td>
+</tr>
+<tr>
+<td>观测</td>
+<td>0.6889</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>两条框架路径相差 289 倍，观测值夹在中间偏上。⟹ <strong>两条路都还差一个 O(10) 的因子</strong>，
+都不是"再补个小修正"能解决的。</p>
+<h2>八、下一步（换个构造）</h2>
+<p>既然 <code>E_c⁴</code> 和 <code>ρ_P/N</code> 都不对，需要的构造应满足：<code>ρ_Λ ≈ 7.73×10⁻¹⁰ J/m³</code>。
+候选方向：
+1. <strong>镜像支贡献</strong>：暗能量若来自 B− 支的投影，密度可能与分支数/方向性有关
+   （2 支？ε 的方向性 50:50 ⟹ 1/2？）。差的是 23.8 倍，不是 2 倍，需要更强的机制。
+2. <strong>饱和区积分已排除</strong>：<code>∫₀^{E_c}E³dE</code> 只给 ×1/4，方向相反。
+3. <strong>接受它作为第四个不可约参数</strong>：若以上都无解，诚实登记 A2 无法给出 Ω_Λ，
+   只给能标。这比硬凑一个 4! 或 e^π 要诚实。</p>
+
+<div class="footer">Ω_Λ 的 23.76 倍缺口：不该补，该放弃 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 ΩΛ缺口判决_二选一与放弃.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

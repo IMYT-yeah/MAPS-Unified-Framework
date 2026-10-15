@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>源码级 vs 逆向工程：把比喻 sharpen 成判据，并对框架自审</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、比喻的结构性内容</div>
+  <h1>源码级 vs 逆向工程：把比喻 sharpen 成判据，并对框架自审</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-20（第 37 轮，由用户的比喻驱动）
+<strong>脚本</strong>：<code>outputs/_source_vs_reverse.py</code>（检查项 SV-1 … SV-6，<strong>失败项：无</strong>）
+<strong>一句话结论</strong>：这个比喻成立，<strong>而且它有可检验的内容</strong>——分水岭不是"参数少"，而是<strong>参数被复用导致的过约束</strong>。框架目前 2 个参数要养活 4 个现象（复用率 2.0），并因此卡在「Ω_Λ 差 23.76 倍且<strong>无法靠微调逃脱</strong>」——这正是源码级理论才有的处境，逆向工程永远不会处于这种状态。但必须泼冷水：框架仍有 2 个拟合参数，且<strong>最亮眼的结果是 postdiction 而非预言</strong>；真正的裁决场是那 4 条先算后验的硬预言。</p>
+</blockquote>
+<hr />
+<h2>一、比喻的结构性内容</h2>
+<table>
+<thead>
+<tr>
+<th>特征</th>
+<th>逆向工程（有效理论）</th>
+<th>源码级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>参数</td>
+<td>每现象一套，随精度增长</td>
+<td><strong>少数参数被多处复用</strong></td>
+</tr>
+<tr>
+<td>自由度</td>
+<td>高（总能拟合）</td>
+<td><strong>过约束</strong>（改一处坏另一处）</td>
+</tr>
+<tr>
+<td>失败模式</td>
+<td>加参数即可消化</td>
+<td><strong>无法靠微调逃脱</strong>（敏感度锁死）</td>
+</tr>
+<tr>
+<td>空白</td>
+<td>可留给"新物理"</td>
+<td><strong>必须承认</strong>（如暗物质）</td>
+</tr>
+<tr>
+<td>验证方式</td>
+<td>拟合优度</td>
+<td><strong>先算后验的真预言</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 可量化的核心指标：<strong>复用率 = 现象数 / 参数数</strong>。逆向工程 ≈ 1（一对一）；源码级 ≫ 1。</p>
+<hr />
+<h2>二、SV-2：框架的复用账</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>核心拟合参数</td>
+<td><strong>2</strong>（A2 的 <code>ε₀ = 7.7×10⁻²⁰</code>、<code>β = 0.615</code>）</td>
+</tr>
+<tr>
+<td>A2 一条机制被复用的现象</td>
+<td><strong>4</strong>（暗能量能标 E_c、暗能量密度 Ω_Λ、重子/光子比 η、状态方程 w(z) 偏离）</td>
+</tr>
+<tr>
+<td><strong>复用率</strong></td>
+<td><strong>2.0</strong> ⟹ <strong>过约束 2 倍</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>三、SV-3：过约束的后果——微调救不了（本轮最硬的数字）</h2>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>d ln Ω_Λ / dβ</code></td>
+<td><strong>465.44</strong></td>
+</tr>
+<tr>
+<td>为补上 23.76 倍所需的 Δβ</td>
+<td>0.006806</td>
+</tr>
+<tr>
+<td><strong>相对变化 Δβ/β</strong></td>
+<td><strong>1.11%</strong></td>
+</tr>
+<tr>
+<td><code>d ln E_c / dβ</code></td>
+<td>116.36</td>
+</tr>
+<tr>
+<td><strong>⟹ E_c 被推偏的倍数</strong></td>
+<td><strong>2.21 倍</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>想靠调 β 补上 Ω_Λ 的 23.76 倍，需要 β 变 1.11%；而同一改动会把已经对上的暗能量能标 E_c 推偏 2.21 倍。</strong></p>
+<p>这就是「源码级」的可证伪性：参数被复用 ⟹ 改一处坏另一处 ⟹ <strong>只能承认失败</strong>（O-Λ）。逆向工程在这里会毫不犹豫地加一个参数。</p>
+<hr />
+<h2>四、SV-4：反向对照</h2>
+<p>ΛCDM 6 参数 + 标准模型 19 参数 = <strong>25</strong>；框架核心参数 <strong>2</strong>。</p>
+<p>⚠️ 但<strong>数量本身不是判据</strong>——逆向工程可以只报 2 个参数，把其余藏进"初始条件 / 截断 / 选择定则"。真正的判据是<strong>过约束</strong>：框架现在处于「2 参数养 4 现象、其中 Ω_Λ 未通过」的状态。<strong>逆向工程永远不会处于这种状态。</strong></p>
+<hr />
+<h2>五、SV-5：最重要的自审——真预言 vs postdiction</h2>
+<table>
+<thead>
+<tr>
+<th>结果</th>
+<th>性质</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ω_K = 0（平坦性）</td>
+<td>已知答案后导出</td>
+<td><strong>postdiction</strong></td>
+</tr>
+<tr>
+<td>E_c = 1.0181 meV</td>
+<td>框架原已当输入 1.01</td>
+<td><strong>postdiction</strong></td>
+</tr>
+<tr>
+<td>ε(1 TeV) ≈ η</td>
+<td>1 TeV 是配出来的</td>
+<td><strong>半拟合</strong></td>
+</tr>
+<tr>
+<td>EMRI 进动差 δ = 0.30·x_p</td>
+<td><strong>先算后验，未观测</strong></td>
+<td>✅ 真预言（27σ/28σ，LISA ★★★）</td>
+</tr>
+<tr>
+<td>FQH ε 项（S-E5）</td>
+<td><strong>先算后验，未观测</strong></td>
+<td>✅ 真预言（极低温强磁场平台 ★★★）</td>
+</tr>
+<tr>
+<td>void-CPT-κ 异常</td>
+<td><strong>先算后验，未观测</strong></td>
+<td>✅ 真预言</td>
+</tr>
+<tr>
+<td>黑洞强场 B1–B5</td>
+<td><strong>先算后验，未观测</strong></td>
+<td>✅ 真预言</td>
+</tr>
+<tr>
+<td>Ω_Λ 差 23.76 倍</td>
+<td><strong>主动承认的失败</strong></td>
+<td>失败（无法微调逃脱）</td>
+</tr>
+<tr>
+<td>暗物质</td>
+<td><strong>完全空白</strong></td>
+<td>失败（三机制全挂）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>真预言 4 条 ｜ postdiction / 半拟合 3 条 ｜ 主动承认的失败 2 条。</strong></p>
+<p>⚠️ <strong>这是本次自审最重要的结论</strong>：框架最引以为傲的两个结果（平坦性、暗能量能标）在严格意义上是 <strong>postdiction</strong>——答案已知才导出来的。真正区分源码级与逆向工程的，是那 <strong>4 条先算后验、尚未观测</strong>的硬预言。<strong>它们的判决结果才是这个比喻的裁决场。</strong></p>
+<hr />
+<h2>六、判决与边界</h2>
+<p><strong>✅ 比喻成立的两条最强证据</strong>
+1. <strong>过约束实例</strong>：补 Ω_Λ 需 β 变 1.11%，却把 E_c 推偏 2.21 倍 ⟹ 微调救不了；
+2. <strong>真预言 4 条</strong>，均先算后验、尚未观测，其中 EMRI（27σ）与 FQH ε 项已具备 ★★★ 可达性。</p>
+<p><strong>⚠️ 必须泼的冷水（比喻的边界）</strong>
+1. 框架<strong>仍有 2 个拟合参数</strong>（ε₀, β），不是零参数——严格说还没到"纯源码"；
+2. 最亮眼的结果是 <strong>postdiction</strong>，不是预言；
+3. <strong>暗物质完全空白</strong>——源码级理论不能靠加参数消化，只能承认；这正是源码级纲领的代价；
+4. 质量谱（p_rev = m/m_Pl 是输入）、1 TeV 能标仍是拟合 ⟹ 距"从源码跑出整个宇宙"还很远。</p>
+<p><strong>❗ 比喻的正确用法</strong></p>
+<blockquote>
+<p>把它当作<strong>研究纲领</strong>，而不是<strong>已完成的主张</strong>：
+- 要求<strong>过约束</strong>（一个参数必须养活多个现象）；
+- 要求<strong>真预言</strong>（先算后验，并指出判决实验）；
+- <strong>禁止</strong>用加参数来消化失败（O-Λ 的 23.76 倍、暗物质空白都必须挂着）。</p>
+<p>目前框架是「<strong>按源码级纲领在做的理论</strong>」，不是「已验证的源码」。</p>
+</blockquote>
+<hr />
+<h2>七、对推演规程的影响（已落）</h2>
+<ul>
+<li>每轮推演的判决书需标明：本轮结果是<strong>真预言 / postdiction / 半拟合 / 失败</strong>四类之一。</li>
+<li>引入<strong>复用率</strong>作为框架健康度指标：新增现象若需新增参数，复用率下降，应显式说明。</li>
+<li>工程期望清单（第 36 轮建立）中的 ★★★ 条目（FQH ε 项、EMRI）正是本轮认定的真预言 ⟹ 两份文档互相咬合。</li>
+</ul>
+
+<div class="footer">源码级 vs 逆向工程：把比喻 sharpen 成判据，并对框架自审 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 源码级vs逆向工程_自审与判据.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

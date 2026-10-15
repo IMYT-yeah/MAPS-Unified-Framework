@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P0-3b：周期边界（环面）实现——κ_c 精确化与判据/文献对照修正</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 环面实现与验证【数值】</div>
+  <h1>P0-3b：周期边界（环面）实现——κ_c 精确化与判据/文献对照修正</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">P 系列行动报告</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>任务</strong>：蓝图候选 <strong>C</strong>——用环面（周期边界）toric code + 横向场替代开边界，消除边界效应，精确化拓扑序→禁闭转变点 κ_c；经文献核实修正 P0-3 的对照错误（X 场版本 σ^x 场 vs Z 场版本 σ^z 场临界值混用）。
+<strong>方法</strong>：环面 Lx×Ly（顶点/面各 Lx·Ly、边 2Lx·Ly、态数 2^(2LxLy)），H(κ) = −ΣA_v − ΣB_p − κΣX_e；判据：序参量 m=⟨X⟩ 的 m=0.5 交叉 + 磁化率 χ 峰 + 能隙；Lanczos（scipy eigsh，LinearOperator 免显式稀疏矩阵）。
+<strong>性质标注</strong>：【数值】= 本次环面计算；【引用】= 文献核实结果；【推导】= 框架内分析。</p>
+</blockquote>
+<hr />
+<h2>1 环面实现与验证【数值】</h2>
+<p><strong>环面构造</strong>：顶点 (i,j) 四边 A_v = Π_{e∋v} X_e（周期模 Lx/Ly）；面 B_p = Π_{e∈∂p} Z_e（4 边奇偶，对角 ±1）。构造验证：所有顶点/面 mask 均为 4 边、每条边恰属 2 个顶点（周期边界 ✓）。</p>
+<p><strong>2×2 环面（256 态，精确对角化）基态验证——全部通过</strong>：
+- E0(κ=0) = <strong>−8.000000</strong> = −(N_v+N_p) = −(4+4) ✓
+- m(κ=0) = <strong>0.000000</strong>（toric code 精确 ⟨X⟩=0）✓
+- <strong>基态 4 重简并</strong>（4 个随机种子 E0 全 = −8，|G|²=4 拓扑序指纹）✓
+- κ→∞ m→1（极化/禁闭相）✓</p>
+<table>
+<thead>
+<tr>
+<th>环面</th>
+<th>边数</th>
+<th>态数</th>
+<th>L=√面积</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×2</td>
+<td>8</td>
+<td>256</td>
+<td>2.000</td>
+<td>精确验证</td>
+</tr>
+<tr>
+<td>2×3</td>
+<td>12</td>
+<td>4096</td>
+<td>2.449</td>
+<td>FSS 点</td>
+</tr>
+<tr>
+<td>2×4</td>
+<td>16</td>
+<td>65536</td>
+<td>2.828</td>
+<td>FSS 点</td>
+</tr>
+<tr>
+<td>3×3</td>
+<td>18</td>
+<td>262144</td>
+<td>3.000</td>
+<td>FSS 点（+能隙/χ 判据）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2 环面 κ* 数据【数值】</h2>
+<table>
+<thead>
+<tr>
+<th>环面</th>
+<th>L</th>
+<th><strong>κ*(m=0.5)</strong></th>
+<th><strong>χ 峰</strong></th>
+<th>E0(κ=0) 验证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2×2</td>
+<td>2.000</td>
+<td><strong>0.1942</strong></td>
+<td>0.17</td>
+<td>−8.0000 ✓</td>
+</tr>
+<tr>
+<td>2×3</td>
+<td>2.449</td>
+<td><strong>0.2017</strong></td>
+<td>0.19</td>
+<td>−12.0000 ✓</td>
+</tr>
+<tr>
+<td>2×4</td>
+<td>2.828</td>
+<td><strong>0.2044</strong></td>
+<td>0.20</td>
+<td>−16.0000 ✓</td>
+</tr>
+<tr>
+<td>3×3</td>
+<td>3.000</td>
+<td><strong>0.1994</strong></td>
+<td>0.19</td>
+<td>−18.0000 ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键发现 1：κ<em>(m=0.5) 几乎尺寸无关<strong>（0.194→0.204，波动 &lt;4%）——与开边界形成鲜明对比（P0-3 开边界：0.0907→0.1300，波动 43%）。</strong>周期边界消除了边界效应的巨大污染，κ</em> 已饱和</strong>；开边界 FSS 的"κ* 随 L 上升"（0.09→0.13）主要是边界效应，非有限尺寸趋近。</p>
+<p><strong>对称约定等价性验证</strong>（关键）【数值 + 推导】：J_A=J_B=1 对称约定 H=−ΣA_v−ΣB_p−hΣX_e（标准文献形式）在交叉点处给出与框架约定（投影形式 −0.5Σ(1+A_v)−ΣB_p−κΣX_e 等）<strong>完全相同</strong>的结果（h<em> = 0.1940/0.2017/0.1994，与框架 κ</em> 全同）——证明在 m=0.5 交叉附近基态满足 A_v=B_p=1（拓扑序扇区），框架哈密顿量 ≡ 标准 toric code + 横向场，<strong>κ 与文献 h 直接对应</strong>。</p>
+<p><strong>能隙验证</strong>：κ=0 时 Δ=0.0000（4 重简并精确重现）；κ&gt;0 简并立即打破、能隙单调打开（拓扑序→极化的连续转变图像）。</p>
+<hr />
+<h2>3 有限尺寸标度外推【数值】</h2>
+<table>
+<thead>
+<tr>
+<th>判据</th>
+<th>数据点</th>
+<th>κ_c(∞)</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>m=0.5 交叉（4 点）</td>
+<td>2×2/2×3/2×4/3×3</td>
+<td><strong>0.217</strong></td>
+<td>斜率 −0.044，几乎平坦（尺寸无关）</td>
+</tr>
+<tr>
+<td>χ 峰（4 点）</td>
+<td>同</td>
+<td><strong>0.247</strong></td>
+<td>χ 峰 0.17→0.19→0.20→0.19 随 L 缓慢上升</td>
+</tr>
+</tbody>
+</table>
+<p><strong>χ 峰随 L 缓慢上升</strong>（0.17→0.20）表明存在真实有限尺寸趋近（δh ∝ L^(−1/ν) 型，ν≈0.63 Ising 类），但 L≤3 尺寸太小，外推精度有限。</p>
+<hr />
+<h2>4 文献对照修正（重要）【引用】</h2>
+<p>P0-3 报告引用 <strong>h_c≈0.328</strong> 作为 X 场版本的对照——<strong>经文献核实这是 σ^z 场（Z 场/磁通凝聚）版本的临界值；框架 X 场版本（σ^x 场/电荷凝聚）应对标 h_xc≈0.32</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>横向场</th>
+<th>转变类型</th>
+<th>文献临界值（无限尺寸）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Z 场</strong>（−λΣZ_e）</td>
+<td>σ^z</td>
+<td>磁通凝聚（对偶 2+1D 横向场 Ising）</td>
+<td><strong>h_zc = 0.328474(3)</strong>【引用，Trebst 2007 / Blöte-Deng 2002 / Wu 2012；经 arXiv:2202.02909、2402.00127 引述】</td>
+</tr>
+<tr>
+<td><strong>X 场（框架，−κΣX_e）</strong></td>
+<td>σ^x</td>
+<td><strong>电荷凝聚</strong></td>
+<td><strong>h_xc ≈ 0.32</strong>（h_z=0）【引用，Trebst 2007 / Vidal 2009；经 arXiv:1304.0780 引述】</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>P0-3 的对照错误</strong>：0.328474 是 σ^z 场（Z 场版本）的值，框架 X 场版本应标 h_xc≈0.32——两者数值巧合接近（0.32 vs 0.328）掩盖了物理对象混用；</li>
+<li>本报告环面 X 场版本：m=0.5 半极化 0.20、χ 峰外推 0.247、框架真相变估计 0.25–0.32——与 σ^x 场文献 h_xc≈0.32 方向一致（判据偏差见 §5）。</li>
+</ul>
+<hr />
+<h2>5 判据分析与真相变点估计【推导 + 数值】</h2>
+<p><strong>关键发现 2：m=0.5 交叉 ≠ 相变点</strong>：
+- 环面 3×3 实测：<strong>m(h=0.32) ≈ 0.84</strong>（文献相变点处 m 已远超 0.5）；m=0.5 半极化发生在 h≈0.20，远低于真相变；
+- m=0.5 与 χ 峰判据给出<strong>半极化点</strong>，系统性低于真相变 ~25–38%（0.20–0.25 vs 0.32）；
+- 原因（诚实标注）：σ^x 磁化在电荷凝聚转变中无尖锐奇异性——该转变的序参量是<strong>弦/Wilson 环</strong>（电荷弦序参量 Ō_Z），非单点磁化 ⟨σ^x⟩；⟨σ^x⟩ 的 0.5 交叉只是"场极化到一半"的标记。</p>
+<p><strong>框架 X 场版本真相变点估计</strong>：<strong>κ_c ≈ 0.25–0.32</strong>
+- 下界：χ 峰 1/L 外推 <strong>0.247</strong>（本报告）；
+- 上界：文献 h_xc≈<strong>0.32</strong>（无限尺寸）；
+- m=0.5 判据的 κ_c≈0.20–0.22 是半极化点，作为真相变严格下界。</p>
+<p><strong>σ_E≈2κ 适用域（不变，更强）</strong>：κ=0.5/1.0/2.0 全部 &gt; κ_c^true（≈0.3）✓——弦张力数值处于禁闭相，自洽。</p>
+<hr />
+<h2>6 结论与意义</h2>
+<ol>
+<li><strong>环面精确化完成</strong>：m=0.5 半极化点 <strong>κ*≈0.20±0.01</strong>（4 尺寸一致，尺寸无关）；开边界 P0-3 的 0.23–0.27 含边界污染（边界效应使 κ* 偏高），环面净化后更精确；</li>
+<li><strong>文献对照修正</strong>：X 场版本（σ^x 场/电荷凝聚）对标 <strong>h_xc≈0.32</strong>（非 0.328——那是 σ^z 场/磁通凝聚版本的值）；</li>
+<li><strong>判据修正</strong>：m=0.5/χ 峰判据系统性低估真相变；框架真相变 <strong>κ_c ≈ 0.25–0.32</strong>（与 σ^x 场文献 0.32 相容）；</li>
+<li><strong>拓扑序→禁闭转变确认</strong>：环面精确复现 toric code 4 重简并（|G|²=4，Δ=0）与 κ&gt;0 简并打破——框架"禁闭 = 通量管线性势"模型的相图在周期边界下自洽；</li>
+<li>3×4 环面（1677 万态）全空间对角化不可行（每 matvec 15–25 s，eigsh 数百次迭代）——精确相变定位（±0.01）需 MPS/DMRG（P0-3 已预言）。</li>
+</ol>
+<hr />
+<h2>7 对论文 v1.22 §5.7 的建议修订（待确认后并入）</h2>
+<p>§5.7"相变点定位（v1.22，P0-3）"小节建议修订：
+- ~~"量级与 toric code 文献 h_c≈0.328 一致"~~ → <strong>"环面（周期边界）精确化：半极化点 κ*≈0.20±0.01（尺寸无关）；真相变 κ_c≈0.25–0.32，与文献 X 场（σ^x）版本 h_xc≈0.32 一致（注：0.328 为 σ^z 场版本值，P0-3 曾混用，已修正）"</strong>；
+- 摘要 (f) 项与 §10.2 #12 同步微调（若并入）。</p>
+<hr />
+<h2>8 诚实标注【开放】</h2>
+<ol>
+<li><strong>κ_c^true 精确值</strong>（±0.01）仍需 MPS/DMRG（4×4+ 环面）——全空间对角化止步 3×3；</li>
+<li><strong>判据系统性偏差未消除</strong>：弦序参量（电荷弦 Ō_Z）/Binder 累积量判据未实现，m=0.5 与 χ 峰均为半极化判据；</li>
+<li><strong>h_xc≈0.32 为二级引用</strong>（arXiv:1304.0780 引述 Trebst 2007/Vidal 2009），原始论文未直接核对；</li>
+<li>χ 峰 1/L 外推只有 4 个尺寸（L≤3），外推精度有限（±0.05 级）。</li>
+</ol>
+<hr />
+<p><em>P0-3b 完成 · 环面 κ</em>≈0.20±0.01 · 真相变 κ_c≈0.25–0.32 · 文献对照修正（σ^x vs σ^z 场）*</p>
+
+<div class="footer">P0-3b：周期边界（环面）实现——κ_c 精确化与判据/文献对照修正 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 P0-3b_环面kc精确化.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

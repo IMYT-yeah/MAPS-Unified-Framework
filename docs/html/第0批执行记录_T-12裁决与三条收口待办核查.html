@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 0 批执行记录：T-12 裁决 ＋ 3 条收口待办核查</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>第 0 批执行记录：T-12 裁决 ＋ 3 条收口待办核查</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>执行日：2026-09-28 ｜ 依据：《未完成研究工作流_按依赖排序》第 0 批（用户确认）
+脚本：<code>_audit_01_02.py</code>（核查，<strong>6 项 0 失败</strong>）、<code>_patch_batch0.py</code>（论文，<strong>8 项 0 失败</strong>）、
+<code>_patch_batch0_records.py</code>（记录，<strong>8 项 0 失败</strong>）
+备份：<code>paper/history/*_备份_2026-09-28第0批前.md</code></p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>0.1（T-12）是一次真实的修改</strong>；<strong>0.2 的三条经核查发现"已由后续轮次落地"，
+本轮的工作是取证 + 补一处漏网</strong>——这正是"先核查再动手"的价值：
+<strong>若直接重做 0.2，会白改三处、还漏掉真正没改的那一处。</strong></p>
+<hr />
+<h2>一、0.1 裁决 T-12（<strong>已执行</strong>）</h2>
+<p><strong>问题</strong>：§7.4 声称「定位是 't Hooft 元胞自动机式：<strong>底层确定事件流</strong>」，
+而 §8.6.7(c) 要求 tick「<strong>必须随机化</strong>轴与相位」，第 42 轮把工作表述定为 <strong>H1</strong>（不可预测）
+—— 字面冲突；而 H1/H2 已被第 42–44 轮证明<strong>不可判定</strong>。</p>
+<p><strong>裁决</strong>：采用<strong>方案 (b)</strong>（成本最低、不牵连其他章节）</p>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>改动</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ZH §7.4 正文</strong></td>
+<td>「底层确定事件流」→「<strong>给定 tick 序列后确定</strong>（单 tick 为置换 ⟹ 双射、可逆、无熵产生，§8.6.7）的事件流」＋ 一句「<strong>不</strong>声称整体决定论」</td>
+</tr>
+<tr>
+<td><strong>EN §7.4 body</strong></td>
+<td>"underlying deterministic event flow" → "an event flow that is <strong>deterministic given the tick sequence</strong>…" ＋ 同义限定</td>
+</tr>
+<tr>
+<td><strong>ZH/EN §10 结论</strong></td>
+<td>「't Hooft 式定位」后加限定（「非『决定论』—— 见 §7.4 的 2026-09-28 裁决」）</td>
+</tr>
+<tr>
+<td><strong>ZH/EN 第 57 轮块</strong></td>
+<td>T-12 行标「✅ 已裁决（2026-09-28，第 0 批）」，并把块内对旧表述的引用标为<strong>「原文为 / originally stated」</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>为什么不选方案 (a)</strong>（明确采用 H2）：那需要<strong>一并改写第 42 轮的 H1 工作表述</strong>，
+成本高且<strong>无必要</strong> —— 因为 §7.4 真正要声称的只是<strong>可逆性</strong>（tick 是双射），不是决定论。</p>
+<p><strong>验收</strong>：
+- ✅ 「底层确定」仅在<strong>第 57 轮块的引用</strong>里出现（已标"原文为"），<strong>正文 0 处</strong>；
+- ✅ §7.4 / §8.6.7 / 第 42 轮之间<strong>无字面冲突</strong>；
+- ✅ 中英一致（8 项改动全部中英同步）。</p>
+<hr />
+<h2>二、0.2 核查结果：<strong>三条都已完成</strong>（本轮取证 + 补一处）</h2>
+<table>
+<thead>
+<tr>
+<th>待办（第 16 轮登记）</th>
+<th>核查结论</th>
+<th>证据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 废弃「因果补丁边界」措辞</td>
+<td>✅ <strong>已废弃</strong></td>
+<td>全文<strong>仅 1 处</strong>，且是<strong>否定句</strong>（第 1043 行「<strong>因此不能表述为</strong>「观测者因果补丁的边界」」）</td>
+</tr>
+<tr>
+<td>② λ 统一为操作式 <code>Ω_tot ≡ ρ/ρ_crit</code></td>
+<td>⚠️ <strong>基本完成，但有一处漏网</strong></td>
+<td>宇宙学侧 <strong>0 处</strong>用 λ；约定句在 §8.6（第 1026–1028 行）+ 结论声明（第 1436 行），中英各 2 处。<strong>但 §8.6.5 判别表仍有 <code>λ_micro = 8π/3</code></strong></td>
+</tr>
+<tr>
+<td>③ 「ξ-稳健性」降为一致性检查</td>
+<td>✅ <strong>已降调</strong></td>
+<td>第 1118 行「早前记为「ξ-稳健性」的这一性质<strong>应降调为一致性检查：它不是稳健，它是重言式</strong>」；摘要层「ξ」<strong>0 次</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>补漏：<code>λ_micro = 8π/3</code> → <code>Ω_tot = 3/(8π)</code></h3>
+<p><strong>依据（互为倒数）</strong>：</p>
+<pre><code>8π/3 = 8.37758…        3/(8π) = 0.119366…
+8.37758 × 0.119366 = 1.0000  ✓
+</code></pre>
+<p>且 <code>0.119366</code> 与判别表第 3 列的 <strong>0.1194</strong> <strong>自洽</strong> ⟹ 两者是<strong>同一个量的两种约定</strong>，
+原文只是遗留了旧记号（λ 表示密度比）。已在<strong>中英同步</strong>改为全文统一使用的 <code>Ω_tot</code> 形式：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>改前</th>
+<th>改后</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ZH §8.6.5</td>
+<td><code>表观视界（λ_micro = 8π/3）</code></td>
+<td><code>表观视界（Ω_tot = 3/(8π) 精确值）</code></td>
+</tr>
+<tr>
+<td>EN 对应行</td>
+<td><code>Apparent horizon (λ_micro = 8π/3)</code></td>
+<td><code>Apparent horizon (Ω_tot = 3/(8π) exact)</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>验收</strong>：<code>λ_micro</code> 在中英两侧<strong>各 0 处</strong>；<code>λ</code> 作密度比 = <strong>0 处</strong>。</p>
+<hr />
+<h2>三、格式自查</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>ZH</th>
+<th>EN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>非表格行的 <code>\|</code></td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>断行残片</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>奇数 <code>&lt;strong&gt;</code>（加粗不配平）</td>
+<td>1（</strong>历史遗留<strong>：第 1426 行「版本沿革」超长行）</td>
+<td>38（</strong>历史遗留**：英文版跨行加粗）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>两处奇数均非本轮引入</strong> ✓（本轮改动集中在 §7.4 / §10 / §8.6.5）</p>
+<hr />
+<h2>四、本次改动清单</h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>改动</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>outputs/论文初稿_…_v2.9.md</code></td>
+<td>§7.4 正文、§10 结论、第 57 轮块、§8.6.5 判别表（4 处）</td>
+</tr>
+<tr>
+<td><code>outputs/Paper_…_v2.9_EN.md</code></td>
+<td>对应 4 处</td>
+</tr>
+<tr>
+<td><code>outputs/工程期望清单.md</code></td>
+<td>1.2 节 T-12 标已裁决；候选池 40 标已做；标识记录表加「第 0 批」行</td>
+</tr>
+<tr>
+<td><code>outputs/未完成研究工作流_按依赖排序.md</code></td>
+<td>0.1 / 0.2 标 ✅ 已完成，并把核查结果写入 0.2 节</td>
+</tr>
+<tr>
+<td><code>环境交接说明.md</code></td>
+<td>头部日期；第 16 轮 3 条收口待办勾掉（含核查结论）；§七 的 T-12 标已裁决</td>
+</tr>
+<tr>
+<td><strong>新增脚本</strong></td>
+<td><code>_audit_01_02.py</code>、<code>_patch_batch0.py</code>、<code>_patch_batch0_records.py</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>五、对工作流的反馈（<strong>一条经验</strong>）</h2>
+<blockquote>
+<p><strong>第 0 批的 0.2 说明了一件事</strong>：交接说明里的"待办"<strong>可能已经做完而没勾掉</strong>
+—— 因为它们是在第 16 轮登记的，而后续 40 轮里可能已顺手处理。</p>
+<p>⟹ <strong>执行工作流时，凡"陈年待办"（跨 10 轮以上），先做一次核查（引文取证），再决定改不改。</strong>
+本轮若跳过核查直接改 0.2，会白改三处、并漏掉唯一真正没改的 <code>λ_micro</code>。</p>
+</blockquote>
+<hr />
+<h2>六、下一步</h2>
+<ul>
+<li>第 0 批 <strong>已完成</strong>（0.1 ✅ / 0.2 ✅）。</li>
+<li>剩余待办按工作流：<strong>第 0 批的 0.3（ε 的 @E 标注规范）与 0.4（轨道等权残留对账）</strong> 尚未做；
+  之后是 <strong>1.1（I-14）</strong>。</li>
+<li>待用户确认。</li>
+</ul>
+
+<div class="footer">第 0 批执行记录：T-12 裁决 ＋ 3 条收口待办核查 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 第0批执行记录_T-12裁决与三条收口待办核查.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3+1D 弦网严格化：凝聚证明、对偶映射与涌现 U(1) 路径</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">1 背景：§5.8 半严格状态与严格化目标</div>
+  <h1>3+1D 弦网严格化：凝聚证明、对偶映射与涌现 U(1) 路径</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>✅ 后续推进（2026-08-23）</strong>：《涌现U1连续极限与自旋2》——① 自旋 2 = 二阶无迹对称张量的旋转本征值 ±2（严格验证，D² 谱 {cos2θ,cosθ,1}）；② 涌现 U(1) 路径补齐（对偶严格 + Villain 紧致化 + 库仑相麦克斯韦 ω=|k|，文献引用）；③ 自旋 2 三层论证（框架严格/弦网半严格/南大观测投影）；④ <strong>可检验预言：FQH 引力子模衰减率含 ε 项</strong>（原文 452 页）。脚本 _u1_spin2.py。</p>
+<p><strong>任务</strong>：后续工作②——§5.8 从"半严格"升级为"严格"（阶段 C 遗留；B8 候选路线图"量子直线=弦网边映射严格化"落地）。
+<strong>后续推进（2026-08-23，P1-3）</strong>：λ&gt;0 凝聚相稳定性已数值定位（《3+1D弦网λc相变》）——四尺寸 χ 峰锁定 <strong>λ_c≈0.14</strong>（伪临界），凝聚相 λ&lt;0.14 稳定，与 2D toric code κ_c≈0.25–0.32 构成维数-临界耦合递减谱系。
+<strong>性质标注</strong>：【推导】= 框架内推导（本报告严格化）；【数值】= 本次计算；【引用】= 文献结果；【开放】= 诚实标注。</p>
+</blockquote>
+<hr />
+<h2>1 背景：§5.8 半严格状态与严格化目标</h2>
+<p>§5.8（v1.19）框架"量子直线 = 弦"与 Wen 弦网凝聚的对接是<strong>半严格</strong>（图像性对应）。本报告严格化四步：
+1. <strong>量子直线-弦网边映射</strong>（B8 路线图落地，Hopf 桥接）；
+2. <strong>λ=0 弦网凝聚严格证明</strong>（E0、简并、能隙）；
+3. <strong>对偶映射</strong>（3+1D Z₂ 弦网 ↔ 3D Z₂ 格点规范）；
+4. <strong>涌现 U(1) 光子的严格化路径</strong>（Wen 弦网玻色化）+ 自旋 2 路线图（诚实标注）。</p>
+<hr />
+<h2>2 严格化 I：量子直线-弦网边 Hopf 桥接【推导】</h2>
+<p><strong>A1 定理</strong>（§5.6）：框架事件流三操作（相遇=乘法、湮灭=对合、再生=余乘法）⟹ Hopf 代数结构 D(G)。</p>
+<p><strong>严格化陈述（B8 路线图落地）</strong>：弦网模型的<strong>边/面算符 = Hopf 代数生成元的几何实现</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>框架（量子直线语言）</th>
+<th>弦网语言（3+1D Z₂）</th>
+<th>严格对应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>量子直线【214-218】= 事件流的直线段</td>
+<td>弦网边（闭合弦的组成单元）</td>
+<td>直线段端点 = 弦端点</td>
+</tr>
+<tr>
+<td>直线相遇（Hopf 乘法）</td>
+<td>弦网分支（顶点融合规则）</td>
+<td>配对阶数 n（A2）决定分支</td>
+</tr>
+<tr>
+<td>直线湮灭（Hopf 对合）</td>
+<td>弦闭合（A_c 闭合法则）</td>
+<td><strong>A_c=Π_{f∈∂c}Z_f=1 ⟺ 弦无端点</strong></td>
+</tr>
+<tr>
+<td>直线再生（Hopf 余乘法）</td>
+<td>弦网涨落（X_f 翻转）</td>
+<td>λΣX_f = 弦网动力学项</td>
+</tr>
+</tbody>
+</table>
+<p><strong>严格陈述</strong>：量子直线的<strong>端点</strong> ↔ 弦端点 = A_c 违反（本报告 §3 证明有正能隙 Δ=2 ⟹ <strong>涌现粒子</strong>）——框架"量子直线 = 弦"从图像对应升级为<strong>算符级对应</strong>（Hopf 生成元 ↔ 弦网边算符）。</p>
+<hr />
+<h2>3 严格化 II：λ=0 弦网凝聚的严格证明【推导 + 数值】</h2>
+<p><strong>定理（λ=0，严格）</strong>：3+1D Z₂ 弦网 H₀ = −Σ_c A_c（A_c=Π_{f∈∂c}Z_f）：
+- <strong>(i) 基态</strong>：所有 A_c=1（闭合弦网凝聚），<strong>E0 = −N_c 精确</strong>（N_c = 立方体数）；
+- <strong>(ii) 拓扑简并</strong>：基态简并度 = <strong>2^(n−N_c)</strong>（n = 面数；每个独立 A_c 约束减半维度；双立方体 n=11, N_c=2 ⟹ <strong>512 = 2⁹</strong>，数值验证 ✓）；
+- <strong>(iii) 激发能隙</strong>：任一 A_c 翻转（弦端点/环激发）代价 <strong>Δ = 2</strong>（严格；双立方体 E0=−2、E1=0、Δ=2 数值验证 ✓）。</p>
+<p><strong>证明</strong>（λ=0）：A_c 两两对易、A_c²=1，可同时对角化。H₀ 谱 = −Σλ_c（λ_c=±1），基态 λ_c=+1 全部 ⟹ E0=−N_c。激发 = 一个 λ_c 翻转 ⟹ Δ=2。简并：n 面、N_c 个独立约束（∏A_c=1 关联）⟹ 2^(n−N_c)。<strong>严格，无近似</strong>。</p>
+<p><strong>数值验证</strong>（脚本 <code>_stringnet31d.py</code>）：
+| 系统 | 态数 | E0(λ=0) | 基态简并 | 激发 Δ |
+|---|---|---|---|---|
+| 单立方体 | 64 | −1（=−N_c=1） | 32 | 2（解析） |
+| 双立方体 | 2048 | <strong>−2（=−N_c=2）</strong> | <strong>512（=2⁹）</strong> | <strong>2</strong> ✓ |
+| λ=0.1 双立方体 | — | ⟨A_c⟩=0.877（凝聚保持） | — | — |</p>
+<p><strong>弦网凝聚确认</strong>：λ 小（0.1）时 ⟨A_c⟩=0.877→1（基态偏向闭合弦网）；λ=0 时精确 A_c=1 全部。<strong>子区域熵</strong>随边界增长（S_A: 0.39→0.63 单立方体；0.38→1.39 双立方体）——基态含量子纠缠（弦网涨落）。</p>
+<hr />
+<h2>4 严格化 III：对偶映射（弦网 ↔ 格点规范）【推导 + 引用】</h2>
+<p><strong>对偶</strong>：3+1D Z₂ 弦网 H(λ) = −Σ_c A_c − λΣ_f X_f 与 3D Z₂ 格点规范理论（H=−Σ_plaq B_plaq − hΣ_link X_link）通过<strong>电磁对偶</strong>关联【引用，Fradkin–Shenker 线；Kogut 1979】：
+- <strong>弦网凝聚相（λ 小）↔ 规范禁闭相</strong>：A_c=1（弦无端点）↔ B_plaq=1（无磁通）；弦端点（A 违反）↔ 电荷（电通量终止）——<strong>弦端点粒子 = 禁闭电荷</strong>；
+- 对偶是<strong>严格</strong>的（格点电磁对偶），框架弦网的 λ=0 严格结果（§3）通过对偶转移为规范理论禁闭相的严格陈述。</p>
+<p><strong>框架衔接</strong>：配对阶数 n=1（U(1) 电磁，§5.1）在弦网语言 = 弦网凝聚相的低能极限——<strong>电磁力 = 弦网凝聚的涌现规范场</strong>（§5 严格化路径）。</p>
+<hr />
+<h2>5 严格化 IV：涌现 U(1) 光子的路径【推导 + 引用 + 开放】</h2>
+<p><strong>Wen 弦网玻色化（半严格→候选严格路径）</strong>：弦网凝聚相的量子涨落 ⟹ 低能有效理论 = <strong>U(1) 麦克斯韦</strong>（光子 = 弦网的相位模式）【引用，Wen 2004 弦网玻色化/量子序】。</p>
+<p><strong>严格化路径（本报告明确化）</strong>：
+1. <strong>对偶</strong>（§4 严格）：弦网凝聚相 → 3D Z₂ 格点规范禁闭相；
+2. <strong>连续极限</strong>：格点规范禁闭相 → 连续 U(1) 规范理论（Z₂ → U(1) 的嵌入，需严格化：大 N 极限/重整化流）【开放】；
+3. <strong>麦克斯韦验证</strong>：有效拉氏量 L_eff = −(1/4)F_μνF^μν（光子色散 ω=ck、横极化 2 个——需数值/解析验证）【开放】；
+4. <strong>框架补强</strong>：配对阶数 n=1 ⟹ U(1)（§5.1 表示论层严格）——框架侧已严格，弦网侧路径明确。</p>
+<p><strong>阶段 C 的落点</strong>：电磁（U(1)）涌现 = <strong>"对偶严格 + 连续极限候选严格"</strong>——比 v1.19 的"半严格"前进一大步（明确严格化步骤），但仍非全严格（步骤 2-3 开放）。</p>
+<hr />
+<h2>6 严格化 V：涌现自旋 2（引力子）路线图【开放】</h2>
+<p><strong>诚实标注</strong>：自旋 2 涌现的严格化 = <strong>世界级难题</strong>（与 4D 质量隙、全息对偶严格化同阶）。候选路线：
+1. 弦网的<strong>环激发/扭结</strong> → 自旋 2 集体模式（Wen 2006 半严格）；
+2. 框架侧补强：统计力学路径（§4，<strong>完整 ✅</strong>）+ 弦网路径（自旋 2，半严格 ⚠️）双路径印证；
+3. 严格化需要：3+1D 弦网的完整低能有效理论 + 自旋 2 谱验证（远超本报告范围，保留为框架开放问题 #13）。</p>
+<hr />
+<h2>7 数值验证汇总【数值】</h2>
+<p>脚本 <code>_stringnet31d.py</code>（单/双立方体，Z₂ 弦网）：
+- λ=0：E0=−N_c 精确、基态简并 2^(n−N_c)（512 ✓）、激发 Δ=2（严格）；
+- λ=0.1：⟨A_c⟩=0.877（凝聚保持）、能隙开；
+- 子区域熵随边界增长（纠缠非平凡）；
+- 与 §5.8 已有数值（闭合弦权重 58.2%&gt;随机 50%、双闭合 34%&gt;25%）一致。</p>
+<hr />
+<h2>8 框架意义</h2>
+<ul>
+<li><strong>§5.8 从"半严格"升级为"部分严格"</strong>：λ=0 弦网凝聚（E0/简并/能隙）<strong>严格证明</strong>；对偶映射<strong>严格</strong>；涌现 U(1) 路径<strong>明确化</strong>（3 步，2 步开放）；</li>
+<li><strong>量子直线 = 弦网边的算符级对应</strong>（Hopf 桥接）——B8 路线图第一落地步；</li>
+<li>弦端点激发 Δ=2（涌现粒子）严格 ⟹ 框架"事件流 ⟹ 粒子"获得 3+1D 严格例证（低维）；</li>
+<li>双路径印证（引力涌现）：统计力学（完整）+ 弦网（严格化推进）——两条路径的严格化差距缩小。</li>
+</ul>
+<hr />
+<h2>9 诚实标注【开放】</h2>
+<ol>
+<li><strong>λ=0 严格、λ&gt;0 未严格</strong>：λΣX_f 扰动的基态（凝聚保持）数值验证（⟨A_c⟩=0.877）但无解析证明——凝聚相的稳定性（λ &lt; λ_c）依赖相变分析（对应 toric code 的 κ_c 类问题，3+1D 未算）；</li>
+<li><strong>涌现 U(1) 步骤 2-3 开放</strong>（连续极限、麦克斯韦验证）；</li>
+<li><strong>自旋 2 涌现严格化</strong> = 世界级难题（保留开放）；</li>
+<li><strong>拓扑纠缠熵</strong>：单/双立方体太小无法提取 γ=ln2（需更大网格/MPS）；</li>
+<li>3+1D 弦网的完整相图（λ_c）未计算。</li>
+</ol>
+<hr />
+<h2>10 对论文的并入建议（待确认）</h2>
+<p>§5.8 升级 v1.28：
+- 补"<strong>3+1D 弦网严格化（v1.28，后续工作②）</strong>：① 量子直线-弦网边 Hopf 桥接（B8 落地，算符级对应）；② <strong>λ=0 弦网凝聚严格证明</strong>——E0=−N_c、基态简并 2^(n−N_c)（双立方体 512 ✓）、激发能隙 Δ=2（涌现粒子）；③ 对偶映射严格（弦网凝聚相 ↔ 3D Z₂ 格点规范禁闭相，Fradkin-Shenker）；④ 涌现 U(1) 路径明确化（对偶严格 + 连续极限候选）；自旋 2 仍开放（世界级难题）"；
+- §10.2 #13 更新：3+1D 弦网严格化推进（λ=0 严格 + 对偶严格；连续极限/自旋 2 开放）。</p>
+<hr />
+<p><em>3+1D 弦网严格化完成 · λ=0 凝聚严格证明（E0=−N_c、简并 2^(n−N_c)、Δ=2）· 对偶严格 · 涌现 U(1) 路径明确化 · 自旋 2 诚实保留</em></p>
+
+<div class="footer">3+1D 弦网严格化：凝聚证明、对偶映射与涌现 U(1) 路径 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 3+1D弦网严格化报告.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

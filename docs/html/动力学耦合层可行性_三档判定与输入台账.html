@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>动力学·耦合层的可行性：三档判定与输入台账</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论（三档）</div>
+  <h1>动力学·耦合层的可行性：三档判定与输入台账</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-05 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 123 轮</strong> ｜ 2026-10-05 ｜ 核验脚本 <code>_dyn123_verify.py</code>（33 项断言 0 失败）
+题源 = 第 122 轮瓶颈分析（「衬底 ↔ 对称骨架之间缺动力学·耦合层」）→ 用户问「能不能做？」
+<strong>性质</strong>：判定轮 —— 不产新物理，产<strong>判定</strong>与<strong>台账</strong>。预跑（补丁前）证人组全过，补丁后复跑 0 失败。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论（三档）</h2>
+<p>「动力学·耦合层」<strong>不是一个问题，是三个</strong> —— 分开问，答案不同：</p>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>问法</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><strong>能从现有公理内部推出来吗？</strong></td>
+<td>⛔ <strong>判否</strong>（<strong>N-43</strong>）</td>
+<td>三条<strong>结构性障碍</strong>（<strong>I-16</strong>／<strong>I-20</strong>／<strong>I-21</strong>）＋ <strong>15 例终止态台账</strong>（无一落在「推导成功」）</td>
+</tr>
+<tr>
+<td>②</td>
+<td><strong>能作为「条件构造」（显式声明输入 ＋ 自洽性过滤）做出来吗？</strong></td>
+<td>✅ <strong>可做，且已在做</strong></td>
+<td>三个样板：度规（B3）／Φ（第五力）／A2（<code>E_c</code>＋<code>τ=t_P</code>）—— <strong>框架全部对外产出都出自这一档</strong></td>
+</tr>
+<tr>
+<td>③</td>
+<td><strong>它「该不该存在」？</strong></td>
+<td>⚖️ <strong>已判定</strong>：宇宙学侧「不该有」（<strong>I-20</strong>）；耦合侧「无对象」（<strong>N-33</strong>／<strong>N-35</strong>）</td>
+<td>第 75／77／81 轮</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>失效条件</strong>（判否的边界，铁律 22）：任何<strong>新增公理级输入</strong>（量子化 §6.1 的 Φ 背景 ／ 给 tick 加耗散或势 ／ 新增一层）
+⟹ ① <strong>自动重开</strong>。<strong>这不是永久判死，是「当前公理集下没有路径」</strong> —— 两者要分开写。</p>
+<hr />
+<h2>二、为什么①判否：三条<strong>结构性</strong>障碍（不是工作量）</h2>
+<h3>障碍 A —— 位置量子化缺口（<strong>I-16</strong>，第 68 轮形式化）</h3>
+<p>三层判定表（引自《位置算符缺口_I-16的形式化与三层判定》）：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>位置</th>
+<th>能量</th>
+<th>哪类数</th>
+<th>能否做「两态之差」</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>衬底层（tick 置换）</td>
+<td>✅ 但只 8 个 (Z₂)³ 类</td>
+<td>❌</td>
+<td>q-数（置换）</td>
+<td>❌ 无能量</td>
+</tr>
+<tr>
+<td>弦网层（<code>A_v</code>／<code>B_p</code>）</td>
+<td>❌（态是通量）</td>
+<td>✅</td>
+<td>q-数（矩阵）</td>
+<td>❌ 无位置</td>
+</tr>
+<tr>
+<td>场论层（§6.1 作用量）</td>
+<td>✅ 连续 x</td>
+<td>✅ <code>gΦ(x)ψ̄ψ</code></td>
+<td><strong>c-数</strong></td>
+<td>❌ 位置不可叠加</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>三层里没有一层同时满足「有位置 ＋ 有能量 ＋ 位置是 q-数」</strong> —— 而耦合层（可与另一构型做量子态之差的那一层）要的正是它。
+⚠️ 附带边界：<strong>「引力量子化之日，就是这条边界消失之时」</strong>（第 68 轮）—— 即量化 Φ 会让本障碍失效（见 §一 失效条件）。</p>
+<h3>障碍 B —— 两个 <code>ρ</code> 不接（<strong>I-20</strong>，第 75 轮结项）</h3>
+<ul>
+<li>守恒流 <code>J^μ</code> 是<strong>事件计数</strong>（不带 <code>p</code>）；等分账的 <code>ρ = 3H²/8πG</code> 是<strong>约束</strong>。</li>
+<li>硬在面上写能量守恒 ⟹ 零自由参数的 <strong><code>w = −1/3</code></strong>，与观测差 <strong>22.4σ</strong>；且 <code>ρ ∝ a⁻²</code> 是曲率标度。</li>
+<li>⟹ <strong>缺的不是方程，是对象</strong>（第 4 种失败形态：<strong>分层</strong>）。</li>
+</ul>
+<h3>障碍 C —— 动力学义务逃逸（第 39／43／56／67 轮）</h3>
+<ul>
+<li>框架<strong>唯一</strong>的时间演化 = <strong>tick 置换</strong>（双射、可逆、<strong>零熵产生</strong>）；四个哈密顿量<strong>全静态</strong>（对易式 = 对称性，不是运动方程）；<strong>无构型空间势 V(r)</strong>；「图热流／梯度流／演化方程」类词条<strong>各 0 处</strong>。</li>
+<li>随机性方向<strong>欠定</strong>：<code>D</code> 是 <strong>1 个实数</strong>，而相位自由度是 <strong>L² 个比特</strong>（不是难测，是欠定）。</li>
+<li>⟹ 「动力学」这个词所需要的（率、弛豫、耗散、箭头）在现有公理里<strong>没有落点</strong>。</li>
+</ul>
+<hr />
+<h2>三、终止态台账（第 53–112 轮，15 例，逐条可查）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>尝试</th>
+<th>终止态</th>
+<th>清单证人</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>E_c</code> 反解表</td>
+<td>恒等式（<code>M_Pl</code> 消掉，≡ 1 meV）</td>
+<td>C-4</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>D = ℏ/(3m)</code> vs Nelson</td>
+<td>恒等式（G 缩放检测）</td>
+<td>N-32</td>
+</tr>
+<tr>
+<td>3</td>
+<td>麦克斯韦谱「数值验证」</td>
+<td>恒等式（变量被直接赋值）</td>
+<td>C-67</td>
+</tr>
+<tr>
+<td>4</td>
+<td>「反解 q」表</td>
+<td>换写（<code>log₂(4q)</code>；「唯一」= log 单调性）</td>
+<td>C-76</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>M²/A</code> 当「普朗克常数」</td>
+<td>量纲不符 ＋ GR 恒等式</td>
+<td>C-77</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>h</code> 的 <code>L²</code> 当「推出面积律」</td>
+<td>定义式（定义 ≠ 发现）</td>
+<td>N-36</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>R_net ~ (E_c)⁴/ħ</code></td>
+<td><strong>量纲不成立</strong>（7.08×10²⁹ 倍歧义）</td>
+<td>C-72</td>
+</tr>
+<tr>
+<td>8</td>
+<td>「<code>g</code> 的精确值」</td>
+<td><strong>没有对象</strong>（两种读法都判否）</td>
+<td>N-33</td>
+</tr>
+<tr>
+<td>9</td>
+<td>「消掉 <code>8π/3</code>」</td>
+<td><strong>没有对象</strong>（比值从未被要求相等）</td>
+<td>N-35</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>n_G → α_s/α_EM</code></td>
+<td><strong>缺 4 个换算因子</strong>（无路径）</td>
+<td>N-34</td>
+</tr>
+<tr>
+<td>11</td>
+<td>非交换化 ⇒ 量子关联</td>
+<td><strong>条件命题</strong>（零框架元素）</td>
+<td>N-31</td>
+</tr>
+<tr>
+<td>12</td>
+<td>等分账 <code>ρ</code> ＋ 守恒</td>
+<td><strong>排除</strong>（<code>w = −1/3</code>，22.4σ）</td>
+<td>N-30</td>
+</tr>
+<tr>
+<td>13</td>
+<td>「η 能标 ~ 1 TeV」</td>
+<td><strong>自由</strong>（一维简并族）</td>
+<td>N-40</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>ℏ</code> 的独立身份</td>
+<td><strong>自由</strong>（不可辨识；自由度 ≥ 1）</td>
+<td>N-41</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>κ = 0.30</code></td>
+<td><strong>填的</strong>（后由度规升级为 <code>κ_rel(e)</code>，−1 参数）</td>
+<td>C-78</td>
+</tr>
+</tbody>
+</table>
+<p><strong>分类计数</strong>：恒等式／换写 <strong>6</strong> ｜ 量纲不成立 <strong>1</strong> ｜ 无对象 <strong>2</strong> ｜ 缺换算因子 <strong>1</strong> ｜ 外加 <strong>1</strong> ｜ 排除 <strong>1</strong> ｜ 自由输入 <strong>2</strong> ｜ 填的 <strong>1</strong>。
+⭐ <strong>无一落在「推导成功」</strong>。这张表是<strong>归纳</strong>（清点已发生的尝试），不是穷举证明 —— 见 §七 边界③。</p>
+<hr />
+<h2>四、为什么②可做：三个样板工程（= 框架现在的全部对外产出）</h2>
+<table>
+<thead>
+<tr>
+<th>样板</th>
+<th>形式</th>
+<th>产出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>度规扇区</strong>（B3）</td>
+<td>三条<strong>框架内线索</strong>收敛（玻尔兹曼路径 ＋ 微变权守恒 ＋ 各向同性）</td>
+<td>指数度规 ⟹ <strong>EMRI</strong>（唯一对外预言；LISA ~10–15 年）</td>
+</tr>
+<tr>
+<td><strong>Φ 扇区</strong>（§6.4 ＋ 第 61–72 轮）</td>
+<td><code>V(Φ)</code>＋<code>g</code> 显式输入；<code>α_Y = 1/3</code> 借自 KK radion（BD ω=0）</td>
+<td><strong>第五力窗口</strong>（47.1 μm 档存活，余量 2–3×）＋ <strong>×3.2 判据</strong>（实验线材料包）</td>
+</tr>
+<tr>
+<td><strong>A2 动能扇区</strong>（§8.1）</td>
+<td><code>ε₀</code>、<code>β</code> 显式输入（锚 meV 与 TeV）</td>
+<td><strong><code>E_c</code> = 1.0181 meV</strong>（给定 <code>ε₀β</code> 无额外自由）＋ <strong><code>τ = t_P</code></strong>（由自洽性挤出）</td>
+</tr>
+</tbody>
+</table>
+<p>⭐ 三条的共同形式 = <strong>「显式声明输入 ＋ 用一致性把它钉住」</strong>；共同点 = <strong>都不是「从 A1／A2 内部推出耦合」</strong>。
+⭐⭐ <strong>自洽性过滤真的会咬人</strong>（这是②不是橡皮图章的证据）：
+- DY-3：微观模型生产率<strong>超出稀释率 61 个量级</strong> ⟹ 被迫引入复合时标，唯一出路 <code>τ = t_P</code>；
+- C-54：<code>ρ_Λ = E_c⁴</code> 识别被<strong>二选一</strong>（能标 vs 密度不可兼得）判死；
+- C-83：排除线换成具体耦合值后，47.1 μm 档从「已排除」翻为「<strong>存活 2–3×</strong>」。</p>
+<hr />
+<h2>五、输入台账（14 项）：真的要「做」，就得声明这些</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>输入／自由度</th>
+<th>现状</th>
+<th>买到什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>c</code></td>
+<td>实测（框架侧 <code>c = l_P/t_P</code>）</td>
+<td>单位换算</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>l_P</code>（衬底尺度）</td>
+<td>框架自有（方向管径 ＋ λ=1 链）</td>
+<td>固定组合 <code>Gℏ = l_P²c³</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>G</code> 与 <code>ℏ</code> 的拆分</td>
+<td><strong>自由</strong>（<code>ℏ</code> 不可辨识，N-41）</td>
+<td>——</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>ε₀ = 7.7×10⁻²⁰</code>、<code>β = 0.615</code></td>
+<td>A2 输入（锚 meV 与 TeV）</td>
+<td><code>E_c</code>（+0.8%）与 η 吻合（2%）</td>
+</tr>
+<tr>
+<td>5</td>
+<td>能标自由度（由 <code>ε₀β</code> 携带）</td>
+<td><strong>自由</strong>（一维简并族，N-40）</td>
+<td>——</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>μ, λ</code>（§6.4 <code>V(Φ)</code> 形状）</td>
+<td>输入（第 62 轮警示：直接用它 = 公设上移）</td>
+<td>Φ 扇区形状</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>g</code>（钉扎）→ <code>α_Y = 1/3</code></td>
+<td><strong>第 4 个纯输入</strong>（D4／N-33）／KK 借用</td>
+<td>第五力窗口 ＋ ×3.2 判据</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>m_Φ = 截断能标</code></td>
+<td>假设（第 70 轮）</td>
+<td>力程 47.1 μm</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>w</code>（状态方程）</td>
+<td><strong>外部借用</strong>（I-20／N-30）</td>
+<td><code>H(a)</code>（有 <code>w</code> 才有稀释律）</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>Ω_Λ／Ω_m／Ω_cdm</code> 组分</td>
+<td>外部（暗物质<strong>空白</strong>）</td>
+<td>组分对照（判别力 0）</td>
+</tr>
+<tr>
+<td>11</td>
+<td>B5 公设（0.25 纳特/<code>l_P²</code> 或 <code>δ</code>）</td>
+<td>公设（已过 Hawking 温度过滤 ✓）</td>
+<td>观测者读数</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>H₀</code></td>
+<td>实测</td>
+<td><code>ρ = 3H₀²/8πG</code> 的数值尺度</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>1/4</code>（等分账）与 <code>β = 1/(2π)</code>（kT）</td>
+<td><strong>标准物理输入</strong>（第 111 轮）</td>
+<td>等分账数值</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>τ = t_P</code>（复合时标）</td>
+<td><strong>自洽性导出 ✓</strong>（DY-4）</td>
+<td>微观模型自洽（否则差 61 个量级）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>汇总</strong>：<strong>给定 2</strong>（#1 <code>c</code>／#2 <code>l_P</code>）｜<strong>自由 2</strong>（#3／#5）＋ <strong>半自由 1</strong>（#11）｜<strong>借用／输入 8</strong>（#4／#6–#10／#12–#13）｜<strong>自洽导出 1</strong>（#14）＋ 附带升级 1（<code>κ</code>，−1 参数）。
+⟹ <strong>「做动力学·耦合层」的真实成本 ≈ 8 项显式声明 ＋ 让 2–3 项自由保持自由</strong> —— 这不是「推」，是「记账」。</p>
+<hr />
+<h2>六、判决与建议</h2>
+<ul>
+<li><strong>登记</strong>：<strong>N-43</strong>（负面计数器 42 → 43）；<strong>C-86</strong>（交接说明 §七 老建议行「金刚石定案」补标 —— C-33 下游残留第 2 处；84 → 85）。</li>
+<li><strong>论文</strong>：§8.6.3 第 75 轮块后加 1 处第 123 轮判定注（中英同步）；<strong>清单</strong>：零表行 ＋ N-43 ＋ C-86 ＋ 两计数器；<strong>交接说明</strong> §七 新条目（并把第 121 轮条目降为历史）。</li>
+<li><strong>建议（本轮结论的用途）</strong>：
+  1. ⛔ <strong>不要再把「补动力学·耦合层」当下一轮主题</strong> —— ①档判否有结构性理由；再推会把三条已判死的路各再审一遍（第 122 轮「只清自己的账 → 设上限」的兑现）。
+  2. ✅ <strong>可做的动作清单不变</strong>（对外三件）：<strong>送材料包／私审（选人）</strong> ／ <strong>等 Du 设计 40–60 μm 投影（I-27）</strong> ／ <strong>等 LISA</strong>。
+  3. ⚖️ <strong>内部唯一活口 = I-26</strong>（Φ 的 screened 读法：声明 <code>β_eff</code>／势类／<code>ρ</code> 范围，凑不出即判否）—— 若做，预期仍是负面居多，但判据已写好。</li>
+<li><strong>失效条件重申</strong>：新增公理级输入 ⟹ 本判定作废、①档重开（尤其是「量化 Φ」——它同时击中障碍 A 的边界句）。</li>
+</ul>
+<hr />
+<h2>七、诚实边界（五条）</h2>
+<ol>
+<li><strong>①的「判否」= 对当前公理集</strong>（A1／A2／B5 ＋ §5–§8 结构）；不是对「任何未来版本」的判死 —— 失效条件已显式给出。</li>
+<li><strong>三条障碍的严格性等级混合</strong>：I-16 的强版依赖一个<strong>设定</strong>（「𝒜 就是全部」，第 68 轮自标）；I-20 为结项级判定；障碍 C 为<strong>词条清点类</strong>（第 39／56／67 轮）。</li>
+<li><strong>15 例台账是归纳</strong>（清点已发生的尝试），不是穷举定理 —— 它把「大概不行」变成「<strong>已试过的都不行</strong>」，强度到此为止。</li>
+<li><strong>样板三例的产出等级沿用原轮次登记</strong>（B3 的【推导】标注、第五力的 KK 借用、A2 的输入参数），本轮<strong>不重新裁决</strong>它们的严格性。</li>
+<li><strong>本轮无新物理、无新数值、新增自由参数 0</strong>；一切数字均引自既有台账（核验脚本逐条取证）。</li>
+</ol>
+<hr />
+<p><em>核验：<code>_dyn123_verify.py</code>（33 项断言 0 失败：底本 1 ＋ 三障碍 4 ＋ 台账 15 例聚合 1 ＋ 样板 5 ＋ 台账侧 4 ＋ 两段式 14 ＋ 格式 4）。</em></p>
+
+<div class="footer">动力学·耦合层的可行性：三档判定与输入台账 · 2026-10-05 · 由 _md2html_generic.py 生成 · 源文件 动力学耦合层可行性_三档判定与输入台账.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

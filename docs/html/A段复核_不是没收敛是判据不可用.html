@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A 段复核：不是「没收敛」，是**判据在 N=256 下不可用**</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、噪声基线：判据的盲区（HA-1，决定性）</div>
+  <h1>A 段复核：不是「没收敛」，是**判据在 N=256 下不可用**</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-18（第 24 轮）
+<strong>脚本</strong>：<code>outputs/_m1_runA_convergence.py</code>（HA-1 … HA-3，失败项：无）
+<strong>补丁</strong>：<code>outputs/_patch_sec4_criterion.py</code>（2 项，0 失败，中英同步；原文件已备份进 <code>paper/history/</code>）
+<strong>一句话结论</strong>：测出该指标<strong>随 N 变化的统计噪声基线</strong>后，A 段的 22.74% 恰好是基线（24.3%±4.9%）的 <strong>0.94 倍</strong>——<strong>A 段与完全正确的麦克斯韦分布不可区分</strong>。而且<strong>步数加长 4 倍后偏差没有下降</strong>（反而 1.16 倍基线），进一步排除"弛豫不足"。C 段两项同样是噪声量级。<strong>上一轮我写进论文的那条「A 段未通过」是错的，已改正。</strong></p>
+</blockquote>
+<hr />
+<h2>一、噪声基线：判据的盲区（HA-1，决定性）</h2>
+<p>直接<strong>从精确麦克斯韦分布抽样</strong> N 个速度，用与论文<strong>完全相同</strong>的 bins/权重口径算同一个加权偏差指标（400 次平均）：</p>
+<table>
+<thead>
+<tr>
+<th>N</th>
+<th>噪声基线（均值±sd）</th>
+<th>论文判据 &lt;10%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>256</strong></td>
+<td><strong>0.2427 ± 0.0494</strong></td>
+<td><strong>基线已超判据 ✗</strong></td>
+</tr>
+<tr>
+<td>500</td>
+<td>0.1657 ± 0.0294</td>
+<td>基线已超判据 ✗</td>
+</tr>
+<tr>
+<td>512</td>
+<td>0.1646 ± 0.0323</td>
+<td>基线已超判据 ✗</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>0.1137 ± 0.0198</td>
+<td>基线已超判据 ✗</td>
+</tr>
+<tr>
+<td>1024</td>
+<td>0.1138 ± 0.0204</td>
+<td>基线已超判据 ✗</td>
+</tr>
+<tr>
+<td>2000</td>
+<td>0.0802 ± 0.0139</td>
+<td>✓（余量仅 ~1.4σ）</td>
+</tr>
+<tr>
+<td>8000</td>
+<td>0.0394 ± 0.0067</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>分布完全正确时，N=256 的偏差就有 24.3%。</strong> 绝对判据「&lt;10%」在 <strong>N ≲ 1600 时不可用</strong>。
+⟹ 顺带：判据在 N=2000 时也只比基线高约 1.4σ，<strong>辨别力本就有限</strong>。</p>
+<hr />
+<h2>二、A 段实测 vs 基线（HA-2）</h2>
+<table>
+<thead>
+<tr>
+<th>设置</th>
+<th>N</th>
+<th>步数</th>
+<th>实测偏差</th>
+<th>噪声基线</th>
+<th>比值</th>
+<th>偏离基线</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>基线（原设置）</strong></td>
+<td>256</td>
+<td>5000</td>
+<td><strong>0.2274</strong></td>
+<td>0.2427</td>
+<td><strong>0.94×</strong></td>
+<td><strong>−0.31σ</strong></td>
+</tr>
+<tr>
+<td>加长 4×</td>
+<td>256</td>
+<td>20000</td>
+<td>0.2825</td>
+<td>0.2427</td>
+<td>1.16×</td>
+<td>+0.81σ</td>
+</tr>
+<tr>
+<td>换种子</td>
+<td>256</td>
+<td>5000</td>
+<td>0.2942</td>
+<td>0.2427</td>
+<td>1.21×</td>
+<td>+1.04σ</td>
+</tr>
+<tr>
+<td>加大 N（同堆积率）</td>
+<td>512</td>
+<td>6000</td>
+<td>0.2223</td>
+<td>0.1645</td>
+<td>1.35×</td>
+<td>+1.79σ</td>
+</tr>
+</tbody>
+</table>
+<p>三个要点：</p>
+<ol>
+<li><strong>原设置（22.74%）落在基线 1σ 内</strong> ⟹ A 段与"完全正确的麦克斯韦分布"<strong>统计上不可区分</strong>。</li>
+<li><strong>加长 4 倍步数，偏差没有下降</strong>（0.2274 → 0.2825，1.16 倍基线）⟹ <strong>这直接排除了"弛豫不足"</strong>：如果真是没弛豫，加长 4 倍应当显著下降。它没有 ⟹ 该偏差不是"还没均衡"，而是<strong>采样统计</strong>（＋可能的 2D 长时尾，原稿已诚实标注）。</li>
+<li><strong>换种子给出 0.2274 / 0.2942</strong> ⟹ 样本间散布 ≈ ±0.03，与基线 sd 0.049 同量级 ⟹ 这就是噪声。</li>
+</ol>
+<p>⚠️ <strong>唯一需要留意的</strong>：N=512 时 1.35×（+1.79σ）——轻微超出基线，可能来自 <strong>2D 长时尾</strong>（真实物理效应）。但只有 1.8σ，<strong>不足以断言</strong>，需要更多种子或三维模拟才能分辨。</p>
+<hr />
+<h2>三、C 段两项同样是噪声</h2>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>实测</th>
+<th>对应 N 的基线</th>
+<th>比值</th>
+<th>偏离</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v0=2.0 / N=1000</td>
+<td>13.6%</td>
+<td>11.37% ± 1.98%</td>
+<td>1.19×</td>
+<td>+1.13σ</td>
+</tr>
+<tr>
+<td>v0=1.0 / N=500</td>
+<td>20.7%</td>
+<td>16.57% ± 2.94%</td>
+<td>1.25×</td>
+<td>+1.40σ</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>两项都在噪声量级</strong>（1.1σ / 1.4σ），不是物理失败。</p>
+<p><strong>B 段反向验证</strong>：N=2000 的基线 8.02%，实测 <strong>7.02% = 0.88 倍基线</strong> ⟹ B 段<strong>真的</strong>通过（不是擦边）。</p>
+<hr />
+<h2>四、结论与建议</h2>
+<p><strong>结论</strong>：三段曾被记为"未通过"的项，<strong>全部是判据不可用</strong>，不是物理问题：
+- A 段 = 0.94× 基线（与完全正确的分布不可区分）；
+- C 段两项 = 1.19× / 1.25× 基线（1.1σ / 1.4σ）；
+- B 段 = 0.88× 基线（真通过）。</p>
+<p><strong>建议</strong>（已写进论文）：
+1. 判据改为<strong>相对式</strong>：「实测偏差 / 噪声基线 ≲ 1.5」；
+2. 或者把第 2 类对照（无分子混沌）的规模提到 <strong>N ≥ 2000</strong>（基线 8.0%）再用绝对判据；
+3. 报告偏差时<strong>一律附上该 N 的噪声基线</strong>，否则数字无法解读。</p>
+<hr />
+<h2>五、已落地的第四处修正</h2>
+<p>§4.2 复核块的 ③ 条目替换为「判据校准」，含：基线表、A 段 0.94× 的判定、加长 4× 未下降的证据、C 段两项的 σ、B 段 0.88×，以及相对判据的建议。（中英同步；原 v2.9 已备份进 <code>paper/history/*_备份_2026-09-18判据前.md</code>。）</p>
+<hr />
+<h2>六、诚实边界</h2>
+<p><strong>是数值事实</strong>：噪声基线表（400 次抽样）、A/C/B 段的实测值与比值、各 σ。</p>
+<p><strong>是推断</strong>：
+- 「排除弛豫不足」依据的是"加长 4× 未下降"——<strong>单种子</strong>的结论，没有做多种子平均；严格说只有 1 组数据支持。
+- N=512 的 +1.79σ 归因于 2D 长时尾是<strong>推测</strong>（原脚本早已标注 2D 长时尾，但本轮没有独立验证其大小）。</p>
+<p><strong>未做</strong>：
+- 多种子统计（每配置只跑 1 个种子，除了基线补了 seed=43）；
+- 三维硬球（全部 2D）；N≥2000 的确定性硬球（受运行时间限制）。
+- 噪声基线假设"速度独立同分布"——若系统存在空间关联（如 2D 长时尾），基线可能被低估，这也是 N=512 略超基线的另一种可能解释。</p>
+<hr />
+<h2>七、判决与下一步</h2>
+<p><strong>判决</strong>：✅ <strong>A 段没有失败</strong>：22.74% = 噪声基线的 0.94 倍，且加长 4× 不下降 ⟹ "未完全收敛"的判定<strong>撤回</strong>；✅ C 段两项同样撤回；✅ B 段 0.88× 基线，真通过；⚠️ 新增一条方法论要求：<strong>报偏差必须附该 N 的噪声基线</strong>。</p>
+<p><strong>下一步</strong>：</p>
+<ol>
+<li><strong>多种子 + 三维</strong>：把 A 段跑成"每配置 ≥5 个种子、2D 与 3D 各一组、N≥512"，才能把 N=512 那 +1.79σ 分辨成"统计涨落"还是"2D 长时尾"。</li>
+<li>论文仍待落的三处硬修正（§4 的 k → e^{1/4}、B5 的 4 bits 改为推导、压缩因子 → 16 ln2）——已排队多轮，可一并处理。</li>
+<li>回到第 21 轮的两条：tick 更新规则（串行 vs 并行）、11.0904 的数值推导。</li>
+</ol>
+<p><strong>附：本轮对 §4 的影响</strong></p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A 段「未完全收敛」</td>
+<td>🔧 <strong>撤回</strong>（0.94× 噪声基线，统计上不可区分）</td>
+</tr>
+<tr>
+<td>C 段两项「未通过」</td>
+<td>🔧 <strong>撤回</strong>（1.1σ / 1.4σ，噪声量级）</td>
+</tr>
+<tr>
+<td>B 段通过</td>
+<td>✅ 强化（0.88× 基线）</td>
+</tr>
+<tr>
+<td>判据</td>
+<td>🔧 <strong>改为相对式</strong>（实测/基线 ≲ 1.5）</td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">A 段复核：不是「没收敛」，是**判据在 N=256 下不可用** · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 A段复核_不是没收敛是判据不可用.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

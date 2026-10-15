@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>公理 B5 能推吗？——从 A1 的"50:50 + 各向同性"到"热力学面 = 因果视界"</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、回答：B5 的地位变了，但没变成定理</div>
+  <h1>公理 B5 能推吗？——从 A1 的"50:50 + 各向同性"到"热力学面 = 因果视界"</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-09-16 ｜ 接续《β 的框架推导：因果视界与 2π 的来源》
+核验脚本：<code>_b5_derive.py</code>（纯标准库）
+<strong>直接回答：能推进一大截——B5 从"两个候选面里随便挑一个"升级为"A1 层面唯一可定义的面"；但还差最后一环，尚不能称为定理。</strong></p>
+</blockquote>
+<hr />
+<h2>一、回答：B5 的地位变了，但没变成定理</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>B5 的地位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上一轮</td>
+<td><strong>公理</strong>：两个候选面（因果视界 / 表观视界）里选一个，靠"唯一有预言力"辩护</td>
+</tr>
+<tr>
+<td>本轮</td>
+<td><strong>准定理</strong>：A1 层面上<strong>只有因果视界可定义</strong>，表观视界根本不可选（它需要 G，而 G 是涌现量）</td>
+</tr>
+<tr>
+<td>仍缺</td>
+<td>"熵 = 观测者看不到的微观态数"与 F3"通量管相干块计数"的严格对接</td>
+</tr>
+</tbody>
+</table>
+<p>判定：<strong>B5 现在是"由框架架构强迫的选择"，不是"自由选择"</strong>。
+但它依赖一个未被形式化的前提（热力学必须先于引力），所以我不把它改称定理。</p>
+<hr />
+<h2>二、推导：A1 的三条各干了什么</h2>
+<h3>BX-6（因果优先 / 涌现次序）</h3>
+<p>框架的核心架构是 <strong>引力 = 通量亏损 = 统计涌现</strong>（Jacobson 式方向：热力学在先，引力在后）。
+所以热力学面必须在<strong>引力涌现之前</strong>就可定义。</p>
+<ul>
+<li><code>R_c = c/H</code>：只需要 <code>(c, H)</code> —— A1 层面就有。</li>
+<li><code>R_A = c/(H√λ)</code>：需要 <code>λ = ρ/ρ_c</code>，<code>ρ_c = 3H²/(8πG)</code> —— <strong>需要 G</strong>。</li>
+</ul>
+<p><strong>G 是涌现量，不在 A1 的基本量表里。</strong> 用 R_A 等于用"涌现之后的产物"去定义"涌现之前的基础"，
+方向反了。⟹ 热力学面只能是 <code>R_c</code>。</p>
+<h3>BX-7（观测者相对性）</h3>
+<p>框架有观测者模型（notes/B-series，B5 观测者模型严格数学化）：观测者是<strong>被钉住的孤子</strong>。
+熵 = 观测者看不到的微观态数。"看不到"是<strong>因果</strong>概念，不是引力概念：
+一个风暴成分能否把信息送回观测者，取决于它的退行速度是否小于信号速度 c。
+⟹ 信息边界 = <code>v_rec = c</code> 的面 = <code>R_c</code>。</p>
+<h3>BX-8（50:50 与 各向同性的具体分工）</h3>
+<table>
+<thead>
+<tr>
+<th>A1 条款</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>各向同性</strong></td>
+<td>观测者的因果边界是<strong>以观测者为心的球面</strong>（定形状，不定半径）</td>
+</tr>
+<tr>
+<td><strong>50:50</strong></td>
+<td>无净漂移、无净荷 ⟹ 边界是<strong>纯运动学</strong>的，不会被不对称通量推移或倾斜</td>
+</tr>
+<tr>
+<td><strong>ν ~ 1/t_P</strong></td>
+<td>风暴组分以 c 传播 ⟹ 半径由 <code>v_rec = Hr = c</code> 定出 ⟹ <strong><code>R_c = c/H</code></strong></td>
+</tr>
+</tbody>
+</table>
+<p>三条合起来把面唯一确定下来，全程没有用到 λ、k 或 G。</p>
+<h3>BX-9（反证 / no-free-lunch）</h3>
+<p>假设取 <code>R_A</code> 为热力学面：
+<code>ε_bit = √λ·ℏH/(2π)</code>，而 <code>κ = c²/R_A = cH√λ</code> 给出 <code>k_B T = √λ·ℏH/(2π)</code> ——
+<strong>两者恒等，<code>E = N k_B T</code> 对任意 λ 成立</strong>（数值：λ = 0.3/0.6/1/3 比值全为 1.000000000000）。
+⟹ 能账不含任何关于 λ 的信息 ⟹ <strong>引力没有从热力学涌现，只是与热力学同义反复</strong>。
+⟹ 与框架的核心主张直接矛盾。
+⟹ <strong>只要框架要求"引力从热力学涌现"具有信息量，热力学面就必须取 <code>R_c</code>。</strong></p>
+<hr />
+<h2>三、意外收获：λ = 1 不依赖 F3 的系数（稳健性定理）</h2>
+<p>把熵写成通式 <code>S = k_B A/(ξ l_P²)</code>（ξ 待定，F3 给 ξ = 4），则：</p>
+<div class="formula">α = <span class="frac"><span class="num">4π</span><span class="den">ξ</span></span>,   β = <span class="frac"><span class="num">ξ</span><span class="den">8π</span></span>,   λ = 4α<sup>2</sup>β<sup>2</sup> = 4·<span class="frac"><span class="num">16π<sup>2</sup></span><span class="den">ξ<sup>2</sup></span></span>·<span class="frac"><span class="num">ξ<sup>2</sup></span><span class="den">64π<sup>2</sup></span></span> = 1</div>
+
+<p><strong>ξ 完全约掉。</strong> 数值核验（ξ = 1, 2, 3, 4, 4ln2, 8, 16）：λ 恒为 <code>1.000000000000</code>，
+<code>N k_B T</code> 恒为 <code>8.273444294e+69 J = c⁵/(2GH)</code>，与 ξ 无关。</p>
+<p>两条重要推论：</p>
+<ol>
+<li><strong>λ = 1 极其稳健</strong>：即使 F3 的熵系数数错了（ξ ≠ 4），λ = 1 依然成立。
+   这比上一轮的结果强得多——之前 λ=1 看起来拴在 α = π 上。</li>
+<li><strong>但 β = 1/(2π) 依赖 ξ = 4</strong>：<code>β = ξ/(8π)</code>，只有 ξ = 4 才给出 1/(2π)。
+   ξ = 4 就是 F3 的 <code>S = k_B A/(4 l_P²)</code>，已由太阳黑洞 <code>S/k_B = 1.0494×10⁷⁷</code> 独立核验。
+   ⟹ <strong>β = 1/(2π) ⟺ 熵系数是 1/4 ⟺ 正确的 Hawking 温度。</strong> 三者是同一件事。</li>
+</ol>
+<hr />
+<h2>四、λ = 1 的新含义：一个一致性条件</h2>
+<p>把层次分开看，λ = 1 的意思变得很清楚：</p>
+<ul>
+<li><strong>基本层（A1）</strong>：因果视界 <code>R_c = c/H</code>，只需 c 与 H。</li>
+<li><strong>涌现层（引力之后）</strong>：表观视界 <code>R_A = c/(H√λ)</code>，需要 G 与 ρ。</li>
+<li><strong>一致性</strong>：热力学账必须记在<strong>基本</strong>面上 ⟹ 涌现层必须追平基本层 ⟹ <code>R_A = R_c</code> ⟹ <strong>λ = 1</strong>。</li>
+</ul>
+<p>换句话说：<strong>λ = 1 是"涌现出的引力视界成功复现了基本的因果视界"这一要求。</strong>
+这比"平坦性是个巧合"或"暴胀把它抹平了"都更有结构。它同时也解释了为什么
+λ 恰好是 1 而不是 0.7 或 3 —— 因为它是两个面的<strong>重合条件</strong>，不是一个数值参数。</p>
+<p>（严格说：这只给出"必须重合"，没给出"重合如何由动力学保证"。后者需要框架自己的
+Friedmann 方程——目前仍缺，见第六节。）</p>
+<hr />
+<h2>五、两面是可分辨的（不是文字游戏）</h2>
+<table>
+<thead>
+<tr>
+<th>λ</th>
+<th>R_A/R_c</th>
+<th>S_A/S_c</th>
+<th>T_A/T_c</th>
+<th>重合？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.3</td>
+<td>1.8257</td>
+<td>3.3333</td>
+<td>0.5477</td>
+<td>否</td>
+</tr>
+<tr>
+<td>0.6</td>
+<td>1.2910</td>
+<td>1.6667</td>
+<td>0.7746</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>1.0</strong></td>
+<td><strong>1.0000</strong></td>
+<td><strong>1.0000</strong></td>
+<td><strong>1.0000</strong></td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>3.0</td>
+<td>0.5774</td>
+<td>0.3333</td>
+<td>1.7321</td>
+<td>否</td>
+</tr>
+</tbody>
+</table>
+<p>λ ≠ 1 时，熵和温度都会差出 O(1) 的倍数——这不是一个不可检验的形而上学选择。</p>
+<hr />
+<h2>六、还差什么才算定理（诚实标注）</h2>
+<p><strong>唯一缺环</strong>：需要证明</p>
+<blockquote>
+<p>"熵 = 观测者看不到的微观态数"（BX-7 的因果式定义）
+与
+"熵 = 通量管相干块微态计数"（F3 的统计力学定义）
+是<strong>同一个量</strong>。</p>
+</blockquote>
+<p>两者在黑洞情形给出同一个数（1.0494e77 k_B），这是强证据，但不是证明。
+要补的部分：
+1. 在<strong>因果视界</strong>（而非黑洞视界）上重做 F3 的相干块计数——F3 原本是在黑洞视界上做的。
+2. 说明为什么"看不到"的判据是因果的（v_rec = c）而不是引力的（俘获面）。
+   在黑洞情形两者重合，所以在那里区分不了；必须在一个 λ≠1 的玩具宇宙里区分。</p>
+<p><strong>另一条更硬的缺环</strong>：框架仍未导出 Friedmann 方程。因此 λ = 1 目前是
+"一致性要求"，不是"动力学后果"——我们说明了它<strong>必须</strong>成立，但没说明动力学<strong>如何</strong>做到。</p>
+<hr />
+<h2>七、一个猜想（明确标注为猜想，勿当结论）</h2>
+<p><strong>猜想 BX-C1</strong>：F3 熵公式里那个"4"可能就是 <code>2 × 2</code> ——
+2 条分支（本支 B+ / 镜像支 B−）× 2 个成员（正份 / 反份）。
+若成立，则 <strong>50:50 正是两条分支贡献相等的保证</strong> ⟹ 熵系数恰为 1/4 ⟹ 2π ⟹ β = 1/(2π)。</p>
+<p>线索：F3 的微态计数里出现过 <code>k = 2^{1/4}</code>（四次根），与"4"同现。</p>
+<p><strong>但请注意（第三节）</strong>：λ = 1 <strong>不依赖</strong>这个猜想（ξ 会约掉）。
+这个猜想只关乎 β 的<strong>数值</strong>是否恰为 1/(2π)，不关乎 λ。
+即使猜想错误（ξ ≠ 4），λ = 1 依然成立，只是 β ≠ 1/(2π)。</p>
+<hr />
+<h2>八、判别器（不变）</h2>
+<table>
+<thead>
+<tr>
+<th>检验</th>
+<th>精确 k ≡ 0（本框架）</th>
+<th>暴胀残余</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ω_K</td>
+<td><strong>恒等于 0</strong></td>
+<td>10⁻⁵ – 10⁻⁴</td>
+</tr>
+<tr>
+<td>所需精度</td>
+<td>未来巡天 σ(Ω_K) ≲ 10⁻⁴</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>若测到 Ω_K ≠ 0（排除系统误差）⟹ 不是"λ 需要微调"，而是<strong>热力学面选错了</strong>（B5 错）。</p>
+<hr />
+<h2>九、更新后的链条全图</h2>
+<pre><code>A1  各向同性 ──▶ 因果边界是球面
+    50:50    ──▶ 无净漂移，边界纯运动学
+    ν~1/t_P  ──▶ 信号速度 c ──▶ v_rec = Hr = c ──▶ R_c = c/H      [BX-1/8]
+        引力是涌现量 ⟹ 热力学面必须可在 A1 层定义 ⟹ 只能是 R_c     [BX-6]
+        熵 = 观测者看不到的态 ⟹ 面由因果定，不由俘获定             [BX-7]
+        反证：取 R_A ⟹ 能账恒等 ⟹ 涌现无信息 ⟹ 矛盾                [BX-9]
+                                    │
+    κ = c²/R_c = cH ──▶ β = 1/(2π)（与 λ 无关）                    [BX-3]
+    F3: S = k_B A/(4l_P²) ──dE=TdS──▶ 2π 的来源（ξ=4）             [BX-A]
+                                    │
+    E = λ·c⁵/(2GH)  vs  N k_B T = c⁵/(2GH)  ⟹  λ = 1（ξ 无关）     [BX-4/F]
+                                    │
+    ⟹ R_A = R_c ⟹ Ω_K = 0 ⟹ k = 0 ⟹ 黑洞宇宙                        [BX-5]
+</code></pre>
+
+<div class="footer">公理 B5 能推吗？——从 A1 的"50:50 + 各向同性"到"热力学面 = 因果视界" · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 公理B5的推导_从A1到因果视界.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I-17 修定：第五力窗口 —— 2025–26 约束带更新与 47.1 μm 档的存活</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>I-17 修定：第五力窗口 —— 2025–26 约束带更新与 47.1 μm 档的存活</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 120 轮</strong>（2026-10-04）｜核验脚本 <code>_i17_120.py</code>（<strong>I17-1 … I17-24，24 项 0 失败</strong>）
+题源：第 118 轮外部输入清单 <strong>C1</strong>（「把 Φ 放进 2025–26 约束表」，标注为「唯一可能改变结论的本地项」）</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<blockquote>
+<p><strong>把 Φ 放进 2025–26 约束表之后，结论不是「判死」，也不是「一切照旧」——</strong>
+<strong>① 2025–26 的全部新结果（微球 α ≲ 10⁶–10⁷ @5–10 μm、HUST 厘米 α &lt; 10⁻⁴、Juno m ~ 10⁻¹⁴ eV、
+chameleon ~2 个数量级）没有一条落在 Φ 的相关带<strong>（40–200 μm；该带自 2020 年后</strong>无新数据</strong>）；
+<strong>② 把第 72 轮的「α ~ O(1)」换成 KK 的 radion 值 <code>α_Y = 1/3</code> 后，(c) 47.1 μm 档从「已被排除」变成「存活」</strong>
+（余量 2.0–3.2×），而 (b) 193.8 μm 档维持排除（余量 4–20×）⟹ <strong>Φ 的第五力窗口 = λ ≲ 65–90 μm</strong>；
+<strong>③ 产出一条可操作的实验判据：40–60 μm 段的 α 界再改进 ×3，即可判定 (c) 的存亡。</strong></p>
+</blockquote>
+<hr />
+<h2>一、为什么做、做了什么</h2>
+<p>第 72 轮把 I-17 结项（「Φ 有场、有质量档位、无耦合」），并留了关门条件：
+「除非找到『第二个可观测量与 <code>g</code> 同台出现』，不要再碰第五力。」第 118 轮的外部扫描从<strong>外部约束侧</strong>重开了口子
+（C1：「把 Φ 放进 2025–26 约束表」）。本轮走这条路径，做三件事：</p>
+<ol>
+<li><strong>取数</strong>：把 2025–26 的第五力约束实测/计划<strong>分开</strong>列清（网络检索，2026-10-04 快照；一手来源已核，见 §二）；</li>
+<li><strong>重判</strong>：把第 72 轮用的「α ~ O(1)」替换为 <strong>KK radion 的具体值 <code>α_Y = 1/3</code></strong>，对第 70 轮的四个质量档逐档重判；</li>
+<li><strong>定界</strong>：给出 Φ 的<strong>存活窗口</strong>与<strong>能把窗口关死的实验判据</strong>。</li>
+</ol>
+<p>本轮<strong>无新数值模拟、无新自由参数、无新现象</strong> —— 产出 = 一次外部对照 ＋ 一次判决细化 ＋ 一条判据。</p>
+<hr />
+<h2>二、2025–26 约束带：三拆（实测 / 计划 / 对 Φ 的命中）</h2>
+<p><strong>判据样式</strong>：<code>V(r) = −(GM/r)·(1 + α_Y·e^{−r/λ})</code>，<code>α_Y</code> = Yukawa 强度（相对引力），<code>λ</code> = 力程。</p>
+<table>
+<thead>
+<tr>
+<th>来源</th>
+<th>参数区</th>
+<th>类型</th>
+<th>对 Φ（α_Y ~ 1/3–1、40–200 μm）的命中</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>光学悬浮微球</strong>（<em>Sci. Rep.</em> <strong>16</strong>, 5180 (2026)；arXiv:2412.13167）</td>
+<td>λ = 1–100 μm；<strong>α ≲ 10⁷ @5 μm、≈10⁶ @≳10 μm</strong>（同技术 ×50–100）</td>
+<td><strong>实测</strong></td>
+<td>❌ 差 <strong>6 个数量级</strong>（它压的是高-α 前沿，不是 α~1 线）</td>
+</tr>
+<tr>
+<td><strong>HUST 新结果</strong>（经 Murata 等 2026 综述 arXiv:2605.18212）</td>
+<td>厘米尺度；<strong>α &lt; 10⁻⁴</strong>（该尺度最佳）</td>
+<td><strong>实测</strong></td>
+<td>❌ 大 λ 侧本来已封死（Cassini 族 α ≲ 10⁻⁵ 量级）</td>
+</tr>
+<tr>
+<td><strong>Juno 轨道进动</strong>（JHEP <strong>01</strong> (2025) 098；arXiv:2409.10616）</td>
+<td><strong>m ~ 10⁻¹⁴ eV</strong>（λ ≈ 2×10⁷ m）新区域 95% CL 排除</td>
+<td><strong>实测</strong></td>
+<td>❌ 框架无超轻候选（Φ 的质量挂在纯输入上，但无任何量指向 10⁻¹⁴ eV）</td>
+</tr>
+<tr>
+<td><strong>悬浮传感对 chameleon</strong>（2024；AG-2024.05-318）</td>
+<td>屏蔽场（chameleon 类）~<strong>2 个数量级</strong> 改进</td>
+<td><strong>实测</strong></td>
+<td>⚠️ <strong>模型不同</strong>（简单 Yukawa 表不适用）—— 但注意 §五 的 I-26</td>
+</tr>
+<tr>
+<td><strong>MORRIS</strong>（arXiv:2506.17385；v2 2026-01）</td>
+<td>λ ~ 1–4 mm；<strong>目标</strong> α ≲ 10⁻⁴（中期）／10⁻⁵（长期）</td>
+<td><strong>计划</strong></td>
+<td>❌ 即便实现也不触窗口边界（4 mm ≫ 90 μm）</td>
+</tr>
+<tr>
+<td><strong>AION-10 / VLBAI / Th-229 核钟</strong></td>
+<td>屏蔽场或亚微米标量耦合（提案/目标）</td>
+<td><strong>计划</strong></td>
+<td>未实现</td>
+</tr>
+<tr>
+<td><strong>（对照）Lee et al. 2020</strong>（PRL 124, 101101）</td>
+<td>α=1 边界 <strong>38.6 μm</strong></td>
+<td>实测（2020）</td>
+<td>⭐ <strong>这就是 Φ 窗口的把守者</strong></td>
+</tr>
+<tr>
+<td><strong>（对照）Tan et al. 2020</strong>（PRL 124, 051301）</td>
+<td>α=1 边界 <strong>48 μm</strong>；40–350 μm 最强；λ ≈ 70 μm 处改进 ×3</td>
+<td>实测（2020）</td>
+<td>⭐ 同上；⚠️ 与 Lee 在 <strong>39–48 μm 段互不一致</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>结论</strong>：对 Φ 这条线，<strong>2025–26 的「大幅收紧」命中 = 0</strong>；收紧发生在三个别的参数区
+（高-α 短程 / chameleon 模型区 / 超轻区）。且必须<strong>拆「实测／计划」</strong>——
+第 118 轮清单里的 MORRIS／AION-10／VLBAI／Th-229 全是<strong>目标数字</strong>，不得当结果引用。</p>
+<hr />
+<h2>三、Φ 的映射与四档重判</h2>
+<h3>3.1 耦合值：从「α ~ O(1)」到 <code>α_Y = 1/3</code></h3>
+<ul>
+<li>平坦额外维 KK（物质在膜上）⇔ <strong>Brans–Dicke ω = 0</strong> ⟹ Yukawa 强度 <code>α_Y = 1/(2ω+3) = 1/3</code>；</li>
+<li>等价地：β = 1/√6（f(R) 型标量子的标准耦合）⟹ <code>α_Y = 2β² = 1/3</code>。（两条链数值恒等，脚本 I17-9 ✓）</li>
+<li>⚠️ <strong>这是标准 KK 的知识，不是框架的推导</strong>（沿用第 72 轮的口径）。变体区间：RS 型可达 2/3；dilaton 读法 = 1。
+  ⟹ 结论一律按 <strong>[1/3, 1]</strong> 区间表述，主判用 <strong>1/3</strong>。</li>
+</ul>
+<h3>3.2 四档重判（质量档沿用第 70 轮）</h3>
+<table>
+<thead>
+<tr>
+<th>档</th>
+<th>来源</th>
+<th>力程 λ</th>
+<th><code>α_Y = 1/3</code> 下判决</th>
+<th><code>α_Y = 1</code>（dilaton）下判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(a)</td>
+<td>弦网标量扇区 Δ = 0.41 J</td>
+<td>0.813 l_P</td>
+<td>不排除、<strong>不可观测</strong>（不变）</td>
+<td>同左</td>
+</tr>
+<tr>
+<td>(b)</td>
+<td>粗粒化 @ E_c = 1.0181 meV</td>
+<td>193.8 μm</td>
+<td><strong>排除</strong>（余量 4–20×）</td>
+<td><strong>排除</strong></td>
+</tr>
+<tr>
+<td>(c)</td>
+<td>粗粒化 @ E(R_H) = 4.1894 meV</td>
+<td><strong>47.1 μm</strong></td>
+<td>⭐ <strong>存活</strong>（余量 2.0–3.2×）</td>
+<td>骑在 <strong>39–48 μm 争议带</strong>内 ⟹ <strong>不能判定</strong></td>
+</tr>
+<tr>
+<td>(d)</td>
+<td>普朗克（公理 1）</td>
+<td>1.000 l_P</td>
+<td>不排除、<strong>不可观测</strong>（不变）</td>
+<td>同左</td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 排除曲线的量化（两锚点幂律插值族）</h3>
+<p>取 α_max(λ) 的两类锚点做幂律 <code>α_max = (λ/λ0)^{−p}</code>，4 组端点组合：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>端点</th>
+<th>p</th>
+<th>λ_(1/3)</th>
+<th>α_max(47.1 μm)</th>
+<th>α_max(193.8 μm)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Tan 48 μm/1 → 70 μm/(1/3)</td>
+<td>2.91</td>
+<td>70.0 μm</td>
+<td>1.057</td>
+<td>0.0172</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Tan 48 μm/1 → 1 mm/10⁻³</td>
+<td>2.27</td>
+<td>77.8 μm</td>
+<td>1.044</td>
+<td>0.0418</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Tan 48 μm/1 → 2 mm/10⁻³</td>
+<td>1.85</td>
+<td>86.9 μm</td>
+<td>1.036</td>
+<td>0.0754</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Lee 38.6 μm/1 → 1 mm/10⁻³</td>
+<td>2.12</td>
+<td>64.8 μm</td>
+<td>0.655</td>
+<td>0.0326</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>四组一致</strong>：<code>λ_(1/3) ∈ [64.8, 86.9] μm</code>（→「<strong>λ ≲ 65–90 μm</strong>」）；
+<strong>(c) 的余量 = α_max(47.1)/(1/3) ∈ [1.97, 3.17]</strong>（存活）；<strong>(b) 的余量 = (1/3)/α_max(193.8) ∈ [4.4, 19.4]</strong>（排除）。
+⚠️ 该曲线是<strong>插值</strong>（一手曲线在 Murata 2026 的图中，未数字化）；但结论对 4 组端点<strong>全部稳健</strong>。</p>
+<hr />
+<h2>四、窗口与可操作判据</h2>
+<p><strong>Φ 的第五力窗口（@<code>α_Y</code> = 1/3）</strong>：</p>
+<blockquote>
+<p><strong>λ ≲ 65–90 μm</strong> —— 一条<strong>短程半线</strong>。
+大 λ 侧无窗口（Cassini 族把 α 压到 ~10⁻⁵ 量级；cm–mm 段 α &lt; 10⁻⁴–10⁻³）；
+窗口内框架只有 <strong>(c) 一档</strong>，且它是<strong>半拟合</strong>（「m_Φ = 截断能标」是假设）。</p>
+</blockquote>
+<p><strong>可操作的实验判据（本轮对外产出）</strong>：</p>
+<blockquote>
+<p>把 <strong>40–60 μm 段</strong>的 α 界<strong>再改进 ×3</strong>（从 ~1 压到 ~0.3 级）⟹ <strong>(c) 档即可被判定</strong>（存或亡）。
+落在<strong>下一代桌面实验</strong>的量程内（同装置一代改进），<strong>不依赖任何新装置</strong>。
+若 (c) 被判死，Φ 的第五力线<strong>终结</strong>；若存活，则得到一个 47 μm、α ≈ 1/3 的<strong>条件性靶标</strong>。</p>
+</blockquote>
+<hr />
+<h2>五、更正与登记</h2>
+<h3>C-83：第 72 轮分支表对 (c) 的判决不成立</h3>
+<p>第 72 轮<strong>细表</strong>已标 (c)「灵敏度前沿」，而<strong>分支表</strong>（同轮）写「毫米档 ⟹ 已被排除」——内部不一致。
+根因：用「<strong>α ~ O(1)</strong>」代替了具体耦合值（<code>1/3 ≠ 1</code>）。修正读法：
+「<strong>193.8 μm 排除 ／ 47.1 μm 存活（骑前沿）</strong>」。论文第 72 块已加细化行（中英同步）。</p>
+<h3>C-84：<code>α</code> 的义项（≥5）未声明</h3>
+<p>① 过载参数（§4.6）② PPN <code>α₁α₂α₃</code>（§4.5b）③ 精细结构常数（§5.7）④ 图热流插值系数（§4.9 注）⑤ <strong>Yukawa 强度</strong>。
+第 120 轮起第五力段<strong>写作 <code>α_Y</code></strong>；§8.6 加「符号约定」补注（中英同步）。
+（与 C-15／C-16／C-21／C-32／C-73／C-75 同族。）</p>
+<h3>I-26（新难题）：Φ 的 screened（chameleon 型）读法</h3>
+<p>框架场方程 <code>□Φ = V′(Φ) + gψ̄ψ</code>（§6.2）＋ <code>V = −½μ²Φ² + ¼λΦ⁴</code>（§6.4）⟹ 介质中
+<code>V_eff = V + gΦ⟨ψ̄ψ⟩</code> <strong>被倾斜</strong>，最小点与曲率都随 <code>⟨ψ̄ψ⟩</code> 变 ⟹ <strong>环境依赖质量</strong>
+（结构上可屏蔽或反屏蔽，取决于 <code>g</code> 符号）。</p>
+<ul>
+<li><strong>为什么值得登记</strong>：2025–26 <strong>实际收紧</strong>的区正是<strong>屏蔽场区</strong>（悬浮传感 ~2 个数量级、AION-10/VLBAI/核钟路线）；
+  如果 Φ 走 screened 读法，它进的就是<strong>这张表</strong>，而不是简单 Yukawa 表。</li>
+<li><strong>为什么现在不能下结论</strong>：要进 chameleon 约束表，需先声明 <strong>① β_eff（有效耦合）② 势的形状类 ③ 环境密度范围</strong>——
+  框架<strong>一个也没声明</strong>；且本读法是<strong>我方的解释性读法</strong>（场方程自带倾斜项 ✓，但框架从未把它写成屏蔽机制）。</li>
+<li><strong>可判定问句</strong>：把上面三个量从框架的现有输入（Λ/μ/λ/g）里<strong>凑得出来吗</strong>？凑不出来 ⟹ 与 I-17 同命的「公设上移」。</li>
+</ul>
+<hr />
+<h2>六、诚实边界（六条）</h2>
+<ol>
+<li><strong>外部锚点是引文</strong>（2026-10-04 检索快照；一手来源：Lee 2020／Tan 2020／微球 2026／Murata 综述 2026／Juno 2025／MORRIS 2025–26）；本轮<strong>未</strong>独立复算实验数据。</li>
+<li><strong><code>α_Y = 1/3</code> 是标准 KK 的知识</strong>（BD ω=0），<strong>不是</strong>框架的推导；变体区间 [1/3, 1] 已在表中并列。</li>
+<li><strong>α_max(λ) 是两锚点幂律插值</strong>（4 组端点），<strong>一手曲线未取到</strong>；但「(c) 存活、(b) 排除」对 4 组<strong>全部成立</strong>。</li>
+<li><strong>「m_Φ = 截断能标」是第 70 轮的假设</strong>（半拟合）⟹ (b)(c) 档是<strong>条件结论</strong>。</li>
+<li><strong>第 72 轮的关门条件仍成立</strong>：本轮的「存活」不改变「框架给不出 <code>g</code>」这一事实 —— 它改变的是<strong>该位置与实验的关系</strong>（从「排除」到「骑前沿」）。</li>
+<li><strong>C-84 的义项清点基于正文抽样</strong>（§4.6／§4.5b／§5.7／§4.9 注 ＋ 历史式）；若有遗漏的局部用法，以「带语境前缀」规范兜底。</li>
+</ol>
+<hr />
+<h2>七、判决（四类判定）</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025–26 新数据对 Φ 相关带的命中</td>
+<td><strong>0 条</strong>（结构判定）</td>
+</tr>
+<tr>
+<td>(c) 47.1 μm 档 @α_Y = 1/3 存活</td>
+<td><strong>条件结论</strong>（半拟合质量档 ＋ 标准 KK 耦合值；两锚点插值族下稳健）</td>
+</tr>
+<tr>
+<td>(b) 193.8 μm 档 @α_Y = 1/3 排除</td>
+<td><strong>条件结论</strong>（同上；余量 4–20×）</td>
+</tr>
+<tr>
+<td>窗口 λ ≲ 65–90 μm</td>
+<td><strong>条件结论</strong>（同上）</td>
+</tr>
+<tr>
+<td>×3 判据（40–60 μm）</td>
+<td><strong>可操作判据</strong>（数值由 4 组插值给出：[1.97, 3.17]）</td>
+</tr>
+<tr>
+<td><strong>I-17 状态</strong></td>
+<td><strong>维持结项</strong>（第 72 轮）；本轮为<strong>修定</strong>：判决细化（C-83）＋ 新难题（I-26）＋ 一条对外判据</td>
+</tr>
+</tbody>
+</table>
+<p><strong>与既有结论的合流</strong>：第 61 轮（工程出口 = 0）＋ 第 62 轮（四力位无空位）＋ 第 72 轮（耦合给不出）＋
+本轮（<strong>窗口收缩到 λ ≲ 65–90 μm 且只剩一个半拟合档</strong>）⟹ 第五力线的<strong>实验侧</strong>第一次有了明确终点：
+<strong>一次 40–60 μm 段的 ×3 改进就是它的终审</strong>。</p>
+<hr />
+<h2>八、下一步</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>动作</th>
+<th>成本</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>送私审</strong>（材料已备好）</td>
+<td>0</td>
+<td>不变；顺带可更新私审包 Q2（它对「KK 是否必然带来长程标量力」的答案现在是「α_Y = 1/3、窗口 λ ≲ 65–90 μm」）</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>实验线：40–60 μm ×3</strong></td>
+<td>外部</td>
+<td>判定 (c) 的唯一输入；不需要新装置</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>I-26 的圆桌问题</strong></td>
+<td>1 轮（可选）</td>
+<td>「β_eff／势类／ρ 范围能否从 Λ/μ/λ/g 凑出」—— 凑不出即判否（同 I-17 命运）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>等 LISA（EMRI）</td>
+<td>~10–15 年</td>
+<td>不变</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>不建议</strong>：继续挑 <code>m_Φ</code> 的档位（挑能标，无判别力增量 —— 第 70/72 轮的告诫仍然有效）。</p>
+<hr />
+<h2>九、本轮改动一览</h2>
+<ul>
+<li><strong>论文（中英同步）</strong>：第 72 块加细化行（C-83）；第 72 块后加<strong>第 120 轮块</strong>（7 行）；§8.6 符号约定加 <code>α</code> 义项补注（C-84）。</li>
+<li><strong>清单</strong>：零表第 120 轮行；<strong>C-83 / C-84</strong>（计数 81 → 83）；<strong>I-26</strong>；难题行口径备注更新。</li>
+<li><strong>交接说明</strong>：§七 新条目（120 当前建议；119 降为历史）。</li>
+<li><strong>备忘</strong>：第 72 轮备忘加 §十二；第 118 轮备忘 C1 加注（拆实测/计划）。</li>
+<li><strong>记忆 / 技能</strong>：MEMORY 进度 120＋铁律 63；技能陷阱 116 ＋ §5.0 第五力条修定。</li>
+<li><strong>核验</strong>：<code>_i17_120.py</code>（I17-1…I17-24，24 项 0 失败）。</li>
+</ul>
+
+<div class="footer">I-17 修定：第五力窗口 —— 2025–26 约束带更新与 47.1 μm 档的存活 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 I17第五力窗口_2025-26约束带与47微米档的存活_备份_2026-10-04第121轮前.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

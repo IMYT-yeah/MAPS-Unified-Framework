@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>形状口径的全链审计：**后期的一轮把早期正确的结论写反了**</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、问题</div>
+  <h1>形状口径的全链审计：**后期的一轮把早期正确的结论写反了**</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-10-02（第 86 轮）
+<strong>脚本</strong>：<code>_shape_audit_86.py</code>（<strong>SA-1 … SA-8，8 项 0 失败</strong>）
+<strong>触发</strong>：用户要求 —— 「暂时先不要推进了，先彻底检查一下已有内容的冲突和验证，
+<strong>也许有某些是对的结论后期再算变成错的，其实它就是对的</strong>」（第 84 轮已做过一轮审计，第 86 轮换切面：<strong>形状口径</strong>）
+<strong>一句话结论</strong>：<strong>找到了那一类的一个真实实例，而且是反方向的</strong> ——
+第 78 轮用 <strong>(2,2,L) 细长格点</strong>的数据，把<strong>第 48 / 51 轮已经用 GAP 算出的正确结论</strong>（<strong>(4,4,4) 的 H/N = 0.1839 满足 0.25</strong>）写成了「<strong>面积律不成立</strong>」。已就地更正（<strong>C-39</strong>）。</p>
+</blockquote>
+<hr />
+<h2>一、问题</h2>
+<p>论文 §4.8 的第 78 轮块里有这么一句（<strong>同一块</strong>的诚实边界却写着「只算了 (2,2,L) 系列……结论<strong>不外推</strong>」）：</p>
+<blockquote>
+<p>④ <strong>H/N 在 N=16 → 24 几乎饱和</strong>（0.4335 → 0.4334）且 ≈ 0.433 ≫ 0.25 ⟹ <strong>面积律在能算的格点上不成立</strong>。</p>
+</blockquote>
+<p>而<strong>同一节、更早的第 48 轮块</strong>早已算出（用 GAP）：</p>
+<blockquote>
+<p><strong>(2,4,4) N=32：H/N = 0.2834</strong>（违反）｜<strong>(4,4,4) N=64：H/N = 0.1839</strong>（满足）｜<strong>(2,4,8) N=64：0.1802</strong></p>
+</blockquote>
+<p>第 51 轮更进一步写明：</p>
+<blockquote>
+<p>⟹ <strong>正确的读法</strong>：(2,4,4) 的 0.2834 是<strong>违反</strong>自洽性；<strong>(4,4,4) 的 0.1839 是满足</strong>。</p>
+</blockquote>
+<p>⟹ <strong>第 78 轮的「不成立」与它直接冲突，而且更晚</strong>。</p>
+<hr />
+<h2>二、⭐ 机制：为什么 (2,2,L) 特殊？（本轮补齐的一条<strong>组合事实</strong>）</h2>
+<p>第 48 轮把判别量记作「<strong>长度为 2 的方向有几个</strong>」，并说这是<strong>8 个算例上归纳出来的</strong>。
+本轮给出<strong>机制</strong>（不是归纳）：</p>
+<blockquote>
+<p><strong>线长为 2 的环上，「偶-奇配对」与「奇-偶配对」是同一个完美匹配</strong> ⟹ <strong>σ_j = 恒等</strong> ⟹ 该方向<strong>不贡献群元素</strong>。</p>
+</blockquote>
+<p>逐项验证（<code>SA-1</code>）：</p>
+<table>
+<thead>
+<tr>
+<th>线长 L</th>
+<th>完美匹配数</th>
+<th>两种配对是否同一个</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>2</strong></td>
+<td>2</td>
+<td>✅ <strong>同一个</strong></td>
+<td><strong>σ_j = 恒等</strong>（无相位自由度）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>2</td>
+<td>❌ 不同</td>
+<td>σ_j ≠ 恒等</td>
+</tr>
+<tr>
+<td>6</td>
+<td>2</td>
+<td>❌ 不同</td>
+<td>σ_j ≠ 恒等</td>
+</tr>
+<tr>
+<td>8</td>
+<td>2</td>
+<td>❌ 不同</td>
+<td>σ_j ≠ 恒等</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>只有 L = 2 是「退化方向」</strong> —— 这是<strong>组合事实</strong>，可逐项验证。</p>
+<hr />
+<h2>三、⭐ 全表核对：15 个算例按「退化方向数」二分，<strong>两组完全分离</strong></h2>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th>H/N</th>
+<th>退化方向数</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td>0.4679</td>
+<td>3</td>
+<td>第 46 轮</td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>16</td>
+<td>0.4335</td>
+<td>2</td>
+<td>第 46 轮</td>
+</tr>
+<tr>
+<td>(2,2,6)</td>
+<td>24</td>
+<td>0.4334</td>
+<td>2</td>
+<td>第 46/50 轮</td>
+</tr>
+<tr>
+<td>(2,2,8)</td>
+<td>32</td>
+<td>0.4617</td>
+<td>2</td>
+<td>第 47 轮</td>
+</tr>
+<tr>
+<td>(2,2,10)</td>
+<td>40</td>
+<td>0.4802</td>
+<td>2</td>
+<td>第 49 轮</td>
+</tr>
+<tr>
+<td>(2,2,14)</td>
+<td>48</td>
+<td>0.5041</td>
+<td>2</td>
+<td>第 49 轮</td>
+</tr>
+<tr>
+<td>(2,2,16)</td>
+<td>64</td>
+<td>0.5307</td>
+<td>2</td>
+<td>第 48 轮</td>
+</tr>
+<tr>
+<td>(2,4,4)</td>
+<td>32</td>
+<td>0.2834</td>
+<td>1</td>
+<td>第 48 轮</td>
+</tr>
+<tr>
+<td>(2,4,6)</td>
+<td>48</td>
+<td>0.2208</td>
+<td>1</td>
+<td>第 49 轮</td>
+</tr>
+<tr>
+<td>(2,4,8)</td>
+<td>64</td>
+<td>0.1802</td>
+<td>1</td>
+<td>第 48 轮</td>
+</tr>
+<tr>
+<td>(2,4,10)</td>
+<td>80</td>
+<td>0.1571</td>
+<td>1</td>
+<td>第 49 轮</td>
+</tr>
+<tr>
+<td>(2,4,12)</td>
+<td>96</td>
+<td>0.1338</td>
+<td>1</td>
+<td>第 49 轮</td>
+</tr>
+<tr>
+<td>(2,6,6)</td>
+<td>72</td>
+<td>0.1652</td>
+<td>1</td>
+<td>第 49 轮</td>
+</tr>
+<tr>
+<td><strong>(4,4,4)</strong></td>
+<td><strong>64</strong></td>
+<td><strong>0.1839</strong></td>
+<td><strong>0</strong></td>
+<td>第 48 轮</td>
+</tr>
+<tr>
+<td><strong>(6,6,6)</strong></td>
+<td><strong>216</strong></td>
+<td><strong>0.0779</strong></td>
+<td><strong>0</strong></td>
+<td>第 49 轮</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>组 A（≥ 2 个退化方向，n = 7）</strong>：<code>[0.4334, 0.5307]</code></li>
+<li><strong>组 B（≤ 1 个，n = 8）</strong>：<code>[0.0779, 0.2834]</code></li>
+<li>⟹ <strong>min(A) &gt; max(B)</strong>，<strong>两组完全分离</strong>，空隙 = <strong>(0.2834, 0.4334)</strong></li>
+</ul>
+<p>⭐ <strong>结论</strong>：<strong>H/N 的主控变量是「退化方向数」（即数值格点带多少伪影），不是 N</strong>。</p>
+<h3>⭐⭐ 而「无退化方向」的算例只有两个 —— 它们<strong>都满足面积律</strong></h3>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th>H/N</th>
+<th>vs 0.25</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(4,4,4)</strong></td>
+<td>64</td>
+<td><strong>0.1839</strong></td>
+<td>✅ <strong>满足（&lt; 0.25）</strong></td>
+</tr>
+<tr>
+<td><strong>(6,6,6)</strong></td>
+<td>216</td>
+<td><strong>0.0779</strong></td>
+<td>✅ <strong>满足（&lt; 0.25）</strong></td>
+</tr>
+</tbody>
+</table>
+<p>而<strong>物理宇宙的格点尺寸远大于 2</strong> ⟹ 它对应的<strong>正是这一组</strong>。
+⟹ <strong>在这条链上，面积律是「被满足」的，不是「被否定」的。</strong></p>
+<hr />
+<h2>四、⚠️ 顺带更正 <strong>C-40</strong>：第 48 轮的「0.25 落在空隙里」<strong>不成立</strong></h2>
+<p>第 48 轮写：</p>
+<blockquote>
+<p><strong>两组完全分离、0.25 落在空隙里</strong></p>
+</blockquote>
+<p>但两组间的空隙 = <strong>(0.2834, 0.4334)</strong>，而 <strong>0.25 &lt; 0.2834</strong> ⟹ <strong>0.25 不在空隙里</strong>，
+它在<strong>组 B 的内部</strong>。真正的「跨点」是<strong>组内</strong>的：</p>
+<blockquote>
+<p>(2,4,4) = 0.2834 <strong>&gt;</strong> 0.25 <strong>&gt;</strong> (2,4,6) = 0.2208 ⟹ <strong>跨点在 N ∈ (32, 48)</strong></p>
+</blockquote>
+<p>（这一条<strong>第 49 轮已经给出</strong>，所以 C-40 只是把那句错措辞改对，<strong>不影响任何后续结论</strong>。）</p>
+<hr />
+<h2>五、影响面（三处，均已就地更正）</h2>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>原文</th>
+<th>处置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>论文 §4.8 第 78 轮块结论 ④</strong>（中英）</td>
+<td>「≈ 0.433 ≫ 0.25 ⟹ <strong>面积律在能算的格点上不成立</strong>」</td>
+<td>删除线 ＋ <strong>C-39</strong> 更正注</td>
+</tr>
+<tr>
+<td><strong>论文 §4.8 第 48 轮块</strong>（中英）</td>
+<td>「<strong>0.25 落在空隙里</strong>」</td>
+<td>删除线 ＋ <strong>C-40</strong> 更正注</td>
+</tr>
+<tr>
+<td>第 78 轮备忘录 / 清单 3.1 行 / 交接说明第 78 轮段</td>
+<td>同上</td>
+<td>就地更正</td>
+</tr>
+</tbody>
+</table>
+<p>另：论文 §4.8 <strong>块链末尾</strong>新增【第 86 轮】审计块（中英同步）。</p>
+<hr />
+<h2>六、✅ <strong>不需要撤回</strong>的（本轮的反向核查）</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>第 80 轮「格点 ↔ 面积律 = 框架不覆盖」登记</strong></td>
+<td>✅ <strong>仍成立</strong> —— 其<strong>四条依据</strong>（无等式 / 无机制 / 不可证伪 / 判据适用域）<strong>没有一条</strong>引用 <code>H/N ≈ 0.433</code></td>
+</tr>
+<tr>
+<td>第 78 轮的其他三条结论（不完备度单调、N ≥ 16 不完备、N=8「14=14」是偶然）</td>
+<td>✅ 不受影响</td>
+</tr>
+<tr>
+<td>第 48/49 轮的 H/N 数值本身</td>
+<td>✅ 不受影响（本轮只是补口径，<strong>没有重算任何数值</strong>）</td>
+</tr>
+<tr>
+<td>第 78 轮的 <strong>C-26 / C-27</strong></td>
+<td>✅ 不受影响</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 但<strong>第 80 轮登记块</strong>里「第 46–52 轮<strong>七轮全部负面</strong>」的措辞需精确化：
+第 48 / 49 轮给出的 <strong>H/N &lt; 0.25</strong> 是<strong>正面事实</strong>（虽只是「不违反」，<strong>不等于</strong>「推出面积律」）。</p>
+<hr />
+<h2>七、方法学（已入技能<strong>陷阱 78</strong>）</h2>
+<ol>
+<li>⭐ <strong>报 <code>H/N</code> 必须同时报「退化方向数」</strong> —— 仅报数值会得出<strong>方向相反</strong>的结论。</li>
+<li>⭐ <strong>审计「某结论是否被后期写错」时，要按「同一量的全部算例」列表核对</strong>，而不是只读最后一条结论句。
+   本轮正是把 15 个算例<strong>排成一张表</strong>才看清两组分离的。</li>
+<li><strong>「归纳出的判据」要补机制</strong> —— 第 48 轮的「判别量」是归纳的，本轮给了组合机制（L=2 ⟹ σ_j = 恒等）。</li>
+<li>⚠️ <strong>同块内部一致性检查</strong>：第 78 轮<strong>结论句</strong>与<strong>同块诚实边界</strong>（「不外推」）自相矛盾 ——
+   这类矛盾<strong>不必跨块比对就能发现</strong>，代价极低。</li>
+</ol>
+<hr />
+<h2>八、判决</h2>
+<ul>
+<li><strong>C-39</strong>（第 78 轮结论 ④ 形状口径缺失 ＋ 方向有误）、<strong>C-40</strong>（第 48 轮「空隙」不成立）</li>
+<li>总账：<strong>更正 37 → 39</strong>；<strong>负面 37 条不变</strong>（<strong>本轮没有推翻任何负面判定</strong>，只纠正一处<strong>错误的负面表述</strong>）</li>
+<li>⭐ <strong>本轮的元意义</strong>：这是<strong>用户第 84 轮担心的那一类</strong>的<strong>真实实例</strong> —— 只是方向是反的：
+  不是「对的被改成错的」，而是「<strong>面积律在干净格点上是满足的</strong>」被写成「<strong>不成立</strong>」。
+  ⟹ <strong>用户那句「也许有某些是对的结论后期再算变成错的，其实它就是对的」，本轮兑现了一次。</strong></li>
+</ul>
+
+<div class="footer">形状口径的全链审计：**后期的一轮把早期正确的结论写反了** · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 形状口径全链审计_后期把早期对的结论写反了一处.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

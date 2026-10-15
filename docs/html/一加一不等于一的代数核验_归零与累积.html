@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「1+1 ≠ 1」的代数核验 —— **归零** vs **累积**</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">0. 结论（三条）</div>
+  <h1>「1+1 ≠ 1」的代数核验 —— **归零** vs **累积**</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-09 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 145 轮（元任务 · 意象迭代四）</strong> ｜ 2026-10-09 ｜ 核验脚本 <code>_arith145.py</code>（<strong>5 组 18 项 0 失败</strong>）
+用户新提法：<strong>「最小因子在底层湮灭时会产生周期性波动，导致外层世界按逻辑排布；
+因为内核为 1，所以 1+1 不能等于 1，这就产生了外层变化；
+随着变化的不断传递，会产生自相似运动 —— 也就是某个层次的整体运动变成了新的最小因子。」</strong></p>
+</blockquote>
+<hr />
+<h2>0. 结论（三条）</h2>
+<ol>
+<li>⭐ <strong>用户的算术直觉和框架底层精确对上了一半</strong>：框架底层 <span class="math">(Z<sub>2</sub>)<sup>3</sup></span> 满足 <span class="math">a+a=0</span> ⟹ <strong>非零元非幂等</strong>（<span class="math">a+ane a</span> ✓）、<strong>周期为 2</strong>（「周期性波动」✓），而 <span class="math">a+a=0</span> <strong>正是「湮灭」的算术形式</strong>。</li>
+<li>⚠️ <strong>但方向不同</strong>：「<span class="math">a+ane a</span>」有两种实现 —— <strong>归零（<span class="math">=0</span>）</strong> 与 <strong>累积（<span class="math">=2</span>）</strong>。<strong>框架是归零，用户要的是累积。</strong></li>
+<li>⭐⭐ <strong>这一个区别同时解释三件事</strong>：底层无熵产生（第 40 轮）、生不出「层」（本轮）、缺「势阱型构型差」（第 138 轮）。</li>
+</ol>
+<hr />
+<h2>一、关键分野：「1+1 ≠ 1」有<strong>两种</strong>实现</h2>
+<table>
+<thead>
+<tr>
+<th>实现</th>
+<th>代数</th>
+<th>结构</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① 归零</strong></td>
+<td><span class="math">a+a=0</span></td>
+<td><strong>2-扭</strong>（<span class="math">Z<sub>2</sub></span> 型）</td>
+<td><strong>可逆、无累积、无熵产生</strong> ⟹ <strong>湮灭</strong></td>
+</tr>
+<tr>
+<td><strong>② 累积</strong></td>
+<td><span class="math">a+a=2ane a</span></td>
+<td><strong>增长型</strong>（<span class="math">mathbb Z</span> 型）</td>
+<td><strong>有累积、有次序、不可逆</strong> ⟹ <strong>涌现</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>两者都满足「<span class="math">a+ane a</span>」</strong> —— 所以用户的命题<strong>不区分这两者</strong>，而<strong>区别正是一切</strong>。</p>
+<hr />
+<h2>二、数值验证：框架底层 <span class="math">(Z<sub>2</sub>)<sup>3</sup></span> 是哪一种</h2>
+<table>
+<thead>
+<tr>
+<th>验证</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math">a+a=0</span>（∀a）</td>
+<td>✅ <strong>2-扭</strong> ⟹ <strong>= 湮灭</strong></td>
+</tr>
+<tr>
+<td><strong>非零元</strong> <span class="math">a+ane a</span></td>
+<td>✅ <strong>用户的「1+1≠1」成立</strong></td>
+</tr>
+<tr>
+<td>⚠️ <strong>单位元</strong> <span class="math">0+0=0</span></td>
+<td><strong>幂等</strong> ⟹ <strong>「内核」本身不变</strong></td>
+</tr>
+<tr>
+<td><span class="math">a+a+a=a</span>（周期 2）</td>
+<td>✅ <strong>= 用户的「周期性波动」</strong></td>
+</tr>
+<tr>
+<td>⚠️ <span class="math">a+a</span> <strong>只可能是 0</strong></td>
+<td>✅ <strong><span class="math">Z<sub>2</sub></span> 无累积、不增长</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⭐ <strong>最漂亮的对应</strong>：</p>
+<blockquote>
+<p><strong>正反物质对 50:50 配对湮灭 = 群论上的 2-扭（<span class="math">a+a=0</span>）</strong>
+用户说的「最小因子湮灭」，在框架里就是 <span class="math">Z<sub>2</sub></span> 的群运算。</p>
+</blockquote>
+<hr />
+<h2>三、⚠️ 但框架给的是「归零」，用户要的是「累积」</h2>
+<p>用户的逻辑链：</p>
+<blockquote>
+<p>「<span class="math">1+1ne1</span>」⟹ <strong>产生外层变化</strong> ⟹ 变化传递 ⟹ 自相似 ⟹ <strong>整体变成新最小因子</strong></p>
+</blockquote>
+<p>这条链需要 <strong>「<span class="math">1+1</span> = 一个新的东西」</strong>（<strong>累积／增长</strong>）。
+而框架给的是 <strong>「<span class="math">1+1=0</span>」</strong>（<strong>归零</strong>）。</p>
+<p>⟹ <strong>用户的第 4 句（整体 → 新最小因子）在框架的底层运算法则下做不到。</strong></p>
+<hr />
+<h2>四、⭐ 一个区别，解释三件事</h2>
+<table>
+<thead>
+<tr>
+<th>现象</th>
+<th>出处</th>
+<th>与「归零 vs 累积」的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>底层无熵产生</strong></td>
+<td>第 40 轮（每 tick 是置换 ⟹ 可逆）</td>
+<td>归零 ⟹ 可逆 ⟹ 无熵</td>
+</tr>
+<tr>
+<td><strong>生不出「层」</strong></td>
+<td>本轮（整体→新因子需累积）</td>
+<td>需累积 ⟹ 归零给不了</td>
+</tr>
+<tr>
+<td><strong>缺「势阱型构型差」</strong></td>
+<td>第 138 轮（<strong>工程出口 = 0</strong> 的根因）</td>
+<td>势阱需能量<strong>储存</strong> ⟹ 需累积</td>
+</tr>
+</tbody>
+</table>
+<p>🌌 <strong>三者是同一原因的三种表现</strong>（本轮推测，<strong>需后续检验</strong>）。</p>
+<p>⚠️ <strong>如果这条成立，它就比第 60 轮那个理由更根本</strong>：
+第 60 轮说「缺势阱型构型差」；本轮说「<strong>为什么会缺</strong>」。</p>
+<hr />
+<h2>五、第 4 句需要的工具：<strong>RG</strong>（框架有，但没这么用）</h2>
+<ul>
+<li>「某个层次的整体运动变成新的最小因子」= <strong>重整化群式的标度变换</strong>
+  （块粗粒化 ⟹ <strong>旧的整体 = 新的最小单元</strong> ⟹ 若存在不动点则自相似）</li>
+<li>框架<strong>有</strong>这个工具：论文「<strong>RG</strong>」<strong>32 处</strong>、「<strong>Wilson</strong>」<strong>12 处</strong>（v1.36 <strong>Wilson RG 路径</strong>）</li>
+<li>⚠️ <strong>但用途不同</strong>：框架的 RG 是「<strong>弦网层内部 → 连续极限</strong>」，<strong>不是「生成新层」</strong></li>
+<li>⚠️ <strong>而且 RG 要求「同类对象的粗粒化」</strong>，而框架的三层<strong>异质</strong>（置换／通量／连续场，第 68 轮）
+  ⟹ <strong>不是 RG 链</strong></li>
+</ul>
+<p>⟹ <strong>第 4 句不能解释现有三层；但它指向了「若要造自相似层次，该用什么工具」。</strong></p>
+<hr />
+<h2>六、判定汇总</h2>
+<table>
+<thead>
+<tr>
+<th>用户主张</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最小因子湮灭 ⟹ <strong>周期性波动</strong></td>
+<td>✅ <strong>精确对应</strong>（<span class="math">Z<sub>2</sub></span> 的 2-扭 ⟹ 周期 2）</td>
+</tr>
+<tr>
+<td>「<strong>1+1 ≠ 1</strong>」</td>
+<td>✅ <strong>成立</strong>（非零元非幂等）</td>
+</tr>
+<tr>
+<td>由此<strong>产生外层变化</strong></td>
+<td>⚠️ <strong>需要「累积」，框架给的是「归零」</strong></td>
+</tr>
+<tr>
+<td>变化传递 ⟹ <strong>自相似</strong></td>
+<td>❌ 论文「分形」<strong>0 处</strong>（第 142 轮）</td>
+</tr>
+<tr>
+<td><strong>整体运动 → 新最小因子</strong></td>
+<td>⭐ <strong>= RG；框架有工具但未这么用</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>七、⭐ 一条可检的路（<strong>不需要新公理</strong>）</h2>
+<blockquote>
+<p><strong>「框架的 <span class="math">(Z<sub>2</sub>)<sup>3</sup></span> 底层有没有任何『累积』机制？即：有没有一个量满足 <span class="math">a+ane0</span>？」</strong></p>
+</blockquote>
+<p>框架里<strong>确实有</strong> —— <strong>置换的复合</strong>：
+- 一个 tick = <strong>对换的乘积</strong> ⟹ 「对换」是 2-扭 ⟹ <strong>单 tick 层面 = 归零</strong>；
+- 但 <strong><span class="math">S<sub>N</sub></span> 的一般元素不是 2-扭</strong>（<span class="math">s· s· sne s</span> 可能）⟹ <strong>多 tick 层面可以「累积」</strong>；
+- 第 41 轮实测：tick 群 <span class="math">|G|</span> 在 <span class="math">Nge64</span> 爆炸（<span class="math">2.79×10<sup>37</sup></span>）⟹ <strong>群元素的阶可以 &gt; 2</strong>。</p>
+<p>⭐ <strong>所以「累积」可能在「多 tick」层面存在</strong> —— 而这<strong>正是「层」可能的来源</strong>。</p>
+<p>📌 <strong>要查的就一件事</strong>：</p>
+<blockquote>
+<p><strong>框架的「多 tick」是「平的」还是「有层级的」？</strong></p>
+</blockquote>
+<ul>
+<li>第 42 轮：达到视界 BH 熵需 <span class="math">π/<span class="fn">ln</span> 2 = 4.532</span> <strong>tick</strong> ⟹ tick 是<strong>可数的、但不分层</strong>；</li>
+<li>⟹ <strong>「层」的缺口就在这里</strong>：<strong>单 tick 只有归零（湮灭），而多 tick 只有"平铺"，没有"层级"。</strong></li>
+</ul>
+<p>⭐⭐ <strong>本轮最终洞察</strong>：</p>
+<blockquote>
+<p><strong>用户的意象在「单 tick」层面精确对应（2-扭、周期 2）；
+而在「多 tick」层面才能"累积"。
+所以「层」若要生出来，必须来自多 tick 的累积 —— 而不是单 tick 的湮灭。</strong>
+而框架的多 tick 是<strong>平的</strong> ⟹ <strong>这就是"层"生不出来的精确位置。</strong></p>
+</blockquote>
+<hr />
+<h2>附：意象迭代系列索引</h2>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>意象</th>
+<th>核心判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>142</strong></td>
+<td>「棋盘翻转」（层层嵌套 / 自相似）</td>
+<td>意象要「自相似」，框架给「三层异质」；论文「分形」0 处</td>
+</tr>
+<tr>
+<td><strong>143</strong></td>
+<td>「8 类 = 3 个独立 Z₂ 指标 ⟹ 层层」</td>
+<td>前半 ✅（三坐标奇偶）、后半 ❌（范畴错误）；实为「3 个并行通道」</td>
+</tr>
+<tr>
+<td><strong>144</strong></td>
+<td>「层层扩大」（不需要反转）</td>
+<td>绕开障碍（不需传递）但换掉可观测性（零内容）；「无尽循环」= <strong>公理 1 直译</strong></td>
+</tr>
+<tr>
+<td><strong>145</strong></td>
+<td>「1+1 ≠ 1」（湮灭 → 周期 → 自相似）</td>
+<td><strong>归零 vs 累积</strong> 一分野；可解释三件事；层需「多 tick 累积」</td>
+</tr>
+</tbody>
+</table>
+<h2>附：出处</h2>
+<table>
+<thead>
+<tr>
+<th>事实</th>
+<th>出处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>框架底层 <span class="math">(Z<sub>2</sub>)<sup>3</sup></span>、<span class="math">a+a=0</span>、周期 2</td>
+<td>第 41 / 46 / 68 轮</td>
+</tr>
+<tr>
+<td>每 tick 每格点<strong>恰好一次对换</strong>；tick 置换可逆 ⟹ 无熵产生</td>
+<td>第 40 轮</td>
+</tr>
+<tr>
+<td>三层异质表；<span class="math">(Z<sub>2</sub>)<sup>3</sup></span> 只在衬底层</td>
+<td>第 68 轮（I-16）</td>
+</tr>
+<tr>
+<td>Wilson RG 路径（弦网层 → 连续极限）</td>
+<td>v1.36</td>
+</tr>
+<tr>
+<td><span class="math">π/<span class="fn">ln</span> 2 = 4.532</span> tick</td>
+<td>第 42 轮</td>
+</tr>
+<tr>
+<td>「势阱型构型差」缺失 = 工程出口 0 的根因</td>
+<td>第 60 / 61 / 138 轮</td>
+</tr>
+</tbody>
+</table>
+
+<div class="footer">「1+1 ≠ 1」的代数核验 —— **归零** vs **累积** · 2026-10-09 · 由 _md2html_generic.py 生成 · 源文件 一加一不等于一的代数核验_归零与累积.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

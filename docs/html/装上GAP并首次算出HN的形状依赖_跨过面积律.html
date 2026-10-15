@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>装上 GAP，并首次算出 H/N 的形状依赖：**跨过面积律 0.25**</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、装 GAP（本轮的前置工程）</div>
+  <h1>装上 GAP，并首次算出 H/N 的形状依赖：**跨过面积律 0.25**</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>日期</strong>：2026-09-22（第 48 轮）
+<strong>脚本</strong>：<code>outputs/_gen_fix_48.py</code>、<code>_gen_fix2_48.py</code>（生成元错误的定位与判定）、
+<code>_fix_run_48.py</code>（受影响 H/N 的重算，<strong>6 项 0 失败</strong>）、
+<code>_gap_shape_48.py</code>（GAP 轨道与形状扫描，<strong>8 项 0 失败</strong>）
+<strong>一句话结论</strong>：① 装上 GAP（4.16.1）并用它算出 <strong>(2,4,4) 的 H/N = 0.2834 ± 0.0061</strong>、
+<strong>(4,4,4) = 0.1839 ± 0.0031</strong> ⟹ <strong>H/N 跨过了面积律要求的 0.25</strong>；
+② 顺带查出<strong>第 41/46/47 轮的一处真错误</strong>：含边长 ≥ 6 的细长格点上用的<strong>生成元集不是 tick 群</strong>
+（已更正：第 46 轮的 (2,2,6) H/N 从 0.4330 → <strong>0.4510</strong>）；
+③ 因此<strong>第 40 轮以来"不变读数偏大 1.75 倍 ⟹ 面积律不成立"的判决，是细长格点假象</strong>。</p>
+</blockquote>
+<hr />
+<h2>一、装 GAP（本轮的前置工程）</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>版本</td>
+<td><strong>GAP 4.16.1</strong>（x86_64-pc-cygwin）</td>
+</tr>
+<tr>
+<td>安装位置</td>
+<td><code>C:\Program Files\GAP-4.16.1\</code>（<strong>Inno Setup 静默安装</strong>：<code>/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /NOICONS /DIR=...</code>）</td>
+</tr>
+<tr>
+<td>安装包</td>
+<td><code>gap-4.16.1-x86_64.exe</code>，<strong>782.5 MB</strong></td>
+</tr>
+<tr>
+<td>校验</td>
+<td>sha256 = <code>b26346c3…43081a</code>，<strong>与官方 <code>.sha256</code> 逐位一致</strong> ✓</td>
+</tr>
+<tr>
+<td>可执行</td>
+<td><code>C:\Program Files\GAP-4.16.1\runtime\opt\gap-4.16.1\gap.exe</code></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>三个坑（都踩过）</strong>：
+1. <strong>唯一 Windows 二进制只在 GitHub Releases</strong>，而本机 <code>github.com</code> 被拦（<code>api.github.com</code> 通、<code>github.com</code> 返回 000）
+   ⟹ 必须走 <strong>GitHub 加速镜像</strong>（实测 <code>ghfast.top</code> / <code>gh-proxy.com</code> / <code>ghproxy.net</code> 可用），
+   且 <code>www.gap-system.org/Releases/...</code> 现在<strong>只是重定向到安装说明页</strong>，不再托管二进制。
+2. 官方 <code>*-core.zip</code>（40 MB）<strong>是纯源码，没有 exe</strong> ⟹ 装了也没用（本机无 C 编译器）。
+3. GAP 是 <strong>Cygwin/MSYS 版</strong>：直接 <code>gap.exe</code> 会报 <code>No such file or directory</code>（缺 <code>cygwin1.dll</code>）
+   ⟹ 必须把 <code>runtime\bin</code> 与 gap 根目录<strong>都</strong>加进 PATH。
+   ⚠️ 而且<strong>不能用 <code>timeout</code> 包一层</strong>（Git Bash 的 execvp 与 Windows 加载器不兼容，必失败）。</p>
+<p><strong>单元测试（GP-2）</strong>：<code>Stabilizer(Sym(5),[1,2],OnSets) = 12</code>、<code>Orbit = 10</code>、
+<code>Stabilizer(Sym(6),[1,2],OnSets) = 48</code> —— 三个已知答案全对 ⟹ set-stabilizer 可信。</p>
+<hr />
+<h2>二、发现一：<strong>第 41/46/47 轮的生成元集在边长 ≥ 6 时是错的</strong></h2>
+<h3>病因</h3>
+<p>三次推演的脚本里都有同一行：</p>
+<pre><code class="language-python">perm2[coords[i]] = coords[(i + 2) % L]      # ← 把「全体 +2 的纯平移」当成每线 σ_j
+</code></pre>
+<p>但正确的 σ_j（= 相位 1 匹配 ∘ 相位 0 匹配）是<strong>偶位 +2、奇位 −2</strong>：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>单线长度 6 上的置换</th>
+<th>是否属于 tick 群</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>代码用的「纯平移」</td>
+<td><code>(0 2 4)(1 3 5)</code></td>
+<td>❌ <strong>不在</strong></td>
+</tr>
+<tr>
+<td>正确的 σ_j</td>
+<td><code>(0 2 4)(1 5 3)</code></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p><strong>单线长度 6 的对照</strong>：真 tick 群 <code>⟨M₀, M₁⟩</code> = 6 阶；<code>⟨M₀, 纯平移⟩</code> = 6 阶，
+<strong>但两者只共有 2 个元素（e 与 M₀）</strong>（|并| = 10）⟹ 阶相同、<strong>群不同</strong>。</p>
+<h3>判定（<code>_gen_fix2_48.py</code>，决定性）</h3>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>|⟨全 tick 集⟩|</th>
+<th>|⟨正确化简⟩|</th>
+<th>|⟨第41–47轮⟩|</th>
+<th>全集 = 正确？</th>
+<th>全集 = 旧？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,4)</td>
+<td>128</td>
+<td>128</td>
+<td>128</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>(2,2,6)</td>
+<td>648</td>
+<td>648</td>
+<td>648</td>
+<td>✅</td>
+<td>❌ <strong>不同</strong></td>
+</tr>
+<tr>
+<td>(2,2,8)</td>
+<td>2048</td>
+<td>2048</td>
+<td>2048</td>
+<td>✅</td>
+<td>❌ <strong>不同</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>极端反例（单线长 6）</strong>：8 个随机真 tick 里，只有 <strong>3 个</strong>落在旧群里 ⟹ <strong>旧群漏掉 5/8 的真 tick</strong>。</p>
+<h3>受影响范围（比预想窄，但正落在关键算例上）</h3>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>受影响？</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)、(2,2,4)</td>
+<td>❌ 否</td>
+<td>边长全 ≤ 4 时两套生成元<strong>逐元素相同</strong></td>
+</tr>
+<tr>
+<td><strong>(2,2,6)、(2,2,8)</strong></td>
+<td>✅ <strong>是</strong></td>
+<td>群不同（穷举验证）</td>
+</tr>
+<tr>
+<td>(2,4,4)、(4,4,4)</td>
+<td>❌ 否</td>
+<td>边长全 ≤ 4（生成元逐元素相同）</td>
+</tr>
+<tr>
+<td>(6,6,6)</td>
+<td>❌ 否</td>
+<td>旧生成元<strong>全部</strong>落在正确群里 ⟹ 同一群</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>只有"恰好一个长轴（L ≥ 6）"的细长格点受影响</strong> —— 而这恰好是第 46/47 轮<strong>全部</strong> H/N 曲线所在。</p>
+<h3>更正后的 (2,2,L) 曲线</h3>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th>H/N（更正）</th>
+<th>H/N（第 46/47 轮）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td>0.4679</td>
+<td>0.4679（不变）</td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>16</td>
+<td>0.4335</td>
+<td>0.4335（不变）</td>
+</tr>
+<tr>
+<td><strong>(2,2,6)</strong></td>
+<td>24</td>
+<td><strong>0.4510</strong></td>
+<td>0.4330（<strong>错</strong>）</td>
+</tr>
+<tr>
+<td><strong>(2,2,8)</strong></td>
+<td>32</td>
+<td><strong>0.4617</strong></td>
+<td>0.4614（<strong>错</strong>，差得小是巧合）</td>
+</tr>
+</tbody>
+</table>
+<p>（(2,2,6) 的精确轨道划分：更正后 <strong>6334</strong> 条轨道，旧值 6224 条。）</p>
+<hr />
+<h2>三、发现二：<strong>H/N 的形状依赖 —— 跨过 0.25</strong></h2>
+<p>用 GAP 的 <code>|O(c)| = |G| / |Stab_G(c)|</code>（<code>Stabilizer(G, c, OnSets)</code>）：</p>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th><strong>L = 2 的方向数</strong></th>
+<th>|G|</th>
+<th><strong>H/N</strong></th>
+<th>95% 区间</th>
+<th>方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td><strong>3</strong></td>
+<td>8</td>
+<td>0.4679</td>
+<td>—</td>
+<td>精确划分</td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>16</td>
+<td><strong>2</strong></td>
+<td>128</td>
+<td>0.4335</td>
+<td>—</td>
+<td>精确划分</td>
+</tr>
+<tr>
+<td>(2,2,6)</td>
+<td>24</td>
+<td><strong>2</strong></td>
+<td>648</td>
+<td>0.4510</td>
+<td>—</td>
+<td>精确划分</td>
+</tr>
+<tr>
+<td>(2,2,8)</td>
+<td>32</td>
+<td><strong>2</strong></td>
+<td>2 048</td>
+<td>0.4617</td>
+<td>—</td>
+<td>采样</td>
+</tr>
+<tr>
+<td>(2,2,16)</td>
+<td>64</td>
+<td><strong>2</strong></td>
+<td>32 768</td>
+<td><strong>0.5307</strong></td>
+<td>±0.0000</td>
+<td>GAP，S=40</td>
+</tr>
+<tr>
+<td><strong>(2,4,4)</strong></td>
+<td><strong>32</strong></td>
+<td><strong>1</strong></td>
+<td>2.2015×10¹¹</td>
+<td><strong>0.2834</strong></td>
+<td>±0.0061</td>
+<td>GAP，S=60</td>
+</tr>
+<tr>
+<td><strong>(2,4,8)</strong></td>
+<td><strong>64</strong></td>
+<td><strong>1</strong></td>
+<td>1.3970×10³⁷</td>
+<td><strong>0.1802</strong></td>
+<td>±0.0034</td>
+<td>GAP，S=40</td>
+</tr>
+<tr>
+<td><strong>(4,4,4)</strong></td>
+<td><strong>64</strong></td>
+<td><strong>0</strong></td>
+<td>2.7940×10³⁷</td>
+<td><strong>0.1839</strong></td>
+<td>±0.0031</td>
+<td>GAP，S=60</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>面积律要求的 0.25 被"跨过"了</strong>：(2,4,4) = 0.2834 <strong>&gt; 0.25</strong> &gt; (4,4,4) = 0.1839。</p>
+<h3>判别量不是"各向同性程度"，而是"<strong>有几个长度为 2 的退化方向</strong>"</h3>
+<p>⚠️ <strong>本轮的一个自否</strong>：我开局预判"越各向同性 H/N 越小"，实测 <strong>失败</strong> ——
+(2,4,8) = 0.1802 <strong>低于</strong> (4,4,4) = 0.1839（(4,4,4) 更各向同性，H/N 反而略高）。</p>
+<p>替换后的判据（<strong>两组完全分离</strong>）：</p>
+<table>
+<thead>
+<tr>
+<th>分组</th>
+<th>例数</th>
+<th>H/N 范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>≥ 2 个 L = 2 方向</strong></td>
+<td>5</td>
+<td><strong>0.4335 – 0.5307</strong></td>
+</tr>
+<tr>
+<td><strong>≤ 1 个 L = 2 方向</strong></td>
+<td>3</td>
+<td><strong>0.1802 – 0.2834</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 最低值 0.4335 <strong>&gt;</strong> 最高值 0.2834 —— 两组间有一个<strong>空隙</strong>，而 <strong>0.25 落在空隙里</strong>。</p>
+<p>（口径说明：<strong>L = 2 的方向上没有任何相位自由度</strong> —— 长度 2 的环只有一种完美匹配，
+所以 σ_j = 恒等。这两个方向的"退化"正是把 H/N 顶到 0.43 以上的原因。）</p>
+<h3>(2,4,4) 的<strong>首次</strong>真值（这是第 47 轮明确列出的缺口）</h3>
+<ul>
+<li>采样 60 个 k=16 构型；轨道大小 <strong>10 368 – 5 971 968</strong>（比 (2,2,L) 系列大 3 个数量级）</li>
+<li>⟨ln|O|⟩ = 13.1115 ⟹ ⟨ln|O|⟩/N = 0.4097</li>
+<li><strong>H/N = 0.2834 ± 0.0061</strong> ⟹ 相对 0.25 是 <strong>+13.4%</strong>（不是 +75%）</li>
+<li>⚠️ 这也解释了第 47 轮为什么算不出来：轨道 ~10⁶，Python 的 BFS 上限 4×10⁵ 根本不够，
+  而按 |G| = 2.2×10¹¹ 判断"不可算"则是<strong>判据选错了变量</strong>（该看轨道大小，不是群阶 —— 见 N-8）。</li>
+</ul>
+<hr />
+<h2>四、判决</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>判决</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>✅ <strong>GAP 装上并互验通过</strong></td>
+<td>sha256 一致；单元测试三个已知答案全对；与 Python 精确 BFS 在 (2,2,6) 上 <strong>8/8 逐位一致</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>❌ <strong>第 41/46/47 轮的生成元集错误</strong>（边长 ≥ 6 的细长格点）</td>
+<td>与全 tick 集穷举比较：群不同；8 个真 tick 只 3 个落在旧群里</td>
+</tr>
+<tr>
+<td>3</td>
+<td>✅ <strong>H/N 的形状依赖</strong>：判别量 = L=2 方向数，两组完全分离</td>
+<td>上表 8 个算例，无重叠</td>
+</tr>
+<tr>
+<td>4</td>
+<td>⚖️ <strong>撤回旧判决 R-1</strong>："不变读数偏大 1.75 倍 ⟹ 面积律不成立"（N-2/N-3）<strong>是细长格点假象</strong></td>
+<td>(2,4,4) 只偏大 13.4%，(4,4,4) 反而<strong>偏小 26.4%</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>⚠️ <strong>不变读数路线并未复活，但也不再是否定态</strong></td>
+<td>0.25 落在两组<strong>空隙</strong>里 ⟹ 需要知道"哪个形状才是真宇宙"，而不是"这条路死了"</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>五、诚实边界（必须随结论走）</h2>
+<ol>
+<li><strong>(4,4,4) 与 (2,4,8) 的 95% 区间都在 0.25 的下方</strong>（[0.178, 0.190] / [0.174, 0.187]），
+   而 (2,4,4) 在上方 [0.272, 0.295] ⟹ <strong>"跨过"是确定的</strong>，但<strong>跨点在哪里未定</strong>。</li>
+<li><strong>形状扫描只有 3 个 N=64 点</strong>（(2,2,16) / (2,4,8) / (4,4,4)）；"退化方向数"这条判据是
+   <strong>8 个算例上归纳出来的</strong>，不是推导出来的。<strong>可能还有别的变量在起作用</strong>（例如 N 与形状的耦合）。</li>
+<li><strong>(2,2,16) 的 H/N = 0.5307 的标准误为 0</strong>（40 个采样轨道大小完全相同 = |G|，稳定子平凡）
+   ⟹ 该点是"所有构型等价"，不是统计偶然。</li>
+<li><strong>(2,2,16) 与 (2,4,8) 的 |G| 未与 sympy 交叉验证</strong>（生成元多、sympy 可能很慢）；
+   但 GAP 与 sympy 在 (2,2,6) / (2,4,4) / (4,4,4) 上<strong>已一致</strong>。</li>
+<li><strong>N = 64 仍远小于宏观 N_c³ ≈ 6.1×10¹⁸² ⟹ 不得外推</strong>（第 41 轮教训）。
+   本轮的结论全部是 <strong>N ≤ 64 的有限格点</strong>事实。</li>
+<li><strong>k 固定为 N/2</strong>；与第 40 轮"全部 2^N 构型"口径不同。</li>
+<li><strong>GAP 的 <code>Stabilizer(...,OnSets)</code> 是精确算法</strong>（非随机回溯的重试版），但本轮未检查
+   GAP 是否走过完整回溯链；若某构型的稳定子搜索退化，GAP 仍会给正确结果（只是慢）。</li>
+</ol>
+<hr />
+<h2>六、下一步</h2>
+<ol>
+<li>🎯 <strong>定位 0.25 的跨点</strong>：在 N=32 / 64 / 128 上补 (2,4,4)/(2,4,8)/(2,6,6)/(4,4,8)/(6,6,6) 等形状，
+   看 H/N 是否<strong>连续穿过 0.25</strong>。GAP 让这条成为<strong>常规计算</strong>（本脚本全跑约 76 s）。</li>
+<li>🎯 <strong>检验"退化方向数"判据</strong>：(2,6,6)（一个 L=2 方向）应与 (2,4,4) 同类；
+   (6,6,6)（无 L=2）应与 (4,4,4) 同类 ⟹ <strong>两个可证伪的预判</strong>。</li>
+<li><strong>把"面积律"问题重新表述</strong>：真问题不是"不变读数偏大多少"，而是
+   "<strong>哪个格点形状/尺寸对应 BH 的 0.25</strong>" ⟹ 这是一条<strong>有解</strong>的问题，不再是判死项。</li>
+<li><strong>回补</strong>：第 41 轮的 (2,2,6) |G| = 648（数值对，但当时未察觉群错）；
+   第 46/47 轮的 H/N 曲线已在论文中更正。</li>
+</ol>
+
+<div class="footer">装上 GAP，并首次算出 H/N 的形状依赖：**跨过面积律 0.25** · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 装上GAP并首次算出HN的形状依赖_跨过面积律.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

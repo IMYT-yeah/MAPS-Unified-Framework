@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>备忘录族的轮次溯源缺口（四种判据给出四个不同答案）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>备忘录族的轮次溯源缺口（四种判据给出四个不同答案）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 89 轮</strong> ｜ 脚本 <code>_reverse_89.py</code>、<code>_reverse_89b.py</code>、<code>_traceability_89.py</code>（<strong>TR-1 … TR-8，0 失败</strong>）
+题源：<strong>第 88 轮的诚实边界 §六.2</strong> —— 「未同步残留 = 0」只覆盖「<strong>论文里显式写了 <code>X → Y</code> 的更正</strong>」；
+<strong>备忘录里记了更正、论文里从未写过的</strong>，那套检测看不到 ⟹ 本轮做<strong>反向核对（备忘录 → 论文）</strong>。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p><strong>反向核对本身通过了</strong>（论文侧没有「只在备忘录里做过的更正」漏网）；
+<strong>但核对过程暴露出更根本的问题：备忘录族的「轮次溯源」不成立</strong> ——
+<strong>第 64 轮与第 79 轮没有任何备忘录</strong>，第 59 轮有备忘录但<strong>无轮次 ID</strong>，第 83 轮<strong>并入</strong>第 82 轮备忘录；
+而「哪几轮缺备忘录」这个问题，<strong>用四种判据会得到四个不同答案（2 / 3 / 4 / 16）</strong>。</p>
+<p>⟹ 这直接打击 <strong>铁律 33（审计面 = 论文 ＋ 备忘录族 ＋ 清单）</strong>：<strong>「备忘录族」目前无法机械核对</strong>，
+   每次审计都要<strong>重新发明判据</strong>，而判据一变、结论就变。</p>
+<hr />
+<h2>二、三段审计的路径（含两次改判）</h2>
+<table>
+<thead>
+<tr>
+<th>段</th>
+<th>脚本</th>
+<th>判据</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><code>_reverse_89.py</code> RC-1</td>
+<td>轮次号覆盖（论文 vs 备忘录）</td>
+<td>报 3 个「论文 0 处」的轮次：<strong>58 / 74 / 89</strong></td>
+</tr>
+<tr>
+<td>①的落地</td>
+<td>—</td>
+<td>逐个查理由</td>
+<td><strong>全部正当</strong>：第 58 轮是<strong>类比</strong>应用（运气/熵），memo 里<strong>一次都没提「论文」</strong>；第 74 轮 memo <strong>明文写</strong>「本轮不动论文……不写入论文正文」；第 89 轮 = 本轮</td>
+</tr>
+<tr>
+<td>②</td>
+<td><code>_reverse_89b.py</code> RC-5</td>
+<td>逐备忘录「标题数字 → 论文是否收录」</td>
+<td><strong>被行号污染</strong>（第 8 类陷阱，见 §四）⟹ 改道</td>
+</tr>
+<tr>
+<td>③</td>
+<td><code>_reverse_89.py</code> RC-1 变体</td>
+<td><strong>转而查溯源链本身</strong></td>
+<td>⭐ <strong>翻出 C-44</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>①的结论是「通过」</strong> —— 这是本轮第一个正面产出：<strong>论文侧没有漏网的更正</strong>。</p>
+<hr />
+<h2>三、⭐ C-44：溯源链的四个缺口</h2>
+<h3>3.1 定案表</h3>
+<p>判据 = 「该轮有<strong>专属核验脚本</strong>，但<strong>备忘录族头部不提它</strong>」＋「逐轮人工落地」</p>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>专属脚本</th>
+<th>备忘录</th>
+<th><strong>定案</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>第 59 轮</strong></td>
+<td><code>_adaptation_59.py</code>、<code>_patch_clist_59.py</code>、<code>_patch_handoff_59.py</code></td>
+<td><strong>存在</strong> = <code>不变必亏与因变化而变化_最优频率是平方根.md</code></td>
+<td><strong>有备忘录、缺轮次 ID</strong>（头部只写 <code>讨论纪要 2026-09-26c ｜ 脚本 _adaptation_59.py</code>）</td>
+</tr>
+<tr>
+<td><strong>第 64 轮</strong></td>
+<td><code>_universe_sim_64.py</code></td>
+<td><strong>无</strong>（<code>_universe_sim_64</code> 只被<strong>清单</strong>引用）</td>
+<td>⚠️⚠️ <strong>没有任何备忘录</strong></td>
+</tr>
+<tr>
+<td><strong>第 79 轮</strong></td>
+<td><code>_hmin_quote_79.py</code>、<code>_clean_quotes_79.py</code>、<code>_patch_79.py</code>、<code>_patch_list_79.py</code></td>
+<td><strong>无</strong>（只被论文 / 清单 / 工作流引用）</td>
+<td>⚠️⚠️ <strong>没有任何备忘录</strong></td>
+</tr>
+<tr>
+<td><strong>第 83 轮</strong></td>
+<td><code>_diamond_83.py</code>、<code>_patch_83.py</code></td>
+<td>内容<strong>并入</strong> <code>庞加莱猜想与Ricci流能否接入框架…md</code> 的 §九</td>
+<td><strong>合并不独立</strong>（可接受，但未标 83）</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 两条缺口的严重性不同</h3>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>论文里有内容吗</th>
+<th>清单里有吗</th>
+<th>严重性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>第 64 轮</strong>（宇宙模拟器）</td>
+<td>❌ <strong>论文 0 处</strong></td>
+<td>✅ 1 处（§九 工具表）</td>
+<td><strong>双重缺口</strong>：无备忘录 ＋ 无论文块 ⟹ 该轮的取证<strong>只存在于清单的一行</strong></td>
+</tr>
+<tr>
+<td><strong>第 79 轮</strong>（C-28 拟合口径 ＋ C-29 引号清理）</td>
+<td>✅ <strong>论文 5 处</strong>（有【第 79 轮】专块）</td>
+<td>✅ 5 处</td>
+<td><strong>单缺口</strong>：只缺备忘录，论文与清单都在</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ ⭐ <strong>按铁律 33</strong>，第 79 轮尚可（论文块就是它的档）；<strong>第 64 轮最薄</strong> —— 它唯一的落点是清单一行。
+⟹ ⚠️ <strong>但我不伪造备忘录</strong> —— 重写历史会让「第 N 轮的产物」与「实际当时算的」脱钩。
+   <strong>本轮的处置是「登记缺口 ＋ 写明取证位置」</strong>，让溯源<strong>可查</strong>，而不是<strong>假装完整</strong>。</p>
+<h3>3.3 ⭐⭐ 最硬的一条：判据敏感性</h3>
+<p>同一问题「39–88 里哪几轮没有备忘录」，<strong>四种合理判据给出四个答案</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>判据</th>
+<th>「无备忘录」的轮次数</th>
+<th>清单</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全文任意位置（最宽）</td>
+<td><strong>2</strong></td>
+<td>64, 79</td>
+</tr>
+<tr>
+<td>头部前 6 行（含标题）</td>
+<td><strong>3</strong></td>
+<td>59, 64, 79</td>
+</tr>
+<tr>
+<td>头 1–10 行（<strong>跳过标题</strong>）</td>
+<td><strong>4</strong></td>
+<td>59, 64, 79, 83</td>
+</tr>
+<tr>
+<td>专用声明式（最严）</td>
+<td><strong>16</strong></td>
+<td>59, 60, 61, 62, 63, 64, 65, 66, 67, 70, 71, 72, 73, 75, 79, 83</td>
+</tr>
+</tbody>
+</table>
+<p><strong>根源：轮次标识至少有 6 种写法</strong>（实测）：</p>
+<table>
+<thead>
+<tr>
+<th>形</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td><code>&gt; 第 67 轮备忘录 ｜ 2026-10-01 ｜ 三工种协作产出</code></td>
+</tr>
+<tr>
+<td>B</td>
+<td><code>&gt; &lt;strong&gt;日期&lt;/strong&gt;：2026-09-21（第 43 轮）</code></td>
+</tr>
+<tr>
+<td>C</td>
+<td><code>&lt;strong&gt;轮次&lt;/strong&gt;：第 60 轮（工作流第 1 批 1.1）</code></td>
+</tr>
+<tr>
+<td>D</td>
+<td><code>&gt; &lt;strong&gt;第 68 轮&lt;/strong&gt;（2026-10-01）。核验脚本 _posop_68.py…</code></td>
+</tr>
+<tr>
+<td>E</td>
+<td><code>&gt; 第 65 轮讨论纪要 ｜ 2026-10-01 ｜ 核验脚本 _snow_65.py</code></td>
+</tr>
+<tr>
+<td>F</td>
+<td><code>&gt; 第 78 轮 ｜ 工作流 &lt;strong&gt;3.1&lt;/strong&gt;（候选池 31）｜ 核验脚本 _incompleteness_78.py</code></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>任何一种单一模式都会漏</strong>（最严的那种把 16 个轮次判成「没有备忘录」，而其中绝大多数<strong>明明有</strong>）。
+⟹ 📌 <strong>规范</strong>：轮次溯源<strong>必须报「用在哪个窗口 / 跳不跳标题 / 认哪些格式」</strong>，否则结论不可复核。</p>
+<hr />
+<h2>四、⚠️⭐ 本轮踩到的第 8 / 9 / 10 / 11 / 12 类判据陷阱</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>陷阱</th>
+<th>实测</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⑧</td>
+<td><strong>行号 / 条目号不是「值」</strong></td>
+<td><code>L1918</code>、<code>_refs_67.md</code> 的 <code>1278 / 1280 / 1300 / 1303 / 1344</code> 被当成「物理值」去论文里找 ⟹ 当然 0 处 ⟹ <strong>整段 RC-5 输出被噪声占满</strong></td>
+</tr>
+<tr>
+<td>⑨</td>
+<td><strong>检测窗口大小会改变结论</strong></td>
+<td>同一判据取前 300 / 600 / 1500 / 全文 ⟹ 命中轮次数 <strong>47 / 47 / 47 / 49</strong>（TR-8 复现）</td>
+</tr>
+<tr>
+<td>⑩</td>
+<td>⭐ <strong>「头部第一个轮次号」会被标题污染</strong></td>
+<td>三例实测：<code>h能否被可观测量定出…且第 26 轮一处数值需修正</code> ⟹ 归给<strong>第 26 轮</strong>（正确 43）；<code>…第 83 轮已撤回</code> ⟹ 归给<strong>第 83 轮</strong>（正确 82）；<code>审计面的漏洞：第 84 轮两处…</code> ⟹ 归给<strong>第 84 轮</strong>（正确 85）。<strong>标题里的轮次是「提到」，不是「是」</strong></td>
+</tr>
+<tr>
+<td>⑪</td>
+<td>⭐⭐ <strong>本轮自己的文档会污染检索（自指污染）</strong></td>
+<td>本轮写的<strong>这份审计备忘录</strong>引用了 <code>_universe_sim_64</code> / <code>_hmin_quote_79</code> / <code>_adaptation_59</code> / <code>_diamond_83</code> 四个脚本名 ⟹ 「第 64 / 79 轮有没有备忘录」的答案<strong>被我自己刚写的文件改掉了</strong>（从「没有任何备忘录」变成「并入其他轮备忘录」）。✅ <strong>判据：审计必须在「不含本轮产物」的语料上跑</strong> —— 显式排除本轮自己的备忘录，并把<strong>本轮将要改的每一份文件</strong>都换成<strong>补丁前备份</strong>（本轮换了 2 份：第 59 / 第 82 轮的备忘录）</td>
+</tr>
+<tr>
+<td>⑫</td>
+<td>⭐ <strong>代码前缀也会被子串误命中</strong></td>
+<td><code>re.findall(r"C-(\d+)")</code> 把 <strong><code>RC-1…RC-9，9 项 0 失败</code></strong> 里的 <strong><code>C-9</code></strong> 当成更正编号 ⟹ 造出一个<strong>幽灵缺口 C-9</strong>（并让我在同一项上连错三次）。✅ 判据：<code>(?&lt;![A-Za-z])C-(\d+)</code></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>另有四处我自己的判据写错</strong>（不是数据错）：
+- 把 <strong>索引类文档</strong>（<code>未完成研究工作流</code> / 交接说明 / 清单）当成了<strong>备忘录</strong>；
+- 期望值<strong>写死</strong>（「第 64/79 轮在论文里 0 处」）而实际第 79 轮<strong>在论文里有专块</strong>；
+- 数「<strong>条目行</strong>」得 37 就当总数用（C 条目有<strong>合并行</strong>：C-33…C-38 与 C-9 写在长串里）；
+- 以为「44 个连续编号」就该等于声明的 43 ⟹ <strong>其实 C-1 的处置列是「修正」而非「撤回 / 更正」</strong>，
+  撤回/更正族 = 44 − 1 = <strong>43</strong> ⟹ <strong>台账完全一致</strong>。<strong>教训：「编号总数」≠「某族条目数」。</strong></p>
+<p>📌 <strong>通则（与第 88 轮的七类合起来）</strong>：<strong>审计里每一个判据，都要先声明「我把它当什么用」</strong> ——
+   是值还是行号？是更正还是序列？是同一行还是含续行？窗口多宽？跳不跳标题？
+   <strong>是本轮写的还是底本里的？代码前缀有没有撞车？属于哪一族？</strong> —— <strong>这些全部要写进结论</strong>。</p>
+<h2>五、本轮处置（不改写历史）</h2>
+<ol>
+<li>✅ <strong>补第 59 轮的轮次 ID</strong>（低成本、无损）：在其备忘录头部加「<strong>轮次</strong>：第 59 轮」。</li>
+<li>⚠️ <strong>第 64 / 79 轮不补备忘录</strong>，改为在<strong>交接说明</strong>登记：写明「这两轮无备忘录，其取证位置 =
+   清单 §… / 论文 §4.8【第 79 轮】块」，使<strong>后续审计不必重新发现</strong>。</li>
+<li>📌 <strong>新规范</strong>：此后<strong>新备忘录头部必须带轮次 ID</strong>，统一为 <code>&gt; &lt;strong&gt;第 N 轮&lt;/strong&gt; ｜ 日期 ｜ 核验脚本</code>（形 D）。</li>
+<li>⭐ <strong>第 83 轮</strong>：保持并入第 82 轮（内容本就同一议题），但<strong>在第 82 轮备忘录头部补一句「含第 83 轮撤回」</strong>。</li>
+</ol>
+<hr />
+<h2>六、诚实边界</h2>
+<ol>
+<li><strong>我只查了 39–88 轮</strong>（有独立备忘录的区间）。<strong>1–38 轮</strong>的备忘录在换机时丢过（见交接说明 §六），
+   本轮不涉及 —— 那是一个<strong>已知的、更大的</strong>缺口。</li>
+<li><strong>「专属脚本」是我判定的</strong>（按 <code>_*_NN.py</code> / <code>_*NN*.py</code> 命名）。若某轮的脚本没带轮次号，
+   本轮会漏判。⚠️ 反例已见：第 66/67 轮的脚本名带轮次号，但<strong>备忘录文件不带</strong>（<code>孤子的诞生…</code> / <code>孤子的动力学…</code>）。</li>
+<li><strong>「无备忘录」的判定只覆盖 <code>outputs/*.md</code></strong> —— 若某轮记录写在别处（如 HTML、备忘录外的地方），本轮看不到。</li>
+<li><strong>第 59 轮的 ID 是我补的</strong>（原文没有）⟹ 日后清点「第 59 轮在头部出现几次」时，
+   <strong>底本要用 <code>不变必亏与因变化而变化_最优频率是平方根_备份_2026-10-02第89轮前.md</code></strong>（铁律 18/20）。</li>
+<li><strong>本轮没有新的物理结论</strong> —— 这是一轮<strong>可追溯性审计</strong>，产出是<strong>元数据缺口 ＋ 判据规范</strong>。</li>
+</ol>
+<hr />
+<h2>七、判决与产出</h2>
+<ul>
+<li><strong>判决</strong>：<strong>C-44</strong>（溯源链缺口：第 64 / 79 轮无备忘录；第 59 轮缺 ID；第 83 轮并入）；
+  另有<strong>正面确认</strong>：论文侧的「只在备忘录做过的更正」<strong>漏网 = 0</strong>。</li>
+<li>净增量：<strong>C-44</strong> ＋ <strong>技能陷阱 83</strong>（溯源判据规范）＋ <strong>第 59 轮补 ID</strong> ＋ <strong>第 64/79 轮缺口登记</strong>。</li>
+<li>总账：<strong>更正 42 → 43</strong>；<strong>负面条数不变</strong>。</li>
+<li>交接说明：§三 新增第 89 轮段；§七 更新 ＋ 新增「已知缺口」条。</li>
+<li>清单：新增 <strong>C-44</strong> 行 ＋ 总账 <strong>43 条</strong>。</li>
+<li>技能：<strong>陷阱 83</strong>。</li>
+<li>备忘录：本文件。</li>
+</ul>
+<h2>八、下一步（第 90 轮建议）</h2>
+<ol>
+<li>⭐ <strong>四类判定的补标</strong>（第 88 轮登记的缺口仍在）：「预言」字样 <strong>59 行</strong>里只有 <strong>6 行</strong>标了
+   真预言 / postdiction / 半拟合 / 失败 之一（≈10%）⟹ 第 37 轮定的判决口径<strong>在论文里基本没被执行</strong>。</li>
+<li><strong>候选池 #5（PPN 优越系 α₁ ≲ 10⁻⁴）</strong> —— ⚠️ 先按<strong>陷阱 50</strong> 自查：若框架给 <code>α₁ = 0</code>（与 GR 同），
+   则<strong>判别力 = 0</strong>（与 N-22 的 <code>Ω_K = 0</code> 同病）⟹ <strong>先算「它排除了什么」再开工</strong>。</li>
+<li><strong>1–38 轮的备忘录缺口</strong>（§六.1）：这批在换机时丢了，是否需要从 <code>本轮推演总结_2026-09-17/21.md</code> 反向重建？</li>
+</ol>
+
+<div class="footer">备忘录族的轮次溯源缺口（四种判据给出四个不同答案） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 备忘录族的轮次溯源缺口_四种判据四个答案.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

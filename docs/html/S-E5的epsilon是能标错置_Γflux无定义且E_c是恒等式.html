@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S-E5 的 ε 是能标错置：FQH 能标下 ε ≈ O(1)，不是 10⁻²⁰</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>S-E5 的 ε 是能标错置：FQH 能标下 ε ≈ O(1)，不是 10⁻²⁰</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 53 轮 ｜ 2026-09-23 ｜ 脚本 <code>_se5_eps_53.py</code>（SE-1…SE-8，<strong>7 项 0 失败</strong>）
+主题：按上一轮建议换方向，接手 <strong>S-6 FQH 引力子模的 ε 项</strong>（清单里唯一 ★★★、且自称"框架独有"）。
+本轮不跑群计算、不做新数值：<strong>全部是算术 + 引文核对</strong>。结果：S-E5 需要先修正，才谈得上具体化。</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>S-E5 引用的 <code>ε ~ 10⁻²⁰</code> 是 §8.1 里的 ε₀ = ε(M_Pl)，被错置到 meV 能标的 FQH 平台上。</strong>
+按框架<strong>自己的</strong>公式 <code>ε(E) = ε₀(M_Pl/E)^β</code>，FQH 能标下 <strong>ε ∈ [0.042, 77]</strong>（随口径），
+与 10⁻²⁰ 差 <strong>18–21 个数量级</strong>。<strong>框架自己的 §8.1 就写着 ε(1 meV) ~ 1</strong> ⟹ 论文两处直接冲突。</p>
+<hr />
+<h2>一、证据：ε(E) 的定义（论文 §8.1 原文，第 890–895 行）</h2>
+<pre><code>【推导】ε_A(E) = ε₀(M_Pl/E)^β，两边界条件：
+- E ~ 1 TeV  → ε ~ 6×10⁻¹⁰ （重子不对称 η ≈ ε）
+- E ~ 1 meV  → ε ~ 1       （暗能量 ρ_Λ ~ (meV)⁴）
+- β = log(6×10⁻¹⁰)/log(10⁻¹⁵) ≈ 0.615，ε₀ ≈ 7.6×10⁻²⁰
+</code></pre>
+<p>⟹ <strong>ε 是一个能标依赖的递减函数</strong>（E 越低，ε 越大），其归一化点 ε₀ 是 <strong>E = M_Pl 处的值</strong>。</p>
+<p>而 S-E5（§5.8 第 804 行 / §9 第 1245 行）写：</p>
+<pre><code>Γ = Γ_Coulomb + ε·Γ_flux        ε ~ 10⁻²⁰ 泄漏项，线宽余项
+</code></pre>
+<p>⟹ 把 M_Pl 处的 ε₀ 直接搬到了 meV 能标的 FQH 平台。<strong>同一个符号 ε，两个不同的能标。</strong></p>
+<h2>二、FQH 平台的能标（GaAs 2DEG，杜灵杰平台）</h2>
+<table>
+<thead>
+<tr>
+<th>B (T)</th>
+<th>l_B (nm)</th>
+<th>ℏω_c (meV)</th>
+<th>E_C (meV)</th>
+<th>Δ_GMP ≈ 0.6 E_C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5</td>
+<td>11.47</td>
+<td>86.4</td>
+<td>9.73</td>
+<td>5.84</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td><strong>8.11</strong></td>
+<td><strong>172.8</strong></td>
+<td><strong>13.76</strong></td>
+<td><strong>8.26</strong></td>
+</tr>
+<tr>
+<td>15</td>
+<td>6.62</td>
+<td>259.2</td>
+<td>16.85</td>
+<td>10.11</td>
+</tr>
+</tbody>
+</table>
+<p>（实验工作温度 mK 量级：k_BT @ 10 mK = 0.86 μeV = 8.6×10⁻⁴ meV）</p>
+<p><strong>各"过程能标"口径下的 ε</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>口径</th>
+<th>E (meV)</th>
+<th><strong>ε(E)</strong></th>
+<th>与 10⁻²⁰ 的 log₁₀ 差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k_BT @ 10 mK</td>
+<td>8.6×10⁻⁴</td>
+<td><strong>76.6</strong></td>
+<td>21.9</td>
+</tr>
+<tr>
+<td>磁旋子能隙 Δ_GMP</td>
+<td>8.26</td>
+<td><strong>0.273</strong></td>
+<td>19.4</td>
+</tr>
+<tr>
+<td>引力子模能量（1 meV 代表值）</td>
+<td>1.0</td>
+<td><strong>1.00</strong></td>
+<td>20.0</td>
+</tr>
+<tr>
+<td>Coulomb 能标 E_C</td>
+<td>13.76</td>
+<td><strong>0.200</strong></td>
+<td>19.3</td>
+</tr>
+<tr>
+<td>回旋能 ℏω_c</td>
+<td>172.8</td>
+<td><strong>0.0421</strong></td>
+<td>18.6</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>无论取哪种能标口径，ε 都不是 10⁻²⁰</strong>（最"保守"的口径差 18.6 个数量级）。
+⟹ 这不是"因子不准"，是<strong>引用错了能标</strong>。</p>
+<h2>三、⭐ 附带结果：<code>E_c</code> 是<strong>恒等式</strong>，不是【推导】</h2>
+<p>论文第 895 行把截断能标标为【推导】：</p>
+<pre><code>【推导】概率归一化 ε_A(E_c) = 1 ⟹ E_c = M_Pl·ε₀^{1/β} = 1.0181 meV
+        ——与暗能量特征能标 2.3 meV 同量级（(E_c)⁴ 差 27 倍，O(1) 系数待定）
+</code></pre>
+<p>但把 ε₀ 的定义代进去，<strong>M_Pl 完全消掉</strong>：</p>
+<pre><code>E_c = M_Pl · [ε(1TeV)/(M_Pl/1TeV)^β]^(1/β)
+    = M_Pl · ε(1TeV)^(1/β) · (1TeV/M_Pl)
+    = 1TeV · ε(1TeV)^(1/β)                    ← M_Pl 不见
+    = 1 TeV × (6×10⁻¹⁰)^(1/0.61479)
+    = 1.000000 meV                             ← 精确
+</code></pre>
+<p><strong>数值 1.000000 meV</strong>（论文的 1.0181 是 ε₀/M_Pl 取值的数值残差，−1.78%）。</p>
+<p>⟹ 因为 β ≡ ln(η)/ln(1meV/1TeV) 就是这个等式解出来的，<strong>"E_c = 1 meV 与暗能量能标同量级"是锚点 2 的重述</strong>，
+用它去"验证"锚点 2（ρ_Λ ~ (meV)⁴）是<strong>循环</strong>。
+⟹ 四类判定：<strong>半拟合</strong>（两个锚点定 β 与 ε₀，第三个量没有独立内容）。
+⟹ 附带：<strong>ε₀ 在论文里有四个写法</strong> —— 7.6 / 7.7 / 7.67 / 7.751 ×10⁻²⁰（第 893 / 27·592·1056 / 914 行 + 由 E_c 反推），跨度 2%。<strong>本轮已在论文里统一为 7.731×10⁻²⁰</strong>（由定义式 ε₀ = ε(1TeV)/(M_Pl/1TeV)^β 算得）—— 因为 E_c 对 ε₀ 敏感，这个常数只能有一个值。</p>
+<h2>四、可识别性：<code>Γ_flux</code> 全文没有定义</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Γ_Coulomb</td>
+<td>标准量，可独立算出 ⟹ 不引入参数</td>
+</tr>
+<tr>
+<td><strong>ε</strong></td>
+<td>若 = ε_A(E)：已知（2 参数已锚定）；若另有所指：<strong>论文没给任何定义</strong></td>
+</tr>
+<tr>
+<td><strong>Γ_flux</strong></td>
+<td><strong>全文无表达式</strong>（字符串 <code>Γ_flux</code> 在论文里只出现 <strong>2 次</strong>，都在同一预言句里）</td>
+</tr>
+</tbody>
+</table>
+<p>观测量：给定 B、ν、T，FQH 线宽 Γ 是<strong>一个实数</strong>。</p>
+<p>⟹ 未知量 ≥ <strong>一个自由函数</strong> ⟹ 预言 <code>Γ = Γ_Coulomb + ε·Γ_flux</code> 可被任意 <code>Γ_flux</code> 满足或规避。
+⟹ 与第 45 轮「公设上移 = 无穷回归」、第 52 轮「不可识别的拆分」<strong>同一个病，这是第四次出现</strong>
+（判据：<strong>未知量个数 &gt; 方程个数</strong>）。</p>
+<h2>五、外部核查：标准理论对引力子模衰减已有机制，且已有提取</h2>
+<table>
+<thead>
+<tr>
+<th>文献</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GMP 1970s → Haldane 2016</td>
+<td>磁旋子（magneto-roton）与量子度规几何理论</td>
+</tr>
+<tr>
+<td><strong>Liang et al., Nature 628, 78 (2024)</strong></td>
+<td>实验首次观测（杜灵杰团队，ν=1/3 等，偏振 Raman）</td>
+</tr>
+<tr>
+<td>Balram–Sreejith–Jain, PRL 133, 246605 (2024)</td>
+<td>GMP 密度波分裂为两个引力子（ν=n/(4n±1)）</td>
+</tr>
+<tr>
+<td>Du, arXiv:2509.04408 (2025)</td>
+<td>手性引力子<strong>非线性有效场论</strong>（APD 规范 + Stueckelberg，可调能隙、色散）</td>
+</tr>
+<tr>
+<td><strong>IOP Rep. Prog. Phys. (2025)</strong></td>
+<td><strong>明确提取引力子模的"内在衰减率"（intrinsic decay rate）</strong> —— 衰减机制 = 衰变进<strong>双磁旋子连续谱</strong></td>
+</tr>
+<tr>
+<td>Wang et al., arXiv (2025)</td>
+<td>栅格 Chern 带中引力子<strong>寿命趋零</strong>（LLL 中寿命长）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>标准凝聚态对 Γ 已有公认的机制与定量提取</strong>（双磁旋子连续谱）。
+⟹ 框架若主张"多出一项 ε·Γ_flux"，就必须给出<strong>相对标准 Γ 的独立额外贡献</strong>；而它没有定义 Γ_flux。</p>
+<h2>六、判决：两难</h2>
+<p>论文对 S-E5 的三处定位（§5.8 第 804 行、§9 第 1245 行、§10 第 1343 行）：
+<strong>① ε ~ 10⁻²⁰（微小泄漏）＋ ②「线宽余项」（比 Γ_Coulomb 小的修正）＋ ③「框架独有、标准凝聚态无此项」</strong></p>
+<p>由 §二：FQH 能标下 ε ≈ O(1) ⟹ <strong>②「余项」不成立</strong>。若 ε = O(1)，则 Γ_flux 与 Γ_Coulomb 同量级：</p>
+<ul>
+<li><strong>(a) 该项已被标准理论包含</strong> ⟹ <strong>③「独有」不成立</strong></li>
+<li><strong>(b) 该项未被包含</strong> ⟹ 一个 O(1) 的通量项早该在 Nature 628, 78 (2024) 的谱里现形 ⟹ <strong>与实验矛盾</strong></li>
+</ul>
+<p>⟹ <strong>②、③ 与「FQH 能标下 ε = O(1)」三者不能同时成立。</strong></p>
+<h2>诚实边界</h2>
+<p><strong>是推导/算术</strong>：
+- ε(E) 的复算、FQH 能标的换算、<code>E_c ≡ 1 meV</code> 的代数消去、ε₀ 四写法对比 —— 全部可逐步核对；
+- 外部文献（Nature 628 / PRL 133 / arXiv 2509.04408 / IOP 2025）的引用。**</p>
+<p><strong>是判定（需要后续验证）</strong>：
+- <strong>ε 究竟该用哪个"过程能标"口径</strong>：本轮列了 5 种（k_BT / Δ_GMP / 实测能量 / E_C / ℏω_c），
+  结论只依赖"<strong>都在 meV 或更低</strong>"这个稳健事实（论文自己也说 E_c 对 β 极敏感、<strong>meV 量级是稳健结论</strong>）。
+  <strong>但"ε 的能标自变量是'过程能标'还是'探测温度'"论文没有明确</strong> —— 若取 k_BT，ε = 76.6（且 &gt; 1，公式失效）。
+- (a)/(b) 二择一<strong>未裁决</strong>：本轮只证明两者不能同时成立，没有判定哪个为真。
+  （倾向 (a)，因为标准侧已有 decay rate 的提取；但这需要逐项比对 Γ 的分解才叫定案。）</p>
+<p><strong>没做</strong>：
+- <strong>没有定义 Γ_flux</strong>（这是框架该做的事，不是审查能补的）；
+- <strong>没有</strong>把标准 Γ（双磁旋子连续谱）与本框架的 Γ_flux 逐项对齐 —— 那是"给出 Γ_flux 表达式"之后的事；
+- <strong>没有</strong>核 FQH 平台是否真能分辨 O(1) 与 10⁻²⁰ 的差别（实验分辨率问题，属另一个方向）。</p>
+<h2>判决（四类判定）</h2>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S-E5 的 <code>ε ~ 10⁻²⁰</code></td>
+<td><strong>失败</strong>（能标错置，差 19 个数量级；框架内部两处冲突）</td>
+</tr>
+<tr>
+<td><code>E_c = 1.0181 meV</code> 的【推导】标注</td>
+<td><strong>半拟合</strong>（恒等式；循环）</td>
+</tr>
+<tr>
+<td><code>Γ = Γ_Coulomb + ε·Γ_flux</code> 的可检验性</td>
+<td><strong>不可识别</strong>（Γ_flux 无定义）</td>
+</tr>
+<tr>
+<td>「框架独有、标准无此项」</td>
+<td><strong>未成立</strong>（标准已有 decay rate 机制；且与 ε = O(1) 冲突）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>S-6 的 ★★★ 评级与「框架独有」定位都需降调</strong>；清单里"唯一 ★★★ 且独有"的说法<strong>不成立</strong>。</p>
+<h2>对 S-6 的处置建议（三条）</h2>
+<ol>
+<li><strong>最小修正</strong>（便宜）：把 S-E5 的 <code>ε ~ 10⁻²⁰</code> 改为 <strong><code>ε(FQH 能标) ≈ O(1)</code></strong>，
+   并把"线宽余项"改为"与 Γ_Coulomb 同量级的附加项"；同时把 §8.1 的 <code>E_c</code> 从【推导】改标【恒等式】。</li>
+<li><strong>让 S-E5 有内容</strong>（工作量大，但这是唯一能让它成为真预言的路）：
+   <strong>给出 Γ_flux 的表达式</strong> —— 从 §5.8 的"通量二阶涨落模态在 2D 电子海的投影"出发；
+   判据是：它必须给出<strong>相对标准 Γ（双磁旋子连续谱）的独立贡献</strong>，否则与 (a) 分支合流。</li>
+<li><strong>降调</strong>：若 1/2 都不做，则把 S-E5 从"可检验预言（框架独有）"降为"<strong>方向性主张、无定量</strong>"，
+   并把 🎯 移出 S-6。</li>
+</ol>
+<p><strong>推荐 1 + 3</strong>：1 是硬错误必须改；3 是因为在 Γ_flux 有定义之前，S-E5 不可能被检验。</p>
+<h2>下一步</h2>
+<ul>
+<li>🎯 <strong>修正 S-E5 与 §8.1 的两处标注</strong>（本轮已给出精确措辞），并把 S-6 降调；</li>
+<li>🎯 其次：<strong>Γ_flux 的候选定义</strong>（唯一能让 S-E5 复活的路）—— 从 §5.8 的"通量二阶涨落"与
+  §4 的通量场涨落出发，问：<strong>通量二阶模态的衰减率与标准的双磁旋子连续谱是什么关系？</strong>
+  若答案是"同一个"，则 S-E5 判死；若能给出不同的动量/密度依赖，则 S-E5 可复活为真预言。</li>
+</ul>
+
+<div class="footer">S-E5 的 ε 是能标错置：FQH 能标下 ε ≈ O(1)，不是 10⁻²⁰ · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 S-E5的epsilon是能标错置_Γflux无定义且E_c是恒等式.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

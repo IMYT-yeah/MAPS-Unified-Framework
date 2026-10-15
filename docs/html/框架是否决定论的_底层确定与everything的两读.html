@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>框架是否决定论的？—— 「底层确定」与「everything」的两读</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>框架是否决定论的？—— 「底层确定」与「everything」的两读</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 57 轮 ｜ 2026-09-26 ｜ 脚本 <code>_determinism_57.py</code>（DF-1…DF-12，<strong>11 项 0 失败</strong>）
+起因：用户提出一条推理链 ——
+① 「量子效应本身在我们的框架中是否成立？」② 「如果该理论成立，宇宙应该是决定论的（初始状态决定一切）」
+③ 「而初始状态之后生成的是 everything（所有可能都是可能的）」</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>框架的底层是「确定且可逆」的（给定 tick 序列），但 tick 本身是外生随机；
+而「tick 到底真随机还是伪随机」框架内不可判定 —— 所以框架不判决自己是否决定论。</strong></p>
+<p><strong>至于「everything」：状态空间层面有，实际轨迹层面没有 ——
+一条轨迹在同层内平均只访问 7.14%（N=8）到 0.0158%（N=24）的可能。</strong></p>
+<p>⭐ <strong>本轮顺带查出一处内部冲突（新张力 T-12）</strong>：框架的自我定位（§7.4「't Hooft 元胞自动机式：
+<strong>底层确定事件流</strong>」）<strong>要求 H2</strong>，而它的工作表述（§8.6.7「轴随机、相位随机」）是 <strong>H1</strong> ——
+而第 42–44 轮又证明 <strong>H1/H2 不可判定</strong> ⟹ <strong>框架无法验证自己的定位</strong>。</p>
+<hr />
+<h2>一、框架的精确结构（本轮先把这件事摆清）</h2>
+<pre><code>[状态]      衬底占据态位型（bitmask：2^N，或按 k 分成 C(N,k) 层）
+   │
+   │  tick = 沿「随机选中的一根轴」的完美匹配
+   │        ＋ 每条线「独立随机」的相位（每 tick 重抽）
+   ▼
+[演化]      单 tick 是&lt;strong&gt;置换&lt;/strong&gt; ⟹ &lt;strong&gt;双射、可逆、信息严格守恒、无熵产生&lt;/strong&gt;
+            （数值验证：对 2^16 = 65536 个构型，施加生成元后像集大小不变 ✓）
+   │
+   │  ⚠️ tick 序列本身是&lt;strong&gt;外部输入&lt;/strong&gt;，不在状态里
+   ▼
+[tick 序列] 每 tick 的选择数 = 3 轴 × 2^(L²) ⟹ 无知 h = ln3 + L²ln2 纳特/tick
+</code></pre>
+<p><strong>关键区分</strong>（本轮最重要的一句话）：</p>
+<table>
+<thead>
+<tr>
+<th>命题</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「<strong>给定 tick 序列</strong>，演化是决定论的」</td>
+<td>✅ <strong>成立</strong>（双射、可逆）</td>
+</tr>
+<tr>
+<td>「<strong>整体</strong>是决定论的」</td>
+<td>❓ <strong>取决于 tick 序列从哪来 —— 框架内不可判定</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、用户的推理链，逐环判定</h2>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>判定</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 「框架成立 ⟹ 宇宙是决定论的」</td>
+<td>❌ <strong>推不出</strong></td>
+<td>框架的<strong>工作表述是 H1（非决定论）</strong>（§8.6.7 + 第 42 轮）；H2（决定论版）只是<strong>一种实现</strong>，且不可判定（第 42–44 轮）</td>
+</tr>
+<tr>
+<td>② 「<strong>初始状态</strong>决定一切」</td>
+<td>❌ <strong>不成立</strong></td>
+<td>状态里<strong>不含 tick 序列</strong> ⟹ 精确版本是「<strong>初态 ＋ 全部 tick 序列</strong>」才决定一切</td>
+</tr>
+<tr>
+<td>③ 「初态之后生成 <strong>everything</strong>」</td>
+<td>⚠️ <strong>半成立</strong></td>
+<td>状态空间层面 ✓；<strong>实际轨迹层面 ✗</strong>（见 §四）</td>
+</tr>
+<tr>
+<td>④ 「所有可能都是<strong>可能的</strong>」</td>
+<td>✅ <strong>成立，但平凡</strong></td>
+<td>这就是状态空间的定义；它<strong>不蕴含</strong>「都会发生」</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>① 的更正最要紧</strong>：从"框架成立"<strong>推不出</strong>决定论 ——
+框架<strong>同时兼容</strong> H1（非决定论）与 H2（决定论），因此它对这个问题<strong>不做判决</strong>。</p>
+<p><strong>而且第 43 轮已经把口径改写过</strong>（这是本轮的关键引文）：</p>
+<blockquote>
+<p>「熵增源头改写 —— 第 42 轮的『熵增源头 = <strong>外生 tick 随机性</strong>』应改为
+『熵增源头 = <strong>无知</strong>（系综熵）』；『无知从哪来』（<strong>真空抛硬币</strong> H1 还是
+<strong>我们不知道种子</strong> H2）<strong>在框架内不可判定</strong>。」</p>
+</blockquote>
+<p>⟹ <strong>熵增只需要「无知」，不需要「真随机」</strong> ⟹ <strong>H2（决定论）下框架照样工作</strong>
+⟹ 所以<strong>决定论与框架并不冲突</strong> —— 只是框架不能告诉你哪一个是真的。</p>
+<hr />
+<h2>三、⭐ 新发现：内部冲突 T-12</h2>
+<p>框架<strong>三次</strong>声称自己的定位是「't Hooft 式」，其中最明确的一次是 §7.4：</p>
+<blockquote>
+<p>「定位是 <strong>'t Hooft 元胞自动机式</strong>：<strong>底层确定事件流</strong>，可观测代数非交换。」</p>
+</blockquote>
+<p>而 §8.6.7 (c) 说（这是实现 tick 所必需的）：</p>
+<blockquote>
+<p>「要同时满足各向同性与真扩散，<strong>必须随机化两件事</strong>：<strong>轴随机</strong>（每 tick 在 x/y/z 中随机选轴）、
+<strong>相位随机</strong>（每条线独立、每 tick 重抽）」</p>
+</blockquote>
+<p>第 42 轮更进一步写明：</p>
+<blockquote>
+<p>「在<strong>现行表述（H1）</strong>下答案明确：<strong>不可预测</strong>（未来不是当前状态的函数）」</p>
+</blockquote>
+<p><strong>⟹ 字面冲突</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>与 §7.4 的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>H1</strong>（tick 真随机）</td>
+<td>底层<strong>不确定</strong> ⟹ 与「't Hooft 式 / 底层确定」<strong>矛盾</strong></td>
+</tr>
+<tr>
+<td><strong>H2</strong>（隐变量）</td>
+<td>底层确定 ⟹ <strong>符合</strong> §7.4</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>§7.4 的定位站在 H2 一边</strong>；而第 42–44 轮证明 <strong>H1/H2 不可判定</strong>
+⟹ <strong>框架无法验证自己的自我定位。</strong> 登记为 <strong>T-12</strong>。</p>
+<p>⚠️ 一个可能的辩解是「『底层确定』指的是『给定 tick 后是确定的』」——
+但那不是 't Hooft 元胞自动机的意思（CA 的<strong>更新规则</strong>本身就是确定的）；
+且第 42 轮已把工作表述定为 H1 ⟹ <strong>措辞需要一次显式裁决</strong>。</p>
+<hr />
+<h2>四、⭐⭐ 「everything」的四种读法（本轮的核心定量）</h2>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>判定</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(a) 所有可能的「历史」都实现</strong>（多世界/多分支）</td>
+<td>❌ <strong>不成立</strong></td>
+<td>tick 是「每 tick <strong>选一个</strong>轴 + 每线选<strong>一个</strong>相位」⟹ <strong>单分支</strong>。框架里「多世界 / 分支 / 退相干」<strong>各 0 处</strong></td>
+</tr>
+<tr>
+<td><strong>(b) 所有可能的状态都在「状态空间」里</strong></td>
+<td>✅ <strong>成立</strong></td>
+<td>构型空间 = 2^N（或 k 层的 C(N,k)）—— 这是「一切可能」的<strong>定义域</strong></td>
+</tr>
+<tr>
+<td><strong>(c) 每条「实际轨迹」会访问所有可能</strong></td>
+<td>❌ <strong>不成立</strong></td>
+<td>tick 群<strong>非遍历</strong>：构型空间被切成不变轨道，<strong>轨迹永不离开自己的轨道</strong></td>
+</tr>
+<tr>
+<td><strong>(d) 在「轨道内」统计上等权</strong></td>
+<td>✅ <strong>成立</strong></td>
+<td>均匀分布 = 每条轨道上的<strong>唯一不变测度</strong>（等分账，§8.6.3；数值验证 ✓）</td>
+</tr>
+</tbody>
+</table>
+<h3>(c) 的定量：<strong>覆盖率随 N 急剧下降</strong></h3>
+<table>
+<thead>
+<tr>
+<th>格点</th>
+<th>N</th>
+<th>同层 M = C(N, N/2)</th>
+<th>轨道数</th>
+<th>平均轨道</th>
+<th><strong>一条轨迹的覆盖率</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(2,2,2)</td>
+<td>8</td>
+<td>70</td>
+<td>14</td>
+<td>5.00</td>
+<td><strong>7.14%</strong></td>
+</tr>
+<tr>
+<td>(2,2,4)</td>
+<td>16</td>
+<td>12 870</td>
+<td>253</td>
+<td>50.87</td>
+<td><strong>0.395%</strong></td>
+</tr>
+<tr>
+<td>(2,2,6)*</td>
+<td>24</td>
+<td>2 704 156</td>
+<td>6 334*</td>
+<td>426.93</td>
+<td><strong>0.0158%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>* (2,2,6) 的轨道数引用第 46 轮（第 50 轮更正为 6334），本轮未重算。</p>
+<p><strong>交叉验证</strong>：本轮还算了<strong>全构型空间 2^N</strong> 的轨道分解 ——
+2×2×2 → <strong>46 条</strong>、2×2×4 → <strong>1357 条</strong>，与第 40 轮<strong>逐项一致 ✓</strong>
+（顺带澄清一个口径：第 40 轮的「构型空间」指<strong>全空间 2^N</strong>，不是单个 k 层）。</p>
+<p>⟹ <strong>「everything」的定量判据</strong>：N 越大，离 everything 越远 ——
+从 7.14% 掉到 0.0158%（<strong>降 450 倍</strong>），而 N 只从 8 涨到 24。</p>
+<h3>(d) 的证据</h3>
+<p>取一条轨道（大小 8），对全部生成元施加均匀分布 <code>u = 1/8</code>：<strong>像集 == 轨道本身 ⟹ 逐项不变 ✓</strong>
+⟹ 论文 §8.6.3「<strong>均匀分布（= 等分）是 tick 动力学在每条轨道上的唯一不变测度</strong>」得到数值支持。
+<strong>这才是「everything」在框架里真正对应的东西</strong>：轨道内所有构型等权（系综意义），
+而<strong>不是</strong>「每条轨迹都会经历一切」。</p>
+<hr />
+<h2>五、量子效应在框架里的地位：涌现，但被实验逼出来的</h2>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§7.1</td>
+<td>「经典隐变量流场只能给出 CHSH ≤ 2，与实验 CHSH = 2√2 矛盾 —— <strong>框架必须非交换化</strong>」</td>
+</tr>
+<tr>
+<td>§7.2</td>
+<td>把事件流从交换代数 <code>L^∞</code> 升级为 C* 代数 ⟹ CHSH = 2√2（Tsirelson 界）、互补性 <code>V²+I² ≤ 1</code>；数值 <code>S = −2.8284 = −2√2 ✓</code></td>
+</tr>
+<tr>
+<td>§7.4</td>
+<td>「一旦非交换化，框架的量子部分与标准 QM <strong>数学上重合</strong>」</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>量子效应是框架的「输出」</strong>（涌现），但<strong>非交换化本身是一个被实验逼迫的升级步骤</strong>
+（§7.1 的「必须」），<strong>不是从公理 1 推出来的</strong>。</p>
+<p>⚠️ 这其实是 <strong>I-14「单谱量特征」的又一例</strong>：框架的底层（构型空间 + 置换）
+<strong>不含相位、不含相干性</strong> —— 要得到量子关联，必须<strong>外加</strong>一个非交换结构。</p>
+<p><strong>词条清点（本轮最重要的检索发现）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>词</th>
+<th>处数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>决定论 / 非决定 / determinism</td>
+<td><strong>0 / 0 / 0</strong></td>
+</tr>
+<tr>
+<td>幺正 / 酉</td>
+<td><strong>0 / 0</strong></td>
+</tr>
+<tr>
+<td>多世界 / 退相干 / 纯态 / 混合态 / 波函数坍缩</td>
+<td><strong>各 0</strong></td>
+</tr>
+<tr>
+<td>分支</td>
+<td>4（但均为「A·B 分支」「B 分支」等<strong>路线</strong>义，非量子分支）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>框架从未讨论过「是否决定论」，也没有量子态层</strong>（无幺正演化、无坍缩、无退相干）。
+它是一个<strong>经典构型空间 + 置换群</strong>的底层，加上一个<strong>公设级的非交换化</strong>。</p>
+<hr />
+<h2>六、判决</h2>
+<table>
+<thead>
+<tr>
+<th>用户的问题</th>
+<th>答案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>量子效应在框架里成立吗？</td>
+<td>✅ <strong>成立</strong>，但<strong>是涌现的</strong>；非交换化是<strong>公设级</strong>步骤（§7.1「必须」）</td>
+</tr>
+<tr>
+<td>框架成立 ⟹ 宇宙决定论？</td>
+<td>❌ <strong>推不出</strong>。框架兼容 H1/H2 ⟹ <strong>不判决</strong>；但<strong>工作表述是 H1（非决定论）</strong></td>
+</tr>
+<tr>
+<td>「初始状态决定一切」？</td>
+<td>❌ <strong>不成立</strong> —— 还缺 tick 序列（状态里没有它）</td>
+</tr>
+<tr>
+<td>「everything」？</td>
+<td>⚠️ <strong>半成立</strong>：状态空间（2^N）✓、轨道内等权 ✓；<strong>多历史 ✗、轨迹覆盖 ✗</strong>（7.14% ⇒ 0.0158%）</td>
+</tr>
+<tr>
+<td>⭐ 新张力</td>
+<td><strong>T-12</strong>：§7.4 的 't Hooft 定位要求 H2，而 H2 不可判定 ⟹ <strong>定位未获验证</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>四类判定</strong>：DF-4/DF-7/DF-8 的<strong>否定</strong>部分 = 排除（排除一条错误推理链）；
+DF-6 = <strong>新张力（T-12）</strong>；DF-2/DF-9 = <strong>一致性验证</strong>（与已有结论合）；
+DF-10 = <strong>引文核对 + I-14 补例</strong>。</p>
+<hr />
+<h2>诚实边界</h2>
+<p><strong>是引文核对 / 算术（可逐步复核）</strong>：
+- 词条计数（决定论/幺正/多世界/退相干/纯态 全 0 处）；§7.1/7.2/7.4、§8.6.7(c)(d)、第 42/43 轮的原文引用；
+- 双射验证（2^16 = 65536 个构型）；全空间轨道分解 46 / 1357（<strong>与第 40 轮逐项一致</strong>）；
+- 同层覆盖率 7.14% / 0.395% / 0.0158%；等分账的生成元不变性验证。</p>
+<p><strong>是判定（需要后续验证）</strong>：
+- <strong>T-12 是「措辞冲突」还是「实质冲突」</strong>：本轮判定为<strong>需要显式裁决的措辞问题</strong>；
+  若作者本意是「给定 tick 后确定」，则 T-12 可降为措辞修正 —— <strong>但第 42 轮把工作表述定为 H1，
+  这一点仍需一并处理</strong>。
+- <strong>「覆盖率随 N 下降」的趋势</strong>：(2,2,6) 一行引用第 46 轮、未重算；
+  且 (2,2,L) 系列是<strong>细长格点</strong>（第 47/48 轮的教训：形状是独立变量）⟹ <strong>趋势成立，具体数值不外推</strong>。
+- <strong>(d) 的「唯一性」</strong>：本轮只验证了「均匀分布不变」，<strong>未证明唯一性</strong>（§8.6.3 声称唯一）。</p>
+<p><strong>没做</strong>：
+- <strong>没有</strong>裁决 H1/H2（那是 T-7 已结项的「框架内不可判定」，本轮不重开）；
+- <strong>没有</strong>改动 §7.4 或 §8.6.7 的措辞（那是<strong>用户/作者的裁定</strong>，本轮只登记 T-12）；
+- <strong>没有</strong>处理「多世界解释是否更优」这类哲学问题（超出框架）。</p>
+<hr />
+<h2>下一步</h2>
+<ol>
+<li><strong>裁决 T-12（便宜）</strong>：§7.4 的 't Hooft 定位与 §8.6.7 的 H1 工作表述需要一次显式对齐 ——
+   二选一：(a) 明确采用 H2 并在 §7.4 加注；或 (b) 把「底层确定」改为
+   「<strong>给定 tick 序列后确定</strong>」（即只声称可逆性，不声称决定论）。</li>
+<li><strong>可做（结构性）</strong>：<code>⟨|O|⟩</code>（平均轨道大小）随 N 的<strong>标度律</strong> —— 本轮给了 5.00 / 50.87 / 426.93，
+   三个点已能试拟合；它与第 46–50 轮的 H/N、第 40 轮的「1.557^N」是同一族问题。</li>
+<li>⚠️ <strong>不建议</strong>：把「决定论/多世界」接向任何<strong>框架外</strong>的哲学结论 ——
+   DF-1 已明框架<strong>没有量子态层</strong>，在这上面谈多世界是<strong>无内容</strong>的。</li>
+</ol>
+
+<div class="footer">框架是否决定论的？—— 「底层确定」与「everything」的两读 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 框架是否决定论的_底层确定与everything的两读.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

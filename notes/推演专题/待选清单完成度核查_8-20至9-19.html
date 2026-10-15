@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8-20 ～ 9-19「待选清单」完成度核查</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、先回答「清单在不在」：**在，而且是结构化的**</div>
+  <h1>8-20 ～ 9-19「待选清单」完成度核查</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>问题来源</strong>（2026-10-04）：用户问「对话记录找不回来了，但是当时的待选清单都在是吗，检查下这些清单我们做完了没有」。
+<strong>脚本</strong>：<code>_ledger108.py</code>（抽取）→ <code>_ledger108c.py</code>（初版，规则过松）→ <strong><code>_ledger108d.py</code>（收紧，五态）</strong>；
+输出存档 <code>_ledger108d_out.txt</code>（334 行）。判定后<strong>手工复核 12 条疑难项</strong>（见 §四）。</p>
+</blockquote>
+<hr />
+<h2>一、先回答「清单在不在」：<strong>在，而且是结构化的</strong></h2>
+<p>8-20 ～ 9-19 的 17 个日志里，<strong>候选/待办/遗留/未完成/开放问题</strong>型共 <strong>142 行</strong>，切成 <strong>265 个条目</strong>。
+它们的写法很规整，逐日滚动推进：</p>
+<pre><code>&lt;strong&gt;下一步候选&lt;/strong&gt;：① … ② … ③ …          ← 8-20 ~ 8-23 的主流写法（每条 3 项）
+&lt;strong&gt;遗留&lt;/strong&gt;：…                            ← 某轮未做完、留给下一轮
+&lt;strong&gt;蓝图进度&lt;/strong&gt;：P0-1 ✅ → P0-2 ✅ → 下一步 P0-3 …   ← 8-23 的蓝图式推进
+&lt;strong&gt;下一步&lt;/strong&gt;：A … B … C …                ← 8-29 ~ 8-30
+🔧 &lt;strong&gt;待办&lt;/strong&gt;：…                          ← 9-17 的单条待办
+&lt;strong&gt;🎯 新首要下一步&lt;/strong&gt;：…                   ← 9-19
+</code></pre>
+<p>⟹ <strong>一条都没丢</strong>（日志是逐日追加的，且这批日志与现行副本<strong>逐字节相同</strong>）。丢的只是「当时为什么这么选」的逐句推理。</p>
+<hr />
+<h2>二、核查结论（54 条线程，五态）</h2>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>条数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>✅ 已执行 / 已并入</strong></td>
+<td><strong>38</strong></td>
+<td>有对应交付物（<code>outputs/*.md</code>），或 B 期日志里当场闭环，或被同日/次日的另一项吸收</td>
+</tr>
+<tr>
+<td><strong>✅→⛔</strong></td>
+<td><strong>12</strong></td>
+<td>执行过，但<strong>结论被后续轮次修正/撤回/判否</strong>（不算白做，但引用要带更正号）</td>
+</tr>
+<tr>
+<td><strong>⏳ 真缺口</strong></td>
+<td><strong>4</strong></td>
+<td>提过，<strong>之后既无交付物、也无人再碰</strong></td>
+</tr>
+<tr>
+<td>合计</td>
+<td>54</td>
+<td>38 ＋ 12 ＋ 4 = 54 ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>一句话</strong>：<strong>该做的几乎都做了 —— 54 条里 50 条有交付物</strong>（38 已执行 ＋ 12 执行后被修正），
+<strong>真正"提了没做"的只有 4 条</strong>。</p>
+<hr />
+<h2>三、⏳ 真缺口（4 条）—— 这是本轮最重要的产出</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>线程</th>
+<th>登记日</th>
+<th>现状</th>
+<th>为什么值得单独看</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A23</strong></td>
+<td><strong>普朗克常数的物理身份</strong></td>
+<td>08-23</td>
+<td>只作为「下一步候选 ②」出现<strong>一次</strong>，此后再无提及，无交付物</td>
+<td>ℏ 在本框架里被写成 <code>l_P² = Gℏ/c³</code> 的<strong>复合量</strong>（非基本常数）—— 这条若成立是有分量的主张，但<strong>从没被推进过</strong></td>
+</tr>
+<tr>
+<td><strong>D4</strong></td>
+<td><strong>EMRI κ↔Γ 的 1/3 精确映射</strong></td>
+<td>08-29</td>
+<td>登记为「EMRI 缺口（10% 偏离，需轨道平均 s_p 分布积分）」，此后再无提及</td>
+<td>这是 <strong>EMRI 那条唯一出口上的一处未闭合</strong>，与 S-E1–E4 的可用性直接相关</td>
+</tr>
+<tr>
+<td><strong>G4</strong></td>
+<td><strong>λ 统一为操作式 <code>λ ≡ ρ/ρ_crit</code></strong></td>
+<td>09-17</td>
+<td>写进交接说明的「🔧 待办」，<strong>未执行</strong></td>
+<td>起因是发现旧的 <code>λ</code> 用法在「面敏感性」上有<strong>重言式</strong>问题（同一轮把「ξ-稳健性」降调）；口径不统一会在论文里留暗雷</td>
+</tr>
+<tr>
+<td><strong>G9</strong></td>
+<td><strong>底层四状态机制</strong>（含 3 个子项）</td>
+<td>09-18</td>
+<td>交接说明明写「<strong>⚠️ 仍未解决</strong>」：① <code>11.0904</code> 的自然性；② 底层<strong>为何恰是这四个</strong>态；③ 拍内零测度过渡态机制</td>
+<td>这是 §4.8 熵块的<strong>根</strong>：<code>4 方向 × 4 状态</code> 里「4 状态」至今是<strong>设定</strong>，没有来源论证</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ 另有 <strong>G11（ε(E) 能否推出宇宙组分比例）</strong>：09-16 登记为「真正的开放问题」，后续只有反复引用、无结论 —— 严格说也属未解，但它已被写进论文的开放问题表，故不计入「静默掉队」。</p>
+</blockquote>
+<hr />
+<h2>四、手工复核的 12 条（自动判定会误判的地方）</h2>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>自动判定</th>
+<th><strong>手核结论</strong></th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A23</td>
+<td>✅（假）</td>
+<td><strong>⏳ 真缺口</strong></td>
+<td>「完成句」规则误命中同段落里别的「完成」；该词全期仅 1 次</td>
+</tr>
+<tr>
+<td>G7</td>
+<td>⏳（假）</td>
+<td><strong>✅ 已定案</strong></td>
+<td>交接说明：「~~16 的方向数是 4 还是 6？~~ —— <strong>第 31 轮已复查并定案</strong>」（16 = 4×4 保住，方向数<strong>必须 4</strong>，两条独立理由）</td>
+</tr>
+<tr>
+<td>G8</td>
+<td>⏳（假）</td>
+<td><strong>✅ 已闭环</strong></td>
+<td>交接说明：<strong>第 32/33 轮</strong>「把权重变成自由参数 w，扫描后两根 w=0 与 w=0.7729，后者与 C-b 冲突被排除」⟹「B2 两个软肋到此全部解除，B2 闭环」</td>
+</tr>
+<tr>
+<td>G9</td>
+<td>⏳（真）</td>
+<td><strong>⏳ 真缺口</strong></td>
+<td>交接说明原文「⚠️ 仍未解决」</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>⏳（假）</td>
+<td><strong>✅ 已并入</strong></td>
+<td>08-20 的 <strong>P0-1 PPN γ 判决</strong>已确立「框架 = GR 的有效理论」定位；08-21 直接改写成「框架无强场度规承诺、与 EHT 无冲突」</td>
+</tr>
+<tr>
+<td>A9</td>
+<td>✅（假命中）</td>
+<td><strong>✅ 已并入</strong></td>
+<td>并入 <code>吸积盘辐射传输报告</code>（火墙发射层非热修正 <code>~√(l_P/R)</code>，原初窗口 10⁻⁹–10⁻⁴）与 <code>黑洞强场机制重新推演报告</code></td>
+</tr>
+<tr>
+<td>E1</td>
+<td>✅（假命中）</td>
+<td><strong>✅ 已完成</strong></td>
+<td>08-30 明写「<strong>开放问题地图 A 类 4 项全部收官</strong>」</td>
+</tr>
+<tr>
+<td>G3</td>
+<td>✅→⛔</td>
+<td><strong>✅（含子项 ⛔）</strong></td>
+<td>E_c 锁定本身 ✅（09-16「⑥E_c 锁定 ✅」）；⛔ 指的是它的<strong>子项</strong>「<code>ρ_Λ = E_c⁴</code> 定量识别」→ <strong>C-54 放弃</strong></td>
+</tr>
+<tr>
+<td>G10</td>
+<td>✅→⛔</td>
+<td><strong>✅</strong></td>
+<td>⛔ 是假阳性（MEMORY 里「Lean」出现在<strong>完成叙述</strong>中）。实际：96 文件层 → 97 环境层 → <strong>100 补完（sorry=0）</strong></td>
+</tr>
+<tr>
+<td>G4</td>
+<td>⏳</td>
+<td><strong>⏳（确认）</strong></td>
+<td>9-17 待办，交接说明仍以「🔧 待办」形式挂着</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>⏳</td>
+<td><strong>⏳（确认）</strong></td>
+<td>8-29 登记为缺口，此后 0 命中（连变体都无）</td>
+</tr>
+<tr>
+<td>A1</td>
+<td>✅</td>
+<td><strong>✅（但证据列被污染）</strong></td>
+<td>真正的交付物是 <code>通量饱和强场度规.md</code>；同列的 <code>k等于N2…HN饱和在0.43</code> 是<strong>另一件事的「饱和」</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>教训</strong>：靠「文件名含关键词」判完成度，<strong>泛词会污染</strong>（<code>饱和</code>／<code>EMRI</code>／<code>κ</code>／<code>PPN</code> 各污染若干条）；
+靠「行内含『完成』」判完成度，<strong>同段落串味</strong>（A23）。<strong>两个规则都必须配手核。</strong></p>
+<hr />
+<h2>五、怎么读「✅→⛔」那 12 条</h2>
+<p>这不是「做了白做」，而是<strong>做了之后被后续轮次修正了结论</strong> —— 引用时应带更正号：</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>线程</th>
+<th>执行产物</th>
+<th>后续判决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A8</td>
+<td>更高阶 PPN（2PN/3PN）</td>
+<td><code>PPN优越系</code> 系列</td>
+<td><strong>C-48/49/50</strong>：优越系结项，「静态 ansatz 盲区」＋ <strong>C-2 未演示</strong></td>
+</tr>
+<tr>
+<td>A14</td>
+<td>毛球拓扑 ⟹ ε 下界</td>
+<td>毛球备忘录</td>
+<td>后续降调</td>
+</tr>
+<tr>
+<td>A16</td>
+<td>内空间编码动力学</td>
+<td>内空间编码报告</td>
+<td>后续撤回<strong>金刚石</strong>（定案简单立方，<strong>T-6</strong>）</td>
+</tr>
+<tr>
+<td>A20</td>
+<td>挂谷 packing ⟹ 1/4</td>
+<td><code>挂谷…</code>/packing 报告</td>
+<td>后续纳入「格点 ↔ 面积律」并限制域 <code>N ≤ 24</code>（<strong>第 80 轮</strong>）</td>
+</tr>
+<tr>
+<td>B3</td>
+<td>J/K 耦合强度推导</td>
+<td>JK 报告</td>
+<td>JK 双路径<strong>无第一性推导</strong>登记</td>
+</tr>
+<tr>
+<td>B6</td>
+<td>4D 自旋 2 涌现</td>
+<td>自旋 2 系列</td>
+<td><strong>C-53</strong>：不判别（自旋 2 特征不能等同于 FQH 引力子模）</td>
+</tr>
+<tr>
+<td>B9</td>
+<td>λ_c(∞) / κ_c 标度</td>
+<td><code>3+1D弦网λc相变</code> 等</td>
+<td><strong>C-61</strong>：<code>[0.21,0.23]</code> 过度解读已撤回；<strong>C-62</strong> 轴混淆；判「方法学不足、未定位」</td>
+</tr>
+<tr>
+<td>F2</td>
+<td>镜像支 B− / 分支 A-B</td>
+<td><code>并轨</code> 系</td>
+<td><strong>第 105 轮</strong>：分支 B 判「<strong>悬空</strong>」，A 保留；<strong>I-23 收口 = 不进论文</strong></td>
+</tr>
+<tr>
+<td>G1</td>
+<td>Friedmann / 动力学缺口</td>
+<td><code>动力学缺口…</code></td>
+<td>部分闭合后收缩到一条；<strong>C-54</strong> 相关的 Ω_Λ 定量放弃</td>
+</tr>
+<tr>
+<td>G2</td>
+<td>Ω_Λ 23.76 / O-Λ</td>
+<td><code>ΩΛ缺口判决…</code></td>
+<td><strong>判决：不该补、该放弃</strong>（C-54）</td>
+</tr>
+<tr>
+<td>G5</td>
+<td>ln2 缺口</td>
+<td><code>论文单位与k的修正…</code></td>
+<td><strong>第 15 轮定案</strong>（11.090355 nats）；<code>11.0904</code> 的自然性<strong>仍在 G9 未解</strong></td>
+</tr>
+<tr>
+<td>G11</td>
+<td>ε(E) 能否推出宇宙组分比例</td>
+<td><code>A2 能标…</code> 系</td>
+<td>09-16 登记后只有引用、无结论；已进论文开放问题表（故不计入「静默掉队」）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>六、诚判</h2>
+<ul>
+<li><strong>好消息</strong>：这批「待选清单」<strong>内容上没丢</strong>，而且<strong>执行率极高</strong>（45/54 有交付物）。
+  这也解释了为什么第 107 轮能仅凭日志就重建出 163 条标记 —— 日志是<strong>带结论的</strong>，不是随手记。</li>
+<li><strong>坏消息</strong>：<strong>丢的是"判据"</strong>。8 月的清单里每一轮都写了「下一步候选」，但<strong>很少写"为什么选它"</strong>；
+  于是后期出现了若干<strong>过度解读</strong>（C-61 的 <code>[0.21,0.23]</code>、B6 的自旋 2、A16 的金刚石），
+  典型病根 = <strong>把某一轮的工作记录当成定案</strong>（第 82 轮那次就是）。
+  ⟹ 若能补回逐句原文，最有价值的就是这类「当时的语境」。</li>
+<li><strong>本轮不动论文</strong>：核查结论属<strong>过程记录</strong>，写入备忘录与台账，不并入正式稿。</li>
+</ul>
+<hr />
+<h2>七、若要继续，最小清单（按性价比排序）</h2>
+<ol>
+<li><strong>G4（λ 统一为操作式）</strong> —— 纯口径工作，<strong>最便宜</strong>，且能消掉论文里潜在的重言式暗雷。</li>
+<li><strong>G9-②（底层为何恰是 4 个态）</strong> —— 它压着 §4.8 的整条熵链；不做则「4 状态」永远是设定。</li>
+<li><strong>A23（普朗克常数的物理身份）</strong> —— 一次都没推过，且是<strong>可能被检验的主张</strong>（<code>G、ℏ</code> 为复合量）。</li>
+<li><strong>D4（EMRI κ↔Γ 的 1/3 映射）</strong> —— 唯一出口上的小缺口；若 LISA 方向要动，先补它。</li>
+<li>⛔ <strong>不建议</strong>：回补 8 月那批已判否的（C-53/C-54/C-61 族）—— 判否都带定量依据。</li>
+</ol>
+<hr />
+<p><em>生成：2026-10-04 ｜ 数据源：<code>.workbuddy/memory/2026-08-20…2026-10-04.md</code>（30 天）＋ <code>outputs/</code> 文件池 ＋ <code>工程期望清单.md</code> ＋ <code>环境交接说明.md</code></em></p>
+<hr />
+<h2>附录 A · ✅ 已执行／已并入的 38 条（逐条列交付物）</h2>
+<blockquote>
+<p>判定依据：<code>outputs/</code> 或 <code>notes/推演专题/</code> 下存在文件名含该线程<strong>专用词</strong>的交付物；
+或 B 期日志里当场闭环（如「全部收官」「完全关闭」）。<strong>已剔除泛词污染项（见 §四）</strong>。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>线程</th>
+<th>交付物（首个）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>通量饱和机制</td>
+<td>通量饱和强场度规.md</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>强场度规裁决</td>
+<td>强场分叉裁决.md</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>与 GR 对接</td>
+<td>（并入 P0-1 PPN γ 判决）</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>压强临界面积锁定</td>
+<td>压强临界面积锁定机制.md</td>
+</tr>
+<tr>
+<td>A5</td>
+<td>过载区径向分布与辐射传输</td>
+<td>（并入 过载区/吸积盘两报告）</td>
+</tr>
+<tr>
+<td>A6</td>
+<td>吸积盘辐射传输</td>
+<td>吸积盘辐射传输报告.md</td>
+</tr>
+<tr>
+<td>A7</td>
+<td>钳制物态微观推导</td>
+<td>钳制物态微观推导报告.md</td>
+</tr>
+<tr>
+<td>A9</td>
+<td>非热修正观测提案</td>
+<td>（并入 吸积盘辐射传输报告 ＋ 黑洞强场机制重新推演报告）</td>
+</tr>
+<tr>
+<td>A10</td>
+<td>火墙厚度判定</td>
+<td>火墙厚度判定.md</td>
+</tr>
+<tr>
+<td>A11</td>
+<td>1/r 稳态与弱场 g₀₀ 对齐</td>
+<td>1r稳态与弱场g00系数对齐.md</td>
+</tr>
+<tr>
+<td>A12</td>
+<td>扩散方程严格解</td>
+<td>通量扩散方程严格解.md / 3D球对称扩散精确解.md</td>
+</tr>
+<tr>
+<td>A13</td>
+<td>涡心失效区域尺寸</td>
+<td>孤子的动力学_涡心的运动湮灭与拓扑修正.md</td>
+</tr>
+<tr>
+<td>A15</td>
+<td>初始微扰来源</td>
+<td>（并入 扩散/泄漏 报告）</td>
+</tr>
+<tr>
+<td>A17</td>
+<td>现在平面选择的动力学来源</td>
+<td>现在平面选择的动力学来源.md</td>
+</tr>
+<tr>
+<td>A18</td>
+<td>观测者模型与全息集中对接</td>
+<td>（观测者/全息集中 系列）</td>
+</tr>
+<tr>
+<td>A19</td>
+<td>k=4 严格证明</td>
+<td>k动力学推导报告.md</td>
+</tr>
+<tr>
+<td>A21</td>
+<td>A 定理包整合进论文</td>
+<td>（并入论文 §4.3）</td>
+</tr>
+<tr>
+<td>A22</td>
+<td>α 微观来源</td>
+<td>α微观来源.md</td>
+</tr>
+<tr>
+<td>B1</td>
+<td>2D YM σ 的 N1–N4</td>
+<td>（弦网 σ 系列）</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>量子双代数定理包</td>
+<td>阶段A_框架规范结构量子双代数.md</td>
+</tr>
+<tr>
+<td>B4</td>
+<td>ε 项拓扑序 ⟹ 禁闭</td>
+<td>（ε 项拓扑序系列）</td>
+</tr>
+<tr>
+<td>B5</td>
+<td>3+1D 弦网严格化</td>
+<td>3+1D弦网严格化报告.md</td>
+</tr>
+<tr>
+<td>B7</td>
+<td>4D 质量隙</td>
+<td>（B6 千禧年段，不声称）</td>
+</tr>
+<tr>
+<td>B8</td>
+<td>Z₂→U(1) RG 严格化</td>
+<td>（Z₂→U(1) 系列）</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>英文翻译 / arXiv 投稿</td>
+<td>Paper_..._EN.md</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>参考文献补全</td>
+<td>（参考文献补全并入论文）</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>投稿行政（CSO）</td>
+<td>cso_submission/（投稿源）</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>EMRI 波形模板与 Fisher</td>
+<td>EMRI完整波形模板与Fisher精度.md</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>Kerr EMRI 波形与贝叶斯</td>
+<td>KerrEMRI波形与贝叶斯分析.md</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>a-δ 联合 MCMC</td>
+<td>EMRI_a-δ联合MCMC分析.md</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>LISA EMRI 3PN 提案</td>
+<td>LISA_EMRI_3PN检验提案.md</td>
+</tr>
+<tr>
+<td>E1</td>
+<td>开放问题地图 A1–A4</td>
+<td>（A 类 4 项收官，见 08-30 日志）</td>
+</tr>
+<tr>
+<td>F1</td>
+<td>新框架缺陷 6 条</td>
+<td>（并轨 5 缺陷 → 分支/开放）</td>
+</tr>
+<tr>
+<td>G3</td>
+<td>E_c 能标锁定</td>
+<td>（E_c 锁定 ✅；ρ_Λ 子项 ⛔ C-54）</td>
+</tr>
+<tr>
+<td>G6</td>
+<td>多种子 / 3D 硬球</td>
+<td>（多种子/硬球 系列）</td>
+</tr>
+<tr>
+<td>G7</td>
+<td>方向状态数 4 vs 6</td>
+<td>（第 31 轮定案，见交接说明）</td>
+</tr>
+<tr>
+<td>G8</td>
+<td>C-b/C-c 跨层判定</td>
+<td>（第 32/33 轮闭环，见交接说明）</td>
+</tr>
+<tr>
+<td>G10</td>
+<td>Lean 资产 / mathlib</td>
+<td>StormPoC.lean（96/97/100 三轮）</td>
+</tr>
+</tbody>
+</table>
+<p>（以上 <strong>38</strong> 条 ＋ §五 的 <strong>12</strong> 条 ＋ §三 的 <strong>4</strong> 条 = <strong>54</strong>，与 §二 表一致。）</p>
+
+<div class="footer">8-20 ～ 9-19「待选清单」完成度核查 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 待选清单完成度核查_8-20至9-19.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

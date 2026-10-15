@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>孤子的诞生 —— 随机湮灭中的拓扑残余</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一句话结论</div>
+  <h1>孤子的诞生 —— 随机湮灭中的拓扑残余</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>第 66 轮备忘录 ｜ 2026-10-01 ｜ 核验脚本 <code>_soliton_66.py</code>（<strong>SO-1…SO-9，9 项 0 失败</strong>）
+＋ 模拟器面板测试 <code>_sim_soliton_test.js</code>（<strong>ST5-1…ST5-4，4 项 0 失败</strong>）</p>
+</blockquote>
+<hr />
+<h2>一句话结论</h2>
+<p><strong>你的图像在框架里有精确对应</strong> —— 框架 §2.3 的层级链就写着
+「<strong>孤子化 ⟹ 粒子（稳定局域结构）</strong>」，而 §8.2 的 <strong>H1</strong> 用 Poincaré–Hopf 给出了「无法湮灭」那一半。</p>
+<p><strong>但有一处需要分开</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>你的说法</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「<strong>随机湮灭</strong>」</td>
+<td>✅ 统计层 —— 泊松涨落产生涡对，<strong>成对消失</strong></td>
+</tr>
+<tr>
+<td>「<strong>出现了</strong>无法湮灭的稳定点」</td>
+<td>⚠️ <strong>不是「出现」，是被拓扑强制的</strong></td>
+</tr>
+<tr>
+<td>「无法湮灭」</td>
+<td>✅ <strong>成立</strong>，且<strong>数目由 χ 定死</strong>（S² 上恒为 2）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>精确版本</strong>：</p>
+<blockquote>
+<p>随机湮灭能抹掉绝大部分涡心（数值上 <strong>50–98%</strong>，取决于场的构型），
+但 <strong>Σ 指数 = χ(S²) = 2 是几何恒等式</strong> ⟹ 无论怎么湮灭、以什么顺序湮灭，
+<strong>必然剩 2 个指数 +1 的涡心，一个也去不掉。</strong></p>
+</blockquote>
+<hr />
+<h2>一、框架侧的对应物（全部是已有内容，不是本轮新造）</h2>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>原文</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>§2.3 层级链</strong></td>
+<td>「事件流（普朗克噪声）→ <strong>孤子化 ⟹ 粒子（稳定局域结构）</strong>」</td>
+<td>你说的「稳定点」= 这条链的输出</td>
+</tr>
+<tr>
+<td><strong>§5.3</strong></td>
+<td>「<strong>三代费米子 = 涡的卷绕模</strong>」（n = 1/2/3）</td>
+<td>孤子的身份 = <strong>涡</strong>（拓扑缺陷）</td>
+</tr>
+<tr>
+<td><strong>§5.2 / S1</strong></td>
+<td><code>d_min(G) = n</code>（n = 涡卷绕模数）</td>
+<td>把涡的卷绕模接到规范群上</td>
+</tr>
+<tr>
+<td><strong>§8.2 H1</strong></td>
+<td>「<strong>χ(S²) = 2 ⟹ 切向量场零点指数和 = 2 ⟹ 方向空间至少 2 个涡心【拓扑论证】</strong>」</td>
+<td><strong>本轮的核心判据来源</strong></td>
+</tr>
+<tr>
+<td><strong>§8.2 H2</strong></td>
+<td><code>ε_topo(R) = (l_P/R)²/(2π)</code></td>
+<td>涡心占比</td>
+</tr>
+<tr>
+<td><strong>§8.2 S³ 澄清</strong></td>
+<td>「χ(S³) = 0 且 S³ 可平行化 ⟹ <strong>毛球定理不适用</strong>」</td>
+<td>框架自己做了「χ ≠ 0 才有强制涡心」的对照</td>
+</tr>
+</tbody>
+</table>
+<p><strong>词条清点</strong>（底本 = 补丁前备份）：正文里「孤子」<strong>9 处</strong>、「涡」<strong>26 处</strong> —— 都有实质使用；
+而「拓扑缺陷 / 绕数 / 稳定点」<strong>各 0 处</strong> ⟹ <strong>本轮首次引入这套语言</strong>。</p>
+<hr />
+<h2>二、数值结果（icosphere 细分 3 次：642 顶点 / 1280 面）</h2>
+<h3>⭐ 核心：30 个随机平滑场，Σ 恒为 2</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>均值</th>
+<th>范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>#max</code></td>
+<td>2.10</td>
+<td>1 – 3</td>
+</tr>
+<tr>
+<td><code>#min</code></td>
+<td>2.07</td>
+<td>1 – 4</td>
+</tr>
+<tr>
+<td><code>#saddle</code></td>
+<td>2.17</td>
+<td>0 – 5</td>
+</tr>
+<tr>
+<td><strong>Σ = #max − #saddle + #min</strong></td>
+<td><strong>2</strong></td>
+<td><strong>30 次全部相同</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>三档解析标定</strong>（已知答案的场）也全部给 +2：</p>
+<table>
+<thead>
+<tr>
+<th>场</th>
+<th>#max</th>
+<th>#min</th>
+<th>#saddle</th>
+<th>Σ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>f = p_x</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td><strong>+2</strong> ✓</td>
+</tr>
+<tr>
+<td>f = p_y</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td><strong>+2</strong> ✓</td>
+</tr>
+<tr>
+<td>f = p_z</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td><strong>+2</strong> ✓</td>
+</tr>
+</tbody>
+</table>
+<h3>⭐ 湮灭实验</h3>
+<p>从真实构型（#max=2, #min=1, #saddle=1 ⟹ 涡心 3 个、反涡心 1 个）出发，
+按「<strong>+1 与 −1 相遇 ⟹ 双双消失</strong>」随机配对：</p>
+<pre><code>消灭 1 对 ⟹ 剩下 2 个（+1：2 ／ −1：0）
+</code></pre>
+<p><strong>40 次独立试验</strong>（每次换一个随机场，每个场反复湮灭 40 次）：
+结束时「存活 +1 / −1」的分布 = <strong>只有一种：<code>2/0</code></strong>。</p>
+<hr />
+<h2>三、反面对照：环面（χ = 0）</h2>
+<p><strong>毛球定理的直接陈述</strong>：S² 上<strong>任何</strong>连续切向量场必有零点；T² 上<strong>存在</strong>处处非零的。</p>
+<table>
+<thead>
+<tr>
+<th>曲面</th>
+<th>χ</th>
+<th>最少涡心数</th>
+<th>存在处处非零场？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>S²</strong>（方向空间，H1）</td>
+<td><strong>2</strong></td>
+<td><strong>≥ 2</strong></td>
+<td>否（毛球定理）</td>
+</tr>
+<tr>
+<td><strong>T²</strong>（环面）</td>
+<td>0</td>
+<td><strong>0</strong></td>
+<td><strong>是</strong>（v = ∂/∂u，实测 |v| = 1.000000）</td>
+</tr>
+<tr>
+<td><strong>S³</strong>（框架已澄清）</td>
+<td>0</td>
+<td>0</td>
+<td><strong>是</strong>（可平行化）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>「能否全部湮灭」由 χ 决定，与随机性无关。</strong></p>
+<p>⚠️ 这正是框架 §8.2 第 1083 行自己做的那个对照。</p>
+<hr />
+<h2>四、⭐ 与 toric code 是同一句话（第 60 轮的结果）</h2>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>守恒量</th>
+<th>「无法湮灭」的内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>方向场</strong>（§8.2 H1）</td>
+<td>Σ 指数 = χ = 2</td>
+<td>必剩 2 个涡心</td>
+</tr>
+<tr>
+<td><strong>弦网</strong>（§5.7）</td>
+<td><code>Π_v A_v = Π_p B_p = 1</code></td>
+<td>激发<strong>必成对</strong>（单个不能消灭）</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>同一个结构（拓扑荷守恒 ⟹ 不能全部湮灭）的两种实现</strong> —— 登记为<strong>一致性</strong>，
+<strong>不声称这是「物质的起源」</strong>。</p>
+<hr />
+<h2>五、顺带两件事</h2>
+<h3>① H2 可以重写，且与 H3 的 0.159 对上</h3>
+<pre><code>H2:  ε_topo(R) = (l_P/R)²/(2π)  =  χ/(4π) · (l_P/R)²      （χ/(4π) = 2/(4π) = 1/(2π)）
+⟺   「单元立体角 ΔΩ = (l_P/R)²，涡心占 χ = 2 个」
+</code></pre>
+<p>⭐ 代入 R = l_P：<code>ε_topo(l_P) = 1/(2π) = &lt;strong&gt;0.1591549&lt;/strong&gt;</code></p>
+<p><strong>与论文 H3 的「普朗克尺度拓扑主导（0.159）」精确一致</strong> ✓
+（注意：这是<strong>算术恒等</strong>，不是新推导 —— 只是把 H2 的 1/(2π) 认出来是 χ/(4π)。）</p>
+<h3>② 尺度跨度</h3>
+<table>
+<thead>
+<tr>
+<th>R</th>
+<th>ε_topo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>l_P</td>
+<td>1.59×10⁻¹</td>
+</tr>
+<tr>
+<td>质子半径 0.84 fm</td>
+<td>5.89×10⁻⁴¹</td>
+</tr>
+<tr>
+<td>原子 0.1 nm</td>
+<td>4.16×10⁻⁵¹</td>
+</tr>
+<tr>
+<td>哈勃半径 1.3×10²⁶ m</td>
+<td><strong>2.46×10⁻¹²³</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 与 H4 引用的 1.35×10⁻¹²³ <strong>量级一致</strong> ✓
+⚠️ 但 R_H 的量级本身由 H₀ 定，<strong>框架未从 H1 推出 R_H</strong> ⟹ 这是<strong>量级一致</strong>，非预言。</p>
+<hr />
+<h2>六、⚠️ 两个方法学教训（本轮真正的收获）</h2>
+<h3>教训 A：<strong>经纬网格的极点会把 1-ring 弄退化</strong></h3>
+<p>顶点 (1, j) 的 1-ring 里，<code>(i−1,j−1)</code>、<code>(i−1,j)</code>、<code>(i−1,j+1)</code> <strong>全部映射到同一个北极点</strong>
+⟹ 环上同一点出现 3 次 ⟹ <strong>绕数全错</strong>（实测 Σ = −8 而非 2）。
+✅ 换成 <strong>icosphere</strong>（每个顶点规则的 5/6-邻居环）后立刻正常。</p>
+<h3>教训 B：<strong>「单位化 ∇f 的绕数」≠「临界点指数」</strong></h3>
+<p>单位化会把 |∇f| 小的<strong>非零点</strong>放大成「方向绕一圈」的<strong>伪涡心</strong>。
+实测 <code>f = p_x</code>（真临界点只有 ±x̂ 两个）用绕数法报 <strong>6 个 +1</strong>，多出的 4 个落在
+<strong>|∇f| ≈ 0.156</strong> 处（不是零点）。</p>
+<p>✅ <strong>改用 Morse 谱</strong>：数 <code>#max / #min / #saddle</code> ⟹ <code>Σ = #max − #saddle + #min = χ</code>。
+三个解析标定<strong>一次全对</strong>。</p>
+<h3>⚠️ 教训 C：判据<strong>只在平滑层上成立</strong></h3>
+<p>若 f 逐点独立随机（不平滑），离散 Morse 判据<strong>不适用</strong>：
+实测 <code>#max=95 / #min=96 / #saddle=182 ⟹ Σ = +9 ≠ 2</code>（因为「处处都是极值」）。</p>
+<p>⭐⭐ <strong>这恰好是框架 §2.3 那一步的意思</strong>：
+<strong>「孤子化」= 从普朗克噪声中粗粒化出平滑层，而拓扑缺陷只定义在平滑层上。</strong></p>
+<hr />
+<h2>七、诚实边界（三条「没做」）</h2>
+<ol>
+<li><strong>没做真正的动力学</strong> —— 本轮算的是<strong>静态几何</strong>（给定随机场数涡心），
+   而「湮灭」在数值上是<strong>抽象配对</strong>，不是从时空动力学推出来的。</li>
+<li><strong>没做「正物质」那一步</strong> —— ε 泄漏把正份留在我支（P1，论文第 593 行）
+   标的是【本框架设定】，本轮<strong>未验证它，也不能从拓扑推出</strong>。
+   ⟹ <strong>拓扑荷 ≠ 物质–反物质不对称</strong>。两者在框架里是<strong>两条独立的命题</strong>。</li>
+<li><strong>没做动力学稳定性</strong> —— 「孤子」要成为<strong>粒子</strong>需要动力学稳定，
+   本轮只验证了<strong>拓扑不可抹去</strong>，那是<strong>必要不充分</strong>。</li>
+</ol>
+<hr />
+<h2>八、判决与交付</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「随机湮灭」</td>
+<td>✅ 成立（统计层）</td>
+</tr>
+<tr>
+<td>「无法湮灭的稳定点」</td>
+<td>✅ 成立（拓扑层），<strong>且数目 = χ = 2 被定死</strong></td>
+</tr>
+<tr>
+<td>「<strong>出现</strong>了稳定点」</td>
+<td>⚠️ 措辞需改：<strong>不是出现，是被强制</strong></td>
+</tr>
+<tr>
+<td>「= 正物质的诞生」</td>
+<td>⚠️ <strong>这一步框架不覆盖</strong> —— 属 ε 泄漏的【设定】，不是拓扑结论</td>
+</tr>
+</tbody>
+</table>
+<p><strong>交付物</strong>：<code>宇宙模拟器.html</code> 新增<strong>面板 ⑤「孤子的诞生 ★」</strong> ——
+球面上撒随机平滑场、数临界点、点「⚡ 湮灭一对」看 Σ 岿然不动。
+<strong>面板测试 4 项 0 失败</strong>（含「40 次试验结束分布恒为 <code>2/0</code>」）。</p>
+<p><strong>下一步候选</strong>：候选池 36（S-12 与 ΛCDM 的判别点）、43（Φ 的质量与耦合）、I-16（位置算符缺口）。</p>
+
+<div class="footer">孤子的诞生 —— 随机湮灭中的拓扑残余 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 孤子的诞生_随机湮灭中的拓扑残余.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

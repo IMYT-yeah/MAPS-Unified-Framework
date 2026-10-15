@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>正负枝的「粒子 ⟷ 层」互换：追溯与判定</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、追溯：这句话的每一个词，原文/论文里在不在</div>
+  <h1>正负枝的「粒子 ⟷ 层」互换：追溯与判定</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-09 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>轮次</strong>：第 146 轮 · 2026-10-09
+<strong>输入</strong>：用户提出「由于空间的三维特性，平面无解在三维有解 ⟹ 同时粒子和波动化，它们同时出现在正负枝；正枝的粒子化为负枝的层，负枝的层化为正枝的粒子」
+<strong>判定工具</strong>：四类判定（推导／推论／设定／失败）＋ 独立数值验证 <code>_branch146.py</code>（36 项 0 失败）
+<strong>本轮论文改动</strong>：<strong>无</strong>（正式稿仍 99,725 字符）</p>
+</blockquote>
+<hr />
+<h2>一、追溯：这句话的每一个词，原文/论文里在不在</h2>
+<table>
+<thead>
+<tr>
+<th>语词</th>
+<th>原始对话</th>
+<th>论文</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>正枝 / 负枝</strong></td>
+<td><strong>352 / 211 次</strong>，跨 <strong>39 / 24 轮</strong>（第 <strong>165</strong> 轮起，至第 419 轮）</td>
+<td><strong>正支 2 ＋ 负支 2 ＝ 4 次</strong></td>
+<td>高密度线索，<strong>几乎未进论文</strong></td>
+</tr>
+<tr>
+<td>「正枝/负枝」在<strong>用户自己</strong>的消息里</td>
+<td><strong>46 条</strong></td>
+<td>—</td>
+<td>是用户反复提出的主线</td>
+</tr>
+<tr>
+<td>「平面无解」「粒子化」「波动化」「三维有解」</td>
+<td><strong>各 0</strong></td>
+<td><strong>各 0</strong></td>
+<td><strong>本轮新造措辞</strong></td>
+</tr>
+<tr>
+<td>「正负诸元」</td>
+<td>第 189 轮（用户把「正负粒子」改称「正负诸元」）</td>
+<td>诸元（六方向连接）</td>
+<td>命名沿革已在</td>
+</tr>
+</tbody>
+</table>
+<p><strong>推论 1（追溯）</strong>：这不是新话题，是<strong>第 165–419 轮的一条长线索</strong>（横跨原始对话后半程），当前只以「公理 3 ＋ §4.8 微态计数」两处的形式残留在论文里。</p>
+<p><strong>推论 2（同线索前科）</strong>：<strong>第 188 轮</strong>用户曾自行提出「陶哲轩挂谷维度（2.5+10⁻⁹）↔ ε 泄漏 10⁻⁹」的对应 —— 本轮是<strong>同一条线索的续</strong>（挂谷 → 三维 → 方向数）。</p>
+<hr />
+<h2>二、拆成四问（不拆开就答不准）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>用户命题</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td><strong>「平面无解、三维有解」</strong></td>
+<td>✅ <strong>严格成立</strong>（是框架<strong>定理 1/2</strong>，非新命题）</td>
+</tr>
+<tr>
+<td>②</td>
+<td><strong>「同时出现在正负枝」</strong></td>
+<td>✅ <strong>结构上成立</strong>（§4.8 的 <code>16 = 2⁴</code>）</td>
+</tr>
+<tr>
+<td>③</td>
+<td><strong>「正枝的粒子化为负枝的层」</strong></td>
+<td>❌ <strong>载体在、载不动</strong></td>
+</tr>
+<tr>
+<td>④</td>
+<td><strong>「粒子和波动化（波粒二象）」</strong></td>
+<td>❌ <strong>框架内无载体</strong>（N-50 族）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>三、① 「平面无解、三维有解」：✅ 严格成立 —— 但这是框架<strong>已有</strong>的定理</h2>
+<h3>3.1 独立数值验证（不引论文，直接算）</h3>
+<p>方向集 <code>V ⊂ S²</code> 的<strong>覆盖半径</strong> = <code>max_{p∈S²} min_{v∈V} ∠(p,v)</code>。挂谷「包全方向」要求<strong>严格 &lt; 90°</strong>（无零信息余量方向）。</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>覆盖半径（本脚本实测）</th>
+<th>论文解析值</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>共面</strong> 3 方向（120° 间隔）</td>
+<td><strong>90.000000°</strong>（最坏点 = <strong>平面法线</strong> <code>(0,0,1)</code>）</td>
+<td>90.0000°</td>
+<td><strong>不满足</strong>（= 临界，非严格 &lt;）</td>
+</tr>
+<tr>
+<td><strong>共面</strong> k=4 / 8 / 16 / 64</td>
+<td><strong>90.000000°</strong>（全部）</td>
+<td>—</td>
+<td>⚠️ <strong>方向数再多也一样</strong></td>
+</tr>
+<tr>
+<td><strong>正四面体</strong> 4 方向</td>
+<td><strong>70.528779°</strong></td>
+<td><code>arccos(1/3)</code> = 70.5288°</td>
+<td><strong>满足</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⭐⭐ <strong>「平面无解」是代数必然</strong>：只要方向集共面，平面法线方向到任一方向的角度恒为 90° ⟹ <strong>共面方案无论如何加密都停在 90°</strong>，永远无法严格小于 90°。
+⭐⭐ <strong>「三维有解」是定理</strong>：跳出平面（正四面体）即得 70.53° &lt; 90°。</p>
+<p><strong>⟹ 用户这句话在覆盖半径意义上严格正确。</strong></p>
+<h3>3.2 但必须区分两种「平面」读法（否则会误判）</h3>
+<table>
+<thead>
+<tr>
+<th>要求覆盖的方向集</th>
+<th>最优方向数</th>
+<th>覆盖半径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>仅<strong>平面内</strong>（S¹）</td>
+<td><strong>3</strong>（120° 间隔）</td>
+<td><strong>60°</strong> ⟹ 有解</td>
+</tr>
+<tr>
+<td><strong>三维全方向</strong>（S²），限共面</td>
+<td>任意多</td>
+<td><strong>90°</strong> ⟹ <strong>无解</strong></td>
+</tr>
+<tr>
+<td><strong>三维全方向</strong>（S²），跳出平面</td>
+<td><strong>4</strong>（正四面体）</td>
+<td><strong>70.53°</strong> ⟹ 有解</td>
+</tr>
+</tbody>
+</table>
+<p><strong>用户说的是第三行</strong> —— 成立。但不同于<strong>挂谷猜想本身</strong>（Kakeya 集维数：2D 早已解决、3D 长期开放，2025 王虹–Zahl 证 = 3）。这两件事<strong>不是同一件</strong>：前者是<strong>覆盖半径</strong>（框架定理 1），后者是<strong>维数</strong>（第 188 轮那条对应所谈的）。<strong>引用时不可互换。</strong></p>
+<h3>3.3 论文出处（已有，非本轮新增）</h3>
+<ul>
+<li><strong>定理 1（方向簇数下界 k ≥ 4）【新证·严格】</strong>：反设 3 个开半球覆盖 S² ⟹ <code>0 ∈ int(conv{v₁,v₂,v₃})</code> ⟹ <code>vᵢ</code> 共面 ⟹ 取平面法线 <code>p</code>：<code>p·vᵢ = 0</code> ⟹ 覆盖半径恰 ≥ 90°，矛盾。∎</li>
+<li><strong>定理 2</strong>：Tammes n=4 —— 4 点最优构型唯一 = 正四面体，最小角 <code>arccos(−1/3) = 109.47°</code>（本脚本实测 <strong>109.4712°</strong> ✓）。</li>
+<li><strong>独立旁证</strong>：§5.2 有另一条三维性论证 ——「<strong>空间三维（挂谷维数锁定）⟹ 四阶反对称 ε_ijkl 需 4 维空间，n=4 费马无解</strong>」。</li>
+</ul>
+<hr />
+<h2>四、② 「同时出现在正负枝」：✅ 结构上成立</h2>
+<p>§4.8 明文：<strong>原始态 = 2⁴ = 16</strong>（<strong>4 个平面内连接 × {正支, 负支}</strong>）。
+§4.10 论证 4：<strong>4 = 时间双向 × 手性双向</strong>（Clifford <code>Cl(1,3)</code> 旋量维数 4）。</p>
+<p>⟹ <strong>结构是「4 个连接 × 每连接一个 {正/负支} 二分标记」</strong>，即 <strong><code>16 = 2⁴</code></strong>。</p>
+<p><strong>所以「正负支」在框架里的确切身份是</strong>：<strong>三维方向结构上附加的一个二分标记</strong>（公理 3 的 CPT 镜像两支），而它<strong>已经内建在微态计数里</strong>。用户说「同时出现在正负枝」—— 结构上成立，且这是<strong>框架已有</strong>的东西。</p>
+<hr />
+<h2>五、③ 「正枝的粒子化为负枝的层」：❌ 载体在，但载不动</h2>
+<h3>5.1 载体确实存在</h3>
+<ul>
+<li><strong>跨支通道存在</strong>：量子直线 =「同源泄漏事件在两支间的<strong>关联通道</strong>」（ER=EPR 的底层本体）；= 挂谷线段（第 214–218 轮）。</li>
+<li><strong>正负支交界处确有结构</strong>：<strong>视界 = 时间箭头翻转面【本框架设定】</strong>，且黑洞表层有<strong>三层结构</strong>（翻转面／饱和模态驻留层／浆糊外围）。</li>
+<li><strong>交界处确有「正支停止」</strong>：七环链 ——「<strong>冻结 = 本体（第 224–228 轮，正支投影源停止）</strong>」。</li>
+</ul>
+<p>👉 <strong>「位置」对上了</strong>：框架里唯一「正负支交界 + 带层状结构 + 正支停止」的地方就是<strong>视界表层</strong>。</p>
+<h3>5.2 但机制不给</h3>
+<p>论文<strong>明文写死的边界</strong>（§4.10 命题 6 引理 B 的 v2.9 补充）：</p>
+<blockquote>
+<p>⚠️ <strong>跨支通道的用途限于「信息」，不含「能量」</strong>
+· 框架自己的能量条件不支持「可穿越」所需的负能量密度 —— <code>P(ρ) = P_P·tanh(ρ/ρ_P)</code> ⟹ <code>P ≤ ρc²</code> 处处满足、<code>ρ ≥ 0</code>（框架有<strong>负压</strong>，但<strong>没有负能量密度</strong>，两者不是同一个量）；
+· 即使允许 ANEC 违反，量子不等式把预算锁死：<code>ΔE·Δt ≲ ℏ</code> ⟹ 取 <code>Δt = 1 s</code> 时 <code>ΔE ≤ 1.06×10⁻³⁴ J</code>，<strong>比室温热能小 14 个数量级</strong>；
+⟹ <strong>跨支通道在框架内不能作为能量 / 物质通路。</strong></p>
+</blockquote>
+<p><strong>「粒子」是物质 / 能量（孤子、质量）；「层」是结构。要把前者变成后者，必须跨支搬运能量 —— 而这条路被两重机制（能量条件 ＋ 量子不等式）关死。</strong></p>
+<p><strong>⟹ 判定：不行。同 N-50 族（第 135 轮「纠缠 = 湮灭结构态」）的同一堵墙。</strong></p>
+<hr />
+<h2>六、④ 「粒子和波动化」：❌ 框架内无载体</h2>
+<table>
+<thead>
+<tr>
+<th>概念</th>
+<th>框架里的状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>粒子</strong></td>
+<td>✅ <strong>有</strong> —— §2.3「<strong>孤子化 ⟹ 粒子（稳定局域结构）</strong>」；观测者 = 现在平面局域孤子（O1）</td>
+</tr>
+<tr>
+<td><strong>波（波动化）</strong></td>
+<td>❌ 论文「波动」<strong>0 处</strong>、「波包」<strong>0 处</strong>；「波函数」1 处、「量子态」2 处 —— <strong>全部只出现在 §7.4「框架没有量子态层」的否定性口径注窗口内</strong>（本脚本按窗口判据验证：窗口外出现数 = <strong>0</strong>）</td>
+</tr>
+</tbody>
+</table>
+<p>论文口径注明文：<strong>框架没有量子态层</strong>（塌缩／波函数／测量问题／量子测量／密度矩阵／退相干／幺正 <strong>各 0 处</strong>），观测者是<strong>经典粗粒化</strong>（互信息），<strong>不改变</strong>被观测系统的态。</p>
+<p><strong>⟹ 「粒子与波的同时性」需要量子态层。框架只有「孤子」这一侧。判否（N-50 族）。</strong></p>
+<hr />
+<h2>七、⭐ 接上一轮（第 145 轮）：负支<strong>不能</strong>提供缺的那个「累积」</h2>
+<p>第 145 轮的结论是：框架底层实现的是 <strong>「归零」</strong>（<code>a + a = 0</code>，2-扭）而非 <strong>「累积」</strong>（<code>a + a = 2a ≠ a</code>）⟹ <strong>「层」生不出来的精确位置在多 tick 的「平」上</strong>。</p>
+<p>用户本轮提出：<strong>「负枝的层」</strong> —— 即把「层」的来源指向负支。<strong>这个方向能不能救？</strong></p>
+<p><strong>不能，理由是可判定的</strong>：
+1. 单 tick = <strong>置换</strong> ⟹ 双射、可逆、<strong>无熵产生</strong>（§8.6.7）；
+2. 两支<strong>互为 CPT 镜像</strong> ⟹ 时间反演 <code>T</code> 只改变<strong>方向</strong>，不改变<strong>可逆性</strong>；
+3. ⟹ <strong>两支同为「归零」型</strong>，都不提供「累积」。</p>
+<p><strong>⟹ 负支与正支在「归零 vs 累积」上无差别。第 145 轮缺的那个东西，负支同样给不了。</strong></p>
+<hr />
+<h2>八、⭐ 本轮新增的一个可判定问题（比原命题锐利）</h2>
+<p>用户这句话触到了一个<strong>框架内部的结构问题</strong>：「六处『4』同源」里，至少两处的「4」<strong>服务对象不同、约束不同</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>「4」</th>
+<th>出处</th>
+<th>它要覆盖什么</th>
+<th>严格性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>正四面体 4 方向</strong></td>
+<td>§4.10 定理 1/2</td>
+<td><strong>S²（三维全方向）</strong></td>
+<td>✅ <strong>定理（下界）</strong></td>
+</tr>
+<tr>
+<td><strong>平面内 4 方向连接</strong></td>
+<td>§4.9 引理 1</td>
+<td><strong>平面内（S¹）</strong></td>
+<td>⚠️ <strong>【本框架设定】</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>在覆盖意义上两者不可能同时是最优</strong>：
+- 2D 平面内最优覆盖是 <strong>3</strong> 方向（60°），不是 4（45°）—— 所以「平面内 4」<strong>不是被下界强迫的</strong>；
+- 3D 最优覆盖才是 <strong>4</strong>，且是<strong>下界</strong>（k=3 恰好 90° 失败）。</p>
+<p>⟹ <strong>数值相同（都是 4），来源不同。</strong> 论文已分别标注【本框架设定】与【定理】（诚实标注到位），但「<strong>同源</strong>」这个词用得偏强 —— 严格说应是「<strong>数值同源</strong>」而非「<strong>理由同源</strong>」。</p>
+<p>⭐ <strong>由此得到一个可补的证明方向</strong>（不需要新公理）：</p>
+<blockquote>
+<p><strong>引理 1（可访问信息 = 平面内 4 方向连接，现为【设定】）能否从定理 1 推出？</strong>
+- 若<strong>能</strong> ⟹ 引理 1 从设定升级为<strong>推论</strong>，「六处同源」获得实质支撑；
+- 若<strong>不能</strong>（因为引理 1 只覆盖 S¹、定理 1 覆盖 S²）⟹「同源」应降级为「数值巧合」，并须给出<strong>为什么观测者恰好取 4 而不用 3</strong>。</p>
+</blockquote>
+<p>📌 <strong>这是本轮给您的入口</strong> —— 它只需要对照已有条目，不缺公理。</p>
+<hr />
+<h2>九、小结（一句话）</h2>
+<blockquote>
+<p><strong>「平面无解、三维有解」是真的，而且是框架定理 1/2 —— 但它已经是框架里的东西，不是新增量。</strong>
+<strong>「正负支」也确实内建在结构里（<code>16 = 2⁴</code>）。</strong>
+<strong>真正的新命题「粒子 ⟷ 层 跨支互换」不成立：位置对上了（视界表层＝正负支交界＝框架里唯一的『层』），但机制不给 —— 跨支通道只载信息不载能量，且两支同为「归零」型、都不产生「累积」。</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>命题</th>
+<th>判定</th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 平面无解、三维有解</td>
+<td>✅ <strong>定理（已有）</strong></td>
+<td>定理 1/2；实测 90.000000° vs 70.528779°</td>
+</tr>
+<tr>
+<td>② 同时出现在正负枝</td>
+<td>✅ <strong>结构成立（已有）</strong></td>
+<td>§4.8 <code>16 = 2⁴</code>；论证 4 <code>4 = 时间双向×手性双向</code></td>
+</tr>
+<tr>
+<td>③ 正枝粒子 → 负枝层</td>
+<td>❌ <strong>N-50 族</strong></td>
+<td>跨支只载信息不载能量；无负能量密度；量子不等式</td>
+</tr>
+<tr>
+<td>④ 粒子＋波动化</td>
+<td>❌ <strong>N-50 族</strong></td>
+<td>无量子态层（§7.4 口径注）</td>
+</tr>
+<tr>
+<td>⑤ 负支提供「累积」</td>
+<td>❌ <strong>新判否</strong></td>
+<td>两支互为 CPT 镜像 ⟹ 同为「归零」型</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>十、意象迭代系列索引（第 142–146 轮）</h2>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>意象</th>
+<th>判定</th>
+<th>备忘录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>142</td>
+<td>棋盘翻转 / 自相似互斥</td>
+<td>冲突：三层<strong>异质</strong>（互不同构）</td>
+<td><code>棋盘翻转意象_翻译与检验.md</code></td>
+</tr>
+<tr>
+<td>143</td>
+<td>8 类 ＝ 3 个 Z₂ 指标 ⟹ 「层层」</td>
+<td>前半 ✅；后半<strong>范畴错误</strong>（3 属性 ≠ 3 层）</td>
+<td><code>验证_衬底层八类与三通道.md</code></td>
+</tr>
+<tr>
+<td>144</td>
+<td>层层扩大的无限性</td>
+<td>结构 ✅ 但<strong>不可观测</strong>（零内容）；「无尽循环」= 公理 1 直译</td>
+<td><code>层层扩大意象_权衡与判定.md</code></td>
+</tr>
+<tr>
+<td>145</td>
+<td>1+1 ≠ 1 ⟹ 累积 ⟹ 整体成新最小因子</td>
+<td>归零 vs <strong>累积</strong>分野；<strong>层生不出来的位置 = 多 tick 的「平」</strong></td>
+<td><code>一加一不等于一的代数核验_归零与累积.md</code></td>
+</tr>
+<tr>
+<td><strong>146</strong></td>
+<td><strong>正负枝 ⟷ 粒子/层 互换</strong></td>
+<td>①② 已有；③④ 判否；<strong>⑤ 新判否（负支无累积）</strong></td>
+<td><strong>本文件</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>核验：<code>_branch146.py</code>，A–F 六组 <strong>36 项 0 失败</strong>；本轮无论文改动（正式稿 99,725 字符，备份 <code>论文_正式稿_v3.0_备份_2026-10-09第146轮前.md</code>）。</em></p>
+
+<div class="footer">正负枝的「粒子 ⟷ 层」互换：追溯与判定 · 2026-10-09 · 由 _md2html_generic.py 生成 · 源文件 正负枝的粒子层互换_追溯与判定.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

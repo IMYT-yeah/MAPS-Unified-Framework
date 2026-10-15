@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>四色定理辨析：与框架无关 —— 但「k ≥ 4」的真正根源是 LST / Borsuk</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、FC-1 先把三个「4」分开</div>
+  <h1>四色定理辨析：与框架无关 —— 但「k ≥ 4」的真正根源是 LST / Borsuk</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-09-19 ｜ 脚本：<code>outputs/_four_color_ls.py</code>（FC-1…FC-7，<strong>12 项检查、失败 0</strong>）
+<strong>一句话结论</strong>：
+<strong>① 四色定理与框架无关</strong>（三条独立理由：衬底图必非平面 / 亏格 1 的环面色数是 7 不是 4 / 不满足"维度 + 1"）；
+<strong>② 但框架的「k ≥ 4」有一个更强的经典出处</strong> —— §4.10 定理 1 就是 <strong>Lusternik–Schnirelmann 定理</strong>在 S² 上的特例，与 <strong>Borsuk 数 R³ = 4</strong> 同源；
+<strong>③ 顺带修正第 27 轮的一处依赖，并发现 §4.10「六处 4 同源」里至少两处的「4」来源不同。</strong></p>
+</blockquote>
+<hr />
+<h2>一、FC-1 先把三个「4」分开</h2>
+<table>
+<thead>
+<tr>
+<th>定理</th>
+<th>染色/计数的对象</th>
+<th>适用图类</th>
+<th>「4」从哪来</th>
+<th>与框架的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>König 边着色</strong>（1916）</td>
+<td><strong>边</strong></td>
+<td>二分图（任意 Δ）</td>
+<td>我们的图恰好 <strong>4-正则</strong></td>
+<td>第 27 轮用到：4 色 = 4 个完美匹配</td>
+</tr>
+<tr>
+<td><strong>四色定理</strong>（1976）</td>
+<td><strong>顶点</strong></td>
+<td><strong>平面图</strong></td>
+<td>平面性 + Euler + 放电法</td>
+<td><strong>本轮判定：无关</strong></td>
+</tr>
+<tr>
+<td><strong>Borsuk / LST</strong>（1933）</td>
+<td>覆盖 S² 所需集数</td>
+<td>拓扑（任意）</td>
+<td><strong>维度</strong>（R³ ⟹ 4）</td>
+<td><strong>本轮判定：这才是框架「k ≥ 4」的根源</strong></td>
+</tr>
+</tbody>
+</table>
+<p>三者形式上都有「4」，但来源完全不同：一个是"图恰好 4-正则"，一个是"平面图的顶点色数"，一个是"三维空间的覆盖数"。<strong>必须分开谈。</strong></p>
+<hr />
+<h2>二、FC-2 决定性判据：4-正则二分图<strong>不可能</strong>是平面图</h2>
+<p>若 4-正则二分图能嵌入平面：</p>
+<ul>
+<li>Euler：<code>f = m − n + 2</code></li>
+<li>二分 ⟹ 无奇环 ⟹ 每个面长度 ≥ 4 ⟹ <code>2m ≥ 4f</code></li>
+</ul>
+<p>两式合并：<code>m ≤ 2n − 4</code>。但 4-正则给出 <code>m = 2n</code> ⟹ <strong>要求 <code>2n ≤ 2n − 4</code>，矛盾</strong>。</p>
+<p>数值（周期金刚石图，L = 8）：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>顶点数 n</td>
+<td>512</td>
+</tr>
+<tr>
+<td>边数 m = 2n</td>
+<td>1024</td>
+</tr>
+<tr>
+<td>平面嵌入允许的 m 上界 2n − 4</td>
+<td><strong>1020</strong> ✗</td>
+</tr>
+<tr>
+<td>平面假设下的面数 f = m − n + 2</td>
+<td>514</td>
+</tr>
+<tr>
+<td>平面假设要求 2m ≥ 4f，即 2m ≥</td>
+<td><strong>2056</strong>（实际 2m = 2048，<strong>缺口 8</strong>）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 任何 4-正则二分图都非平面</strong>（n ≥ 3）。这是纯组合论证，与具体结构无关。
+<strong>⟹ 四色定理（只对平面图说话）对衬底图完全不适用。</strong></p>
+<hr />
+<h2>三、FC-3 金刚石图的亏格恰好是 1 —— 而且它把"平面/非平面"区分得很干净</h2>
+<table>
+<thead>
+<tr>
+<th>嵌入</th>
+<th>面数 f</th>
+<th>检查</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>环面（亏格 1）</td>
+<td>512（= m − n）</td>
+<td><code>2m = 2048 = 4f</code> <strong>恰好饱和</strong> ⟹ 每个面都是四边形 ✓</td>
+</tr>
+<tr>
+<td>球面（亏格 0）</td>
+<td>514（= m − n + 2）</td>
+<td><code>2m = 2048 &lt; 4f = 2056</code> ✗</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 金刚石图<strong>能嵌环面、不能嵌球面</strong>，是"最接近平面的非平面图"。</p>
+<p>对照 2D 方格网（8×8）：n = 64、m = 112、f = 50 ⟹ <code>2m = 224 ≥ 4f = 200</code> ✓ <strong>可平面嵌入</strong>。</p>
+<p><strong>这张对照表直接说明</strong>：
+- <strong>表面/观测者平面内的 4 邻居网格</strong> = 2D 方格网 ⟹ <strong>平面</strong>
+- <strong>三维体衬底</strong> = 金刚石 ⟹ <strong>非平面</strong></p>
+<p>两者虽然都是"配位 4 + 二分"，但一个平面、一个非平面 —— <strong>它们不是同一件事</strong>。</p>
+<hr />
+<h2>四、FC-4 如果把衬底图当「地图」，色数是 7 不是 4</h2>
+<p>Heawood 公式 <code>χ(g) = ⌊(7 + √(1+48g))/2⌋</code>：</p>
+<table>
+<thead>
+<tr>
+<th>亏格 g</th>
+<th>地图色数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0（球面 ⟹ 四色定理）</td>
+<td><strong>4</strong></td>
+</tr>
+<tr>
+<td><strong>1（环面 ⟹ 金刚石图的亏格）</strong></td>
+<td><strong>7</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>8</td>
+</tr>
+<tr>
+<td>3</td>
+<td>9</td>
+</tr>
+<tr>
+<td>7</td>
+<td>12</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ 四色定理的「4」与框架的「4」<strong>不仅不同源，数值也对不上</strong>。</p>
+<hr />
+<h2>五、FC-5 Borsuk 数：R¹→2、R²→3、<strong>R³→4</strong> —— 三维空间自己的「4」</h2>
+<p><strong>Borsuk 定理</strong>：R^d 中任何有界集可分成 d+1 个直径更小的子集，且 d+1 最优。</p>
+<p>数值（构造演示）：</p>
+<table>
+<thead>
+<tr>
+<th>空间</th>
+<th>原直径</th>
+<th>分成几块</th>
+<th>每块直径</th>
+<th>更小?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R¹：[0,1]</td>
+<td>1</td>
+<td>2</td>
+<td>0.5</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>R²：[0,1]²</td>
+<td>1.4142136</td>
+<td>3</td>
+<td>1.0540926</td>
+<td>✓</td>
+</tr>
+<tr>
+<td><strong>R³：[0,1]³</strong></td>
+<td>1.7320508</td>
+<td><strong>4</strong></td>
+<td>1.2247449</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>「N 维空间需要 N+1 块」</strong> —— 这才是框架里那个「4」的正统出处（R³ ⟹ 4）。
+注意 R² 给 <strong>3</strong>、R¹ 给 <strong>2</strong>：<strong>与四色定理的「平面图 4 色」无任何关系</strong>（若同源，R² 就该给 4，但它给 3）。</p>
+<hr />
+<h2>六、FC-6 §4.10 定理 1 的定量形式：覆盖半径</h2>
+<p>判据是<strong>覆盖半径</strong> <code>max_{x∈S²} min_{d∈D} ∠(x,d)</code>，要求「<strong>严格 &lt; 90°</strong>」（每个方向都被某个方向锥包住，无零信息余量方向）。</p>
+<table>
+<thead>
+<tr>
+<th>方向数 k</th>
+<th>最坏点</th>
+<th>覆盖半径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3（共面 120°）</td>
+<td>平面法线 (0,0,1)</td>
+<td><strong>90.0000°</strong> ⟹ 不满足"严格 &lt; 90°" ✗</td>
+</tr>
+<tr>
+<td><strong>4（正四面体）</strong></td>
+<td>Voronoi 顶点 (1,1,−1)/√3</td>
+<td><strong>70.5288°</strong> = arccos(1/3) ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ §4.10 定理 1「3 个开半球不能覆盖 S² ⟹ k ≥ 4」正是 Lusternik–Schnirelmann 定理在 S² 上（LS 范畴 = 3）的特例</strong>，与 Borsuk 数 R³ = 4 同源。</p>
+<p><strong>这对框架是加强，不是削弱</strong>：k ≥ 4 从"框架自己的新证"升级为"有 90 年历史的经典拓扑定理的直接推论"。但<strong>必须在论文里引用</strong> LST/Borsuk，否则容易被审稿人指出"reinventing the wheel"。</p>
+<p>⚠️ <strong>本轮踩到的坑（已进技能）</strong>：<strong>随机采样会低估覆盖半径</strong>，因为最坏点落在"Voronoi 顶点"上 —— 那是<strong>零测度集</strong>。120000 点采样只给 k=3 → 89.909°、k=4 → 70.450°（真值 90.0000° 与 70.5288°）。求覆盖半径必须用候选极值点（法线 / Voronoi 顶点），不能靠随机打点取 max。</p>
+<p>📌 <strong>数值修正建议</strong>：论文 §4.10 写「k=3 最优覆盖半径 = 90.05°、k=4 = 70.291°」，与解析值 90.0000° 与 arccos(1/3) = 70.5288° 有 0.05° / 0.24° 出入（同源：随机搜索未穷尽）。建议改用解析值。</p>
+<hr />
+<h2>七、FC-7 ⚠️ 顺带修正第 27 轮的一处依赖，并质疑「六处 4 同源」</h2>
+<p><strong>（a）修正第 27 轮的依赖。</strong> 上一轮我用「表面诸元 <strong>4 邻居</strong>」作为「体配位数 = 4」的支撑。追溯出处后这<strong>不成立</strong>：</p>
+<ul>
+<li><strong>表面 4 邻居</strong> ⟸ §4.9 引理 1【<strong>本框架设定</strong>】：「可访问信息 = <strong>平面内 4 方向</strong>连接（平面外 2 方向被卷曲）」⟹ 这是 <strong>2D 平面内 2 根轴 × 2 个方向 = 4</strong>，对应 <strong>2D 方格网</strong>（平面、可 2-着色）。它是<strong>观测者平面内的计数</strong>，不是体配位数。</li>
+<li><strong>正四面体 4 方向簇</strong> ⟸ §4.10 定理 1+2（<strong>严格</strong>）：S² 上的方向覆盖需要 ≥ 4 个方向。</li>
+</ul>
+<p><strong>正确的支撑是后者</strong>：若每个方向对应一条键，则每格点 4 条键 ⟹ <strong>体配位数 = 4</strong>。
+⟹ <strong>第 27 轮「金刚石唯一」的结论仍然成立，但支撑换成了更严格的一条（定理而非设定）。</strong></p>
+<p><strong>（b）「六处 4 同源」需要降调。</strong> 论文 §4.10 把六处「4」并列说成"同源"。但至少这两处的「4」来源不同：一个是 <strong>2D 平面内的轴数</strong>，一个是 <strong>S² 的覆盖数</strong>（LST）。数值上都是 4，机制无关。其余几处（4l_P² 相干截面、每 4 面元 1 比特、Clifford 4 分量、挂谷 1/4）也应各自复查出处。</p>
+<hr />
+<h2>八、诚实边界</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「4-正则二分图非平面」（Euler 论证）</td>
+<td>【推导】，纯组合，<strong>对任意 4-正则二分图成立</strong></td>
+</tr>
+<tr>
+<td>金刚石图亏格 = 1</td>
+<td>【推导 + 数值】（环面嵌入恰好饱和）</td>
+</tr>
+<tr>
+<td>Heawood 色数 4 / 7 / 8 / 9 / 12</td>
+<td>【定理】（Heawood 1968 年被 Ringel–Youngs 证明为一般情形）</td>
+</tr>
+<tr>
+<td>Borsuk 数 R¹/R²/R³ = 2/3/4</td>
+<td>【定理】（Borsuk 1933）；本轮只演示构造，未证最优性</td>
+</tr>
+<tr>
+<td>覆盖半径 90.0000° 与 arccos(1/3)</td>
+<td>【推导 + 数值】，解析值精确</td>
+</tr>
+<tr>
+<td>「§4.10 定理 1 = LST 特例」</td>
+<td>【判定】：定理 1 的<strong>陈述</strong>（3 个开半球不覆盖 S²）确实是 LST 的直接推论；但论文的<strong>证明</strong>是自成一体的（分离超平面法），<strong>未引用 LST</strong> ⟹ 建议补引用</td>
+</tr>
+<tr>
+<td>「表面 4 邻居 ≠ 方向簇 4」</td>
+<td>【判定】，基于 §4.9 引理 1 与 §4.10 定理 1 的<strong>出处对比</strong>；若作者本意是"两者都是同一几何事实的两种表述"，需要作者澄清</td>
+</tr>
+<tr>
+<td>其余四处「4」是否同源</td>
+<td><strong>未逐一复查</strong>（本轮只查了最明显的两处）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>九、判决与下一步</h2>
+<p><strong>判决</strong></p>
+<ul>
+<li>❌ <strong>四色定理与框架无关</strong>。三条独立理由：
+  ① 四色定理只管<strong>平面图</strong>，而 4-正则二分图（载我们的衬底）<strong>必非平面</strong>（<code>m = 2n</code> 与 <code>m ≤ 2n − 4</code> 矛盾）；
+  ② 金刚石图的亏格恰为 1（环面），当"地图"看其色数是 <strong>7</strong>，不是 4；
+  ③ 四色定理的「4」来自平面性的深层结构（放电法），Borsuk 型「4」来自维度 —— 若同源，R² 就该给 4，但它给 3。</li>
+<li>✅ <strong>但框架的「k ≥ 4」有更强的经典出处</strong>：§4.10 定理 1 = <strong>LST 定理</strong>（S² 的 LS 范畴 = 3）的特例，与 <strong>Borsuk 数 R³ = 4</strong> 同源。建议论文引用 LST/Borsuk。</li>
+<li>⚠️ <strong>顺带修正</strong>：第 27 轮「表面 4 邻居 ⟹ 体配位数 4」的依赖不成立（表面计数 ≠ 体配位数），已改用「方向簇 k = 4」（严格）；结论不变。</li>
+<li>⚠️ <strong>顺带发现</strong>：§4.10「六处 4 同源」中最少两处的「4」来源不同，应降调。</li>
+<li>⚠️ <strong>数值修正</strong>：§4.10 的两处覆盖半径（90.05° / 70.291°）应改为解析值 90.0000° / arccos(1/3) = 70.5288°。</li>
+<li>⚠️ König 边着色的「4」与上述都不同源：它只是"我们的图恰好 4-正则"。</li>
+</ul>
+<p><strong>下一步（按价值排序）</strong></p>
+<ol>
+<li><strong>逐一复查「六处 4」的出处</strong>：本轮只查了两处就发现不同源，其余四处（4l_P² 相干截面、每 4 面元 1 比特、Clifford 4 分量、挂谷 1/4）需要各自的独立判据。<strong>这是对框架"内部一致性"最直接的检验。</strong></li>
+<li><strong>把 LST/Borsuk 引用补进论文</strong>（§4.10 定理 1 处）——低成本、高收益。</li>
+<li><strong>Borsuk 数是否还有第二处对应</strong>：R³ ⟹ 4 只解释了"为什么是 4 而不是 3 或 5"；若框架里还有别的地方需要"4 是最优"（如 §4.10 命题 6、packing 1/4），可以一并挂到 Borsuk 上。</li>
+</ol>
+
+<div class="footer">四色定理辨析：与框架无关 —— 但「k ≥ 4」的真正根源是 LST / Borsuk · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 四色定理辨析_无关但LST才是4的根源.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

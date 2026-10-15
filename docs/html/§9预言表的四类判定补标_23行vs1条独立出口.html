@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§9「可检验预言」表的四类判定补标（23 行 vs 1 条独立出口）</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、一句话结论</div>
+  <h1>§9「可检验预言」表的四类判定补标（23 行 vs 1 条独立出口）</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 90 轮</strong> ｜ 脚本 <code>_fourclass_90.py</code>（<strong>FC-1…FC-5，0 失败</strong>）、核验 <code>_verify_90.py</code>（<strong>V-1…V-10，0 失败</strong>）
+题源：<strong>第 88 / 89 轮登记的缺口</strong> —— 第 37 轮定的判决口径（真预言 / postdiction / 半拟合 / 失败）
+<strong>在论文里基本没被执行</strong>（含「预言」的 60 行里只 8 行标了，<strong>覆盖率 13%</strong>）。</p>
+</blockquote>
+<hr />
+<h2>一、一句话结论</h2>
+<p><strong>§9 表 23 行全部补上了四类判定</strong>（真预言 11｜推导/数值 3｜未定量 2｜失败 2｜postdiction 2｜半拟合 1｜
+真预言（不可测）1｜解释性（判别力 0）1）。<strong>而补标之后浮现出一件此前任何地方都没写过的事</strong>：</p>
+<blockquote>
+<p><strong>11 条「真预言」里，EMRI 系（S-E1–S-E4）四项同源</strong> —— 全都来自 <code>δ = 0.30·x_p</code> <strong>一个关系</strong>
+⟹ <strong>按「独立出口」计 = 1 条</strong>（与<strong>第 61 轮</strong>「观测出口 = 1 条」一致）。
+⟹ <strong>表格的行数是排版单位，不是成果单位。</strong></p>
+</blockquote>
+<p>顺带修掉 §9 表的<strong>两处结构破损</strong>（一处裸竖线、一处残行）。</p>
+<hr />
+<h2>二、四类判定台账（23 行）</h2>
+<p>判据：第 37 轮的四类<strong>＋ 两条必要补充档</strong>（四类之外，否则半数行无处可放）。</p>
+<table>
+<thead>
+<tr>
+<th>行</th>
+<th>命题（简）</th>
+<th><strong>四类判定</strong></th>
+<th>依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>B1–B5 黑洞强场预言包</td>
+<td><strong>真预言</strong></td>
+<td>框架先给、EHT/LIGO/LISA 未做</td>
+</tr>
+<tr>
+<td>2</td>
+<td>void-CPT-κ 异常</td>
+<td><strong>真预言</strong></td>
+<td>分析方案已给出、结果未出</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>w = −1+4ε/3</code>（<code>wa = 0</code>）</td>
+<td><strong>半拟合</strong></td>
+<td><code>ε</code> 是能标参数；<strong>第 73 轮</strong>：<code>wa = 0</code> <strong>不是框架独有</strong>（ΛCDM 同值）⟹ 判别力 = 0</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SU(3) β 阶梯跳跃</td>
+<td><strong>未定量</strong></td>
+<td>「数值待推导」—— 没有可算的数</td>
+</tr>
+<tr>
+<td>5</td>
+<td>第四代费米子</td>
+<td><strong>失败</strong></td>
+<td>「与 LHC 未发现存在张力」</td>
+</tr>
+<tr>
+<td>6</td>
+<td>霍金辐射非热修正 ~<code>1/S</code></td>
+<td><strong>真预言</strong></td>
+<td>有数、未观测（接近窗口边缘）</td>
+</tr>
+<tr>
+<td>6′</td>
+<td>火墙厚度 ~<code>√(l_P/R)</code></td>
+<td><strong>真预言</strong></td>
+<td>有标度律、未观测</td>
+</tr>
+<tr>
+<td>7</td>
+<td>PeV 中微子味比率异常</td>
+<td><strong>未定量</strong></td>
+<td>只写「定性预言」</td>
+</tr>
+<tr>
+<td>8</td>
+<td>纠缠熵面积律系数</td>
+<td><strong>真预言</strong></td>
+<td>系数含 <code>ln2</code>、可算、未观测</td>
+</tr>
+<tr>
+<td>9</td>
+<td>拓扑序激发（量子双 / 弦网）</td>
+<td><strong>推导 / 数值</strong></td>
+<td>2+1D 格点模型的<strong>严格结果</strong>，不是对自然的预言</td>
+</tr>
+<tr>
+<td>10</td>
+<td>禁闭弦张力 ＋ 相变点定位</td>
+<td><strong>推导 / 数值</strong></td>
+<td>同上（⚠️ 「张力」有两个义项，见 §四）</td>
+</tr>
+<tr>
+<td><strong>S1</strong></td>
+<td><code>α = 1.00±0.06</code></td>
+<td><strong>postdiction</strong></td>
+<td>EHT 阴影<strong>已观测</strong>（框架调 <code>α</code> 以兼容 ⟹ 附带<strong>半拟合</strong>）</td>
+</tr>
+<tr>
+<td><strong>S2</strong></td>
+<td>QNM <code>f = f_GR/α</code></td>
+<td><strong>真预言</strong></td>
+<td>ET/CE 未建</td>
+</tr>
+<tr>
+<td><strong>S3</strong></td>
+<td>火墙弥散 <code>δ/R ~ 10⁻⁹</code></td>
+<td><strong>真预言</strong></td>
+<td>原初黑洞未观测</td>
+</tr>
+<tr>
+<td><strong>S4</strong></td>
+<td>过载区无奇点 ＋ 声速消失</td>
+<td><strong>推导 / 数值</strong></td>
+<td>自标「✅ 流体模型 ＋ 微观推导」</td>
+</tr>
+<tr>
+<td><strong>S5</strong></td>
+<td>阴影边缘普朗克弥散</td>
+<td><strong>真预言（不可测）</strong></td>
+<td>~10⁻¹⁹–10⁻²⁴ ⟹ <strong>可检验性 = 0</strong></td>
+</tr>
+<tr>
+<td><strong>S-E1…S-E4</strong></td>
+<td>EMRI 四项</td>
+<td><strong>真预言</strong></td>
+<td>LISA 未发射（⚠️ <strong>第 61 轮 C-7</strong>：<code>σ</code> 口径须统一）</td>
+</tr>
+<tr>
+<td><strong>S-E5</strong></td>
+<td>FQH 引力子模</td>
+<td><strong>失败</strong></td>
+<td>❌ <strong>结项（第 54 轮）</strong>：T-11 裁决</td>
+</tr>
+<tr>
+<td><strong>S-E6</strong></td>
+<td>胶球 = 非阿贝尔通量自束缚态</td>
+<td><strong>postdiction</strong></td>
+<td>BESIII X(2370) <strong>已确认</strong>，框架做「翻译」</td>
+</tr>
+<tr>
+<td><strong>S-C1</strong></td>
+<td><code>wa = 0</code> ∧ <code>Ω_K = 0</code></td>
+<td><strong>解释性（判别力 0）</strong></td>
+<td><strong>第 61 轮 N-22</strong>：与平 ΛCDM <strong>同值</strong> ⟹ 观测不可区分</td>
+</tr>
+</tbody>
+</table>
+<p><strong>汇总（23 行）</strong>：真预言 <strong>11</strong> ｜ 推导 / 数值 3 ｜ 未定量 2 ｜ 失败 2 ｜ postdiction 2 ｜ 半拟合 1 ｜
+真预言（不可测）1 ｜ <strong>解释性（判别力 0）1</strong>。</p>
+<h3>⭐⭐ 2.1 为什么这条是新信息</h3>
+<ul>
+<li>第 61 轮的结论是「<strong>观测出口 = 1 条</strong>」，但它说的是<strong>清单里的工程/观测条目</strong>；</li>
+<li><strong>§9 表</strong>此前只有「状态」列（「可检验」「已兼容」「判别中」…），<strong>没有任何一处给出「几行算几条出口」</strong>；</li>
+<li>补标后第一次能并排看：<strong>表里 4 行 EMRI，独立关系只有 1 个</strong>。
+⟹ ⚠️ 这是本项目<strong>反复出现的同一个病</strong>的新形态：<strong>把「行数」当「条数」</strong>
+   （与 <strong>C-18</strong>「§七 不是台账」、<strong>C-19</strong>「清单标记失真」<strong>同族</strong>）。</li>
+</ul>
+<h3>⭐ 2.2 与「理论侧」的一处对称</h3>
+<p>同一件事在负面上已经写过：<strong>N-21</strong> 说框架不覆盖化学键/潜热/电离能，因为「<strong>差</strong>只有三类」；
+这里在正面上是同一条：<strong>§9 的 23 行也不是 23 个独立内容</strong> ——
+「真预言」11 行里 EMRI 4 行同源、「推导/数值」3 行同类（都是格点模型结果）。
+⟹ <strong>判据：数「独立关系」，不数「行」。</strong></p>
+<hr />
+<h2>三、🐞 顺手修掉的两处结构破损</h2>
+<table>
+<thead>
+<tr>
+<th>位置</th>
+<th>问题</th>
+<th>修法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>§9 第 <strong>9</strong> 行</td>
+<td>表格单元里写了 <strong><code>\|G\|²</code></strong> ⟹ markdown 当成列分隔符 ⟹ <strong>被拆成 6 列</strong>（应为 4）</td>
+<td>转义为 <code>\|G\|²</code></td>
+</tr>
+<tr>
+<td>§9 <strong>S-C1</strong> 行</td>
+<td><strong>跨三行</strong>（列数 2 / 2 / 3）⟹ 渲染成三个<strong>残行</strong></td>
+<td>合并为一行（列数 = 4）</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>这是全文表格里唯一的裸竖线</strong>（脚本全表扫描确认）。
+⚠️ 技能<strong>陷阱 11</strong> 只说了「表格<strong>外</strong>直接写 <code>|G|</code>」—— <strong>表格内必须写 <code>\|G\|</code></strong>，本轮补上。
+✅ 修复后断言：<strong>§9 全表所有表格行的列数都 = 4</strong>（中英双查，<code>_verify_90.py</code> V-9）。</p>
+<hr />
+<h2>四、⚠️⭐ 本轮踩到的第 13 / 14 类判据陷阱</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>陷阱</th>
+<th>实测</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⑬</td>
+<td>⭐ <strong>转义后的 <code>\|</code> 仍会被「按 <code>\|</code> split」的列计数器计入</strong></td>
+<td>修完 <code>\|G\|²</code> 后再数一次，<strong>仍然得 6 列</strong> ⟹ <strong>假 FAIL（修好了却报没修好）</strong>。✅ 判据：<code>re.split(r"(?&lt;!\\)\|", s)</code> —— <strong>按未转义的竖线分割</strong></td>
+</tr>
+<tr>
+<td>⑭</td>
+<td>⭐ <strong>规则表的关键词会撞「同形词不同义」</strong></td>
+<td>初筛把第 10 行的「<strong>弦张力</strong>」（string tension，一个物理量）当成「与观测<strong>存在张力</strong>」⟹ <strong>误判为「失败」</strong>。⚠️ 与第 88 轮「<code>0.04</code> ⊂ <code>0.0493</code>」（<strong>子串</strong>）<strong>同族但机制不同</strong>（<strong>同词两义</strong>）。✅ 规范：<strong>规则表要显式列出「不要命中的词」</strong>；<strong>初筛结果一律人工过一遍</strong></td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 另有一处<strong>我自己的流程失误</strong>（同一类病的第 N 次）：<code>_fourclass_90.py</code> 第一版读<strong>当前稿</strong>，
+于是<strong>补丁一落、FC-1 的判据就自己过期</strong>（报「列数仍异常」）。
+✅ 修法同铁律 18/20：<strong>审计脚本一律读补丁前备份</strong>；当前稿状态交给 <code>_verify_90.py</code> 做两段式确认。</p>
+<p>📌 <strong>通则（与第 88 / 89 轮合起来共十四类）</strong>：<strong>审计里每个判据都要先声明「我把它当什么用」</strong> ——
+   值还是行号？更正还是序列？同行还是含续行？窗口多宽？跳不跳标题？是本轮写的还是底本里的？
+   代码前缀撞车了没？属于哪一族？<strong>转义符算不算？这个词是哪个义项？</strong></p>
+<hr />
+<h2>五、诚实边界</h2>
+<ol>
+<li><strong>四类判定是我的判定，不是框架的推导</strong> —— 每一行的依据都引了一条<strong>已登记的轮次</strong>，
+   但「真预言 vs postdiction」的分界在某些行上<strong>仍有裁量空间</strong>（如第 6 行的「接近窗口边缘」）。</li>
+<li><strong>两条补充档（未定量 / 推导·数值）是我加的</strong>，第 37 轮只定了四类。
+   理由：不加则 §9 里<strong>半数行无处可放</strong>（第 9/10/S4 行不是对自然的预言，第 4/7 行没有可算的数）。
+   ⚠️ 若要严格守「四类」，应把这两档显式登记为<strong>第 37 轮口径的扩展</strong>。</li>
+<li><strong>EMRI「同源」的判据是「都来自 <code>δ = 0.30·x_p</code> 一个关系」</strong> —— 依据是 §9 表各行自己的表述
+   （S-E1「δ=0.30·x_p」、S-E4「δ∝x_p」）；S-E2/S-E3 的相位差是<strong>该进动差的调制结果</strong>。
+   ⚠️ 没有做独立的信息论去重。</li>
+<li><strong>我没改 §9 表本身的结构</strong>（不加列）—— 因为多行表格行有续行，加列会破坏渲染。
+   四类判定以<strong>表后台账</strong>（<code>&gt;</code> 引用块）的形式追加在 §9 之后。</li>
+<li><strong>本轮没有新的物理结论</strong> —— 产出是<strong>分类 ＋ 两处结构修复 ＋ 一条「行数≠条数」的规范</strong>。</li>
+</ol>
+<hr />
+<h2>六、判决与产出</h2>
+<ul>
+<li><strong>判决</strong>：<strong>C-45</strong>（§9 表从未带四类判定 ＋ 两处结构破损）；净增量为 <strong>23 行四类判定台账</strong>。</li>
+<li>总账：<strong>更正 43 → 44</strong>；<strong>负面条数不变</strong>。</li>
+<li>论文 <strong>ZH / EN</strong>：§9 表修复（<code>\|G\|²</code> ＋ S-C1 合并）＋ §9 后追加四类判定台账（<strong>中英同步</strong>）。</li>
+<li>清单：新增 <strong>C-45</strong> 行 ＋ 总账 <strong>44 条</strong>。</li>
+<li>交接说明：§三 第 90 轮段 ＋ §七 更新。</li>
+<li>技能：<strong>陷阱 84</strong>（含第 13 / 14 类判据陷阱）。</li>
+<li>备忘录：本文件。</li>
+</ul>
+<h2>七、下一步（第 91 轮建议）</h2>
+<ol>
+<li>⭐ <strong>把四类判定从「§9 表」推到「全文 60 行『预言』」</strong> —— 本轮只做了表（23 行）；
+   剩下 37 行散在正文里，其中若干是<strong>正文级的承诺句</strong>（比表更该标）。</li>
+<li><strong>候选池 #5（PPN 优越系 α₁ ≲ 10⁻⁴）</strong> —— ⚠️ 先按<strong>陷阱 50</strong> 自查：若框架给 <code>α₁ = 0</code>（与 GR 同），
+   则<strong>判别力 = 0</strong>（与 <strong>N-22</strong> 的 <code>Ω_K = 0</code> 同病）⟹ <strong>先算「它排除了什么」再开工</strong>。</li>
+<li><strong>第 1–38 轮备忘录缺口</strong>（换机时丢失，第 89 轮 C-44 登记）是否从 <code>本轮推演总结_2026-09-17/21.md</code> 反向重建。</li>
+</ol>
+
+<div class="footer">§9「可检验预言」表的四类判定补标（23 行 vs 1 条独立出口） · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 §9预言表的四类判定补标_23行vs1条独立出口.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

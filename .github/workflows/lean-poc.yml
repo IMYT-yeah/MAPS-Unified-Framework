@@ -1,0 +1,42 @@
+# ============================================================================
+# lean-poc —— StormPoC 的 CI 机器核验（重建版，2026-10-02 第 96 轮）
+# ============================================================================
+# 历史：原 workflow 于 2026-09-09 撰写（push 时自动 elan + mathlib cache +
+#       lake build），2026-09-16 随旧机丢失。本文件为重建版。
+# 用途：本机无 Lean/mathlib 环境时的替代核验通道（09-09 环境教训：
+#       直连下载极慢时的首选；本机装成后为「本地+CI 双通道」）。
+
+name: lean-poc
+
+on:
+  push:
+    paths:
+      - "verification/lean/**"
+      - ".github/workflows/lean-poc.yml"
+  pull_request:
+    paths:
+      - "verification/lean/**"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: verification/lean
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Fetch mathlib and its olean cache
+        run: |
+          lake update
+          lake exe cache get
+
+      - name: Build
+        run: lake build StormPoC

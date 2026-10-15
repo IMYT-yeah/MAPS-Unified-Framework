@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>格点几何：4 邻居 + 二分性唯一锁定金刚石结构</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、LG-1 结构约束：这是硬约束，不是审美偏好</div>
+  <h1>格点几何：4 邻居 + 二分性唯一锁定金刚石结构</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-09-18 ｜ 脚本：<code>outputs/_lattice_geometry.py</code>（LG-1…LG-7，<strong>16 项检查、失败 0</strong>）
+<strong>一句话结论</strong>：第 26 轮把 tick 规则从「实现选择」推到「需要格点几何」之后，本轮<strong>把几何定下来了</strong>——
+论文里早已各自写下的两条（§4.10「表面诸元 <strong>4 邻居</strong>」与定理 2「k = 4 = <strong>正四面体</strong>」）
+加上 tick 的<strong>二分性硬约束</strong>，三者交集<strong>唯一</strong>：<strong>金刚石结构</strong>。
+于是 tick 规则可从几何直接读出（König 边着色：4 个键方向各是一个完美匹配），
+各向同性由 Σd⊗d = 4I <strong>内建</strong>。
+代价：新浮现一个数密度问题（0.6495/l_P³ vs 1/l_P³）。</p>
+</blockquote>
+<hr />
+<h2>一、LG-1 结构约束：这是硬约束，不是审美偏好</h2>
+<p>第 26 轮定下的归一化是「<strong>每 tick 每个格点恰好一次事件</strong>」，而事件 = 相邻对换。一个 tick 里的全部交换因此构成一个<strong>完美匹配</strong>（每个顶点恰被覆盖一次）。若还要求「每个方向都能轮到」（各向同性），则全部边要被 d 个完美匹配覆盖 ⟹ 图必须是 <strong>d-正则二分图</strong>；由 <strong>König 边着色定理</strong>，其边恰可 d 色染色，每种颜色是一个完美匹配。</p>
+<p><strong>⟹ 两条纯结构性约束（不含物理假设）：</strong>
+1. <strong>配位数 d = 方向数 k</strong>（每格点有 d 条边、d 个方向）；
+2. <strong>邻接图必须是二分图</strong> —— 否则完美匹配不保证覆盖所有顶点（奇环上的交替路径推不出匹配）。</p>
+<hr />
+<h2>二、LG-2 候选几何筛选：金刚石是唯一候选</h2>
+<table>
+<thead>
+<tr>
+<th>几何</th>
+<th>配位数</th>
+<th>二分?</th>
+<th>与 k = 4 相容?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>简单立方 sc</td>
+<td>6</td>
+<td>✓</td>
+<td>✗（配位 6 ≠ 4）</td>
+</tr>
+<tr>
+<td>体心立方 bcc</td>
+<td>8</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>面心立方 fcc</td>
+<td>12</td>
+<td>✗（含三角形）</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>蜂巢 honeycomb</td>
+<td>3</td>
+<td>✓</td>
+<td>✗（配位 3 ≠ 4）</td>
+</tr>
+<tr>
+<td><strong>金刚石 diamond</strong></td>
+<td><strong>4</strong></td>
+<td><strong>✓</strong></td>
+<td><strong>✓ 唯一</strong></td>
+</tr>
+</tbody>
+</table>
+<p>fcc 的非二分性是数值验证过的：三点 (0,0,0)、(1,1,0)、(1,0,1) 两两最近邻（距离平方各为 2），构成三角形 ⟹ 有奇环 ⟹ 非二分。</p>
+<p><strong>配位数 4 这一条不是本轮引入的</strong>——论文 §4.10 的「六处「4」同源」第一条就写着「<strong>表面诸元 4 邻居</strong>（观测者几何，本框架推论）」，§4.10 定理 2 又已证「4 点最优构型 = 正四面体（Tammes，最小角 109.47°）」。
+<strong>本轮做的是：把这两条既有设定与 tick 的二分要求放在一起，发现它们唯一确定了几何。</strong></p>
+<hr />
+<h2>三、LG-3 金刚石结构：构造与 König 边着色</h2>
+<p>在立方坐标下取两个子格：</p>
+<ul>
+<li><strong>A</strong> = {(i,j,k) : i+j+k 偶}（即 fcc 的一个整数表示）</li>
+<li><strong>B</strong> = {(i,j,k) : i+j+k 奇}</li>
+</ul>
+<p>键沿 4 个<strong>正四面体方向</strong>：<code>d₁=(1,1,1)</code>、<code>d₂=(1,−1,−1)</code>、<code>d₃=(−1,1,−1)</code>、<code>d₄=(−1,−1,1)</code>（每个方向和为 ±1，故沿任一方向必翻转子格 ⟹ <strong>二分</strong>）。</p>
+<p>数值验证（L = 8，共 512 格点）：</p>
+<table>
+<thead>
+<tr>
+<th>检查</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>两子格等大</td>
+<td>|A| = |B| = 256 ✓</td>
+</tr>
+<tr>
+<td>A 沿任一 dᵤ 必落到 B</td>
+<td>✓</td>
+</tr>
+<tr>
+<td><strong>4 个键方向的边集各构成一个完美匹配</strong>（每格点恰出现一次）</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p>第三项就是 <strong>König 边着色定理</strong>在 4-正则二分图上的具体实现：4 个方向的边互不相交、并集覆盖全部边、每个都完美匹配。</p>
+<hr />
+<h2>四、LG-4 各向同性是内建的，且与定理 2 精确一致</h2>
+<div class="formula">∑<sub>μ=1</sub><sup>4</sup> d<sub>μ</sub> ⊗ d<sub>μ</sub> = 4 <span class="bb">I</span> (<span class="txt">非对角元全为 </span>0)</div>
+
+<p>⟹ 4 个方向等概率选取时，位移的二阶矩<strong>自动各向同性</strong> ⟹ <code>⟨x²⟩ = ⟨y²⟩ = ⟨z²⟩</code> 不需要任何额外假设。</p>
+<p>键方向两两夹角（数值）：</p>
+<div class="formula"><span class="fn">arccos</span>(<span class="frac"><span class="num">d<sub>1</sub>· d<sub>2</sub></span><span class="den">|d|<sup>2</sup></span></span>) = <span class="fn">arccos</span>(-1/3) = 109.4712206<sup>∘</sup></div>
+
+<p><strong>与 §4.10 定理 2 的 Tammes 值逐位相同</strong> —— 这不是巧合，是同一件事：正四面体的 4 个顶点方向。</p>
+<hr />
+<h2>五、LG-5 tick 模拟：光有「4 个确定性匹配」还不够</h2>
+<p><strong>第一次尝试失败了，而且失败得很有教育意义。</strong></p>
+<p>按最自然的读法实现 tick（每 tick 随机选一个方向 μ，沿 E_μ 交换所有边），结果：</p>
+<table>
+<thead>
+<tr>
+<th>n_tick</th>
+<th>⟨x²⟩</th>
+<th>⟨y²⟩</th>
+<th>⟨z²⟩</th>
+<th>⟨r²⟩/3n</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>500</td>
+<td>64</td>
+<td>36</td>
+<td>100</td>
+<td>0.133</td>
+</tr>
+<tr>
+<td>2000</td>
+<td>1156</td>
+<td>4</td>
+<td>1936</td>
+<td>0.516</td>
+</tr>
+<tr>
+<td>4000</td>
+<td>9604</td>
+<td>2500</td>
+<td>1024</td>
+<td>1.094</td>
+</tr>
+</tbody>
+</table>
+<p>分量极度不均（有个种子 <code>⟨y²⟩ = 0</code>），且 <code>⟨r²⟩/3n</code> 在 0.13~1.09 之间乱跳。</p>
+<p><strong>诊断过程</strong>：先排除随机数（<code>randrange(4)</code> 分布均匀、<code>i+μ</code> 奇偶平衡、连续相同率 0.256 ≈ 1/4，全部正常），再做"抽象对照"——用同一条随机序列、纯位移累加 <code>s = Σ(−1)ⁱ d_{μᵢ}</code>，得到 <strong>(224, 200, 808, 3096, 13128)，与仿真逐位完全相同</strong>。</p>
+<p>⟹ <strong>仿真没有 bug，是规则错了。</strong> 「每 tick 全局选一个方向」意味着<strong>所有状态共享同一条方向序列</strong>（起始于 A 的状态位移为 <code>+d</code>，起始于 B 的为 <code>−d</code>，两者互为相反数）⟹ 整个衬底<strong>刚性地一起飘</strong>，⟨r²⟩ 只是<strong>一条</strong>随机轨迹的瞬时值，涨落可达 ±141%，而且分量是不均的。</p>
+<p><strong>修复</strong>：把匹配<strong>局域随机化</strong>——沿 dᵤ 的每条链独立抽取 odd-even 相位（链 = {p, p+dᵤ, p+2dᵤ, …}，长度 = L 为偶数 ⟹ 环上配对恒为完美匹配）。</p>
+<p><strong>修复后的结果</strong>（L = 8、N = 512、1500 tick、5 个种子）：</p>
+<table>
+<thead>
+<tr>
+<th>量</th>
+<th>实测（5 种子均值）</th>
+<th>期望</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⟨x²⟩</td>
+<td><strong>1487.3</strong></td>
+<td>n = 1500</td>
+</tr>
+<tr>
+<td>⟨y²⟩</td>
+<td><strong>1438.6</strong></td>
+<td>1500</td>
+</tr>
+<tr>
+<td>⟨z²⟩</td>
+<td><strong>1441.9</strong></td>
+<td>1500</td>
+</tr>
+<tr>
+<td>⟨r²⟩</td>
+<td><strong>4367.8</strong></td>
+<td>3n = 4500</td>
+</tr>
+<tr>
+<td>真空事件</td>
+<td><strong>0</strong></td>
+<td>0</td>
+</tr>
+<tr>
+<td>非置换 tick</td>
+<td><strong>0</strong></td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>对照（只用确定性匹配 + 全局统一相位）：<code>⟨x²⟩:⟨y²⟩:⟨z²⟩ = 676 : 900 : 3600</code>，<code>⟨r²⟩/3n = 1.725</code>，<strong>分量比 5.33</strong> ⟹ 刚性、各向异性。</p>
+<hr />
+<h2>六、LG-6 与第 26 轮的对比：减少的不是随机量，而是「需要假设的东西」</h2>
+<table>
+<thead>
+<tr>
+<th>实现</th>
+<th>方向源</th>
+<th>匹配的局域随机化</th>
+<th>各向同性的来源</th>
+<th>自由参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 26 轮（几何未定）</td>
+<td>3 个坐标轴</td>
+<td>每线独立相位</td>
+<td>轴等概率（<strong>假设</strong>对称）</td>
+<td>1</td>
+</tr>
+<tr>
+<td>本轮（几何 = 金刚石）</td>
+<td><strong>4 个四面体键方向</strong></td>
+<td><strong>每链独立相位</strong></td>
+<td><strong>Σd⊗d = 4I（代数恒等）</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><strong>必须诚实</strong>：<strong>随机量的个数并没有减少</strong>（都是 2 个），本轮的增量是<strong>几何定下来了</strong>、并且"各向同性"从假设变成了恒等式。</p>
+<p><strong>但有一条重要的普适性确认</strong>：第 26 轮那条「相位必须每线独立」在金刚石结构上<strong>原样重现</strong>（全局统一 ⟹ ⟨r²⟩/3n = 1.725、分量比 5.33）。这说明它不是简单立方的偶然，而是<strong>任何"全局同步匹配"的普遍失效模式</strong>：</p>
+<blockquote>
+<p><strong>全局同步 = 整体刚性平移，不是随机游走。</strong></p>
+</blockquote>
+<hr />
+<h2>七、LG-7 ⚠️ 新浮现的结构问题：数密度取决于嵌入</h2>
+<p>「一步 l_P / 一拍 t_P ⟹ 速度 = c」要求<strong>键长 = l_P</strong>（否则 v = √3·c）。但两种都满足键长 = l_P 的嵌入给出不同数密度：</p>
+<table>
+<thead>
+<tr>
+<th>嵌入</th>
+<th>n·l_P³</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>标准金刚石</strong>（8 原子/晶胞，a = 4l_P/√3）</td>
+<td><strong>3√3/8 = 0.64952</strong></td>
+</tr>
+<tr>
+<td>ℤ³ 对角键嵌入（格距 = l_P/√3）</td>
+<td>3√3 = 5.19615</td>
+</tr>
+<tr>
+<td>§4/§4.2 一直用的</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>两者相差恰好 8 倍。<strong>物理判据：「最近邻即键」</strong> —— 标准金刚石满足（所有近邻距离都是键长）；ℤ³ 对角键嵌入不满足（同子格最近距离 = l_P/√3 &lt; l_P，却不参与手递手）。⟹ <strong>取标准金刚石</strong>。</p>
+<p><strong>连带修正（O(1)，不改结论）</strong>：论文第 190 行应改为</p>
+<ul>
+<li>数密度 <code>n = 0.6495/l_P³</code></li>
+<li>碰撞率 <code>nσv = 0.6495/t_P</code>（σ = l_P² 口径；硬球 σ = πl_P²/4 则 0.510/t_P）</li>
+<li>平均自由程 = <code>1.5396 l_P</code></li>
+</ul>
+<p>「碰撞率 ~1/t_P、平均自由程 ~l_P」的<strong>量级结论不变</strong>。</p>
+<hr />
+<h2>八、诚实边界</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>结构约束（每格点每 tick 一次 ⟹ d-正则二分 + König）</td>
+<td>【推导】纯结构，不含物理假设</td>
+</tr>
+<tr>
+<td>候选筛选（配位 4 + 二分 ⟹ 金刚石）</td>
+<td>【推导 + 数值】，但<strong>依赖「表面诸元 4 邻居 = 体配位数 4」这一步</strong>——论文那句写在 §4.10 的表面/观测者几何层面，本轮的格点是<strong>体衬底</strong>；两者同源需要额外论证（表面是体的投影则同源）</td>
+</tr>
+<tr>
+<td>金刚石构造、König 边着色、夹角 109.4712°、Σd⊗d = 4I</td>
+<td>【推导 + 数值】，精确</td>
+</tr>
+<tr>
+<td>tick 模拟（⟨r²⟩ = 3n、各向同性、真空 0）</td>
+<td>【数值】，2D/3D 立方坐标 + 周期边界，L = 8；<strong>格点几何与嵌入的对应关系仍待独立判据</strong></td>
+</tr>
+<tr>
+<td>「全局同步 = 刚性」</td>
+<td>【数值观察】，在两种几何上都出现 ⟹ 疑似普遍，但<strong>未做解析证明</strong></td>
+</tr>
+<tr>
+<td>「每链独立相位」</td>
+<td>【数值必要条件】，同第 26 轮</td>
+</tr>
+<tr>
+<td><strong>相邻性（为何是对换而非三循环/更长置换）</strong></td>
+<td><strong>仍未论证</strong>，继承自「手递手」图像</td>
+</tr>
+<tr>
+<td>数密度 = 0.6495/l_P³</td>
+<td>【依赖于"标准金刚石"这一嵌入选择】，判据是"最近邻即键"（物理偏好，非证明）</td>
+</tr>
+<tr>
+<td>方向是否还需局域化</td>
+<td><strong>未测</strong>：本轮只测了"方向全局随机 + 每链独立相位"；"每条链独立选方向"未做（会与链的定义循环）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>九、判决与下一步</h2>
+<p><strong>判决</strong></p>
+<ul>
+<li>✅ <strong>结构约束成立</strong>：每格点每 tick 一次事件 ⟹ 全部边可分解为完美匹配 ⟹ <strong>d-正则二分图</strong>（König）。</li>
+<li>✅ <strong>格点几何定下来（本轮核心增量）</strong>：配位数 4（论文 §4.10 已有）+ 二分性 ⟹ <strong>金刚石结构是唯一候选</strong>；简单立方/体心/面心/蜂巢全被排除。</li>
+<li>✅ <strong>与 §4.10 定理 2 精确一致</strong>：键方向夹角 = arccos(−1/3) = 109.4712°。</li>
+<li>✅ <strong>tick 规则可从几何读出</strong>：每 tick「随机选一个键方向 + 每条链独立随机相位」；各向同性由 Σd⊗d = 4I 内建。</li>
+<li>⚠️ <strong>匹配的局域随机化仍然必需</strong>（全局统一 ⟹ 刚性），与第 26 轮同一条教训、同一失效模式。</li>
+<li>⚠️ <strong>新浮现</strong>：数密度 0.6495/l_P³ ≠ §4 用的 1/l_P³，O(1) 修正，量级结论不变。</li>
+<li>⚠️ 「配位数 4」现在是<strong>结构推论</strong>，但<strong>「为何是对换而非三循环」仍无论证</strong>。</li>
+</ul>
+<p><strong>下一步（按价值排序）</strong></p>
+<ol>
+<li><strong>打通「表面 4 邻居 ↔ 体配位数 4」</strong>：这是本轮结论唯一依赖的外来步骤。若能把 §4.10 的表面计数与体格点几何显式连起来（例如证明表面邻居数 = 体配位数），"金刚石结构"就从"结构推论"升级为"框架推论"。</li>
+<li><strong>给相邻性（对换 vs 三循环）找判据</strong>：König 用的是边着色（对换）；三循环会破坏"每格点每 tick 一次"或破坏二分 ⟹ 也许正是二分性在挑对换。这是一个很自然的下一步。</li>
+<li><strong>数密度歧义的独立判据</strong>：除了"最近邻即键"，还能不能从框架别处（如 B5 的 4l_P² 相干块、熵归一化）定出嵌入？</li>
+</ol>
+
+<div class="footer">格点几何：4 邻居 + 二分性唯一锁定金刚石结构 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 格点几何_四邻居加二分唯一锁定金刚石结构.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

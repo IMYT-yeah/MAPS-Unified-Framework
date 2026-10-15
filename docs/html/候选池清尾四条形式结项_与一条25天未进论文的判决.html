@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>候选池清尾：四条形式结项 —— 与一条 25 天未进论文的判决</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、四条结项判决表</div>
+  <h1>候选池清尾：四条形式结项 —— 与一条 25 天未进论文的判决</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>第 95 轮</strong> ｜ 2026-10-02 ｜ 核验脚本：<code>_candpool_95.py</code>（<strong>CP-1…CP-10，34 项 0 失败</strong>）
+<strong>一句话：候选池的四条剩余条目（#1 η 能标 / #2 暗能量能标 / #4 η/s / #6 规范群结构）全部完成形式结项；
+其中 #2 的判决（2026-09-17 做出）<strong>从未进入论文</strong> —— 「23.76 倍」「二选一」在论文里 0 处，
+而 §8.4 至今把 <code>ρ_Λ ~ (E_c)⁴</code> 标为【推导】⟹ 本轮补录（C-54）。</strong></p>
+</blockquote>
+<hr />
+<h2>一、四条结项判决表</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>条目</th>
+<th>判定</th>
+<th>依据（源头文档）</th>
+<th>论文同步状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>#1</strong></td>
+<td>η 能标（0.969 TeV）</td>
+<td><strong>半拟合</strong>（能标是输入）＋「独立解释」<strong>判否</strong></td>
+<td><code>从A2推组分…md</code> CM-2</td>
+<td>仅一句「配出来的」；<strong>判否理由未写</strong> ⟹ 本轮加注</td>
+</tr>
+<tr>
+<td><strong>#2</strong></td>
+<td>暗能量能标（E_c = 1.0181 meV）</td>
+<td><strong>保住 meV 量级 / 放弃 <code>ρ_Λ = E_c⁴</code> 定量识别</strong></td>
+<td><code>ΩΛ缺口判决…md</code> OM-1…OM-6</td>
+<td>⚠️⚠️ <strong>判决核心 0 处</strong>（见 §二）⟹ 本轮补录</td>
+</tr>
+<tr>
+<td><strong>#4</strong></td>
+<td>η/s → 1/4π</td>
+<td><strong>postdiction / 一致性</strong>（KSS 界 2001，非框架独有）</td>
+<td><code>工程路径评估…md</code>；清单 H2 行</td>
+<td>判定已在 H2 行（✅）；<strong>池条目挂起</strong> ⟹ 本轮结项</td>
+</tr>
+<tr>
+<td><strong>#6</strong></td>
+<td>规范群结构 n = 3,2,1</td>
+<td><strong>结构对应 = 解释性（判别力 0）／数值映射 = 判否</strong>（<strong>N-34</strong>）</td>
+<td>第 77 轮（N-33/N-34/C-24）</td>
+<td>判定已成；<strong>池条目挂起</strong> ⟹ 本轮结项</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>四条</strong>，不是三条 —— 第 93/94 轮的回顾<strong>漏了 #6</strong>（C-18 族「回顾过度声明」的第 N 次；本轮由脚本清点抓出）。</p>
+<hr />
+<h2>二、⭐⭐ 核心发现：#2 的判决 25 天未进论文</h2>
+<p><strong>判决（2026-09-17）</strong>：<code>ΩΛ缺口判决_二选一与放弃.md</code>（OM-1…OM-6）——
+A2 面临一个<strong>干净的二选一</strong>：要么保住 <code>E_c = 1.018 meV</code> 的一致性（放弃 Ω_Λ），
+要么配住 Ω_Λ（失去 E_c 的一致性）。<strong>二者不可兼得。</strong></p>
+<p><strong>论文侧现状（补丁前取证）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>判决要素</th>
+<th>论文里何处</th>
+<th>计数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「<strong>23.76</strong> 倍」（缺口数值）</td>
+<td><strong>无</strong></td>
+<td><strong>0 处</strong></td>
+</tr>
+<tr>
+<td>「<strong>二选一</strong>」（判决结构）</td>
+<td><strong>无</strong></td>
+<td><strong>0 处</strong></td>
+</tr>
+<tr>
+<td>「该放弃 / 放弃 <code>ρ_Λ</code> 识别」</td>
+<td>无</td>
+<td>——</td>
+</tr>
+<tr>
+<td>数值 <code>0.0290</code></td>
+<td>§8.6.5 第 73 轮宇宙学审计块（2 处）</td>
+<td>在，但<strong>与判决不连接</strong></td>
+</tr>
+<tr>
+<td><code>ρ_Λ ~ (E_c)⁴</code></td>
+<td>§8.4 <strong>标【推导】</strong></td>
+<td>判决<strong>未同步</strong>的落点</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>判决做出 25 天（跨 90+ 轮），论文从未收到它</strong> —— 与 C-51（判定降级未同步）、
+C-37（gap 只记在备忘录里）<strong>同族</strong>，但形态更极端：<strong>这次丢的是整个判决</strong>（不只是标注）。</p>
+<p><strong>本轮复算（两条路互验）</strong>：
+- 路线 1（直接）：<code>ρ_Λ = E_c⁴/(ℏc)³ = 2.2403×10⁻¹¹ J/m³</code> ⟹ <code>Ω_Λ = 0.02899</code>（OM 记 0.028991，差 0.0%）；
+- 路线 2（闭式）：<code>8π/3·(R_H/l_P)²·ε₀^{4/β} = 0.02899</code>（同量级 ✓）；
+- 缺口 <code>= 0.6889/0.02899 = 23.76 倍</code>；
+- <code>ρ_crit = 7.7282×10⁻¹⁰ J/m³</code> ⟺ <strong>H₀ = 67.66 km/s/Mpc</strong>（Planck 域自洽 ✓）。</p>
+<p><strong>二选一复算</strong>：选项 A（β=0.615、ε₀=7.7×10⁻²⁰）→ E_c = 1.018 meV ✓、Ω_Λ = 0.0290 ✗；
+选项 B（联立解 β=0.62887、ε₀=4.696×10⁻²⁰）→ Ω_Λ = 0.6888 ✓、E_c = 2.25 meV ✗（= 2.2×E_c）。
+<strong>不可兼得成立。</strong></p>
+<p><strong>拒绝数值占卜（部分）</strong>：缺口 23.7641 vs <code>4! = 24</code>（+0.99%）、<code>e^π = 23.14</code>（−2.62%）、
+<code>π⁴/4 = 24.35</code>（+2.47%）、<code>8π = 25.13</code>（+5.76%）—— <strong>凑得上的不少、有机制的没有</strong>。
+（另一条构造 <code>ρ_P/N</code> 与观测差 12.2 倍；两条路相差 289 倍，观测夹在中间 ⟹ <strong>都还差一个 O(10) 因子</strong>。）</p>
+<hr />
+<h2>三、⭐ #1 的判据：一维简并族（本轮新产出）</h2>
+<p>「η 能标 ~1 TeV」为什么不能算预言？CM-2 的说法是「E = 1 TeV 是选来配 η 的」。
+本轮把它<strong>形式化</strong>为一个可计算判据：</p>
+<blockquote>
+<p>给定<strong>任意</strong>能标 <code>E*</code>，都存在一对 <code>(ε₀*, β*)</code> 使两个锚点<strong>同时精确成立</strong>：
+<code>β*(E*) = ln(1/η)/ln(E*/1meV)</code>，<code>ε₀* = (1meV/M_Pl)^{β*}</code>。</p>
+</blockquote>
+<p>实测（η = 6.14×10⁻¹⁰）：</p>
+<table>
+<thead>
+<tr>
+<th>E*</th>
+<th>β*</th>
+<th>ε(1 meV)</th>
+<th>ε(E*) / η − 1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.246 TeV（电弱）</td>
+<td>0.6401</td>
+<td>1.000000000</td>
+<td>1.9×10⁻¹⁵</td>
+</tr>
+<tr>
+<td><strong>0.969 TeV</strong>（反解值）</td>
+<td><strong>0.6147</strong></td>
+<td>1.000000000</td>
+<td>8.9×10⁻¹⁶</td>
+</tr>
+<tr>
+<td>5 TeV</td>
+<td>0.5868</td>
+<td>1.000000000</td>
+<td>5.6×10⁻¹⁶</td>
+</tr>
+<tr>
+<td>100 TeV</td>
+<td>0.5419</td>
+<td>1.000000000</td>
+<td>2.0×10⁻¹⁵</td>
+</tr>
+</tbody>
+</table>
+<p>⟹ <strong>能标完全不被约束</strong>（一维简并）：0.246 → 100 TeV 任意值都行，β<em> 随之摆动 0.54–0.64。
+反解值 0.969 TeV 给 β</em> = 0.6147 ≈ 论文 0.615 ✓ —— 这不是吻合的证明，
+而恰恰说明 <strong>0.969 TeV 就是「让 ε = η 的那个能标」（定义式反解），不是预测</strong>。</p>
+<p><strong>机制判否</strong>：论文「电弱」仅 2 处（L61 模态阶梯、L738 前期望泄漏——<strong>均非重子能标机制</strong>）；
+「重子能标」<strong>0 处</strong> ⟹ 框架<strong>没有任何</strong>重子能标机制。CM-2 判据句在档：「<strong>框架没给出它</strong>」。
+⟹ 登记 <strong>N-40</strong>：把「η 能标 ~1 TeV」当作框架能导出的量 —— 不可行。</p>
+<hr />
+<h2>四、#4 / #6：双轨不一致（C-18 族的第 N 次）</h2>
+<ul>
+<li><strong>#4 η/s</strong>：判定早已完成（清单 <strong>H2 行 ✅</strong>「S-3 收口：两条判别预言都不独有」＋
+  「<code>η/s → 1/4π</code> = <strong>KSS 界（2001）</strong>」），但<strong>候选池条目仍以「待办」形态挂着</strong>。</li>
+<li><strong>#6 规范群结构</strong>：判定已经<strong>两级完成</strong> —— ① <strong>结构对应</strong>（n = 3,2,1 ↔ SU(3)×SU(2)×U(1)）
+  是<strong>表示论结构的解释</strong>（<strong>判别力 0</strong>：其他框架也能放这套结构）；② <strong>数值映射</strong>（<code>n_G → α_s/α_EM</code>）
+  已在第 77 轮<strong>判否</strong>（<strong>N-34</strong>：差 5.03 倍 ≈ 100σ、4 个换算因子全缺）。但池条目未结项，
+  且<strong>我自己在第 93/94 轮的回顾里把它漏了</strong>（只报「#1/#2/#4」）。</li>
+<li>⟹ 登记 <strong>C-55</strong>（候选池状态对账：两条池条目过期 ＋ 回顾漏项）。</li>
+</ul>
+<hr />
+<h2>五、诚实边界</h2>
+<ol>
+<li>本轮<strong>不重算</strong>任何源文档里的数值；CP-3 / CP-4 的复算是<strong>验证性</strong>的（复现 OM 表至 1–2%）。</li>
+<li>「保住 meV 量级」的表述来自 OM 判决本文；<strong>本轮未独立审查</strong>它对「量级」的定义（
+   OM 的两选项给 1.02 / 2.25 meV，都称「meV 量级」）。</li>
+<li><strong>一维简并族</strong>是新形式化，<strong>非定理</strong>：它证明的是「给定两个锚点，能标是自由参数」——
+   反过来说，<strong>如果</strong>框架未来能独立定出 β（或 ε₀），能标才会被约束。</li>
+<li>
+<h1>6 的「结构对应 = 解释性」判定与第 77 轮的判否<strong>不冲突</strong>：前者说结构放得下，</h1>
+   后者说<strong>放得下 ≠ 算得出</strong>（G-→α 的四个换算因子）。</li>
+<li>三份源头文档（2026-09-17 / 09-21）<strong>无轮次 ID</strong> —— 属 <strong>C-44</strong> 已登记的第 1–38 轮缺口族；
+   本轮<strong>不伪造</strong>轮次归属。</li>
+</ol>
+<hr />
+<h2>六、判决</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#1</td>
+<td><strong>结项</strong>：半拟合（能标是输入）＋「独立解释」判否（<strong>N-40</strong>）</td>
+</tr>
+<tr>
+<td>#2</td>
+<td><strong>结项</strong>：二选一判决 ⟹ 保住 meV 量级 / 放弃 <code>ρ_Λ = E_c⁴</code> 识别；论文补录（<strong>C-54</strong>）</td>
+</tr>
+<tr>
+<td>#4</td>
+<td><strong>结项</strong>：postdiction / 一致性（KSS 2001）</td>
+</tr>
+<tr>
+<td>#6</td>
+<td><strong>结项</strong>：结构 = 解释性；数值 = 判否（N-34）</td>
+</tr>
+<tr>
+<td>对账</td>
+<td>池条目结项 ＋ 回顾漏项更正（<strong>C-55</strong>）</td>
+</tr>
+<tr>
+<td><strong>清尾后剩余</strong></td>
+<td><strong>EMRI</strong>（等 LISA）＋ <strong>A1</strong>（换机资产）—— 与第 61/63 轮的天花板一致</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ <strong>教训一条（值得单列）</strong>：本轮是「<strong>判决做了、论文没收到</strong>」这一失败形态的<strong>首次完整登记</strong>——
+未来凡在备忘录里做出<strong>判决级</strong>结论（判否 / 放弃 / 二选一），必须<strong>当轮</strong>检查论文对应位置
+是否同步；否则判决会<strong>静默过期</strong>（本案：25 天）。</p>
+<hr />
+<h2>七、下一步</h2>
+<ol>
+<li><strong>候选池已清尾</strong>（剩 EMRI ＋ A1）⟹ 下一轮的选项集中为：
+   ① <strong>A1（Lean 资产恢复）</strong> —— 唯一有明确可判定入口；
+   ② <strong>EMRI 路线</strong>（三前提在框架外，可做的是「把 S-E1–E4 打包成给 LISA 组的材料」）；
+   ③ <strong>私审准备包</strong>（第 63 轮建议的「先私下找人核 §4.5b / §9 / §8.1」——C-54 刚刚给这份材料添了一页）。</li>
+<li>⚠️ <strong>流程级</strong>：本轮再次命中「回顾过度声明」（漏 #6）；<strong>每轮收尾的池表清点必须脚本化</strong>
+   （<code>grep</code> 未结项条目），不靠回忆。</li>
+</ol>
+
+<div class="footer">候选池清尾：四条形式结项 —— 与一条 25 天未进论文的判决 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 候选池清尾四条形式结项_与一条25天未进论文的判决.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>

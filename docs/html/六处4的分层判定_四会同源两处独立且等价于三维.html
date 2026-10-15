@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>「六处 4」的分层判定：四会同源 + 两处独立，而三组重合 ⟺ 空间三维</title>
+<style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --ink:#22303f; --sub:#60708a; --line:#e4e9f2;
+  --accent:#2f6fed; --accent-soft:#edf3ff; --gold:#b8860b; --gold-soft:#fdf7e6;
+  --green:#0a7d3c; --green-soft:#e9f8ef; --red:#c0392b; --red-soft:#fdecea;
+  --radius:14px; --shadow:0 1px 3px rgba(30,50,90,.06),0 4px 16px rgba(30,50,90,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.9;font-size:16px;padding:28px 18px}
+.wrap{max-width:1160px;margin:0 auto}
+
+/* ---------- 侧栏 TOC ---------- */
+.toc{position:sticky;top:26px;width:236px;flex-shrink:0;max-height:calc(100vh - 52px);
+  overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:13px;line-height:1.7}
+.toc-title{font-weight:700;font-size:13px;color:var(--sub);letter-spacing:1px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.toc a{color:var(--sub);text-decoration:none;display:block;padding:3px 8px;border-radius:7px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc .toc-h2 a{font-weight:600;color:var(--ink);margin-top:6px}
+.toc .toc-h3 a{padding-left:20px;font-size:12.5px}
+
+/* ---------- 主内容 ---------- */
+.main{flex:1;min-width:0}
+.hero{background:linear-gradient(135deg,#0e7c7c 0%,#2f6fed 55%,#6c3fb5 100%);
+  border-radius:18px;padding:42px 46px;color:#fff;margin-bottom:30px;box-shadow:0 8px 30px rgba(47,111,237,.25)}
+.hero .en{font-size:13.5px;opacity:.88;letter-spacing:.6px;margin-bottom:10px}
+.hero h1{font-size:30px;font-weight:700;line-height:1.45;margin-bottom:14px}
+.hero p{opacity:.94;font-size:14px;max-width:900px;line-height:1.8}
+.hero .tags{margin-top:18px}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:4px 15px;font-size:12.5px;margin:4px 8px 0 0;backdrop-filter:blur(4px)}
+
+h2{font-size:23px;margin:52px 0 18px;padding:14px 20px;background:var(--card);
+  border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;
+  box-shadow:var(--shadow);color:#17304f}
+h3{font-size:18px;margin:30px 0 12px;color:#1d3a5f;padding-left:14px;border-left:4px solid var(--gold)}
+h4{font-size:15.5px;margin:20px 0 8px;color:#33465f}
+
+p{margin:12px 0}
+strong{color:#0f2a47}
+ul,ol{margin:12px 0;padding-left:28px}
+li{margin:7px 0}
+
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);font-size:14.5px}
+th{background:linear-gradient(135deg,#2f6fed,#5a8df0);color:#fff;padding:11px 15px;font-weight:600;
+  text-align:left;letter-spacing:.3px}
+td{padding:10px 15px;border-top:1px solid var(--line);vertical-align:top}
+tbody tr:nth-child(even) td{background:#f8fafd}
+tbody tr:hover td{background:var(--accent-soft)}
+
+/* 引用 / 标注块 */
+blockquote{background:var(--accent-soft);border-left:5px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:13px 20px;margin:16px 0;color:#3a4f6e;font-size:15px}
+blockquote strong{color:var(--accent)}
+
+/* ---------- 数学公式（静态 HTML 排版） ---------- */
+.formula{background:#f8fafd;border:1px solid var(--line);border-radius:10px;
+  padding:20px 24px;margin:20px 0;text-align:center;overflow-x:auto;
+  font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  font-size:18.5px;letter-spacing:.4px;color:#14263f;line-height:2.1}
+.math{font-family:Georgia,"Times New Roman","STIX Two Math","Cambria Math",serif;
+  color:#17304f;white-space:nowrap;font-size:.95em}
+/* 分式 */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;
+  text-align:center;margin:0 3px;line-height:1.3}
+.frac .num{padding:0 5px;border-bottom:1.2px solid currentColor;font-size:.86em}
+.frac .den{padding:0 5px;font-size:.86em}
+/* 根号 */
+.sqrt{white-space:nowrap}
+.radicand{border-top:1.2px solid currentColor;padding:0 3px;font-size:.94em}
+/* 上下标 */
+sup,sub{line-height:0;font-size:.72em;color:#1d3a5f}
+/* 函数/正体/花体 */
+.fn{font-style:normal;font-variant:small-caps}
+.rm{font-style:normal}
+.txt{font-style:normal}
+.cal{font-family:"Segoe Script","Lucida Calligraphy","STXingkai","Comic Sans MS",cursive;font-size:1.08em}
+.bf{font-weight:700}
+.bb{font-family:"Cambria Math","STIX Two Math",serif;font-weight:700}
+.frak{font-family:"Old English Text MT","UnifrakturMaguntia",serif}
+.acc{white-space:nowrap}
+
+/* 代码 */
+code{background:#eef1f7;border-radius:5px;padding:1.5px 7px;font-size:.9em;
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace}
+pre{background:#1f2937;color:#e5e7eb;border-radius:12px;padding:18px 22px;overflow:auto;
+  margin:18px 0;font-size:13.5px;line-height:1.7}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
+
+.footer{text-align:center;color:var(--sub);font-size:13px;margin:44px 0 10px;padding-top:20px;
+  border-top:1px solid var(--line)}
+
+@media(max-width:960px){
+  .toc{display:none}
+  .wrap{display:block}
+  .hero{padding:30px 26px}
+  .hero h1{font-size:23px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="en">一、SF-1 六处「4」的出处，逐一追溯</div>
+  <h1>「六处 4」的分层判定：四会同源 + 两处独立，而三组重合 ⟺ 空间三维</h1>
+  <p>MAPS 统一框架 · 备忘录快照 · 2026-10-04 · 启发式统一框架（非已确立物理）</p>
+  <div class="tags">
+    <span class="tag">推演专题</span>
+    <span class="tag">离线静态排版（无 JS / CDN 依赖）</span>
+  </div>
+</div>
+
+<blockquote>
+<p>日期：2026-09-19 ｜ 脚本：<code>outputs/_six_fours.py</code>（SF-1…SF-6，<strong>8 项检查、失败 0</strong>）
+<strong>一句话结论</strong>：
+§4.10 的「六处 4 同源」应改为<strong>分层结论</strong>——其中 <strong>4 处</strong>（4l_P² 相干截面 / 每 4 面元 1 比特 / 挂谷 1/4 / 正四面体 4 方向）<strong>确实同源</strong>，全部锚在 <strong>k = 4 = LST/Borsuk</strong>；
+另 <strong>2 处</strong>（表面 4 邻居 / Clifford 4 分量）是<strong>独立机制</strong>，它们的 4 是 <strong>d = 3 的后果</strong>。
+而三组机制的取值全部相等 <strong>⟺ d = 3</strong>，且 <strong>(n, d) = (4, 3) 是唯一解</strong>。
+⚠️ 顺带登记一条新张力：§4.9 引理 1 的「平面内 4 + 平面外 2」与 §4.10 的「k = 4」在<strong>体配位数</strong>上口径不同，第 27 轮的「金刚石」依赖的正是这一步。</p>
+</blockquote>
+<hr />
+<h2>一、SF-1 六处「4」的出处，逐一追溯</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>处</th>
+<th>论文明标</th>
+<th>追溯到的机制</th>
+<th>分类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>①</td>
+<td>表面诸元 4 邻居</td>
+<td>观测者几何，本框架<strong>推论</strong></td>
+<td>§4.9 引理 1【<strong>设定</strong>】「平面内 4 方向」= (d−1) 维表面网格的配位 <strong>2(d−1)</strong></td>
+<td><strong>独立</strong></td>
+</tr>
+<tr>
+<td>②</td>
+<td>Clifford 4 分量</td>
+<td>内空间，本框架<strong>设定</strong></td>
+<td>论证 4：Cl(1,3) 的表示维数 <strong>2^⌊D/2⌋</strong>（D = 时空维数）</td>
+<td><strong>独立</strong></td>
+</tr>
+<tr>
+<td>③</td>
+<td>通量管相干截面 4l_P²</td>
+<td>k 模型</td>
+<td>Nyquist：模式数 = k ⟹ 需 ≥ k 个采样点</td>
+<td><strong>同源（LST）</strong></td>
+</tr>
+<tr>
+<td>④</td>
+<td>每 4 面元 1 比特</td>
+<td>本框架<strong>设定</strong></td>
+<td>同 ③（= 1/(4l_P²) 的倒数）</td>
+<td><strong>同源（LST）</strong></td>
+</tr>
+<tr>
+<td>⑤</td>
+<td>挂谷 packing 1/4</td>
+<td>本框架<strong>推论</strong></td>
+<td>§4.10 命题 5：链条 <code>定理1(k≥4) → 定理2 → 定理3 → 论证4 → Nyquist</code> 的终值</td>
+<td><strong>同源（LST）</strong></td>
+</tr>
+<tr>
+<td>⑥</td>
+<td>正四面体 4-方向簇</td>
+<td>Tammes n=4</td>
+<td>§4.10 定理 1+2 = <strong>LST/Borsuk</strong></td>
+<td><strong>同源（LST）</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 「六处同源」至多能说成「四会同源 + 两处独立」。</strong></p>
+<p>注意一个有意思的偏差：论文给 ① 标的是「<strong>推论</strong>」（不是设定），但追溯下来它的直接依据 §4.9 引理 1 是【设定】；而 ④ 标的是【设定】却完全可以由 ③ 推出。<strong>标注与实际出处有错位。</strong></p>
+<hr />
+<h2>二、SF-2 扰动试验：改变空间维数 d，看三组机制各自怎么变</h2>
+<p>这是本轮的判据。把「空间维数 d」当自变量：</p>
+<ul>
+<li><strong>① 表面邻居数</strong> = 2(d−1)（(d−1) 维超立方格的配位）</li>
+<li><strong>② Clifford 分量数</strong> = 2^⌊(d+1)/2⌋（时空维数 D = d+1，Cl(1, d) 的不可约表示维数）</li>
+<li><strong>③④⑤⑥ 方向数 k</strong> = d+1（LST：S^{d−1} 需 (d−1)+2 个集覆盖，亦即 Borsuk 数）</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>空间维 d</th>
+<th>① 表面邻居</th>
+<th>② Clifford</th>
+<th>③④⑤⑥ k</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><strong>4</strong></td>
+<td><strong>4</strong></td>
+<td><strong>4</strong> ← 三者重合</td>
+</tr>
+<tr>
+<td>4</td>
+<td>6</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td>5</td>
+<td>8</td>
+<td>8</td>
+<td>6</td>
+</tr>
+<tr>
+<td>6</td>
+<td>10</td>
+<td>8</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 只有 d = 3 让三组同时等于 4。</strong> 而且这不是"某两处碰巧相等"——是<strong>三个完全不同的函数</strong>在 d = 3 处同取 4。</p>
+<hr />
+<h2>三、SF-3 唯一性：(n, d) = (4, 3) 是唯一解</h2>
+<p>设三组共同值为 n：</p>
+<pre><code>2(d − 1) = n        （①）
+d + 1    = n        （⑥）
+</code></pre>
+<p>相减 ⟹ <code>d = 3</code> ⟹ <code>n = 4</code>；回代 ②：<code>2^⌊(3+1)/2⌋ = 2² = 4 = n</code> ✓（<strong>自动满足，不是额外约束</strong>）</p>
+<p>暴力枚举 2 ≤ d &lt; 200：<strong>解的个数 = 1</strong>。</p>
+<p><strong>⟹ 「表面网格配位数」「内空间表示维数」「方向覆盖数」三者一致 ⟺ d = 3，且唯一。</strong>
+<strong>也就是说：§4.10 那几处「4」的相等，底层等价于「空间是三维的」。</strong></p>
+<p>⚠️ <strong>但这是自洽性，不是推导</strong>——不能反过来用它"推出"三维（d = 3 在框架里是【设定】）。它只说明：<strong>框架现有的几处「4」与"三维"是相容且唯一的</strong>，若将来要从框架内部选维度，这是一个天然的自洽条件。<strong>记录为候选，不作主张。</strong></p>
+<hr />
+<h2>四、SF-4 Cl(1, D−1) 表示维数公式的独立核对</h2>
+<table>
+<thead>
+<tr>
+<th>时空维 D</th>
+<th>物理</th>
+<th>旋量分量数 = 2^⌊D/2⌋</th>
+<th>已知值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td>2+1 维</td>
+<td>2</td>
+<td>2 ✓</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><strong>3+1 维</strong></td>
+<td><strong>4</strong></td>
+<td><strong>4 ✓</strong></td>
+</tr>
+<tr>
+<td>5</td>
+<td>4+1 维</td>
+<td>4</td>
+<td>4 ✓</td>
+</tr>
+<tr>
+<td>6</td>
+<td>5+1 维</td>
+<td>8</td>
+<td>8 ✓</td>
+</tr>
+</tbody>
+</table>
+<p><strong>⟹ 公式正确。Cl(1,3) 那个 4 来自时空维数 4 —— 与 LST 的 4 是两回事。</strong></p>
+<hr />
+<h2>五、SF-5 分层结论（替代「六处同源」）</h2>
+<table>
+<thead>
+<tr>
+<th>组</th>
+<th>处</th>
+<th>底层机制</th>
+<th>d = 2 / 3 / 4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LST 组（4 处）</strong></td>
+<td>③ 4l_P²、④ 每 4 面元 1 比特、⑤ 挂谷 1/4、⑥ 正四面体 4 方向</td>
+<td>S² 覆盖 ⟹ k = d+1</td>
+<td>3 / <strong>4</strong> / 5</td>
+</tr>
+<tr>
+<td><strong>独立组 1（1 处）</strong></td>
+<td>① 表面 4 邻居</td>
+<td>(d−1) 维表面网格配位 2(d−1)</td>
+<td>2 / <strong>4</strong> / 6</td>
+</tr>
+<tr>
+<td><strong>独立组 2（1 处）</strong></td>
+<td>② Clifford 4 分量</td>
+<td>Cl(1,d) 表示维数 2^⌊(d+1)/2⌋</td>
+<td>2 / <strong>4</strong> / 4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>正确的读法</strong>：
+- 其中 <strong>4 处确实同源</strong>，都锚在 <strong>k = 4</strong>（§4.10 定理 1 = <strong>LST/Borsuk</strong>）——<strong>这是真实的、且现在是经典定理背书的</strong>；
+- 另 <strong>2 处是独立机制</strong>，它们的 4 是 <strong>d = 3 的后果</strong>；
+- 而"三组在 d = 3 处重合"这件事，<strong>底层等价于"空间三维"</strong>（框架里的【设定】）。</p>
+<hr />
+<h2>六、SF-6 ⚠️ 顺带发现的新张力（T-6）：体配位数到底是 4 还是 6？</h2>
+<ul>
+<li><strong>§4.10 定理 1+2</strong>：方向簇 <strong>k = 4</strong>（S² 上需要 4 个方向锥）。</li>
+<li><strong>§4.9 引理 1</strong>【设定】：「可访问信息 = <strong>平面内 4 方向</strong>连接（<strong>平面外 2 方向被卷曲</strong>）」
+  ⟹ 这里出现 <strong>6 个方向</strong>（平面内 2 轴 × 2 + 平面外 1 轴 × 2 = 6），<strong>正是简单立方格的 6 邻居</strong>；而"平面外 2 方向被卷曲"解释的是"为何只有 4 个可访问"。</li>
+</ul>
+<p><strong>两处对"方向数"的口径不同</strong>：一个是 S² 上的方向锥数（4），一个是格点邻居方向数（4 可访问 / 6 总共）。</p>
+<p><strong>这直接影响第 27 轮的结论</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>读法</th>
+<th>格点几何</th>
+<th>配位数</th>
+<th>4 从哪来</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A：每个 S² 方向 = 一条格点键</td>
+<td><strong>金刚石</strong></td>
+<td>4</td>
+<td>方向簇 k = 4</td>
+</tr>
+<tr>
+<td>B：格点本就有 6 邻居、2 个被卷曲</td>
+<td><strong>简单立方</strong></td>
+<td>6</td>
+<td>"可访问方向数" = 4</td>
+</tr>
+</tbody>
+</table>
+<p><strong>两种读法都给"4 个可访问方向"，但格点几何不同。</strong> 第 27 轮选金刚石，依据的正是"配位数 = 方向数"这一步 —— <strong>该步未被独立论证</strong>，现已登记为待裁决（<strong>T-6</strong>）。</p>
+<p>（补充：第 26 轮的 tick 实现在<strong>简单立方</strong>上跑通了（沿 3 个轴 odd–even 配对 + 每线独立相位），所以读法 B 在动力学上并非不可行；而金刚石的"4 个键方向各是一完美匹配"更优雅。<strong>两者都满足"每格点每 tick 一次事件"</strong>。）</p>
+<hr />
+<h2>七、诚实边界</h2>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>六处的出处追溯</td>
+<td>【判定】，基于论文原文逐条核对；① 的标的（"推论"）与其实据（§4.9 引理 1 是【设定】）<strong>有错位</strong></td>
+</tr>
+<tr>
+<td>扰动试验的四个公式</td>
+<td>① 2(d−1)、③④⑤⑥ d+1（LST/Borsuk）为<strong>定理</strong>；② 2^⌊D/2⌋ 为<strong>标准结论</strong>（已独立核对 D = 3,4,5,6）</td>
+</tr>
+<tr>
+<td>「(n,d) = (4,3) 唯一」</td>
+<td>【推导 + 枚举】，在 2 ≤ d &lt; 200 内唯一</td>
+</tr>
+<tr>
+<td>「三组重合 ⟺ d = 3」</td>
+<td>【推导】，但<strong>只说明自洽，不能反推三维</strong>（d = 3 是设定）</td>
+</tr>
+<tr>
+<td>「③④⑤⑥ 同源」</td>
+<td>【判定】：④ 由 ③ 直接给出；⑤ 是命题 5 链条的终值、起点为定理 1；⑥ 就是定理本身 ✓</td>
+</tr>
+<tr>
+<td><strong>T-6（体配位数 4 vs 6）</strong></td>
+<td><strong>未裁决</strong>；两种读法都满足"4 个可访问方向"，第 27 轮的"配位数 = 方向数"这一步<strong>未被独立论证</strong></td>
+</tr>
+<tr>
+<td>「Clifford 4 = 独立来源」</td>
+<td>【判定】：其 4 来自时空维数（Cl(1,3) 表示维数），与 S² 覆盖无关；但论文论证 4 又用它来"论证恰好 4"，<strong>存在轻微的循环嫌疑</strong>（用维数 4 论证方向数 4，而方向数又用于别处）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>八、判决与下一步</h2>
+<p><strong>判决</strong></p>
+<ul>
+<li>✅ <strong>「六处 4 同源」改为分层</strong>：<strong>四会同源（锚在 k = 4 = LST/Borsuk）+ 两处独立</strong>（表面网格配位 / Clifford 表示维数）。</li>
+<li>✅ <strong>一个干净的等价</strong>：三组机制的值全部相等 <strong>⟺ d = 3</strong>，且 <strong>(n, d) = (4, 3) 唯一</strong>。
+  ⟹ 那几处「4」的相等，<strong>底层等价于「空间三维」</strong>（框架里的设定）。<strong>记为自洽性条件，不作主张。</strong></li>
+<li>✅ <strong>标注错位已记录</strong>：① 标"推论"但实据是【设定】；④ 标【设定】但可由 ③ 推出。</li>
+<li>⚠️ <strong>新张力 T-6</strong>：§4.9 引理 1（平面内 4 + 平面外 2 = <strong>6 方向</strong>）与 §4.10 定理（<strong>k = 4</strong>）在体配位数上口径不同；第 27 轮的"金刚石"依赖"配位数 = 方向数"这一步，<strong>该步未论证</strong>。</li>
+<li>⚠️ <strong>轻微循环嫌疑（②处）</strong>：论证 4 用 Cl(1,3) 的维数 4 去论证"方向数恰好 4"，而方向数 4 又用于 4l_P² 等——<strong>用维度论证方向数、再用方向数解释别处</strong>，需要拆开。</li>
+</ul>
+<p><strong>下一步（按价值排序）</strong></p>
+<ol>
+<li><strong>裁决 T-6</strong>：体配位数是 4 还是 6？入口是 §4.9 引理 1 的「平面外 2 方向被卷曲」到底指什么 —— 是"格点没有这两条边"，还是"有边但不可用于信息传递"。<strong>这一条定了，第 27 轮的格点几何才算真定案。</strong></li>
+<li><strong>拆解 ② 的循环嫌疑</strong>：把「Cl(1,3) 维数 = 4」与「S² 覆盖 = 4」在论文里明确分开，并说明两者是"两个独立的 4 在 d = 3 处重合"，而不是互为论据。</li>
+<li><strong>修标注错位</strong>：① 的"推论"改为"设定 ⟹ 推论"（或补上推论链），④ 的"设定"改为"由 ③ 推出"。</li>
+</ol>
+
+<div class="footer">「六处 4」的分层判定：四会同源 + 两处独立，而三组重合 ⟺ 空间三维 · 2026-10-04 · 由 _md2html_generic.py 生成 · 源文件 六处4的分层判定_四会同源两处独立且等价于三维.md</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toc = document.getElementById('toc-list');
+  if(!toc) return;
+  var hs = document.querySelectorAll('.main h2, .main h3');
+  hs.forEach(function(h){
+    if(!h.id){ h.id = 'sec-' + Math.random().toString(36).slice(2,8); }
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent.replace(/^\s*\d+[.．]?\s*/, '').trim();
+    var box = document.createElement('div');
+    box.className = h.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
+    box.appendChild(a);
+    toc.appendChild(box);
+  });
+  var links = toc.querySelectorAll('a');
+  window.addEventListener('scroll', function(){
+    var pos = window.scrollY + 120;
+    var cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= pos) cur = h.id; });
+    links.forEach(function(l){
+      l.style.color = (l.getAttribute('href') === '#'+cur) ? 'var(--accent)' : '';
+      l.style.background = (l.getAttribute('href') === '#'+cur) ? 'var(--accent-soft)' : '';
+    });
+  });
+});
+</script>
+
+</body>
+</html>
