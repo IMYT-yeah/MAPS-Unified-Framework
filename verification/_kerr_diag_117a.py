@@ -4,7 +4,7 @@ exact ΔlnL(Δδ) = ½⟨Δh|Δh⟩ = 2∫(Δh)²/S_n dt（直接内积）
 vs ρ²(1−M)（M = |2∫w e^{i2Δδω}|/ρ²）
 """
 import io, os, numpy as np
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 src = io.open(os.path.join(BASE, 'outputs', '_emri_waveform.py'), encoding='utf-8').read()
 ns = {}
 exec(src[:src.index('print("="*78)')], ns)

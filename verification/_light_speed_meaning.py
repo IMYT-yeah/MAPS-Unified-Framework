@@ -5,7 +5,7 @@ LS 系列 —— 光速在框架中的意义改写：微观恒 c、宏观 = 落�
                 影响只能靠湮灭-再生的手递手传递，故一步 = l_P、一拍 = t_P ⟹ c = l_P/t_P；
                 要跨越距离直接作用于远端，除非中间**连续无穷多个状态都是绝对真空**。
 只用标准库 math。运行：
-  C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe outputs/_light_speed_meaning.py
+  [TOOLCHAIN]/binaries/python/versions/3.13.12/python.exe outputs/_light_speed_meaning.py
 """
 import math as m
 

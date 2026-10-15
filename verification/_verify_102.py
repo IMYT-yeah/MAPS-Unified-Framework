@@ -4,11 +4,11 @@ import io
 import os
 import numpy as np
 
-ROOT = r"C:/Users/Administrator/Desktop/2026-08-20-21-43-34"
+ROOT = r"[WORKSPACE]"
 ZH = os.path.join(ROOT, "outputs/论文初稿_正反物质对风暴统一框架_v2.9.md")
 EN = os.path.join(ROOT, "outputs/Paper_MatterAntimatterPairStorm_v2.9_EN.md")
-LIST = os.path.join(ROOT, "outputs/工程期望清单.md")
-HAND = os.path.join(ROOT, "环境交接说明.md")
+LIST = os.path.join(ROOT, "outputs/项目台账.md")
+HAND = os.path.join(ROOT, "环境说明.md")
 MEM = os.path.join(ROOT, ".workbuddy/memory/MEMORY.md")
 MEMO = os.path.join(ROOT, "outputs/甲3结项_toric_code相变点_判据不能判别与h_c=K-J缺机制.md")
 OUT = os.path.join(ROOT, "outputs")

@@ -22,7 +22,7 @@
 | ② **git 历史** | `git log --all` | **0 commit**（仓库从未提交 ⟹ 无历史可回滚） |
 | ③ **remote** | `git remote -v` | **无远端** |
 | ④ **全盘** | Desktop / Documents / Downloads 扫 `formula.py`/`maps_framework.py`/`run.sh`/`maps.py` | **3 命中，全部是本轮刚重建的文件**（即"命中"是本轮自身产物） |
-| ⑤ **旧机** | `D:/Users/IMYT.YT/WorkBuddy/_MAPS_explore` | **D 盘不存在** |
+| ⑤ **早期环境** | `[OLD_WORKSPACE]/_MAPS_explore` | **早期环境不存在** |
 
 ⚠️ **本轮踩到的判据坑（值得单列）**：第 ① 路第一版报 **1 命中** —— 命中的是
 `outputs/_repo_assemble.py`（仓库组装器），它含 `lam_c = 1.3e26`，但那是它 `patch_maps()` 的**替换文本**。

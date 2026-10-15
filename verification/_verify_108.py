@@ -4,13 +4,13 @@ import io
 import os
 import re
 
-ROOT = r"C:\Users\Administrator\Desktop\2026-08-20-21-43-34"
+ROOT = r"[WORKSPACE]"
 MD = os.path.join(ROOT, ".workbuddy", "memory")
 OUTD = os.path.join(ROOT, "outputs")
 MEMO_P = os.path.join(OUTD, "待选清单完成度核查_8-20至9-19.md")
 MEMO = io.open(MEMO_P, encoding="utf-8").read()
-HAND = io.open(os.path.join(ROOT, "环境交接说明.md"), encoding="utf-8", errors="replace").read()
-LIST = io.open(os.path.join(OUTD, "工程期望清单.md"), encoding="utf-8", errors="replace").read()
+HAND = io.open(os.path.join(ROOT, "环境说明.md"), encoding="utf-8", errors="replace").read()
+LIST = io.open(os.path.join(OUTD, "项目台账.md"), encoding="utf-8", errors="replace").read()
 
 FAIL = []
 N = [0]

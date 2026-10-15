@@ -6,10 +6,10 @@ ZH = "论文初稿_正反物质对风暴统一框架_v2.9.md"
 PZH = "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-02第95轮前.md"
 EN = "Paper_MatterAntimatterPairStorm_v2.9_EN.md"
 PEN = "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-02第95轮前.md"
-LI = "工程期望清单.md"
-PLI = "工程期望清单_备份_2026-10-02第95轮前.md"
-HH = "../环境交接说明.md"
-PHH = "../环境交接说明_备份_2026-10-02第95轮前.md"
+LI = "项目台账.md"
+PLI = "项目台账_备份_2026-10-02第95轮前.md"
+HH = "../环境说明.md"
+PHH = "../环境说明_备份_2026-10-02第95轮前.md"
 
 ok = 0; bad = 0
 def chk(tag, cond, msg):

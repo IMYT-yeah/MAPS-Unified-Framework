@@ -2,7 +2,7 @@
 
 > ✅ **2026-10-03（第 98 轮「A2 资产恢复」）已重建**：4 个文件 —— `formula.py`、`maps_framework.py`、
 > `verify.py`、`run.sh`。实测 **`maps_framework.py` 11 项 0 失败 ＋ `verify.py` 13 项 0 失败**。
-> ⚠️ **原文件 2026-09-16 随旧机丢失**（源目录 `D:/Users/IMYT.YT/WorkBuddy/_MAPS_explore` 亦不存在）；
+> ⚠️ **原文件 2026-09-16 随早期环境丢失**（源目录 `[OLD_WORKSPACE]/_MAPS_explore` 亦不存在）；
 > 本文件保留了**丢失时留下的原恢复规格**（下方「§0 原恢复规格（历史留痕）」），不作删改。
 
 ## §1 恢复状态（第 98 轮 · 分级标注，引用时须区分）
@@ -70,7 +70,7 @@ python python/maps/verify.py                 # 独立符号/数值自检（13 �
 
 > ⚠️ **本包源文件已丢失（2026-09-16）**，当时内容为**恢复规格**。
 > 原文件：`formula.py`、`maps_framework.py`、`verify.py`、`run.sh`
-> （源目录 `D:/Users/IMYT.YT/WorkBuddy/_MAPS_explore` 亦不存在）。
+> （源目录 `[OLD_WORKSPACE]/_MAPS_explore` 亦不存在）。
 
 | 锚点 | 内容 | 判据 |
 |---|---|---|

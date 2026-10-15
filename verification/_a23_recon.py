@@ -2,7 +2,7 @@
 """A23 侦查：盘点论文中 ℏ 的全部出现形态（按上下文片段聚类）"""
 import io, re, collections, os
 
-BASE = r"C:\Users\Administrator\Desktop\2026-08-20-21-43-34"
+BASE = r"[WORKSPACE]"
 Z = io.open(os.path.join(BASE, "outputs", "论文初稿_正反物质对风暴统一框架_v2.9.md"),
             encoding="utf-8").read().split("\n")
 E = io.open(os.path.join(BASE, "outputs", "Paper_MatterAntimatterPairStorm_v2.9_EN.md"),

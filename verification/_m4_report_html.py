@@ -2,7 +2,7 @@
 """M4补强报告.md → HTML（清爽样式）"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "M4补强报告.md"
 OUT = BASE / "M4补强报告.html"
 

@@ -5,7 +5,7 @@
 """
 import io, os, re
 
-B = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+B = r'[WORKSPACE]'
 SRC = os.path.join(B, 'outputs', '论文初稿_正反物质对风暴统一框架_v2.9.md')
 OUT_MAIN = os.path.join(B, 'outputs', '论文_正式稿_v3.0.md')
 OUT_APX = os.path.join(B, 'outputs', '论文_技术附录_轮次记录.md')

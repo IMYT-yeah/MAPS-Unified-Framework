@@ -252,7 +252,7 @@ ax[1].set_ylabel(r"single-event leakage  $\epsilon_A(E)$", fontsize=11)
 ax[1].set_title(r"(b) $\epsilon_A(E)=\epsilon_0(M_{Pl}/E)^{0.615}$ : same loss", fontsize=11)
 ax[1].legend(fontsize=9); ax[1].grid(alpha=.25, which="both")
 fig.tight_layout()
-fig.savefig(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs/C1_gamma_p.png",
+fig.savefig(r"[OLD_WORKSPACE]/outputs/C1_gamma_p.png",
             dpi=150)
 print("\nfigure saved -> outputs/C1_gamma_p.png")
 print("\nALL C1 NUMERIC CHECKS DONE")

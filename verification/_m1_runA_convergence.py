@@ -8,7 +8,7 @@ HA 系列 —— A 段（确定性硬球）到底是不是"没收敛"？
      ⟹ 得到每个 N 下"不可避免"的偏差下限（无需跑 MD，秒出）。
   ② MD 加长 / 加大 N：看实测偏差是否向基线收敛。
 （maxwell_pdf 与 hard_disk_md 为 _m1_boltzmann.py 的忠实拷贝，保证指标口径一致。）
-需要 numpy：C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe outputs/_m1_runA_convergence.py
+需要 numpy：[TOOLCHAIN]/binaries/python/envs/default/Scripts/python.exe outputs/_m1_runA_convergence.py
 """
 import math as m
 import sys

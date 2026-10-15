@@ -2,7 +2,7 @@
 """
 PA 系列 —— 论文 §8 收口：核对要写进论文的每个数
 只用标准库 math。运行：
-  C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe outputs/_paper_sec8_check.py
+  [TOOLCHAIN]/binaries/python/versions/3.13.12/python.exe outputs/_paper_sec8_check.py
 """
 import math as m
 import os

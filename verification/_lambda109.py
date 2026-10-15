@@ -7,14 +7,14 @@ import io
 import os
 import re
 
-ROOT = r"C:\Users\Administrator\Desktop\2026-08-20-21-43-34"
+ROOT = r"[WORKSPACE]"
 OUT = os.path.join(ROOT, "outputs")
 ZH = os.path.join(OUT, "论文初稿_正反物质对风暴统一框架_v2.9.md")
 EN = os.path.join(OUT, "Paper_MatterAntimatterPairStorm_v2.9_EN.md")
 ZH_PRE = os.path.join(OUT, "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-04第109轮前.md")
 EN_PRE = os.path.join(OUT, "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-04第109轮前.md")
-LIST = os.path.join(OUT, "工程期望清单.md")
-HAND = os.path.join(ROOT, "环境交接说明.md")
+LIST = os.path.join(OUT, "项目台账.md")
+HAND = os.path.join(ROOT, "环境说明.md")
 
 FAIL = []
 N = [0]

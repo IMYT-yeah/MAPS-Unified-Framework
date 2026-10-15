@@ -15,7 +15,7 @@ import io, os, re, glob, collections
 MEMOS = sorted(p for p in glob.glob("*.md")
                if "_备份_" not in p
                and not p.startswith("论文初稿") and not p.startswith("Paper_")
-               and p != "工程期望清单.md"
+               and p != "项目台账.md"
                and "本轮推演总结" not in p and "交接说明" not in p
                and "未完成研究工作流" not in p and not p.startswith("_"))
 
@@ -106,7 +106,7 @@ chk("RC-5", True, "已列出（判定在人工读表后）")
 
 # ---------------------------------------------------------------- RC-6 修正 RC-3
 hdr("RC-6  ⭐ 清单 C-编号全集 vs 声明总数（修正第 88 轮 RC-3 的判据）")
-LI_T = io.open("工程期望清单.md", encoding="utf-8").read()
+LI_T = io.open("项目台账.md", encoding="utf-8").read()
 codes = sorted({int(m) for m in re.findall(r"C-(\d+)", LI_T)})
 declared = re.search(r"\*\*撤回 / 更正\*\* \| \*\*(\d+) 条\*\*", LI_T)
 print("  清单里出现的 C-编号：{} 个（最小 {}，最大 {}）".format(len(codes), min(codes), max(codes)))

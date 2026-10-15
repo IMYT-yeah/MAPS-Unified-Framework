@@ -82,8 +82,8 @@ chk("LA-6c", fam_rows == 16, "两张族表各 8 行（实测合计 {}）".format
 chk("LA-6d", "ghfast" in RM and "MB/s" in RM and "850.7MB" in RM, "下载通道实测记录（ghfast / 850.7MB / MB/s 速度）")
 
 print()
-print("LA-7  RECOVERY.md 更新 + 四份报告补充登记")
-RC = R(os.path.join(REPO, "RECOVERY.md"))
+print("LA-7  资产说明 更新 + 四份报告补充登记")
+RC = R(os.path.join(REPO, "资产说明"))
 chk("LA-7a", RC.count("已重建") >= 2, "Lean 两条资产已标「已重建」（{} 处）".format(RC.count("已重建")))
 for rep in ["黑洞宇宙条件_从巧合到必然", "路线A_50比50到平坦性_解剖报告", "攻λ_全息热力学与临界密度", "做功项修正_λ的命运"]:
     chk("LA-7b", rep in RC, "补充登记：{}".format(rep))

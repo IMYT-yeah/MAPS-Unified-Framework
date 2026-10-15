@@ -102,13 +102,13 @@ print('')
 print('=' * 88)
 print('LIT：补丁落地（两段式）')
 print('=' * 88)
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 P = dict(
     ZH=os.path.join(BASE, 'outputs', '论文初稿_正反物质对风暴统一框架_v2.9.md'),
     EN=os.path.join(BASE, 'outputs', 'Paper_MatterAntimatterPairStorm_v2.9_EN.md'),
     MAT=os.path.join(BASE, 'outputs', 'EMRI材料包_给LISA组的S-E1-E4.md'),
-    LIST=os.path.join(BASE, 'outputs', '工程期望清单.md'),
-    HO=os.path.join(BASE, '环境交接说明.md'),
+    LIST=os.path.join(BASE, 'outputs', '项目台账.md'),
+    HO=os.path.join(BASE, '环境说明.md'),
     MEMO=os.path.join(BASE, 'outputs', '文献锚定升级_指数度规2025-26与EMRI波形2026.md'),
 )
 B = dict(
@@ -117,8 +117,8 @@ B = dict(
     EN=os.path.join(BASE, 'MAPS-Unified-Framework', 'paper', 'history',
                     'Paper_v2.9_EN_备份_2026-10-04第119轮前.md'),
     MAT=os.path.join(BASE, 'outputs', 'EMRI材料包_给LISA组的S-E1-E4_备份_2026-10-04第119轮前.md'),
-    LIST=os.path.join(BASE, 'outputs', '工程期望清单_备份_2026-10-04第119轮前.md'),
-    HO=os.path.join(BASE, '环境交接说明_备份_2026-10-04第119轮前.md'),
+    LIST=os.path.join(BASE, 'outputs', '项目台账_备份_2026-10-04第119轮前.md'),
+    HO=os.path.join(BASE, '环境说明_备份_2026-10-04第119轮前.md'),
 )
 rd = lambda p: io.open(p, encoding='utf-8').read() if os.path.exists(p) else ''
 cur = {k: rd(v) for k, v in P.items()}

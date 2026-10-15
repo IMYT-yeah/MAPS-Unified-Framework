@@ -4,16 +4,16 @@ import io
 import os
 import re
 
-BASE = r"C:\Users\Administrator\Desktop\2026-08-20-21-43-34"
+BASE = r"[WORKSPACE]"
 OUT = os.path.join(BASE, "outputs")
 ZH = os.path.join(OUT, "论文初稿_正反物质对风暴统一框架_v2.9.md")
 EN = os.path.join(OUT, "Paper_MatterAntimatterPairStorm_v2.9_EN.md")
 ZH_PRE = os.path.join(OUT, "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-04第109轮前.md")
 EN_PRE = os.path.join(OUT, "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-04第109轮前.md")
-LIST = os.path.join(OUT, "工程期望清单.md")
-LIST_PRE = os.path.join(OUT, "工程期望清单_备份_2026-10-04第109轮前.md")
-HAND = os.path.join(BASE, "环境交接说明.md")
-HAND_PRE = os.path.join(BASE, "环境交接说明_备份_2026-10-04第109轮前.md")
+LIST = os.path.join(OUT, "项目台账.md")
+LIST_PRE = os.path.join(OUT, "项目台账_备份_2026-10-04第109轮前.md")
+HAND = os.path.join(BASE, "环境说明.md")
+HAND_PRE = os.path.join(BASE, "环境说明_备份_2026-10-04第109轮前.md")
 MEMO = os.path.join(OUT, "λ统一收尾_四义清点与同轮块内表格正文分叉.md")
 SCRIPT = os.path.join(OUT, "_lambda109.py")
 

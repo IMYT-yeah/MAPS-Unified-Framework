@@ -2,19 +2,19 @@
 """第 118 轮（元任务·对外扫描）核验：E118-1…（两段式取证）"""
 import io, os
 
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 P = dict(
     MEMO=os.path.join(BASE, 'outputs', '外部输入清单_可接入的活问题与渠道_2026-10.md'),
     MEMO_H=os.path.join(BASE, 'outputs', '外部输入清单_可接入的活问题与渠道_2026-10.html'),
-    LIST=os.path.join(BASE, 'outputs', '工程期望清单.md'),
-    HO=os.path.join(BASE, '环境交接说明.md'),
+    LIST=os.path.join(BASE, 'outputs', '项目台账.md'),
+    HO=os.path.join(BASE, '环境说明.md'),
     MEM=os.path.join(BASE, '.workbuddy', 'memory', 'MEMORY.md'),
     LOG=os.path.join(BASE, '.workbuddy', 'memory', '2026-10-04.md'),
     ZH=os.path.join(BASE, 'outputs', '论文初稿_正反物质对风暴统一框架_v2.9.md'),
 )
 B = dict(
-    LIST=os.path.join(BASE, 'outputs', '工程期望清单_备份_2026-10-04第118轮前.md'),
-    HO=os.path.join(BASE, '环境交接说明_备份_2026-10-04第118轮前.md'),
+    LIST=os.path.join(BASE, 'outputs', '项目台账_备份_2026-10-04第118轮前.md'),
+    HO=os.path.join(BASE, '环境说明_备份_2026-10-04第118轮前.md'),
 )
 rd = lambda p: io.open(p, encoding='utf-8').read()
 OK, FAIL = 0, 0

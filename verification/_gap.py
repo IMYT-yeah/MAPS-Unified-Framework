@@ -6,7 +6,7 @@
     out = gap_run('Print(Size(SymmetricGroup(5)), "\\n"); QUIT;')
     print(out)
 
-⚠️ 三个坑（见 SKILL.md「GAP」一节）：
+⚠️ 三个坑（见 工作流说明「GAP」一节）：
   ① 必须把 runtime\\bin 与 gap 根目录都加进 PATH（cygwin1.dll / libgap.dll）；
   ② 不能用 `timeout` 包（Git Bash 的 execvp 与 Windows 加载器不兼容）；
   ③ `gap.bat` 走 cygstart+mintty，无法非交互，别用。

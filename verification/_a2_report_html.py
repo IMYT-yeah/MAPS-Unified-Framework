@@ -2,7 +2,7 @@
 """A2 湮灭型 BBGKY 报告 md → HTML（清爽样式，与 A1 报告一致）"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "A2_湮灭型BBGKY完整证明.md"
 OUT = BASE / "A2_湮灭型BBGKY完整证明.html"
 

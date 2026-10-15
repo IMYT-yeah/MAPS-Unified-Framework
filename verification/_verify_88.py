@@ -8,7 +8,7 @@ import io, os, glob
 ZH = "论文初稿_正反物质对风暴统一框架_v2.9.md"
 EN = "Paper_MatterAntimatterPairStorm_v2.9_EN.md"
 MEMO = "横向一致性审计_成熟度自评与三张表不相容.md"
-LIST = "工程期望清单.md"
+LIST = "项目台账.md"
 PRE_Z = "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-02第88轮前.md"
 PRE_E = "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-02第88轮前.md"
 MEM = "../.workbuddy/memory/MEMORY.md"

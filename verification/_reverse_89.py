@@ -15,7 +15,7 @@ import io, os, re, glob, collections
 MEMOS = [p for p in glob.glob("*.md")
          if "_备份_" not in p
          and not p.startswith("论文初稿") and not p.startswith("Paper_")
-         and p != "工程期望清单.md"
+         and p != "项目台账.md"
          and "本轮推演总结" not in p
          and "交接说明" not in p
          and "未完成研究工作流" not in p]
@@ -115,7 +115,7 @@ chk("RC-2b", True, "已列出（判定在人工读表后；⚠️ 数字可能�
 
 # ================================================================ RC-3 清单 C-xx 的「已改」声明
 hdr("RC-3  清单里 C-xx 条目的「处置」列抽样核对")
-LI = io.open("工程期望清单.md", encoding="utf-8").read().split("\n")
+LI = io.open("项目台账.md", encoding="utf-8").read().split("\n")
 crows = [s for s in LI if re.match(r"^\| \*\*C-\d+\*\* \|", s)]
 print("  清单里 C-xx 行 {} 条".format(len(crows)))
 print("  处置列（第 3 列）分布：")

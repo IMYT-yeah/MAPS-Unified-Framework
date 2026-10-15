@@ -4,7 +4,7 @@ I17-1 … I17-24。用法：补丁前跑（物理部分）、补丁后复跑（�
 """
 import io, os, math, re
 
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 OUT = os.path.join(BASE, 'outputs')
 HIS = os.path.join(BASE, 'MAPS-Unified-Framework', 'paper', 'history')
 MEM = os.path.join(BASE, '.workbuddy', 'memory')
@@ -12,18 +12,18 @@ MEM = os.path.join(BASE, '.workbuddy', 'memory')
 def rd(p): return io.open(p, encoding='utf-8').read()
 ZH = os.path.join(OUT, '论文初稿_正反物质对风暴统一框架_v2.9.md')
 EN = os.path.join(OUT, 'Paper_MatterAntimatterPairStorm_v2.9_EN.md')
-LP = os.path.join(OUT, '工程期望清单.md')
-HO = os.path.join(BASE, '环境交接说明.md')
+LP = os.path.join(OUT, '项目台账.md')
+HO = os.path.join(BASE, '环境说明.md')
 M72 = os.path.join(OUT, 'Φ的耦合强度_框架给不出第五力的另一半.md')
 M118 = os.path.join(OUT, '外部输入清单_可接入的活问题与渠道_2026-10.md')
 MEMO = os.path.join(OUT, 'I17第五力窗口_2025-26约束带与47微米档的存活.md')
-SKILL = r'C:\Users\Administrator\.workbuddy\skills\maps-deduction-round\SKILL.md'
+工作流说明 = r'[WORKFLOW]\工作流说明'
 D = '第120轮前'
 PRE = {
     'ZH': os.path.join(HIS, '论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-04%s.md' % D),
     'EN': os.path.join(HIS, 'Paper_v2.9_EN_备份_2026-10-04%s.md' % D),
-    'LP': os.path.join(OUT, '工程期望清单_备份_2026-10-04%s.md' % D),
-    'HO': os.path.join(BASE, '环境交接说明_备份_2026-10-04%s.md' % D),
+    'LP': os.path.join(OUT, '项目台账_备份_2026-10-04%s.md' % D),
+    'HO': os.path.join(BASE, '环境说明_备份_2026-10-04%s.md' % D),
     'M72': os.path.join(OUT, 'Φ的耦合强度_框架给不出第五力的另一半_备份_2026-10-04%s.md' % D),
     'M118': os.path.join(OUT, '外部输入清单_可接入的活问题与渠道_2026-10_备份_2026-10-04%s.md' % D),
 }
@@ -190,7 +190,7 @@ m72 = rd(M72); m72p = rd(PRE['M72'])
 m118 = rd(M118); m118p = rd(PRE['M118'])
 mem_t = rd(os.path.join(MEM, 'MEMORY.md'))
 log_t = rd(os.path.join(MEM, '2026-10-04.md'))
-sk_t = rd(SKILL)
+sk_t = rd(工作流说明)
 
 # I17-20 清单四件
 c83 = lp_t.count('| **C-83** |'); c84 = lp_t.count('| **C-84** |'); i26 = lp_t.count('| **I-26** |')

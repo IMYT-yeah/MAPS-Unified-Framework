@@ -2,15 +2,15 @@
 """第 117 轮核验（K117-1…）：Kerr 重算 + C-81/C-82 落地的两段式取证。"""
 import io, os, re
 
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 P = dict(
     ZH=os.path.join(BASE, 'outputs', '论文初稿_正反物质对风暴统一框架_v2.9.md'),
     EN=os.path.join(BASE, 'outputs', 'Paper_MatterAntimatterPairStorm_v2.9_EN.md'),
     MAT=os.path.join(BASE, 'outputs', 'EMRI材料包_给LISA组的S-E1-E4.md'),
-    LIST=os.path.join(BASE, 'outputs', '工程期望清单.md'),
-    HO=os.path.join(BASE, '环境交接说明.md'),
+    LIST=os.path.join(BASE, 'outputs', '项目台账.md'),
+    HO=os.path.join(BASE, '环境说明.md'),
     MEMO=os.path.join(BASE, 'outputs', 'Kerr版EMRI重算_delta与lnL与sigma口径_C-81与C-82.md'),
-    SKILL=r'C:\Users\Administrator\.workbuddy\skills\maps-deduction-round\SKILL.md',
+    工作流说明=r'[WORKFLOW]\工作流说明',
     MEM=os.path.join(BASE, '.workbuddy', 'memory', 'MEMORY.md'),
     LOG=os.path.join(BASE, '.workbuddy', 'memory', '2026-10-04.md'),
 )
@@ -20,8 +20,8 @@ B = dict(
     EN=os.path.join(BASE, 'MAPS-Unified-Framework', 'paper', 'history',
                     'Paper_v2.9_EN_备份_2026-10-04第117轮前.md'),
     MAT=os.path.join(BASE, 'outputs', 'EMRI材料包_给LISA组的S-E1-E4_备份_2026-10-04第117轮前.md'),
-    LIST=os.path.join(BASE, 'outputs', '工程期望清单_备份_2026-10-04第117轮前.md'),
-    HO=os.path.join(BASE, '环境交接说明_备份_2026-10-04第117轮前.md'),
+    LIST=os.path.join(BASE, 'outputs', '项目台账_备份_2026-10-04第117轮前.md'),
+    HO=os.path.join(BASE, '环境说明_备份_2026-10-04第117轮前.md'),
 )
 rd = lambda p: io.open(p, encoding='utf-8').read()
 OK, FAIL = 0, 0
@@ -138,7 +138,7 @@ chk('K117-12b', '117' in mem_txt, 'MEMORY 含 117 记录（%d 字符）' % len(m
 chk('K117-12c', len(mem_txt) <= 3000, 'MEMORY ≤ 3000 字符（实际 %d）' % len(mem_txt))
 log_txt = rd(P['LOG']) if os.path.exists(P['LOG']) else ''
 chk('K117-12d', '第 117 轮' in log_txt, '当日日志含第 117 轮')
-sk = rd(P['SKILL'])
+sk = rd(P['工作流说明'])
 chk('K117-12e', '114.' in sk and '115.' in sk, '技能含陷阱 114 / 115')
 
 print('=== K117-13 旧报告横幅与生成器修复 ===')
@@ -146,7 +146,7 @@ rpt = rd(os.path.join(BASE, 'outputs', 'KerrEMRI波形与贝叶斯分析.md'))
 rptb = rd(os.path.join(BASE, 'outputs', 'KerrEMRI波形与贝叶斯分析_备份_2026-10-04第117轮前.md'))
 chk('K117-13a', '第 117 轮更正' in rpt and '第 117 轮更正' not in rptb, '报告横幅（两段式）')
 gen = rd(os.path.join(BASE, 'outputs', '_kerr_report_html.py'))
-chk('K117-13b', 'IMYT.YT' not in gen and '__file__' in gen, '生成器旧机路径已修')
+chk('K117-13b', '[OLD_HOME]' not in gen and '__file__' in gen, '生成器早期环境路径已修')
 chk('K117-13c', '第 117 轮更正' in rd(os.path.join(BASE, 'MAPS-Unified-Framework', 'docs', 'html', 'KerrEMRI波形与贝叶斯分析.html')),
     'docs/html 副本含横幅')
 

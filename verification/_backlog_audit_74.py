@@ -35,8 +35,8 @@ def load(p):
 
 
 WF = load(os.path.join(BASE, "未完成研究工作流_按依赖排序.md"))
-CG = load(os.path.join(BASE, "工程期望清单.md"))
-HO = load(os.path.join(ROOT, "环境交接说明.md"))
+CG = load(os.path.join(BASE, "项目台账.md"))
+HO = load(os.path.join(ROOT, "环境说明.md"))
 PP = load(os.path.join(BASE, "论文初稿_正反物质对风暴统一框架_v2.9.md"))
 
 print("工作流 {} 行 | 清单 {} 行 | 交接说明 {} 行 | 论文 {} 行".format(

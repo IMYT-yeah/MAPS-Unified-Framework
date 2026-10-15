@@ -4,15 +4,15 @@ import io
 import os
 import numpy as np
 
-ROOT = r"C:/Users/Administrator/Desktop/2026-08-20-21-43-34"
+ROOT = r"[WORKSPACE]"
 ZH = os.path.join(ROOT, "outputs/论文初稿_正反物质对风暴统一框架_v2.9.md")
 EN = os.path.join(ROOT, "outputs/Paper_MatterAntimatterPairStorm_v2.9_EN.md")
-LIST = os.path.join(ROOT, "outputs/工程期望清单.md")
-HAND = os.path.join(ROOT, "环境交接说明.md")
+LIST = os.path.join(ROOT, "outputs/项目台账.md")
+HAND = os.path.join(ROOT, "环境说明.md")
 MEM = os.path.join(ROOT, ".workbuddy/memory/MEMORY.md")
 A1R = os.path.join(ROOT, "outputs/A1_3D盒子λc数值定位.md")
 MEMO = os.path.join(ROOT, "outputs/甲2结项_λc∞未定位_判据分辨率不足的量化.md")
-SKILL = r"C:/Users/Administrator/.workbuddy/skills/maps-deduction-round/SKILL.md"
+工作流说明 = r"[WORKFLOW]/工作流说明"
 OUT = os.path.join(ROOT, "outputs")
 
 N, BAD = 0, []
@@ -30,7 +30,7 @@ def rd(p):
 
 
 zh, en, li, hd, me, a1, mo = rd(ZH), rd(EN), rd(LIST), rd(HAND), rd(MEM), rd(A1R), rd(MEMO)
-sk = rd(SKILL)
+sk = rd(工作流说明)
 
 # ---------------- 论文：中文 ----------------
 ck("V-1", "【第 101 轮：热力学极限值仍未定位】" in zh, "ZH850 未更新")

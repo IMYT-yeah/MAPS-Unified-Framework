@@ -4,7 +4,7 @@
 """
 import io, os, math, re
 
-BASE = r"C:\Users\Administrator\Desktop\2026-08-20-21-43-34"
+BASE = r"[WORKSPACE]"
 OUT = os.path.join(BASE, "outputs")
 HIST = os.path.join(BASE, "MAPS-Unified-Framework", "paper", "history")
 
@@ -12,9 +12,9 @@ ZH = os.path.join(OUT, "论文初稿_正反物质对风暴统一框架_v2.9.md")
 EN = os.path.join(OUT, "Paper_MatterAntimatterPairStorm_v2.9_EN.md")
 ZH_PRE = os.path.join(HIST, "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-04第110轮前.md")
 EN_PRE = os.path.join(HIST, "Paper_v2.9_EN_备份_2026-10-04第110轮前.md")
-LIST = os.path.join(OUT, "工程期望清单.md")
-HO = os.path.join(BASE, "环境交接说明.md")
-HO_PRE = os.path.join(BASE, "环境交接说明_备份_2026-10-04第110轮前.md")
+LIST = os.path.join(OUT, "项目台账.md")
+HO = os.path.join(BASE, "环境说明.md")
+HO_PRE = os.path.join(BASE, "环境说明_备份_2026-10-04第110轮前.md")
 
 rd = lambda p: io.open(p, encoding="utf-8").read()
 Z, E, LP, H, HP = rd(ZH), rd(EN), rd(LIST), rd(HO), rd(HO_PRE)

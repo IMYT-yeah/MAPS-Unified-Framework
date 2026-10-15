@@ -12,7 +12,7 @@ import io
 import os
 import numpy as np
 
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 src = io.open(os.path.join(BASE, 'outputs', '_kerr_emri_bayes.py'), encoding='utf-8').read()
 cut = src.index('print("="*78)')
 ns = {}

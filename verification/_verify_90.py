@@ -6,10 +6,10 @@ ZH  = "论文初稿_正反物质对风暴统一框架_v2.9.md"
 PZH = "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-02第90轮前.md"
 EN  = "Paper_MatterAntimatterPairStorm_v2.9_EN.md"
 PEN = "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-02第90轮前.md"
-LIST= "工程期望清单.md"
-PLIST="工程期望清单_备份_2026-10-02第90轮前.md"
-HS  = "../环境交接说明.md"
-PHS = "../环境交接说明_备份_2026-10-02第90轮前.md"
+LIST= "项目台账.md"
+PLIST="项目台账_备份_2026-10-02第90轮前.md"
+HS  = "../环境说明.md"
+PHS = "../环境说明_备份_2026-10-02第90轮前.md"
 MEM = "../.workbuddy/memory/MEMORY.md"
 FAIL = 0
 def chk(tag, ok, msg):
@@ -111,7 +111,7 @@ chk("V-6c", max(codes) - len(non) == 44, "编号 {} − 非撤回更正族 {} = 
 # ---------------------------------------------------------------- V-7 元文本
 hdr("V-7  ⭐ 元文本自指自检（铁律 18/20）")
 import glob
-files = sorted(glob.glob("*_备份_2026-10-02第90轮前.md")) + sorted(glob.glob("../环境交接说明_备份_2026-10-02第90轮前.md"))
+files = sorted(glob.glob("*_备份_2026-10-02第90轮前.md")) + sorted(glob.glob("../环境说明_备份_2026-10-02第90轮前.md"))
 allz = True
 for p in files:
     c = rd(p).count("C-45")

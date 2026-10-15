@@ -2,7 +2,7 @@
 """第三方审稿意见 md → HTML（清爽样式）"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "M7补强报告.md"
 OUT = BASE / "M7补强报告.html"
 

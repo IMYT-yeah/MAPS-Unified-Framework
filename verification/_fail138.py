@@ -13,7 +13,7 @@ def chk(tag, name, cond, extra=''):
 def info(tag, name, val):
     print('[--] %-6s %-38s %s' % (tag, name, val))
 
-Q = open('工程期望清单.md', encoding='utf-8').read()
+Q = open('项目台账.md', encoding='utf-8').read()
 QL = Q.split('\n')
 B = open('论文_正式稿_v3.0.md', encoding='utf-8').read()
 BL = B.split('\n')

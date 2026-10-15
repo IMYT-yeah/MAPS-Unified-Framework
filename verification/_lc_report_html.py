@@ -2,7 +2,7 @@
 """3+1D 弦网严格化报告 md → HTML"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "3+1D弦网λc相变.md"
 OUT = BASE / "3+1D弦网λc相变.html"
 

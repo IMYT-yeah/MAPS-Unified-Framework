@@ -4,7 +4,7 @@
 核验项：A2-1 … A2-20（每项 [OK]/[XX]；末尾打印通过/失败计数）
 
 五段：
-  ① 五路取证（对象池 / git 史 / remote / 全盘 / 旧机）—— 必须**全负**
+  ① 五路取证（对象池 / git 史 / remote / 全盘 / 早期环境）—— 必须**全负**
   ② 重建文件与分级标注
   ③ 两个脚本实跑（抓「通过 N 项，失败 M 项」）
   ④ 五个锚点的数值判据（与项目既有记录逐条对）
@@ -23,7 +23,7 @@ ROOT = os.path.dirname(BASE)
 REPO = os.path.join(ROOT, "MAPS-Unified-Framework")
 PKG = os.path.join(REPO, "python", "maps")
 GITDIR = os.path.join(REPO, ".git", "objects")
-PY = r"C:\Users\Administrator\.workbuddy\binaries\python\envs\default\Scripts\python.exe"
+PY = r"[TOOLCHAIN]\binaries\python\envs\default\Scripts\python.exe"
 OLD = "源文件 2026-09-16 丢失"          # 补丁前 python/README.md 的状态短语
 
 PASS = FAIL = 0
@@ -91,7 +91,7 @@ chk("A2-1", pool_judge == 0,
     "第 1 路（对象池）：无任何对象**定义** T1–T5（maps 源码对象 = {}；含 `lam_c=1.3e26` 的只有组装器）".format(pool_judge))
 
 # 路 2：git 历史
-GITEXE = r"C:\Users\Administrator\.workbuddy\binaries\PortableGit\versions\1.2.0\cmd\git.exe"
+GITEXE = r"[TOOLCHAIN]\binaries\PortableGit\versions\1.2.0\cmd\git.exe"
 r = subprocess.run([GITEXE, "log", "--all", "--oneline"], cwd=REPO, capture_output=True)
 nlog = len([x for x in (r.stdout or b"").decode("utf-8", "replace").split("\n") if x.strip()])
 chk("A2-2", nlog == 0, "第 2 路（git 史）：commit 数 = {}（仓库从未提交）".format(nlog))
@@ -106,8 +106,8 @@ NAMES = {"formula.py", "maps_framework.py", "run.sh", "maps.py"}
 SKIP = {".git", "node_modules", "__pycache__", ".venv", ".lake", "site-packages",
         "_workbuddy", "binaries", "_MAPS_explore"}
 found = []
-for rr in [r"C:\Users\Administrator\Desktop", r"C:\Users\Administrator\Documents",
-           r"C:\Users\Administrator\Downloads"]:
+for rr in [r"[HOME]/Desktop", r"[HOME]/Documents",
+           r"[HOME]/Downloads"]:
     if not os.path.isdir(rr):
         continue
     for dp, dns, fns in os.walk(rr):
@@ -120,9 +120,9 @@ rebuilt = [f for f in found if os.path.normcase(os.path.dirname(f)) == os.path.n
 chk("A2-4", len(found) == len(rebuilt) and len(rebuilt) >= 3,
     "第 4 路（全盘）：命中 {} 处，全部是本轮重建的包（{} 个文件）".format(len(found), len(rebuilt)))
 
-# 路 5：旧机路径
-chk("A2-5", not os.path.isdir("D:/") and not os.path.isdir("D:/Users/IMYT.YT/WorkBuddy/_MAPS_explore"),
-    "第 5 路（旧机 D:）：D 盘不存在（源目录 _MAPS_explore 不可达）")
+# 路 5：早期环境路径
+chk("A2-5", not os.path.isdir("[OLD_DRIVE]/") and not os.path.isdir("[OLD_WORKSPACE]/_MAPS_explore"),
+    "第 5 路（早期环境盘）：早期环境不存在（源目录 _MAPS_explore 不可达）")
 
 # ======================================================= ② 文件与分级
 hdr("A2-6…10  重建文件与分级标注")

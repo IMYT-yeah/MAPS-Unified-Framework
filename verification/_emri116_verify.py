@@ -7,7 +7,7 @@ import io
 import os
 import numpy as np
 
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 OUT = os.path.join(BASE, 'outputs')
 HIST = os.path.join(BASE, 'MAPS-Unified-Framework', 'paper', 'history')
 MAT = os.path.join(OUT, 'EMRI材料包_给LISA组的S-E1-E4.md')
@@ -15,8 +15,8 @@ MAT_PRE = os.path.join(OUT, 'EMRI材料包_给LISA组的S-E1-E4_备份_2026-10-0
 ZH = os.path.join(OUT, '论文初稿_正反物质对风暴统一框架_v2.9.md')
 EN = os.path.join(OUT, 'Paper_MatterAntimatterPairStorm_v2.9_EN.md')
 ZH_PRE = os.path.join(HIST, '论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-04第116轮前.md')
-LP = os.path.join(OUT, '工程期望清单.md')
-HO = os.path.join(BASE, '环境交接说明.md')
+LP = os.path.join(OUT, '项目台账.md')
+HO = os.path.join(BASE, '环境说明.md')
 PROP = os.path.join(OUT, '_emri_proposal_116.log')
 MEM = os.path.join(BASE, '.workbuddy', 'memory', 'MEMORY.md')
 rd = lambda p: io.open(p, encoding='utf-8').read()

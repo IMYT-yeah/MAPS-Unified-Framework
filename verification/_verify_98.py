@@ -4,8 +4,8 @@
 核验项：V-1 … V-12；末尾打印通过/失败计数
 
 底本（补丁前）：
-  ① outputs/工程期望清单_备份_2026-10-03第98轮前.md
-  ② 环境交接说明_备份_2026-10-03第98轮前.md
+  ① outputs/项目台账_备份_2026-10-03第98轮前.md
+  ② 环境说明_备份_2026-10-03第98轮前.md
   ③ .workbuddy/memory/MEMORY_备份_2026-10-03第98轮前.md
   ④ MAPS-Unified-Framework/python/_history/README_备份_2026-10-03第98轮前.md（**事后补录**）
 """
@@ -18,10 +18,10 @@ ROOT = os.path.dirname(BASE)
 REPO = os.path.join(ROOT, "MAPS-Unified-Framework")
 PKG = os.path.join(REPO, "python", "maps")
 
-LIST = os.path.join(BASE, "工程期望清单.md")
-PRE_LIST = os.path.join(BASE, "工程期望清单_备份_2026-10-03第98轮前.md")
-HAND = os.path.join(ROOT, "环境交接说明.md")
-PRE_HAND = os.path.join(ROOT, "环境交接说明_备份_2026-10-03第98轮前.md")
+LIST = os.path.join(BASE, "项目台账.md")
+PRE_LIST = os.path.join(BASE, "项目台账_备份_2026-10-03第98轮前.md")
+HAND = os.path.join(ROOT, "环境说明.md")
+PRE_HAND = os.path.join(ROOT, "环境说明_备份_2026-10-03第98轮前.md")
 MEM = os.path.join(ROOT, ".workbuddy", "memory", "MEMORY.md")
 PRE_MEM = os.path.join(ROOT, ".workbuddy", "memory", "MEMORY_备份_2026-10-03第98轮前.md")
 PY_README = os.path.join(REPO, "python", "README.md")
@@ -56,7 +56,7 @@ def rd(p):
 print("第 98 轮补丁后核验（V 系列）")
 
 # ============================================================ V-1 清单
-hdr("V-1  工程期望清单（两段式）")
+hdr("V-1  项目台账（两段式）")
 pre_l, cur_l = rd(PRE_LIST), rd(LIST)
 chk("V-1a", "**A2 ✅**" not in pre_l and "**A2 ✅**" in cur_l, "补丁前无 A2 行 → 补丁后有（两段式）")
 chk("V-1b", "**C-58**" not in pre_l and "**C-58**" in cur_l, "补丁前无 C-58 → 补丁后有")
@@ -65,7 +65,7 @@ chk("V-1c", "| **撤回 / 更正** | **56 条**" in pre_l and "| **撤回 / 更�
 chk("V-1d", cur_l.count("A2") >= 5, "A2 在清单中出现 {} 处（含三处剩余待办 ＋ 台账组 VI）".format(cur_l.count("A2")))
 
 # ============================================================ V-2 交接说明
-hdr("V-2  环境交接说明（§七 98 ＋ 第 98 轮段）")
+hdr("V-2  环境说明（§七 98 ＋ 第 98 轮段）")
 pre_h, cur_h = rd(PRE_HAND), rd(HAND)
 chk("V-2a", "当前建议（第 97 轮后）" in pre_h and "当前建议（第 98 轮后）" in cur_h,
     "§七：97 → 98（两段式）")

@@ -10,8 +10,8 @@ set -u
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # 优先用项目隔离 venv（含 numpy/sympy），否则退回当前 python
 PY="${MAPS_PY:-python}"
-if [ -x "/c/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe" ]; then
-  PY="${MAPS_PY:-/c/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe}"
+if [ -x "[HOME]/.workbuddy/binaries/python/envs/default/Scripts/python.exe" ]; then
+  PY="${MAPS_PY:-[HOME]/.workbuddy/binaries/python/envs/default/Scripts/python.exe}"
 fi
 
 rc=0

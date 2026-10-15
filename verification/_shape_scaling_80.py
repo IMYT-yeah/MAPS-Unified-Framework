@@ -22,7 +22,7 @@ import _tickgroup as tg
 
 ZH = os.path.join(BASE, "论文初稿_正反物质对风暴统一框架_v2.9.md")
 EN = os.path.join(BASE, "Paper_MatterAntimatterPairStorm_v2.9_EN.md")
-GL = os.path.join(BASE, "工程期望清单.md")
+GL = os.path.join(BASE, "项目台账.md")
 WF = os.path.join(BASE, "未完成研究工作流_按依赖排序.md")
 
 OK = [0]

@@ -12,8 +12,8 @@ ZH = os.path.join(BASE, "论文初稿_正反物质对风暴统一框架_v2.9.md"
 EN = os.path.join(BASE, "Paper_MatterAntimatterPairStorm_v2.9_EN.md")
 ZH_PRE = os.path.join(BASE, "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-04第103轮前.md")
 EN_PRE = os.path.join(BASE, "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-04第103轮前.md")
-LIST = os.path.join(BASE, "工程期望清单.md")
-HAND = os.path.join(os.path.dirname(BASE), "环境交接说明.md")
+LIST = os.path.join(BASE, "项目台账.md")
+HAND = os.path.join(os.path.dirname(BASE), "环境说明.md")
 MEMO = os.path.join(BASE, "甲4结项_麦克斯韦谱_恒等式验证与二阶各向同性定理.md")
 OUT = os.path.join(BASE, "_maxwell_103_out.txt")
 
@@ -95,7 +95,7 @@ ck("V-15", j0 > 0 and n_blank_en == 0,
    "EN 第 103 轮块：内部空行 = {}".format(n_blank_en))
 
 # ---------- 清单 ----------
-print("\n[工程期望清单]")
+print("\n[项目台账]")
 ck("V-16", "| **第 103 轮**（**甲-4 执行**） |" in L,
    "§零 表格已加第 103 轮行")
 ck("V-17", "| **C-67** | ⭐⭐ **「数值验证」是恒等式（第 103 轮；甲-4）**" in L,
@@ -109,7 +109,7 @@ ck("V-20", "**甲类只剩 甲-5**" in L and "有明确可判定入口的待办�
    "「甲类只剩 甲-5」（同轮修正一处**过度声明**）")
 
 # ---------- 交接说明 ----------
-print("\n[环境交接说明]")
+print("\n[环境说明]")
 ck("V-21", "**当前建议（第 103 轮后）**" in H and "**（历史，第 102 轮后）**" in H,
    "§七：新建议在前、旧建议标「（历史，第 102 轮后）」")
 ck("V-22", "**第 103 轮新增（甲-4：麦克斯韦谱严格化" in H,

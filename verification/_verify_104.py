@@ -9,8 +9,8 @@ ZH = os.path.join(BASE, "论文初稿_正反物质对风暴统一框架_v2.9.md"
 EN = os.path.join(BASE, "Paper_MatterAntimatterPairStorm_v2.9_EN.md")
 ZH_PRE = os.path.join(BASE, "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-04第104轮前.md")
 EN_PRE = os.path.join(BASE, "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-04第104轮前.md")
-LIST = os.path.join(BASE, "工程期望清单.md")
-HAND = os.path.join(os.path.dirname(BASE), "环境交接说明.md")
+LIST = os.path.join(BASE, "项目台账.md")
+HAND = os.path.join(os.path.dirname(BASE), "环境说明.md")
 MEMO = os.path.join(BASE, "甲5结项_N2的4π相位锁定相容性方程.md")
 OUT = os.path.join(BASE, "_n2phase_104_out.txt")
 
@@ -92,7 +92,7 @@ blank_en = sum(1 for s in seg_en.split("\n") if s.strip() == "")
 ck("V-17", j0 > 0 and blank_en == 0, "EN 第 104 轮块：内部空行 = {}".format(blank_en))
 
 # ---------- 清单 ----------
-print("\n[工程期望清单]")
+print("\n[项目台账]")
 ck("V-18", "| **第 104 轮**（**甲-5 执行**） |" in L, "§零 表格已加第 104 轮行")
 ck("V-19", all("| **{}** |".format(c) in L for c in ["C-68", "C-69", "C-70", "C-71"]),
    "更正表已加 C-68 / C-69 / C-70 / C-71 四行")
@@ -108,7 +108,7 @@ ck("V-22", seq[i:i + 8] == ["C-67", "C-68", "C-69", "C-70", "C-71", "C-64", "C-6
    "**表格块完整性**：C-67…C-71 连续，且 **C-64/C-65/C-66（第 102 轮块）恢复连续**（修 103 轮引入的切开）")
 
 # ---------- 交接 ----------
-print("\n[环境交接说明]")
+print("\n[环境说明]")
 ck("V-23", "**当前建议（第 104 轮后）**" in H and "**（历史，第 103 轮后）**" in H,
    "§七：新建议在前、旧建议标「（历史，第 103 轮后）」")
 ck("V-24", "**第 104 轮新增（甲-5：N2 的 4π 相位锁定相容性方程" in H,

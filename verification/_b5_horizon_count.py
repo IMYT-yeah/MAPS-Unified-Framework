@@ -3,7 +3,7 @@
 CG 系列 —— 在因果视界上重做 F3 计数（B5 最后一环的下半）
 命题：观测者端（B5 比特计数）与统计端（F3 通量管相干块计数）是否数同一批块？
 只用标准库 math。运行：
-  C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe outputs/_b5_horizon_count.py
+  [TOOLCHAIN]/binaries/python/versions/3.13.12/python.exe outputs/_b5_horizon_count.py
 """
 import math as m
 

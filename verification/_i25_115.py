@@ -9,15 +9,15 @@ import os
 import sys
 from fractions import Fraction as F
 
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 OUT = os.path.join(BASE, 'outputs')
 HIST = os.path.join(BASE, 'MAPS-Unified-Framework', 'paper', 'history')
 sys.path.insert(0, OUT)
 
 ZH = os.path.join(OUT, '论文初稿_正反物质对风暴统一框架_v2.9.md')
 EN = os.path.join(OUT, 'Paper_MatterAntimatterPairStorm_v2.9_EN.md')
-LP = os.path.join(OUT, '工程期望清单.md')
-HO = os.path.join(BASE, '环境交接说明.md')
+LP = os.path.join(OUT, '项目台账.md')
+HO = os.path.join(BASE, '环境说明.md')
 MAT = os.path.join(OUT, 'EMRI材料包_给LISA组的S-E1-E4.md')
 D4M = os.path.join(OUT, 'D4结项_EMRI进动系数的偏心率依赖与1_3极限.md')
 D4M_PRE = os.path.join(OUT, 'D4结项_EMRI进动系数的偏心率依赖与1_3极限_备份_2026-10-04第115轮前.md')

@@ -16,7 +16,7 @@ def info(tag, name, val):
 BASE = '../初始资料/元宝对话_反物质与时间的哲学猜想/'
 S = open(BASE + '对话全文_完整版.md', encoding='utf-8').read()
 B = open('论文_正式稿_v3.0.md', encoding='utf-8').read()
-Q = open('工程期望清单.md', encoding='utf-8').read()
+Q = open('项目台账.md', encoding='utf-8').read()
 T = open('动力学耦合层可行性_三档判定与输入台账.md', encoding='utf-8').read()
 
 marks = [(m.start(), m.group(1)) for m in re.finditer(r'## 第\s*(\d+)\s*轮', S)]

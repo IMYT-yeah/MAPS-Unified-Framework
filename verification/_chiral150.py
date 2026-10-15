@@ -63,7 +63,7 @@ MEM = open('../.workbuddy/memory/MEMORY.md', encoding='utf-8').read()
 chk('B-5', '⚠️ 但该 ε 的定量兑现已判 **N-40**（η 能标不可导出）',
     'η 能标不可导出' in MEM and 'N-40' in MEM)
 chk('B-6', '⚠️ 而「动力学·耦合层」内部推导已判 **N-43**（框架无动力学层）',
-    'N-43' in MEM or 'N-43' in open('工程期望清单.md', encoding='utf-8').read())
+    'N-43' in MEM or 'N-43' in open('项目台账.md', encoding='utf-8').read())
 
 print()
 print('=' * 88)

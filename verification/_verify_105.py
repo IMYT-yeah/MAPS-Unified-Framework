@@ -9,12 +9,12 @@ import os
 import re
 import hashlib
 
-ROOT = r"C:/Users/Administrator/Desktop/2026-08-20-21-43-34"
+ROOT = r"[WORKSPACE]"
 OUT = os.path.join(ROOT, "outputs")
-LIST = os.path.join(OUT, "工程期望清单.md")
-PRE_LIST = os.path.join(OUT, "工程期望清单_备份_2026-10-04第105轮前.md")
-HAND = os.path.join(ROOT, "环境交接说明.md")
-PRE_HAND = os.path.join(ROOT, "环境交接说明_备份_2026-10-04第105轮前.md")
+LIST = os.path.join(OUT, "项目台账.md")
+PRE_LIST = os.path.join(OUT, "项目台账_备份_2026-10-04第105轮前.md")
+HAND = os.path.join(ROOT, "环境说明.md")
+PRE_HAND = os.path.join(ROOT, "环境说明_备份_2026-10-04第105轮前.md")
 MEMO = os.path.join(OUT, "乙类并轨结项_O1-O5逐条判定与分支B的空悬.md")
 ZH = os.path.join(OUT, "论文初稿_正反物质对风暴统一框架_v2.9.md")
 EN = os.path.join(OUT, "Paper_MatterAntimatterPairStorm_v2.9_EN.md")

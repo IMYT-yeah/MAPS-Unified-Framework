@@ -2,7 +2,7 @@
 """C1 湮灭损失率三通道统一报告 md → HTML（与 A2/A3 报告同款样式）"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "C1_湮灭损失率三通道统一.md"
 OUT = BASE / "C1_湮灭损失率三通道统一.html"
 

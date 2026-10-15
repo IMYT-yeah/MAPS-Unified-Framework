@@ -7,7 +7,7 @@ MAPS 新思考包 —— 独立符号/数值自检（verify.py）
 
 ⚠️ 重建说明（第 98 轮 · 2026-10-03）
 ------------------------------------
-原文件 2026-09-16 随旧机丢失。
+原文件 2026-09-16 随早期环境丢失。
 【A 级 · 逐字恢复】本文件的 [PPN] 段来自 `outputs/_repo_assemble.py::patch_maps()`：
     原文：  beta_ppn = series.expand().coeff(x, 2) / 2
     修复：  beta_ppn = -series.expand().coeff(x, 2) / 2   # 负号: Will 约定 g00=-(1-2x+2 beta x^2)

@@ -5,7 +5,7 @@
       outputs/_paper_sec8_check.py（PA-1…PA-7，失败项：无）
 
 用法：
-  C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe outputs/_paper_patch_v29.py
+  [TOOLCHAIN]/binaries/python/versions/3.13.12/python.exe outputs/_paper_patch_v29.py
 
 设计原则：
   · 每个锚点必须**恰好命中一次**，否则报错退出（宁可不动，不可乱改）；

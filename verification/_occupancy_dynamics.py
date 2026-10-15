@@ -6,7 +6,7 @@ OD 系列 —— 衬底占位动力学：C-4 的化解，与「湮灭 = 再生�
   C-4  底层四状态含「真空」，与 f = 1 冲突 ⟹ 待化解
 本轮问：占位率 f 的**动力学**是什么？三种候选各自给什么 f？哪个与 c = l_P/t_P 相容？
 只用标准库 math。运行：
-  C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe outputs/_occupancy_dynamics.py
+  [TOOLCHAIN]/binaries/python/versions/3.13.12/python.exe outputs/_occupancy_dynamics.py
 """
 import math as m
 

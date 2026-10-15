@@ -7,11 +7,11 @@ E121-9…E121-16 文档：论文中英新块、清单、交接、MEMORY、日志
 """
 import io, os, math
 
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 H = os.path.join(BASE, 'MAPS-Unified-Framework', 'paper', 'history')
 OUT = os.path.join(BASE, 'outputs')
 MEM = os.path.join(BASE, '.workbuddy', 'memory')
-SKILL = r'C:\Users\Administrator\.workbuddy\skills\maps-deduction-round\SKILL.md'
+工作流说明 = r'[WORKFLOW]\工作流说明'
 
 def rd(p):
     return io.open(p, encoding='utf-8').read()
@@ -113,8 +113,8 @@ for tag, txt in (('zh', ZH), ('en', EN)):
     miss = [s for s in need if s not in txt]
     chk('E121-10' + tag, ok, '%s 块关键串齐全（缺：%s）' % ('ZH' if tag == 'zh' else 'EN', miss))
 
-LP = rd(os.path.join(OUT, '工程期望清单.md'))
-LPp = rd(os.path.join(OUT, '工程期望清单_备份_2026-10-04第121轮前.md'))
+LP = rd(os.path.join(OUT, '项目台账.md'))
+LPp = rd(os.path.join(OUT, '项目台账_备份_2026-10-04第121轮前.md'))
 chk('E121-11a', ('| **第 121 轮**' not in LPp) and ('| **第 121 轮**' in LP),
     '清单：补丁前无 / 补丁后有「第 121 轮」零表行（两段式）')
 chk('E121-11b', ('| **C-85** |' not in LPp) and ('| **C-85** |' in LP),
@@ -137,7 +137,7 @@ chk('E121-12a', ('**撤回 / 更正** | **83 条**' in LPp) and ('**撤回 / 更
 chk('E121-12b', 'I-27' in LP and '第 99 轮后新登记的 I-23…I-27' in LP,
     'I 计数行已提及 I-27')
 
-HO = rd(os.path.join(BASE, '环境交接说明.md'))
+HO = rd(os.path.join(BASE, '环境说明.md'))
 chk('E121-13a', ('当前建议（第 121 轮后）' in HO) and ('（历史，第 120 轮后）' in HO),
     '交接说明 §七：新条目在顶 ＋ 第 120 轮条目降为历史')
 
@@ -149,7 +149,7 @@ LOG = rd(os.path.join(MEM, '2026-10-04.md'))
 chk('E121-13c', '第 121 轮' in LOG and '实验线' in LOG,
     '日志：含「第 121 轮 · 实验线」段')
 
-SK = rd(SKILL)
+SK = rd(工作流说明)
 chk('E121-14a', '117.' in SK and '第 121 轮' in SK,
     '技能：陷阱 117 ＋ §5.0 第 121 轮修定已入')
 

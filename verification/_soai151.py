@@ -17,7 +17,7 @@ import io, os, re, math
 BASE = os.path.dirname(os.path.abspath(__file__))
 ZH   = os.path.join(BASE, "论文_正式稿_v3.0.md")
 ZH_B = os.path.join(BASE, "论文_正式稿_v3.0_备份_2026-10-09第151轮前.md")
-Q    = os.path.join(BASE, "工程期望清单.md")
+Q    = os.path.join(BASE, "项目台账.md")
 
 B  = io.open(ZH,   encoding="utf-8").read()   # 当前稿
 BB = io.open(ZH_B, encoding="utf-8").read()   # 改前备份（状态类判据用这个）

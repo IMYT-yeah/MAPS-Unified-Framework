@@ -2,7 +2,7 @@
 """报告 md → 完整版 HTML（复用 P0-3 报告的金色 hero 样式）"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "P0-3b_环面kc精确化.md"
 OUT = BASE / "P0-3b_环面kc精确化.html"
 

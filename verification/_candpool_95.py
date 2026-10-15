@@ -22,7 +22,7 @@ def hdr(s): print("\n" + "=" * 100 + "\n" + s)
 ZH_BASE = "论文初稿_正反物质对风暴统一框架_v2.9"
 ZH_P = ZH_BASE + "_备份_2026-10-02第95轮前.md"   # 底本
 EN_P = "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-02第95轮前.md"
-LI_P = "工程期望清单_备份_2026-10-02第95轮前.md"
+LI_P = "项目台账_备份_2026-10-02第95轮前.md"
 print("[底本] 一律读 *_备份_2026-10-02第95轮前.md（当前稿状态见 _verify_95.py）")
 
 Z = io.open(ZH_P, encoding="utf-8").read()

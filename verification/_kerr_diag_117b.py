@@ -4,7 +4,7 @@
 以及 lnL(δ, φ0_true) 的半宽 = 1.23e-6（=1/(2ρ√<w²>) = Fisher）。
 """
 import io, os, numpy as np
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 src = io.open(os.path.join(BASE, 'outputs', '_emri_waveform.py'), encoding='utf-8').read()
 ns = {}
 exec(src[:src.index('print("="*78)')], ns)

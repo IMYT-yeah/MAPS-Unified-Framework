@@ -22,11 +22,11 @@ ZH = "论文初稿_正反物质对风暴统一框架_v2.9.md"
 ZHB = "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-02第93轮前.md"
 EN = "Paper_MatterAntimatterPairStorm_v2.9_EN.md"
 ENB = "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-02第93轮前.md"
-LI = "工程期望清单.md"
+LI = "项目台账.md"
 LD = "光速的意义_落差分解与超光速的结构性.md"
 LSB = "光速的意义_落差分解与超光速的结构性_备份_2026-10-02第93轮前.md"
 B3 = "B3_高阶PPN与指数度规.md"
-HH = "../环境交接说明.md"
+HH = "../环境说明.md"
 
 r = lambda p: io.open(p, encoding="utf-8").read()
 zh, zhb, en, enb, li, lsd, lsb, b3, hh = map(r, [ZH, ZHB, EN, ENB, LI, LD, LSB, B3, HH])

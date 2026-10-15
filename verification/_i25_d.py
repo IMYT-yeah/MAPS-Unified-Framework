@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """I-25 主结果（终版）：四个 f/h 组合的 S(e)，以及 kappa_rel(e) 的机制分解"""
 import sys
-sys.path.insert(0, r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34\outputs')
+sys.path.insert(0, r'[WORKSPACE]\outputs')
 from fractions import Fraction as F
 import _i25_b as M
 

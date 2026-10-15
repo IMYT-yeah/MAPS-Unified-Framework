@@ -16,7 +16,7 @@ import io, re
 ZH = "论文初稿_正反物质对风暴统一框架_v2.9.md"
 EN = "Paper_MatterAntimatterPairStorm_v2.9_EN.md"
 PRE = "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-02第88轮前.md"
-LIST = "工程期望清单.md"
+LIST = "项目台账.md"
 
 FAIL = 0
 def chk(tag, ok, msg):

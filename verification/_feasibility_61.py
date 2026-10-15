@@ -16,7 +16,7 @@ import re
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 ZH = os.path.join(BASE, "论文初稿_正反物质对风暴统一框架_v2.9.md")
-CL = os.path.join(BASE, "工程期望清单.md")
+CL = os.path.join(BASE, "项目台账.md")
 zh = io.open(ZH, encoding="utf-8").read()
 cl = io.open(CL, encoding="utf-8").read()
 

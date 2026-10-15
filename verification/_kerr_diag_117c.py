@@ -3,7 +3,7 @@
 用 _emri_ad_mcmc.py 自己的机器（inspiral/loglike_prof/sigma_halfwidth）复现其 step ①。
 """
 import io, os, numpy as np
-BASE = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+BASE = r'[WORKSPACE]'
 src = io.open(os.path.join(BASE, 'outputs', '_emri_ad_mcmc.py'), encoding='utf-8').read()
 cut = src.index('print("="*80)')
 ns = {}

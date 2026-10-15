@@ -12,7 +12,7 @@ def info(tag, name, val=''):
     print('[--]  %-5s %s %s' % (tag, name, val))
 
 B = open('论文_正式稿_v3.0.md', encoding='utf-8').read()
-Q = open('工程期望清单.md', encoding='utf-8').read()
+Q = open('项目台账.md', encoding='utf-8').read()
 MEM = open('../.workbuddy/memory/MEMORY.md', encoding='utf-8').read()
 
 print('=' * 88)

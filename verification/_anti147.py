@@ -13,7 +13,7 @@ def info(tag, name, val):
 B = open('论文_正式稿_v3.0.md', encoding='utf-8').read()
 A = open('论文_技术附录_轮次记录.md', encoding='utf-8').read()
 SRC = open('../初始资料/元宝对话_反物质与时间的哲学猜想/对话全文_完整版.md', encoding='utf-8').read()
-Q = open('工程期望清单.md', encoding='utf-8').read()
+Q = open('项目台账.md', encoding='utf-8').read()
 BB = open('论文_正式稿_v3.0_备份_2026-10-09第146轮前.md', encoding='utf-8').read()
 
 print('=' * 86)

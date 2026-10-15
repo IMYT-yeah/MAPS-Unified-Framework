@@ -2,7 +2,7 @@
 """报告 md → HTML（钳制物态微观推导报告）"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "钳制物态微观推导报告.md"
 OUT = BASE / "钳制物态微观推导报告.html"
 

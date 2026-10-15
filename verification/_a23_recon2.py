@@ -2,13 +2,13 @@
 """A23 侦查 2：定位 08-23 那个「普朗克常数」在现稿里是否还有对象；并核 ℏ 与 G 的辨识性线索"""
 import io, os
 
-BASE = r"C:\Users\Administrator\Desktop\2026-08-20-21-43-34"
+BASE = r"[WORKSPACE]"
 FILES = {
     "ZH论文": os.path.join(BASE, "outputs", "论文初稿_正反物质对风暴统一框架_v2.9.md"),
     "EN论文": os.path.join(BASE, "outputs", "Paper_MatterAntimatterPairStorm_v2.9_EN.md"),
-    "交接说明": os.path.join(BASE, "环境交接说明.md"),
-    "清单": os.path.join(BASE, "outputs", "工程期望清单.md"),
-    "技能SKILL": os.path.join(r"C:\Users\Administrator\.workbuddy\skills\maps-deduction-round", "SKILL.md"),
+    "交接说明": os.path.join(BASE, "环境说明.md"),
+    "清单": os.path.join(BASE, "outputs", "项目台账.md"),
+    "技能工作流说明": os.path.join(r"[WORKFLOW]", "工作流说明"),
 }
 KEYS = ["16\u03c0G\u00b2", "M\u00b2/A", "3.6\u00d710\u2075\u00b2", "3.6\u00d7 10\u2075\u00b2",
         "\u666e\u6717\u514b\u5e38\u6570", "Planck constant", "l_P\u00b2 = G\u210f/c\u00b3",

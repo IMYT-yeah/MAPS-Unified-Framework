@@ -30,8 +30,8 @@ def head(t):
     print("=" * 92)
 
 
-OUT = r"C:/Users/Administrator/Desktop/2026-08-20-21-43-34/outputs"
-PKG = r"C:/Users/Administrator/Desktop/2026-08-20-21-43-34/MAPS-Unified-Framework/python/maps"
+OUT = r"[WORKSPACE]/outputs"
+PKG = r"[REPO]/python/maps"
 
 
 def rd(p):

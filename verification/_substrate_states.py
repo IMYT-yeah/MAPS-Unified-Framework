@@ -6,7 +6,7 @@ ST 系列 —— 底层状态数枚举 + 隧穿与「超光速」同源
   (b) 量子隧穿与「超光速」是同一个公式 T = p^N，只是每步概率 p 不同；
   (c) 宏观粒子数多 ⟹ 整体隧穿概率 T^N ⟹ 0；高能量 ⟹ 反应次数多 ⟹ 聚变可能。
 只用标准库 math。运行：
-  C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe outputs/_substrate_states.py
+  [TOOLCHAIN]/binaries/python/versions/3.13.12/python.exe outputs/_substrate_states.py
 """
 import math as m
 

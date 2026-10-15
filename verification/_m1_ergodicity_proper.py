@@ -11,7 +11,7 @@ EG 系列 —— 复核 _m1_boltzmann.py 的「遍历性 0.00%」，并做真正
       · 遍历 ⟹ 离散度 ∝ 1/√n_t（随观测时间下降，各粒子时间平均趋同于系综平均）
       · 非遍历 ⟹ 离散度 = 常数（不随 n_t 下降）
 需要 numpy（venv 有 2.5.3）。运行：
-  C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe outputs/_m1_ergodicity_proper.py
+  [TOOLCHAIN]/binaries/python/envs/default/Scripts/python.exe outputs/_m1_ergodicity_proper.py
 """
 import math as m
 

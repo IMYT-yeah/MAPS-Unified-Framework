@@ -110,4 +110,4 @@
 
 ---
 
-*对比基准：`outputs/论文初稿_正反物质对风暴统一框架_v2.8.md`（799 行）+ A2/C1 报告；新包解压于 `D:\Users\IMYT.YT\WorkBuddy\_MAPS_explore\`。关键词统计由脚本完成，无人工估算。*
+*对比基准：`outputs/论文初稿_正反物质对风暴统一框架_v2.8.md`（799 行）+ A2/C1 报告；新包解压于 `[OLD_WORKSPACE]\_MAPS_explore\`。关键词统计由脚本完成，无人工估算。*

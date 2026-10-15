@@ -8,7 +8,7 @@
 import io, sys, re, collections
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-Q = open('工程期望清单.md', encoding='utf-8').read()
+Q = open('项目台账.md', encoding='utf-8').read()
 row = [l for l in Q.split('\n') if l.startswith('| **负面判定**')][0]
 
 # 逐条切分 N-xx

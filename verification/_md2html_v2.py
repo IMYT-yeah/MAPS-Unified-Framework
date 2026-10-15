@@ -2,7 +2,7 @@
 """将 论文初稿 md 转为完整版 HTML（复用旧 HTML 的 CSS 视觉框架）。"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "论文初稿_正反物质对风暴统一框架_v2.0.md"
 OLD_HTML = BASE / "论文初稿_正反物质对风暴统一框架.html"
 OUT = BASE / "论文初稿_正反物质对风暴统一框架_v2.0.html"

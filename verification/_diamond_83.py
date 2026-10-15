@@ -20,7 +20,7 @@ import io
 import os
 import sys
 
-BASE = "C:/Users/Administrator/Desktop/2026-08-20-21-43-34"
+BASE = "[WORKSPACE]"
 OUT = os.path.join(BASE, "outputs")
 HIST = os.path.join(BASE, "MAPS-Unified-Framework", "paper", "history")
 ZH = os.path.join(OUT, "论文初稿_正反物质对风暴统一框架_v2.9.md")

@@ -2,7 +2,7 @@
 """涌现 U(1) 连续极限与自旋 2 报告 md → HTML"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "Z2U1严格嵌入与4D自旋2.md"
 OUT = BASE / "Z2U1严格嵌入与4D自旋2.html"
 

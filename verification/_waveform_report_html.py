@@ -2,7 +2,7 @@
 """LISA LISA EMRI 3PN 检验提案 md → HTML"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "EMRI完整波形模板与Fisher精度.md"
 OUT = BASE / "EMRI完整波形模板与Fisher精度.html"
 

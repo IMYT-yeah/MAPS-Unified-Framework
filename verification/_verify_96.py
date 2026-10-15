@@ -5,10 +5,10 @@ import io, os, subprocess, sys
 base = os.path.dirname(os.path.abspath(__file__))
 B = lambda p: io.open(p, encoding="utf-8").read()
 
-LI = os.path.join(base, "工程期望清单.md")
-LI0 = os.path.join(base, "工程期望清单_备份_2026-10-02第96轮前.md")
-HH = os.path.join(base, "..", "环境交接说明.md")
-HH0 = os.path.join(base, "..", "环境交接说明_备份_2026-10-02第96轮前.md")
+LI = os.path.join(base, "项目台账.md")
+LI0 = os.path.join(base, "项目台账_备份_2026-10-02第96轮前.md")
+HH = os.path.join(base, "..", "环境说明.md")
+HH0 = os.path.join(base, "..", "环境说明_备份_2026-10-02第96轮前.md")
 LI_c, LI_p = B(LI), B(LI0)
 HH_c, HH_p = B(HH), B(HH0)
 

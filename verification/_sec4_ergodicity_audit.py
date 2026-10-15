@@ -7,7 +7,7 @@ EA 系列 —— §4.2 热平衡命题链与第 21 轮「置换模型」的兼�
             ⟹ 一个哈勃时只混合 ~47 μm。
 本轮问：这两件事**冲突吗**？遍历性的主体到底是谁？
 标准库：math / random。运行：
-  C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe outputs/_sec4_ergodicity_audit.py
+  [TOOLCHAIN]/binaries/python/versions/3.13.12/python.exe outputs/_sec4_ergodicity_audit.py
 """
 import math as m
 import random

@@ -99,11 +99,11 @@ print('=' * 92)
 print('F 组 · 判定所需的框架依据')
 print('=' * 92)
 chk('F-1', '第 60 轮的「缺势阱型构型差」在清单里',
-    '势阱型构型差' in open('工程期望清单.md', encoding='utf-8').read())
+    '势阱型构型差' in open('项目台账.md', encoding='utf-8').read())
 chk('F-2', '框架的「自旋」是自旋 2（引力模态），非磁自旋',
     '自旋 2' in PAPER)
 chk('F-3', 'N-21（化学键/相变潜热/电离能）已登记为同源障碍',
-    'N-21' in open('工程期望清单.md', encoding='utf-8').read())
+    'N-21' in open('项目台账.md', encoding='utf-8').read())
 
 print()
 print('通过 %d 项，失败 %d 项' % (sum(R), len(R) - sum(R)))

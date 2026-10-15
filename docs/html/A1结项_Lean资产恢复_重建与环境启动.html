@@ -133,7 +133,7 @@ hr{border:none;border-top:1.5px dashed var(--line);margin:38px 0}
 <strong>一句话：A1 的全部可恢复资产已恢复</strong> —— 五个工程文件（StormPoC.lean / lakefile / lean-toolchain /
 CI workflow / README）按恢复规格 + 日志重建（<strong>分级标注</strong>：含证明 21 条、sorry 2 条、待重写 23 条、
 设计登记 5 条）；本机 Lean 工具链<strong>正在恢复</strong>（zip 850.7MB，下载中）；
-⚠️ 顺带发现 <strong>RECOVERY.md 的丢失清单不完整</strong>（四份中旬报告未登记）。</p>
+⚠️ 顺带发现 <strong>资产说明 的丢失清单不完整</strong>（四份中旬报告未登记）。</p>
 </blockquote>
 <hr />
 <h2>一、侦察（本轮先做的四路取证，全部为负）</h2>
@@ -158,12 +158,12 @@ CI workflow / README）按恢复规格 + 日志重建（<strong>分级标注</st
 <td>❌ 无 remote（从未关联 GitHub；CI 通道从未实际运行过）</td>
 </tr>
 <tr>
-<td><strong>全盘文件系统</strong>（<code>C:\Users\Administrator</code>）</td>
+<td><strong>全盘文件系统</strong>（<code>[HOME]</code>）</td>
 <td>❌ 无 <code>StormPoC*</code> / <code>lakefile*</code> / <code>lean-toolchain</code> 残留</td>
 </tr>
 <tr>
-<td><strong>旧机</strong>（<code>D:\Users\IMYT.YT\...</code>）</td>
-<td>❌ 本机无 D 盘（09-16 已判定不可访问）</td>
+<td><strong>早期环境</strong>（<code>[OLD_HOME]\...</code>）</td>
+<td>❌ 本机无 早期环境（09-16 已判定不可访问）</td>
 </tr>
 </tbody>
 </table>
@@ -255,12 +255,12 @@ T2 等价形式）＋ A4 的 <code>simpa</code>/除法记法坑 —— 全部写
 <li><strong>剩余（2 步 + 迭代）</strong>：<code>lake update</code>（clone mathlib ~494MB）→ <code>lake exe cache get</code> →
   <code>lake build StormPoC</code> → 按报错修 API 名（历史 3 处已内建注释）→ 目标 <strong>8909 jobs 全绿</strong>。</li>
 </ul>
-<h2>四、⚠️ 顺带发现：RECOVERY.md 的丢失清单不完整</h2>
+<h2>四、⚠️ 顺带发现：资产说明 的丢失清单不完整</h2>
 <p><strong>第 4–7 行</strong>（本轮取证）：09-11/09-12 的<strong>四份专题报告</strong>——
 <code>黑洞宇宙条件_从巧合到必然.md</code>、<code>路线A_50比50到平坦性_解剖报告.md</code>、
 <code>攻λ_全息热力学与临界密度.md</code>、<code>做功项修正_λ的命运.md</code> ——
-<strong>也不在镜像中</strong>（它们在旧机 repo 的 <code>notes/</code>，09-16 重建时未入镜像），但<strong>未登记</strong>。
-⟹ 已补登记进 RECOVERY.md；其内容以 09-11/09-12 日志为<strong>最高现存凭证</strong>
+<strong>也不在镜像中</strong>（它们在早期环境 repo 的 <code>notes/</code>，09-16 重建时未入镜像），但<strong>未登记</strong>。
+⟹ 已补登记进 资产说明；其内容以 09-11/09-12 日志为<strong>最高现存凭证</strong>
 （BH/AR/LC/LW 的结论目标已随 StormPoC.lean 重建保留）。</p>
 <h2>五、诚实边界</h2>
 <ol>
@@ -295,14 +295,14 @@ T2 等价形式）＋ A4 的 <code>simpa</code>/除法记法坑 —— 全部写
 </tr>
 <tr>
 <td>附加</td>
-<td>RECOVERY.md 补登记（4 份报告）；README 更新为六步补全路线</td>
+<td>资产说明 补登记（4 份报告）；README 更新为六步补全路线</td>
 </tr>
 <tr>
 <td>⚠️ 教训一条</td>
 <td>「不可恢复」的评估（09-16）<strong>只扫了 outputs 镜像</strong>——<strong>未扫 .git 对象池</strong>（本轮扫了：无）。</td>
 </tr>
 <tr>
-<td>本轮凭证链：<strong>对象池 → git 历史 → remote → 全盘 → 旧机</strong>，五路全查后才定「只能重建」。</td>
+<td>本轮凭证链：<strong>对象池 → git 历史 → remote → 全盘 → 早期环境</strong>，五路全查后才定「只能重建」。</td>
 <td></td>
 </tr>
 </tbody>

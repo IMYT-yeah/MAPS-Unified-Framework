@@ -4,7 +4,7 @@ LaTeX 公式在生成阶段静态转换为 HTML 数学排版（分式/根号/上
 任何浏览器离线均可显示为人类语言公式。"""
 import re, markdown, pathlib
 
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "论文初稿_正反物质对风暴统一框架_v2.8.md"
 OUT = BASE / "论文初稿_正反物质对风暴统一框架_v2.8.html"
 

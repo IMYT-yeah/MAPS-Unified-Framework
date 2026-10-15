@@ -18,8 +18,8 @@ import io, os, re, math
 BASE = os.path.dirname(os.path.abspath(__file__))
 ZH   = os.path.join(BASE, "论文_正式稿_v3.0.md")
 ZH_B = os.path.join(BASE, "论文_正式稿_v3.0_备份_2026-10-09第151轮前.md")
-Q    = os.path.join(BASE, "工程期望清单.md")
-HAND = os.path.join(BASE, "..", "环境交接说明.md")
+Q    = os.path.join(BASE, "项目台账.md")
+HAND = os.path.join(BASE, "..", "环境说明.md")
 
 B  = io.open(ZH,   encoding="utf-8").read()
 BB = io.open(ZH_B, encoding="utf-8").read()

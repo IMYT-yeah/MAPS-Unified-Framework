@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re, markdown, pathlib
-BASE = pathlib.Path(r"D:/Users/IMYT.YT/WorkBuddy/2026-08-20-21-43-34/outputs")
+BASE = pathlib.Path(r"[OLD_WORKSPACE]/outputs")
 MD = BASE / "MAPS与v2.8融合方案_空间库并轨备忘录.md"
 OUT = BASE / "MAPS与v2.8融合方案_空间库并轨备忘录.html"
 text = MD.read_text(encoding="utf-8")

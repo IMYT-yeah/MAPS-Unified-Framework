@@ -10,6 +10,6 @@ python -m pytest python/stormetric -q      # 53 passed
 bash python/maps/run.sh                    # maps_framework.py (11 项) + verify.py (13 项)
 ```
 
-> ⚠️ 历史：`maps/` 的源文件曾于 **2026-09-16 随旧机丢失**。第 98 轮按恢复规格 ＋ 逐字片段重建
+> ⚠️ 历史：`maps/` 的源文件曾于 **2026-09-16 随早期环境丢失**。第 98 轮按恢复规格 ＋ 逐字片段重建
 > （**五路取证全部为负** ⟹ 只能重建；证据见 `outputs/A2结项_python_maps包恢复_T1-T5五锚点.md`）。
 > ⚠️ **「重建」不得写成「已恢复」**：数值判据已逐条对过项目既有记录，但原实现的函数名与打印格式不可复现。

@@ -22,7 +22,7 @@ sys.path.insert(0, BASE)
 import _tickgroup as tg
 
 ZH = os.path.join(BASE, "论文初稿_正反物质对风暴统一框架_v2.9.md")
-GL = os.path.join(BASE, "工程期望清单.md")
+GL = os.path.join(BASE, "项目台账.md")
 HIST = os.path.join(os.path.dirname(BASE), "MAPS-Unified-Framework", "paper", "history")
 PRE = os.path.join(HIST, "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-02第81轮前.md")
 

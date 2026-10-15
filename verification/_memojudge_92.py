@@ -41,7 +41,7 @@ def block_text(n):
 
 FILES = [p for p in glob.glob("*.md")
          if "_备份_" not in p and not p.startswith("论文初稿") and not p.startswith("Paper_")
-         and p != "工程期望清单.md" and not p.startswith("_")
+         and p != "项目台账.md" and not p.startswith("_")
          and "未完成研究工作流" not in p and "交接说明" not in p and "本轮推演总结" not in p]
 OWN = {}
 for p in FILES:

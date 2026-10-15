@@ -22,9 +22,9 @@ ZH = "论文初稿_正反物质对风暴统一框架_v2.9.md"
 ZHB = "论文初稿_正反物质对风暴统一框架_v2.9_备份_2026-10-02第94轮前.md"
 EN = "Paper_MatterAntimatterPairStorm_v2.9_EN.md"
 ENB = "Paper_MatterAntimatterPairStorm_v2.9_EN_备份_2026-10-02第94轮前.md"
-LI = "工程期望清单.md"
-LIB = "工程期望清单_备份_2026-10-02第94轮前.md"
-HH = "../环境交接说明.md"
+LI = "项目台账.md"
+LIB = "项目台账_备份_2026-10-02第94轮前.md"
+HH = "../环境说明.md"
 
 r = lambda p: io.open(p, encoding="utf-8").read()
 zh, zhb, en, enb, li, lib, hh = map(r, [ZH, ZHB, EN, ENB, LI, LIB, HH])

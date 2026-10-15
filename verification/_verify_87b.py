@@ -18,7 +18,7 @@ def hdr(t):
 ZH   = "论文初稿_正反物质对风暴统一框架_v2.9.md"
 EN   = "Paper_MatterAntimatterPairStorm_v2.9_EN.md"
 MEMO = "h_min标度律的分组重拟合_两条方向相反的幂律与干净底本.md"
-LIST = "工程期望清单.md"
+LIST = "项目台账.md"
 MEM  = r"../.workbuddy/memory/MEMORY.md"
 
 zh = io.open(ZH, encoding="utf-8").read()

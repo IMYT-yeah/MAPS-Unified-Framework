@@ -6,13 +6,13 @@ import io, os, re
 from mpmath import mp, mpf
 
 mp.dps = 30
-B   = r'C:\Users\Administrator\Desktop\2026-08-20-21-43-34'
+B   = r'[WORKSPACE]'
 DIR = os.path.join(B, '初始资料', '元宝对话_反物质与时间的哲学猜想', '检索批次')
 P_ZH   = os.path.join(B, 'outputs', '论文初稿_正反物质对风暴统一框架_v2.9.md')
-P_LP   = os.path.join(B, 'outputs', '工程期望清单.md')
+P_LP   = os.path.join(B, 'outputs', '项目台账.md')
 P_TZ   = os.path.join(B, 'outputs', '起点对话研究方向检索台账.md')
 P_MEMO = os.path.join(B, 'outputs', '候选5判定_1-3债务谱系_同源误并与生日式检验.md')
-P_HO   = os.path.join(B, '环境交接说明.md')
+P_HO   = os.path.join(B, '环境说明.md')
 P_LOG  = os.path.join(B, '.workbuddy', 'memory', '2026-10-05.md')
 P_MEM  = os.path.join(B, '.workbuddy', 'memory', 'MEMORY.md')
 

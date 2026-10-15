@@ -7,7 +7,7 @@ PM 系列 —— 「配对」的机制：湮灭 = 相邻格点的置换（对换
   · 真空态永不出现（测度 0）          ⟹ C-4 化解
   · 状态图案每 tick 平移一格          ⟹ c = l_P/t_P
 标准库：math / random。运行：
-  C:/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12/python.exe outputs/_pairing_permutation.py
+  [TOOLCHAIN]/binaries/python/versions/3.13.12/python.exe outputs/_pairing_permutation.py
 """
 import math as m
 import random
